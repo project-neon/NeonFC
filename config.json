@@ -1,0 +1,13 @@
+{
+    "network" : {
+        "multicast_ip": "224.5.23.2",
+        "host_ip": "localhost",
+        "blue_port": 30011,
+        "yellow_port": 30012,
+        "vision_port": 10020,
+        "command_port": 20011
+    },
+    "match" : {
+        "robots": 5
+    }
+}
