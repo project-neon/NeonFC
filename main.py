@@ -26,6 +26,17 @@ class Game():
 
     def update(self):
         frame = vision.assign_empty_values(self.vision.frame)
+        # print([a for a in frame.get('robotsBlue') if a['robotId'] == 0])
+        self.comm.send(
+            [
+                {
+                    'robot_id': 0,
+                    'wheel_left': 20,
+                    'wheel_right': 20,
+                    'color': 'blue'
+                }
+            ]
+        )
 
 
 

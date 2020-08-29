@@ -2,9 +2,12 @@ import socket
 import struct
 
 import json
+import time
+import math
 
 import threading
 
+from collections import deque
 from utils import get_config
 
 from google.protobuf.json_format import MessageToJson
@@ -22,8 +25,20 @@ class FiraVision(threading.Thread):
         self.vision_port = self.config['network']['vision_port']
         self.host = self.config['network']['multicast_ip']
 
+        self._fps = 0
+        self._frame_times = deque(maxlen=60)
+
     def assign_vision(self, game):
         self.game = game
+
+    def set_fps(self):
+        self._frame_times.append(time.time())
+        if len(self._frame_times) <= 3:
+            return
+        fps_frame_by_frame = [
+            (v - i) for i, v in zip(self._frame_times, list(self._frame_times)[1:])
+        ]
+        self._fps = len(fps_frame_by_frame)/sum(fps_frame_by_frame)
 
     def run(self):
         print("Starting vision...")
@@ -34,6 +49,7 @@ class FiraVision(threading.Thread):
         while True:
             env = packet_pb2.Environment()
             data = self.vision_sock.recv(1024)
+            self.set_fps()
             env.ParseFromString(data)
             self.frame = json.loads(MessageToJson(env))
             self.game.update()
@@ -73,6 +89,7 @@ class FiraVision(threading.Thread):
 
 def assign_empty_values(raw_frame):
     frame = raw_frame.get('frame')
+    
     if frame.get('ball'):
         frame['ball']['x'] = frame['ball'].get('x', 0)
         frame['ball']['y'] = frame['ball'].get('y', 0)
