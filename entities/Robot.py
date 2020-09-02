@@ -1,3 +1,6 @@
+import math
+import numpy as np
+
 from collections import deque
 
 def speed(_list, _fps):
@@ -12,7 +15,26 @@ def speed(_list, _fps):
         )
     ]
 
-    return _fps * (sum(speed_fbf)/len(speed_fbf)) 
+    return _fps * (sum(speed_fbf)/len(speed_fbf))
+
+def unit_vector(vector):
+    """ Returns the unit vector of the vector."""
+    return vector / np.linalg.norm(vector)
+
+def angle_between(v1, v2):
+    """Finds angle between two vectors"""
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+
+def rotate(vector, theta):
+    angle = angle_between(vector, (1, 0))
+    return np.array(
+        [
+            math.cos(angle + theta), 
+            math.sin(angle + theta)
+        ]
+    )
 
 
 class Robot(object):
@@ -60,9 +82,27 @@ class Robot(object):
         # print(self.get_name(), '= speeds: vx: {:.4f} m/s :: vy: {:.4f} m/s :: vt: {:.2f} RAD/s'.format(self.vx, self.vy, self.vtheta))
 
 
+    def _get_differential_robot_speeds(self, vx, vy, theta):
+        '''
+        Entradas: velocidades no eixo X, Y
+        Saidas: velocidades linear, angular
+        '''
+        speed_vector = np.array([vx, vy])
+
+        speed_norm = np.linalg.norm(speed_vector)
+
+        robot_world_speed = rotate(speed_vector, -theta)
+
+        vl = robot_world_speed[0] * speed_norm
+
+        va = -angle_between(robot_world_speed, (1, 0)) * speed_norm
+
+        return vl, va
+        
+
     def decide(self):
         # mocado, for a while :)
-        power_left, power_right = 40, 40
+        power_left, power_right = 20, 20
 
         return self._get_command(power_left, power_right)
 
