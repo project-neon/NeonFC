@@ -1,5 +1,6 @@
 import comm
 import vision
+import entities
 
 import concurrent.futures
 
@@ -14,7 +15,9 @@ class Game():
 
         self.vision.start()
         self.comm.start()
-        
+
+        self.test_subject = entities.Robot(self, 0, 'blue')
+        self.ball = entities.Ball(self)
     
     def run(self):
         '''
@@ -27,15 +30,14 @@ class Game():
     def update(self):
         frame = vision.assign_empty_values(self.vision.frame)
         # print([a for a in frame.get('robotsBlue') if a['robotId'] == 0])
+
+        self.ball.update(frame)
+        self.test_subject.update(frame)
+        
+        subject_command = self.test_subject.decide()
+
         self.comm.send(
-            [
-                {
-                    'robot_id': 0,
-                    'wheel_left': 20,
-                    'wheel_right': 20,
-                    'color': 'blue'
-                }
-            ]
+            [subject_command]
         )
 
 

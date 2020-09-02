@@ -40,6 +40,8 @@ class FiraVision(threading.Thread):
         ]
         self._fps = len(fps_frame_by_frame)/sum(fps_frame_by_frame)
 
+        print(self._fps)
+
     def run(self):
         print("Starting vision...")
         self.vision_sock = self._create_socket()
