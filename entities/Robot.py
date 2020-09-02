@@ -3,6 +3,8 @@ import numpy as np
 
 from collections import deque
 
+from scipy.ndimage.interpolation import rotate
+
 def speed(_list, _fps):
     if len(_list) <= 1:
         return 0
@@ -27,14 +29,14 @@ def angle_between(v1, v2):
     v2_u = unit_vector(v2)
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
-def rotate(vector, theta):
-    angle = angle_between(vector, (1, 0))
-    return np.array(
-        [
-            math.cos(angle + theta), 
-            math.sin(angle + theta)
-        ]
-    )
+def rotate_via_numpy(xy, radians):
+    """Use numpy to build a rotation matrix and take the dot product."""
+    x, y = xy
+    c, s = np.cos(radians), np.sin(radians)
+    j = np.matrix([[c, s], [-s, c]])
+    m = np.dot(j, [x, y])
+
+    return float(m.T[0]), float(m.T[1])
 
 
 class Robot(object):
@@ -75,6 +77,8 @@ class Robot(object):
         self._frames['y'].append(self.current_data['y'])
         self._frames['theta'].append(self.current_data['orientation'])
 
+    
+        self.theta = self.current_data['orientation']
         self.vx = speed(self._frames['x'], self.game.vision._fps)
         self.vy = speed(self._frames['y'], self.game.vision._fps)
         self.vtheta = speed(self._frames['theta'], self.game.vision._fps)
@@ -90,8 +94,7 @@ class Robot(object):
         speed_vector = np.array([vx, vy])
 
         speed_norm = np.linalg.norm(speed_vector)
-
-        robot_world_speed = rotate(speed_vector, -theta)
+        robot_world_speed = rotate_via_numpy(speed_vector, theta)
 
         vl = robot_world_speed[0] * speed_norm
 
@@ -102,7 +105,9 @@ class Robot(object):
 
     def decide(self):
         # mocado, for a while :)
-        power_left, power_right = 20, 20
+        power_left, power_right = 80, 50
+
+        self._get_differential_robot_speeds(self.vx, self.vy, self.theta)
 
         return self._get_command(power_left, power_right)
 
