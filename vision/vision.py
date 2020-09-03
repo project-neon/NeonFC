@@ -8,7 +8,7 @@ import math
 import threading
 
 from collections import deque
-from utils import get_config
+from commons.utils import get_config
 
 from google.protobuf.json_format import MessageToJson
 

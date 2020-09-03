@@ -4,8 +4,12 @@ import entities
 
 import concurrent.futures
 
+from commons.utils import get_config
+
 class Game():
     def __init__(self):
+        self.config = get_config()
+
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
         self.start()

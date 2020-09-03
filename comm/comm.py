@@ -1,6 +1,6 @@
 import socket
 
-from utils import get_config
+from commons.utils import get_config
 
 from protocols import command_pb2, packet_pb2
 
