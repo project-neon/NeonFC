@@ -5,12 +5,27 @@ from collections import deque
 
 from scipy.ndimage.interpolation import rotate
 
-def speed(_list, _fps):
+def is_left(c, a=(0, 0), b=(1, 0)):
+     return 1 if ((b[0] - a[0])*(c[1] - a[1]) - (b[1] - a[1])*(c[0] - a[0])) > 0 else - 1
+
+    
+def _fix_angle(theta_1, theta_2):
+    rate_theta = (theta_2 - theta_1)
+  
+    if (rate_theta > math.pi ):
+        rate_theta -= 2 * math.pi
+    elif (rate_theta < -math.pi):
+        rate_theta += 2 * math.pi
+
+    return rate_theta
+
+
+def angular_speed(_list, _fps):
     if len(_list) <= 1:
         return 0
     
     speed_fbf = [
-        (v - i) for i, v 
+        _fix_angle(t0, t1) for t0, t1 
         in zip(
             _list, 
             list(_list)[1:]
@@ -19,15 +34,34 @@ def speed(_list, _fps):
 
     return _fps * (sum(speed_fbf)/len(speed_fbf))
 
+
+def speed(_list, _fps):
+    if len(_list) <= 1:
+        return 0
+    
+    speed_fbf = [
+        (t1 - t0) for t0, t1 
+        in zip(
+            _list, 
+            list(_list)[1:]
+        )
+    ]
+
+    return _fps * (sum(speed_fbf)/len(speed_fbf))
+
+
 def unit_vector(vector):
     """ Returns the unit vector of the vector."""
+    if np.linalg.norm(vector) == 0:
+        return np.array([0, 0])
     return vector / np.linalg.norm(vector)
 
 def angle_between(v1, v2):
     """Finds angle between two vectors"""
     v1_u = unit_vector(v1)
     v2_u = unit_vector(v2)
-    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)) * is_left(v1)
 
 def rotate_via_numpy(xy, radians):
     """Use numpy to build a rotation matrix and take the dot product."""
@@ -81,7 +115,7 @@ class Robot(object):
         self.theta = self.current_data['orientation']
         self.vx = speed(self._frames['x'], self.game.vision._fps)
         self.vy = speed(self._frames['y'], self.game.vision._fps)
-        self.vtheta = speed(self._frames['theta'], self.game.vision._fps)
+        self.vtheta = angular_speed(self._frames['theta'], self.game.vision._fps)
 
         # print(self.get_name(), '= speeds: vx: {:.4f} m/s :: vy: {:.4f} m/s :: vt: {:.2f} RAD/s'.format(self.vx, self.vy, self.vtheta))
 
@@ -94,18 +128,19 @@ class Robot(object):
         speed_vector = np.array([vx, vy])
 
         speed_norm = np.linalg.norm(speed_vector)
+
         robot_world_speed = rotate_via_numpy(speed_vector, theta)
 
         vl = robot_world_speed[0] * speed_norm
 
-        va = -angle_between(robot_world_speed, (1, 0)) * speed_norm
-
+        va = self.vtheta
+        
         return vl, va
         
 
     def decide(self):
         # mocado, for a while :)
-        power_left, power_right = 80, 50
+        power_left, power_right = 2, -2
 
         self._get_differential_robot_speeds(self.vx, self.vy, self.theta)
 
