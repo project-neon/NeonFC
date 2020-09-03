@@ -58,4 +58,4 @@ No ```config.json```:
 
 Esse repositorio é desenvolvido pela equipe Project Neon, mas sinta livre para Forkar!
 
-Manual de desenvolvimento ainda esta WIP mas as documentação irá ser construida [aqui](wiki)
+Manual de desenvolvimento ainda esta WIP mas as documentação irá ser construida [aqui](https://github.com/project-neon/NeonFC/wiki)
