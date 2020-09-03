@@ -30,7 +30,11 @@ python -r requirements.txt
 
 2.1. Antes de executar, é importante checar o arquivo de configuração para verificar se as portas e endereços de rede estão compativeis com o software de simulação.
 
+No FiraSIM:
+
 ![Aba de Comunicação do FIRASim](readme/FiraSIM-comtab.png "Aba de Comunicação do FIRASim")
+
+No ```config.json```:
 
 ```json
 {
