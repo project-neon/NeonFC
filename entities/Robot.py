@@ -74,7 +74,7 @@ class Robot(object):
 
     def decide(self):
         # mocado, for a while :)
-        power_left, power_right = 2, -2
+        power_left, power_right = 10, 20
 
         self._get_differential_robot_speeds(self.vx, self.vy, self.theta)
 
