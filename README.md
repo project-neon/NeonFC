@@ -1,27 +1,27 @@
 # NeonFC - Neon Futebol Clube
 
-### Software de estrategia da Equipe Project Neon
+### Software de estratégia
 
-Software desenvolvido inicialmente para LARC 2020 na sua modalidade online
+Software desenvolvido para LARC 2020 para o VSSS online.
 
 ### Instalação
 
-#### Para usar o NeonFC você irá precisar ter instalado em sua maquina:
+#### Para usar o NeonFC você irá precisar ter instalado em sua máquina:
 
 - Python >=3.7.x
 - PiPy
 - Google protobuf
 
-Além de uma interface que irá fazer enviar os dados do campo atualmente [FIRASim](https://github.com/fira-simurosot/FIRASim) é suportado.
+Além de uma interface que irá enviar os dados do campo. Atualmente o [FIRASim](https://github.com/fira-simurosot/FIRASim) é suportado.
 
 #### passo-a-passo da instalação:
 
-1. Clonar o repositorio
+1. Clonar o repositório
 ```bash
 git clone https://github.com/project-neon/NeonFC.git
 ```
 
-2. Instalar dependencias usando pipy:
+2. Instalar dependências usando pipy:
 
 ```bash
 cd NeonFC
@@ -52,10 +52,10 @@ No ```config.json```:
 }
 ```
 
-3. Agora basta rodar ```Python main.py```
+3. Agora é só rodar ```Python main.py```
 
 ### Desenvolvimento
 
-Esse repositorio é desenvolvido pela equipe Project Neon, mas sinta livre para Forkar!
+Esse repositório é desenvolvido pela equipe Project Neon, mas sinta-se livre para Forkar!
 
 Manual de desenvolvimento ainda esta WIP mas as documentação irá ser construida [aqui](https://github.com/project-neon/NeonFC/wiki).
