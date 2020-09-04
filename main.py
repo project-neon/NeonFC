@@ -20,10 +20,10 @@ class Game():
     def start(self):
         self.vision.assign_vision(self)
 
+        self.match.start()
+
         self.vision.start()
         self.comm.start()
-
-        self.match.start()
 
     def update(self):
         frame = vision.assign_empty_values(self.vision.frame)

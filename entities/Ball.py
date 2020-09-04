@@ -40,5 +40,8 @@ class Ball(object):
         self._frames['x'].append(self.current_data['x'])
         self._frames['y'].append(self.current_data['y'])
 
+        self.x = self.current_data['x']
+        self.y = self.current_data['y']
+
         self.vx = speed(self._frames['x'], self.game.vision._fps)
         self.vy = speed(self._frames['y'], self.game.vision._fps)

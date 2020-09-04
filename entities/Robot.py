@@ -4,6 +4,8 @@ import numpy as np
 from collections import deque
 from scipy.ndimage.interpolation import rotate
 
+import controller
+
 from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
 
 class Robot(object):
@@ -13,6 +15,14 @@ class Robot(object):
         self.robot_id = robot_id
         self.team_color = team_color
         self.current_data = {}
+
+        self.dimensions = {
+            'L': 0.075,
+            'R': 0.02
+        }
+
+        self.controller = controller.SimpleLQR(self)
+        self.power_left, self.power_right = 0, 0
 
         self._frames = {
             'x': deque(maxlen=10),
@@ -47,11 +57,14 @@ class Robot(object):
     
         self.theta = self.current_data['orientation']
 
+        self.x = self.current_data['x']
+        self.y = self.current_data['y']
+
         self.vx = speed(self._frames['x'], self.game.vision._fps)
         self.vy = speed(self._frames['y'], self.game.vision._fps)
         self.vtheta = angular_speed(self._frames['theta'], self.game.vision._fps)
 
-        # print(self.get_name(), '= speeds: vx: {:.4f} m/s :: vy: {:.4f} m/s :: vt: {:.2f} RAD/s'.format(self.vx, self.vy, self.vtheta))
+        print(self.get_name(), '= speeds: vx: {:.4f} m/s :: vy: {:.4f} m/s :: vt: {:.2f} RAD/s'.format(self.vx, self.vy, self.vtheta))
 
 
     def _get_differential_robot_speeds(self, vx, vy, theta):
@@ -60,9 +73,7 @@ class Robot(object):
         Saidas: velocidades linear, angular
         '''
         speed_vector = np.array([vx, vy])
-
         speed_norm = np.linalg.norm(speed_vector)
-
         robot_world_speed = rotate_via_numpy(speed_vector, theta)
 
         vl = robot_world_speed[0] * speed_norm
@@ -73,12 +84,13 @@ class Robot(object):
         
 
     def decide(self):
-        # mocado, for a while :)
-        power_left, power_right = 10, 20
+        desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) * 3000
 
-        self._get_differential_robot_speeds(self.vx, self.vy, self.theta)
+        self.controller.set_desired(desired)
 
-        return self._get_command(power_left, power_right)
+        self.power_left, self.power_right = self.controller.update()
+       
+        return self._get_command(self.power_left, self.power_right)
 
 
     def _get_command(self, pl, pr):
