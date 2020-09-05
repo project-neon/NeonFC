@@ -1,4 +1,5 @@
 import math
+import logging
 import numpy as np
 
 from collections import deque
@@ -15,6 +16,14 @@ class Robot(object):
         self.robot_id = robot_id
         self.team_color = team_color
         self.current_data = {}
+
+        self.log = logging.getLogger(self.get_name())
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+
+        formatter = logging.Formatter('\033[1m|%(levelname)s|%(name)s|%(message)s\033[1m')
+        ch.setFormatter(formatter)
+        self.log.addHandler(ch)
 
         self.dimensions = {
             'L': 0.075,
@@ -43,8 +52,8 @@ class Robot(object):
         if len(robot_data) >= 1:
             self.current_data = robot_data[0]
         else:
-            print('## CAUTION: robo não encontrado')
-            raise ValueError('## CAUTION: robo não encontrado')
+            self.log.warn('Robo [{}] não encontrado, pode estar desligado!'.format(self.get_name()))
+            return
             
         
         self._update_speeds()
