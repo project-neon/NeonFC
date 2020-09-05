@@ -15,6 +15,7 @@ class Game():
 
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
+        
         self.start()
 
     def start(self):

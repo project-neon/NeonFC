@@ -64,7 +64,7 @@ class Robot(object):
         self.vy = speed(self._frames['y'], self.game.vision._fps)
         self.vtheta = angular_speed(self._frames['theta'], self.game.vision._fps)
 
-        print(self.get_name(), '= speeds: vx: {:.4f} m/s :: vy: {:.4f} m/s :: vt: {:.2f} RAD/s'.format(self.vx, self.vy, self.vtheta))
+        # print(self.get_name(), '= speeds: vx: {:.4f} m/s :: vy: {:.4f} m/s :: vt: {:.2f} RAD/s'.format(self.vx, self.vy, self.vtheta))
 
 
     def _get_differential_robot_speeds(self, vx, vy, theta):
