@@ -1,4 +1,5 @@
 import entities
+import algorithims
 
 from concurrent import futures
 
@@ -22,6 +23,7 @@ class Match(object):
             entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
         ]
 
+        self.field = algorithims.DiscreteField()
 
     def update(self, frame):
         self.ball.update(frame)
@@ -31,6 +33,14 @@ class Match(object):
         
         for entity in self.robots:
             entity.update(frame)
+        
+        self.field.update(
+            avoiances=[
+                {"x": r.x, "y": r.y, "radius": int(r.dimensions['L']/2)} for r in self.robots
+            ]
+        )
+
+
         
     def decide(self):
         commands = []

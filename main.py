@@ -28,12 +28,9 @@ class Game():
 
     def update(self):
         frame = vision.assign_empty_values(self.vision.frame)
-        # print([a for a in frame.get('robotsBlue') if a['robotId'] == 0])
         
         self.match.update(frame)
-        # self.ball.update(frame)
-        # self.test_subject.update(frame)
-        
+
         subject_command = self.match.decide()
 
         self.comm.send(subject_command)
