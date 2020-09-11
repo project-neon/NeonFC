@@ -49,10 +49,6 @@ class DiscreteField(object):
             x, y, radius = obstacle['x'], obstacle['y'], obstacle.get('radius', 0)
             self._paint_forbidden(x, y, radius)
 
-        for i in range(len(self.matrix)):
-            for j in range(len(self.matrix[0])):
-                print(self.matrix[i][j], end='')
-
     def _paint_forbidden(self, x, y, radius):
         x, y = self._fm(x, y)
         radius = int(radius/self.resolution)

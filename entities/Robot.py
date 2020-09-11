@@ -6,6 +6,8 @@ from collections import deque
 from scipy.ndimage.interpolation import rotate
 
 import controller
+import algorithims
+
 
 from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
 
@@ -16,6 +18,9 @@ class Robot(object):
         self.robot_id = robot_id
         self.team_color = team_color
         self.current_data = {}
+
+        self.astar = algorithims.AStar()
+
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()
@@ -54,8 +59,7 @@ class Robot(object):
         else:
             self.log.warn('Robo [{}] não encontrado, pode estar desligado!'.format(self.get_name()))
             return
-            
-        
+
         self._update_speeds()
 
     def _update_speeds(self):
@@ -93,7 +97,23 @@ class Robot(object):
         
 
     def decide(self):
-        desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) * 3000
+        self.astar.update_field(
+            obstacles=[
+                {
+                    "x": r.x, 
+                    "y": r.y
+                } for r in self.game.match.opposites + self.game.match.robots if not (r.team_color == self.team_color and r.robot_id == self.robot_id)
+            ]
+        )
+
+        self.astar.calculate_when(
+            (self.x, self.y),
+            (self.game.match.ball.x, self.game.match.ball.y),
+            timespan = 10
+        )
+
+        objective = self.astar.next_node(self.x, self.y)
+        desired = unit_vector([(objective[0] - self.x), (objective[1] - self.y)]) * 3000
 
         self.controller.set_desired(desired)
 
