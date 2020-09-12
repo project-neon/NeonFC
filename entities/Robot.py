@@ -8,6 +8,7 @@ from scipy.ndimage.interpolation import rotate
 import controller
 import algorithims
 
+import strategy
 
 from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
 
@@ -19,8 +20,7 @@ class Robot(object):
         self.team_color = team_color
         self.current_data = {}
 
-        self.astar = algorithims.AStar()
-
+        self.strategy = strategy.tests.FollowBall(game.match)
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()
@@ -45,6 +45,8 @@ class Robot(object):
         }
 
         self.vx, self.vy, self.vtheta = 0, 0, 0
+
+        self.strategy.start(self)
     
     def get_name(self):
         return 'ROBOT_{}_{}'.format(self.robot_id, self.team_color)
@@ -97,24 +99,7 @@ class Robot(object):
         
 
     def decide(self):
-        self.astar.update_field(
-            obstacles=[
-                {
-                    "x": r.x, 
-                    "y": r.y
-                } for r in self.game.match.opposites + self.game.match.robots if not (r.team_color == self.team_color and r.robot_id == self.robot_id)
-            ]
-        )
-
-        self.astar.calculate_when(
-            (self.x, self.y),
-            (self.game.match.ball.x, self.game.match.ball.y),
-            timespan = 0.1
-        )
-
-        objective = self.astar.next_node(self.x, self.y)
-        desired = unit_vector([(objective[0] - self.x), (objective[1] - self.y)]) * 3000
-
+        desired = self.strategy.decide()
 
         self.controller.set_desired(desired)
 
