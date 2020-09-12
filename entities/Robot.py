@@ -109,11 +109,12 @@ class Robot(object):
         self.astar.calculate_when(
             (self.x, self.y),
             (self.game.match.ball.x, self.game.match.ball.y),
-            timespan = 10
+            timespan = 0.1
         )
 
         objective = self.astar.next_node(self.x, self.y)
         desired = unit_vector([(objective[0] - self.x), (objective[1] - self.y)]) * 3000
+
 
         self.controller.set_desired(desired)
 

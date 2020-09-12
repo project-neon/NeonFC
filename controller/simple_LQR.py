@@ -2,7 +2,7 @@ import math
 import numpy as np
 
 class SimpleLQR(object):
-    def __init__(self, robot, l=0.5):
+    def __init__(self, robot, l=0.20):
         self.desired = np.array([0, 0])
         self.robot = robot
 

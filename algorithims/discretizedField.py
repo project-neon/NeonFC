@@ -52,18 +52,20 @@ class DiscreteField(object):
     def _paint_forbidden(self, x, y, radius):
         x, y = self._fm(x, y)
         radius = int(radius/self.resolution)
+        # TODO caso o robo não esteja dentro do grid que representa
+        # o campo, talvez seja bom logar uma mensagem de erro
+        if x < self.cells_w and y < self.cells_h:
+            self.matrix[x][y] = 1
 
-        self.matrix[x][y] = 1
+            for i in range(x - radius, x + radius):
+                for j in range(y - radius, y + radius):
+                    # caso onde sai do campo
+                    if x < 0 or y < 0 or x >= self.cells_h or y >= self.cells_w:
+                        continue
 
-        for i in range(x - radius, x + radius):
-            for j in range(y - radius, y + radius):
-                # caso onde sai do campo
-                if x < 0 or y < 0 or x >= self.cells_h or y >= self.cells_w:
-                    continue
-
-                # fora do raio
-                if math.sqrt( math.pow((x - i), 2) + math.pow((y - j), 2)) <= radius:
-                    self.matrix[i][j] = 1
+                    # fora do raio
+                    if math.sqrt( math.pow((x - i), 2) + math.pow((y - j), 2)) <= radius:
+                        self.matrix[i][j] = 1
 
 
 if __name__ == "__main__":
