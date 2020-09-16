@@ -1,0 +1,1 @@
+from strategy.tests.astarFollowBall import FollowBall

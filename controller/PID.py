@@ -10,6 +10,7 @@ class PID(object):
         self.ki = ki
 
         self.last_error = 0
+        self.integral = 0
 
     def set_desired_PID(self, speed):
         self.desired_PID = speed
@@ -21,9 +22,9 @@ class PID(object):
 
         derivative = (error - self.last_error)/dt
 
-        integral = integral + error * dt
+        self.integral = self.integral + error * dt
 
-        output = self.kp * error + self.kd * derivative + self.ki * integral
+        output = self.kp * error + self.kd * derivative + self.ki * self.integral
 
         self.last_error = error
 
@@ -40,21 +41,34 @@ class Robot_PID(object):
         self.desired = np.array([0,0])
 
         self.linear_pid = PID(1,0,0)
-        self.angular_pid = PID(1,0,0)
+        self.angular_pid = PID(0,0,0)
+
+        self.power_left , self.power_right = 0, 0
 
     def update(self):
         linear_speed, angular_speed = self.robot._get_differential_robot_speeds(self.robot.vx, self.robot.vy, self.robot.theta)
-        linear_desired, angular_desired = self.robot._get_desired_differential_robot_speeds(self.desired[0],self.desired[1], self.robot.theta)
+        linear_speed, angular_speed = linear_speed * 100, angular_speed * 100
+        #linear_desired, angular_desired = self.robot._get_desired_differential_robot_speeds(self.desired[0],self.desired[1], self.robot.theta)
+        linear_desired, angular_desired = 0.2, 0
+        linear_desired, angular_desired =  linear_desired * 100, angular_desired * 100
+
         vl, va = self.update_Speed(linear_desired,angular_desired,linear_speed, angular_speed)
 
         acc_left  = vl + va
-        acc_right = vl - vl
+        acc_right = vl - va
+        if self.robot.robot_id == 0:
+            print('###########', linear_speed, angular_speed)
+        if self.game.vision._fps != 0:
+            self.power_left = self.power_left + acc_left * (1/self.game.vision._fps)
+            self.power_right = self.power_right + acc_right * (1/self.game.vision._fps)
 
-        power_left = power_left + acc_left * (1/self.game._fps)
-        power_right = power_right + acc_right * (1/self.game._fps)
+            self.power_left = min(300, max(self.power_left, -300))
+            self.power_right = min(300, max(self.power_right, -300))
 
-        return power_left , power_right
+            return self.power_left , self.power_right
 
+        
+        return 0, 0
 
 
     def set_desired(self, vector):
@@ -70,7 +84,9 @@ class Robot_PID(object):
         self.linear_pid.set_desired_PID(linear_desired)
         self.angular_pid.set_desired_PID(angular_desired)
 
-        vl = self.linear_pid.update_PID(now_linear,self.game._fps)
-        va = self.angular_pid.update_PID(now_angular,self.game._fps)
+        vl, va = 0, 0
+        if self.game.vision._fps != 0:
+            vl = self.linear_pid.update_PID(now_linear, self.game.vision._fps)
+            va = self.angular_pid.update_PID(now_angular, self.game.vision._fps)
 
         return vl, va
