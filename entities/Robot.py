@@ -30,7 +30,7 @@ class Robot(object):
             'R': 0.02
         }
 
-        self.controller = controller.SimpleLQR(self)
+        self.controller = controller.Robot_PID(self)
         self.power_left, self.power_right = 0, 0
 
         self._frames = {
@@ -74,6 +74,30 @@ class Robot(object):
         self.vtheta = angular_speed(self._frames['theta'], self.game.vision._fps)
 
         # print(self.get_name(), '= speeds: vx: {:.4f} m/s :: vy: {:.4f} m/s :: vt: {:.2f} RAD/s'.format(self.vx, self.vy, self.vtheta))
+
+
+    def _get_desired_differential_robot_speeds(self, vx, vy, theta)
+        '''
+        Entradas: velocidades no eixo X, Y
+        Saidas: velocidades linear, angular
+        '''
+
+        speed_vector = np.array([vx, vy])
+        speed_norm = np.linalg.norm(speed_vector)
+        robot_world_speed = rotate_via_numpy(speed_vector, theta)
+        vl = robot_world_speed[0] * speed_norm
+
+        # code to make the robot move to both directions
+        if vx < 0.0:
+            vy = -vy
+            vx = -vx
+
+
+        robot_angle_speed = -math.atan2(vy, vx)
+        va = robot_angle_speed * 160
+
+        
+        return vl, va
 
 
     def _get_differential_robot_speeds(self, vx, vy, theta):
