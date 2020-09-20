@@ -123,8 +123,9 @@ class Robot(object):
 
         self.power_left, self.power_right = self.controller.update()
         if self.robot_id == 0:
-            print("--------------", self.power_left, self.power_right)
-            print('::::::::::::::::::::', self._get_differential_robot_speeds(self.vx, self.vy, self.theta))
+            # print("--------------", self.power_left, self.power_right)
+            # print('::::::::::::::::::::', self._get_differential_robot_speeds(self.vx, self.vy, self.theta))
+            pass
         return self._get_command(self.power_left, self.power_right)
 
 

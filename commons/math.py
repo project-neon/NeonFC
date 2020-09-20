@@ -1,6 +1,8 @@
 import math
 import numpy as np
 
+from scipy.signal import savgol_filter
+
 def _fix_angle(theta_1, theta_2):
     rate_theta = (theta_2 - theta_1)
   
@@ -36,7 +38,7 @@ def speed(_list, _fps):
         in zip(
             _list, 
             list(_list)[1:]
-        )
+        ) if abs((t1 - t0)) < 0.1
     ]
 
     return _fps * (sum(speed_fbf)/len(speed_fbf))

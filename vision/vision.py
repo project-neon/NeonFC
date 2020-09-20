@@ -41,10 +41,10 @@ class FiraVision(threading.Thread):
         self._fps = len(fps_frame_by_frame)/sum(fps_frame_by_frame)
 
     def run(self):
-        print("Starting vision...")
+        # print("Starting vision...")
         self.vision_sock = self._create_socket()
         self._wait_to_connect()
-        print("Vision completed!")
+        # print("Vision completed!")
 
         while True:
             env = packet_pb2.Environment()

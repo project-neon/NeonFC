@@ -57,7 +57,8 @@ class Robot_PID(object):
         acc_left  = vl + va
         acc_right = vl - va
         if self.robot.robot_id == 0:
-            print('###########', linear_speed, angular_speed)
+            # print('###########', linear_speed, angular_speed)
+            pass
         if self.game.vision._fps != 0:
             self.power_left = self.power_left + acc_left * (1/self.game.vision._fps)
             self.power_right = self.power_right + acc_right * (1/self.game.vision._fps)
@@ -88,5 +89,7 @@ class Robot_PID(object):
         if self.game.vision._fps != 0:
             vl = self.linear_pid.update_PID(now_linear, self.game.vision._fps)
             va = self.angular_pid.update_PID(now_angular, self.game.vision._fps)
+
+        print(str(self.linear_desired) + "," + str(now_linear))
 
         return vl, va
