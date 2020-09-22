@@ -94,9 +94,8 @@ class Robot(object):
 
 
         robot_angle_speed = -math.atan2(vy, vx)
-        va = robot_angle_speed * 160
+        va = robot_angle_speed * 18
 
-        
         return vl, va
 
 
@@ -117,7 +116,7 @@ class Robot(object):
         
 
     def decide(self):
-        desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) * 10
+        desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) * 20
 
         self.controller.set_desired(desired)
 

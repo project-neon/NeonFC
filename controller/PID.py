@@ -40,17 +40,19 @@ class Robot_PID(object):
 
         self.desired = np.array([0,0])
 
-        self.linear_pid = PID(1,0,0)
-        self.angular_pid = PID(0,0,0)
+        self.linear_pid = PID(1,0,0.02)
+        self.angular_pid = PID(4,0,0)
 
         self.power_left , self.power_right = 0, 0
+        
+        self.print_counter = 0
 
     def update(self):
         linear_speed, angular_speed = self.robot._get_differential_robot_speeds(self.robot.vx, self.robot.vy, self.robot.theta)
-        linear_speed, angular_speed = linear_speed * 100, angular_speed * 100
-        #linear_desired, angular_desired = self.robot._get_desired_differential_robot_speeds(self.desired[0],self.desired[1], self.robot.theta)
-        linear_desired, angular_desired = 0.2, 0
-        linear_desired, angular_desired =  linear_desired * 100, angular_desired * 100
+        linear_speed, angular_speed = linear_speed * 100, angular_speed
+        linear_desired, angular_desired = self.robot._get_desired_differential_robot_speeds(self.desired[0],self.desired[1], self.robot.theta)
+        # linear_desired, angular_desired = 0, 3.14 * 2 * 10
+        linear_desired, angular_desired =  linear_desired * 100, angular_desired
 
         vl, va = self.update_Speed(linear_desired,angular_desired,linear_speed, angular_speed)
 
@@ -90,6 +92,8 @@ class Robot_PID(object):
             vl = self.linear_pid.update_PID(now_linear, self.game.vision._fps)
             va = self.angular_pid.update_PID(now_angular, self.game.vision._fps)
 
-        print(str(self.linear_desired) + "," + str(now_linear))
+        self.print_counter += 1
 
+        if self.print_counter % 2 == 0:
+            print(str(self.linear_desired) + "," + str(now_linear) + "," + str(vl) + "," +  str(self.angular_desired) + "," + str(now_angular) + "," + str(va))
         return vl, va
