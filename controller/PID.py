@@ -40,27 +40,31 @@ class Robot_PID(object):
 
         self.desired = np.array([0,0])
 
-        self.linear_pid = PID(1,0,0.02)
-        self.angular_pid = PID(4,0,0)
+        self.linear_pid = PID(2,0,0)
+        self.angular_pid = PID(12,0,4)
 
         self.power_left , self.power_right = 0, 0
-        
-        self.print_counter = 0
 
+        self.pid_file = open("pid.log", "a")
+        
     def update(self):
         linear_speed, angular_speed = self.robot._get_differential_robot_speeds(self.robot.vx, self.robot.vy, self.robot.theta)
         linear_speed, angular_speed = linear_speed * 100, angular_speed
+
         linear_desired, angular_desired = self.robot._get_desired_differential_robot_speeds(self.desired[0],self.desired[1], self.robot.theta)
-        # linear_desired, angular_desired = 0, 3.14 * 2 * 10
+        
+        # linear_desired, angular_desired = 0.5, 0
         linear_desired, angular_desired =  linear_desired * 100, angular_desired
 
         vl, va = self.update_Speed(linear_desired,angular_desired,linear_speed, angular_speed)
 
-        acc_left  = vl + va
-        acc_right = vl - va
+        acc_left  = vl - va
+        acc_right = vl + va
+
         if self.robot.robot_id == 0:
             # print('###########', linear_speed, angular_speed)
             pass
+
         if self.game.vision._fps != 0:
             self.power_left = self.power_left + acc_left * (1/self.game.vision._fps)
             self.power_right = self.power_right + acc_right * (1/self.game.vision._fps)
@@ -69,15 +73,12 @@ class Robot_PID(object):
             self.power_right = min(300, max(self.power_right, -300))
 
             return self.power_left , self.power_right
-
         
         return 0, 0
 
 
     def set_desired(self, vector):
         self.desired = vector
-
-
 
 
     def update_Speed(self, linear_desired, angular_desired, now_linear, now_angular):
@@ -92,8 +93,5 @@ class Robot_PID(object):
             vl = self.linear_pid.update_PID(now_linear, self.game.vision._fps)
             va = self.angular_pid.update_PID(now_angular, self.game.vision._fps)
 
-        self.print_counter += 1
-
-        if self.print_counter % 2 == 0:
-            print(str(self.linear_desired) + "," + str(now_linear) + "," + str(vl) + "," +  str(self.angular_desired) + "," + str(now_angular) + "," + str(va))
+        self.pid_file.write(str(self.linear_desired) + "," + str(now_linear) + "," + str(vl) + "," +  str(self.angular_desired) + "," + str(now_angular) + "," + str(0) + '\n')
         return vl, va

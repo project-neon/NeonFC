@@ -87,14 +87,14 @@ class Robot(object):
         robot_world_speed = rotate_via_numpy(speed_vector, theta)
         vl = robot_world_speed[0] * speed_norm
 
-        # code to make the robot move to both directions
-        # if vx < 0.0:
-        #     vy = -vy
-        #     vx = -vx
-
-
-        robot_angle_speed = -math.atan2(vy, vx)
-        va = robot_angle_speed * 18
+        # # code to make the robot move to both directions
+        if vx < 0.0:
+            vy = -vy
+            vx = -vx
+        
+        robot_angle_speed = -math.atan2(robot_world_speed[1], robot_world_speed[0])
+        # TODO Discover magic number after PID testing
+        va = robot_angle_speed
 
         return vl, va
 
@@ -116,7 +116,7 @@ class Robot(object):
         
 
     def decide(self):
-        desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) * 20
+        desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)])
 
         self.controller.set_desired(desired)
 

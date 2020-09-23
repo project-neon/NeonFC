@@ -41,7 +41,7 @@ def speed(_list, _fps):
         ) if abs((t1 - t0)) < 0.1
         # considerando que o jogo funciona a 60 fps
         # limitar 0.1 m/f aqui é dizer que é impossivel
-        # o robo fazer 6 m/s (0.1 [m][f⁻¹] * 60 [f][s⁻¹] = 0.6[m][s⁻¹])
+        # o robo fazer 6 m/s (0.1 [m][f⁻¹] * 60 [f][s⁻¹] = 6[m][s⁻¹])
     ]
 
     return _fps * (sum(speed_fbf)/len(speed_fbf))
