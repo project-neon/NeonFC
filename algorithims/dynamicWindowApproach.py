@@ -19,7 +19,7 @@ class DynamicWindowApproach:
     def get_obstacles(self):
         return self.game.match.opposites
 
-    def predict_position(vL, vR, x, y, theta, deltat):
+    def predict_position(self, vL, vR, x, y, theta, deltat):
         # Simple special cases
         # Straight line motion
         if (round (vL,3) == round(vR,3)):
@@ -42,13 +42,13 @@ class DynamicWindowApproach:
 
         return (xnew, ynew, thetanew)
 
-    def calculate_closest_obstacles_distance(self):
+    def calculate_closest_obstacles_distance(self, x, y):
         closestdist = 100000.0  
         # Calculate distance to closest obstacle
         opposites = self.get_obstacles()
         for (i,opposites) in enumerate(opposites):
-            dx = opposites.x - self.robot.x
-            dy = opposites.y - self.robot.y
+            dx = opposites.x - x
+            dy = opposites.y - y
             d = math.sqrt(dx**2 + dy**2)
             # Distance between closest touching point of circular robot and circular barrier
             dist = d - BARRIER_RADIUS - ROBOT_RADIUS
@@ -68,10 +68,16 @@ class DynamicWindowApproach:
     def decide(self):
         return [0, 0]
 
+    def start(self, robot):
+        pass
+
     def get_best_path(self):
 
         opposites = self.get_obstacles()
-        dt = 1 / self.game.vision._fps
+        if (self.game.vision._fps > 0):
+            dt = 1.0 / self.game.vision._fps
+        else:
+            dt = 1.0/60
 
         BEST_BENEFIT = -100000
         FORWARD_WEIGHT = 12
@@ -86,12 +92,12 @@ class DynamicWindowApproach:
                 # We can only choose an action if it's within velocity limits
                 if (vLpossible <= MAX_VELOCITY and vRpossible <= MAX_VELOCITY and vLpossible >= -MAX_VELOCITY and vRpossible >= -MAX_VELOCITY):
                     # Predict new position in TAU seconds
-                    (xpredict, ypredict, thetapredict, path) = self.predict_position(vLpossible, vRpossible, x, y, theta, TAU)
+                    (xpredict, ypredict, thetapredict) = self.predict_position(vLpossible, vRpossible, self.robot.x, self.robot.y, self.robot.theta, TAU)
                     # What is the distance to the closest obstacle from this possible position?
                     distanceToObstacle = self.calculate_closest_obstacles_distance(xpredict, ypredict)
                     # Calculate how much close we've moved to target location
-                    previousTargetDistance = math.sqrt((x - self.get_target().x ** 2 + (y - self.get_target().y ** 2)
-                    newTargetDistance = math.sqrt((xpredict - self.get_target().x ** 2 + (ypredict - self.get_target().y ** 2)
+                    previousTargetDistance = math.sqrt((self.robot.x - self.get_target().x)** 2 + (self.robot.y - self.get_target().y) ** 2)
+                    newTargetDistance = math.sqrt((xpredict - self.get_target().x) ** 2 + (ypredict - self.get_target().y) ** 2)
                     distanceForward = previousTargetDistance - newTargetDistance
                     # Alternative: how far have I moved forwards?
                     # distanceForward = xpredict - x
