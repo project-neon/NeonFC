@@ -84,13 +84,13 @@ class Robot(object):
     
         speed_vector = np.array([vx, vy])
         speed_norm = np.linalg.norm(speed_vector)
-        robot_world_speed = rotate_via_numpy(speed_vector, theta)
+        robot_world_speed = list(rotate_via_numpy(speed_vector, theta))
         vl = robot_world_speed[0] * speed_norm
 
         # # code to make the robot move to both directions
-        if vx < 0.0:
-            vy = -vy
-            vx = -vx
+        if robot_world_speed[0] > 0.0:
+            robot_world_speed[1] = -robot_world_speed[1]
+            robot_world_speed[0] = -robot_world_speed[0]
         
         robot_angle_speed = -math.atan2(robot_world_speed[1], robot_world_speed[0])
         # TODO Discover magic number after PID testing
@@ -116,7 +116,7 @@ class Robot(object):
         
 
     def decide(self):
-        desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)])
+        desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) / 2
 
         self.controller.set_desired(desired)
 

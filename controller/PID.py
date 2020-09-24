@@ -38,7 +38,7 @@ class Robot_PID(object):
         self.robot = robot
         self.game = self.robot.game
 
-        self.desired = np.array([0,0])
+        self.desired = np.array([0, 0])
 
         self.linear_pid = PID(2,0,0)
         self.angular_pid = PID(12,0,4)
