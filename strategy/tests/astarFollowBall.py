@@ -9,7 +9,7 @@ class FollowBall(Strategy):
         self.astar = algorithims.AStar()
 
 
-    def start(self, robot=None, speed=1000, astar_timespan=0.1):
+    def start(self, robot=None, speed=0.5, astar_timespan=0.1):
         super().start(robot=robot)
 
         self.speed = speed
@@ -28,7 +28,8 @@ class FollowBall(Strategy):
             obstacles=[
                 {
                     "x": r.x, 
-                    "y": r.y
+                    "y": r.y,
+                    "radius": r.dimensions["R"] * 100
                 } for r in self.match.opposites + self.match.robots if not (r.team_color == self.robot.team_color and r.robot_id == self.robot.robot_id)
             ]
         )
