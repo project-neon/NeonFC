@@ -15,9 +15,9 @@ class FiraComm(object):
         self.host = self.config['network']['host_ip']
     
     def start(self):
-        print("Starting communication...")
+        # print("Starting communication...")
         self.command_sock = self._create_socket()
-        print("Communication socket created!")
+        # print("Communication socket created!")
     
     def send(self, robot_commands = []):
         '''
