@@ -1,1 +1,1 @@
-from strategy.tests.astarFollowBall import FollowBall
+from strategy.tests.pfFollowBall import FollowBall
