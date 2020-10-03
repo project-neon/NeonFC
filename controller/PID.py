@@ -2,7 +2,7 @@ import math
 import numpy as np
 
 class PID(object):
-    def __init__(self, kp, kd ,ki):
+    def __init__(self, kp, ki ,kd):
         self.desired_PID = 0.0
         
         self.kp = kp
@@ -41,7 +41,7 @@ class Robot_PID(object):
         self.desired = np.array([0, 0])
 
         self.linear_pid = PID(2,0,0)
-        self.angular_pid = PID(12,0,4)
+        self.angular_pid = PID(12,4,0)
 
         self.power_left , self.power_right = 0, 0
 
