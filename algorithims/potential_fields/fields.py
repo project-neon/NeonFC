@@ -3,7 +3,7 @@ import numpy as np
 
 import commons
 
-MIN_WEIGHT_ACTIVE = 0
+MIN_WEIGHT_ACTIVE = 0.0
 
 def call_or_return(func, context):
     if callable(func):
@@ -33,13 +33,12 @@ class PotentialField(object):
 
 
     def compute (self, input):
-        output_sum = (0, 0) # velocity x, velocity y
+        output_sum = [0, 0] # velocity x, velocity y
 
         output_sum_weight = 0
 
         for field in self.field_childrens:
             weight = field.weight
-
             output = field.compute(input)
             self.output = output
             
@@ -58,7 +57,6 @@ class PotentialField(object):
 class PointField(PotentialField):
     def __init__(self, match, **kwargs):
         super().__init__(match, **kwargs)
-
         self.target = kwargs['target']
         self.decay = kwargs['decay']
         self.radius = kwargs.get('radius', kwargs.get('radius_max'))
@@ -71,7 +69,8 @@ class PointField(PotentialField):
         multiplier = call_or_return(self.multiplier, self.match)
 
         to_target = np.subtract(target_go_to, input)
-        to_taget_scalar = np.ndarray(to_target).size
+        to_taget_scalar = np.linalg.norm(to_target)
+
 
         if radius_max and to_taget_scalar > radius_max:
             return (0, 0)

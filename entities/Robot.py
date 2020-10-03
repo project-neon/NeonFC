@@ -122,8 +122,8 @@ class Robot(object):
         
 
     def decide(self):
-        # x, y = self.strategy.decide()
-        desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) / 2
+        desired = self.strategy.decide()
+        # desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) / 2
 
         self.controller.set_desired(desired)
 

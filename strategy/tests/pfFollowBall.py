@@ -14,13 +14,15 @@ class FollowBall(Strategy):
 
         def follow_ball(m):
             return (m.ball.x, m.ball.y)
+        
 
         self.fields.add_field(
             algorithims.fields.PointField(
                 self.match,
-                target = follow_ball,
-                radius = 300, # 30cm
-                decay = 1
+                target = (2.0/2, 1.8/2),
+                radius = 0.3, # 30cm
+                decay = None,
+                multiplier = 0.5 # 50 cm/s
                 )
         )
 
