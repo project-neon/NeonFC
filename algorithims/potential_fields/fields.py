@@ -18,7 +18,6 @@ def apply_decay(decay_fn, value):
 
     return out if value >= 0 else -out
 
-
 class PotentialField(object):
     def __init__(self, match, **kwargs):
         self.match = match
