@@ -20,7 +20,7 @@ class Robot(object):
         self.team_color = team_color
         self.current_data = {}
 
-        self.strategy = strategy.tests.GoalKeeper(game.match)
+        self.strategy = strategy.tests.FollowBall(game.match)
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()
@@ -123,7 +123,6 @@ class Robot(object):
 
     def decide(self):
         desired = self.strategy.decide()
-        print(desired)
         # desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) / 2
 
         self.controller.set_desired(desired)

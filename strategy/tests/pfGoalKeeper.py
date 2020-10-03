@@ -10,22 +10,15 @@ class GoalKeeper(Strategy):
         self.fields = algorithims.fields.PotentialField(self.match)
 
 
-<<<<<<< HEAD
     def start(self, robot=None):
-=======
-    def start(self, robot=None, speed=0.5, astar_timespan=0.1):
->>>>>>> 3c95fcda3b5480982fb3c5d1efa0fbc331333067
         super().start(robot=robot)
 
         def follow_ball(m):
             return (m.ball.x, m.ball.y)
         
-<<<<<<< HEAD
         def quadratic(x):
             return x**2
         
-=======
->>>>>>> 3c95fcda3b5480982fb3c5d1efa0fbc331333067
 
         self.fields.add_field(
             algorithims.fields.LineField(
@@ -35,11 +28,7 @@ class GoalKeeper(Strategy):
                 line_size = 1.8, # 30cm
                 line_dist = 0.8,
                 decay = None,
-<<<<<<< HEAD
                 multiplier = 0.5 # 50 cm/s
-=======
-                multiplier = 0.5 # 80 cm/s
->>>>>>> 3c95fcda3b5480982fb3c5d1efa0fbc331333067
                 )
         )
 
@@ -51,11 +40,7 @@ class GoalKeeper(Strategy):
                 line_size = 1.8, # 30cm
                 line_dist = 0.8,
                 decay = None,
-<<<<<<< HEAD
                 multiplier = 0.5 # 50 cm/s
-=======
-                multiplier = 0.5 # 80 cm/s
->>>>>>> 3c95fcda3b5480982fb3c5d1efa0fbc331333067
                 )
         )
 
