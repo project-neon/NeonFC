@@ -19,7 +19,7 @@ class FollowBall(Strategy):
         self.fields.add_field(
             algorithims.fields.PointField(
                 self.match,
-                target = (2.0/2, 1.8/2),
+                target = follow_ball,
                 radius = 0.3, # 30cm
                 decay = None,
                 multiplier = 0.5 # 50 cm/s
