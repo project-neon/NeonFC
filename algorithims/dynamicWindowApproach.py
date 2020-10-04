@@ -1,12 +1,12 @@
 import os, math, time, random, copy
 
 ROBOT_WIDTH = 0.08
-ROBOT_RADIUS = 0.0375
+ROBOT_RADIUS = 0.04
 SAFE_DIST = 0.0375
-BARRIER_RADIUS = 0.0375
-MAX_VELOCITY = 0.5
-MAX_ACCELERATION = 0.5
-STEPS_AHEAD_TO_PLAN = 10
+BARRIER_RADIUS = 0.08
+MAX_VELOCITY = 50.0
+MAX_ACCELERATION = 50.0
+STEPS_AHEAD_TO_PLAN = 2
 
 class DynamicWindowApproach:
 
@@ -73,7 +73,6 @@ class DynamicWindowApproach:
 
     def get_best_path(self):
 
-        opposites = self.get_obstacles()
         if (self.game.vision._fps > 0):
             dt = 1.0 / self.game.vision._fps
         else:
@@ -84,8 +83,34 @@ class DynamicWindowApproach:
         OBSTACLE_WEIGHT = 6666
         TAU = dt * STEPS_AHEAD_TO_PLAN
 
-        vLpossiblearray = (self.vL - MAX_ACCELERATION * dt, self.vL, self.vL + MAX_ACCELERATION * dt)
-        vRpossiblearray = (self.vR - MAX_ACCELERATION * dt, self.vR, self.vR + MAX_ACCELERATION * dt)
+        vLpossiblearray = (
+            self.vL - MAX_ACCELERATION * dt, 
+            -self.vL - MAX_ACCELERATION * dt,
+            self.vL, 
+            -self.vL, 
+            self.vL + MAX_ACCELERATION * dt,
+            -self.vL + MAX_ACCELERATION * dt,
+            self.vL - (MAX_ACCELERATION / 2) * dt, 
+            -self.vL - (MAX_ACCELERATION / 2) * dt, 
+            self.vL + (MAX_ACCELERATION / 2) * dt,
+            -self.vL + (MAX_ACCELERATION / 2) * dt,
+            self.vL + MAX_ACCELERATION * dt,
+            -self.vL + MAX_ACCELERATION * dt,
+        )
+        vRpossiblearray = (
+            self.vR - MAX_ACCELERATION * dt, 
+            -self.vR - MAX_ACCELERATION * dt,
+            self.vR, 
+            -self.vR, 
+            self.vR + MAX_ACCELERATION * dt,
+            -self.vR + MAX_ACCELERATION * dt,
+            self.vR - (MAX_ACCELERATION / 2) * dt, 
+            -self.vR - (MAX_ACCELERATION / 2) * dt, 
+            self.vR + (MAX_ACCELERATION / 2) * dt,
+            -self.vR + (MAX_ACCELERATION / 2) * dt,
+            self.vR + MAX_ACCELERATION * dt,
+            -self.vR + MAX_ACCELERATION * dt,
+        )
 
         for vLpossible in vLpossiblearray:
             for vRpossible in vRpossiblearray:
@@ -105,7 +130,7 @@ class DynamicWindowApproach:
                     distanceBenefit = FORWARD_WEIGHT * distanceForward
                     # Negative cost: once we are less than SAFE_DIST from collision, linearly increasing cost
                     if (distanceToObstacle < SAFE_DIST):
-                        obstacleCost = OBSTACLE_WEIGHT * (SAFE_DIST - distanceToObstacle)
+                        obstacleCost = OBSTACLE_WEIGHT * 1000 * (SAFE_DIST - distanceToObstacle)
                     else:
                         obstacleCost = 0.0
                     # Total benefit function to optimise
