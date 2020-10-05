@@ -20,7 +20,10 @@ class Robot(object):
         self.team_color = team_color
         self.current_data = {}
 
-        self.strategy = strategy.tests.FollowBall(game.match)
+        if self.robot_id == 0:
+            self.strategy = strategy.tests.GoalKeeper(game.match)
+        elif self.robot_id == 1:
+            self.strategy = strategy.tests.FollowBall(game.match)
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()
@@ -35,7 +38,7 @@ class Robot(object):
             'R': 0.02
         }
 
-        self.controller = controller.Robot_PID(self)
+        self.controller = controller.SimpleLQR(self)
         self.power_left, self.power_right = 0, 0
 
         self._frames = {
@@ -100,7 +103,7 @@ class Robot(object):
         
         robot_angle_speed = -math.atan2(robot_world_speed[1], robot_world_speed[0])
         # TODO Discover magic number after PID testing
-        va = robot_angle_speed
+        va = robot_angle_speed 
 
         return vl, va
 

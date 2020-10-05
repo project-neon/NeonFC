@@ -11,7 +11,8 @@ class SimpleLQR(object):
         self.R = self.robot.dimensions.get('R')
 
     def set_desired(self, vector):
-        self.desired = vector
+        self.desired = (self.robot.x + vector[0] * 5000, self.robot.y + vector[1] * 5000)
+        print(self.desired)
 
     def update(self):
         n = (1/self.l)

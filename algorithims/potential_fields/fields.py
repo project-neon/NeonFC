@@ -112,7 +112,7 @@ class LineField(PotentialField):
         to_line = np.subtract(target_line, input)
         to_line_with_theta = commons.math.rotate_via_numpy(to_line, -target_theta)
 
-        if self.line_size and to_line_with_theta[0] > self.line_size:
+        if self.line_size and abs(to_line_with_theta[0]) > self.line_size:
             return (0, 0)
 
         if self.line_size_single_side and to_line_with_theta[0] < 0:

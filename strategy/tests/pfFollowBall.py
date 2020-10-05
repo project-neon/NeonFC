@@ -14,12 +14,15 @@ class FollowBall(Strategy):
 
         def follow_ball(m):
             return (m.ball.x, m.ball.y)
+
+        def quadratic(x):
+            return x**2
         
 
         self.fields.add_field(
             algorithims.fields.PointField(
                 self.match,
-                target = [2.0/2, 1.8/2], # centro do campo
+                target = follow_ball, # centro do campo
                 radius = 0.05, # 30cm
                 decay = None,
                 multiplier = 0.5 # 50 cm/s
@@ -33,5 +36,4 @@ class FollowBall(Strategy):
 
 
     def decide(self):
-        print([self.robot.x, self.robot.y])
         return self.fields.compute([self.robot.x, self.robot.y])

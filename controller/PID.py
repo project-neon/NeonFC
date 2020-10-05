@@ -2,12 +2,14 @@ import math
 import numpy as np
 
 class PID(object):
-    def __init__(self, kp, kd ,ki):
+    def __init__(self, kp, kd ,ki, _ilimit=1000):
         self.desired_PID = 0.0
         
         self.kp = kp
         self.kd = kd
         self.ki = ki
+
+        self._ilimit = _ilimit
 
         self.last_error = 0
         self.integral = 0
@@ -19,6 +21,8 @@ class PID(object):
         dt = 1/fps
 
         error = self.desired_PID - now
+
+        self.integral = min(self._ilimit, max(-self._ilimit, self.integral))
 
         derivative = (error - self.last_error)/dt
 
@@ -40,8 +44,8 @@ class Robot_PID(object):
 
         self.desired = np.array([0, 0])
 
-        self.linear_pid = PID(2,0,0)
-        self.angular_pid = PID(12,0,4)
+        self.linear_pid = PID(2, 1.2, 0)
+        self.angular_pid = PID(12, 4, 0)
 
         self.power_left , self.power_right = 0, 0
 
@@ -69,8 +73,8 @@ class Robot_PID(object):
             self.power_left = self.power_left + acc_left * (1/self.game.vision._fps)
             self.power_right = self.power_right + acc_right * (1/self.game.vision._fps)
 
-            self.power_left = min(300, max(self.power_left, -300))
-            self.power_right = min(300, max(self.power_right, -300))
+            self.power_left = min(500, max(self.power_left, -500))
+            self.power_right = min(500, max(self.power_right, -500))
 
             return self.power_left , self.power_right
         
