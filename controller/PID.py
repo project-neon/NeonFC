@@ -57,7 +57,6 @@ class Robot_PID(object):
 
         linear_desired, angular_desired = self.robot._get_desired_differential_robot_speeds(self.desired[0],self.desired[1], self.robot.theta)
         
-        # linear_desired, angular_desired = 0.5, 0
         linear_desired, angular_desired =  linear_desired * 100, angular_desired
 
         vl, va = self.update_Speed(linear_desired,angular_desired,linear_speed, angular_speed)

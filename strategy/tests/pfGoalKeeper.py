@@ -7,7 +7,7 @@ import json
 import numpy as np
 
 class GoalKeeper(Strategy):
-    def __init__(self, match, plot_field=True):
+    def __init__(self, match, plot_field=False):
         super().__init__(match)
 
         """
@@ -36,13 +36,12 @@ class GoalKeeper(Strategy):
         self.normal_speed = 0.5
         self.push_speed = 0.8
 
-        self.field_file = open('field.log', 'w')
-
         self.plot_field = plot_field
+        self.exporter = None
 
         self.base_rules = algorithims.fields.PotentialField(
             self.match,
-            name="{}|BaseRules".format(self.__class__)
+            name="{}|BaseRulesBehaviour".format(self.__class__)
         )
         
         self.maintain = algorithims.fields.PotentialField(
@@ -60,15 +59,23 @@ class GoalKeeper(Strategy):
             name="{}|PushBehaviour".format(self.__class__)
         )
 
-
     def start(self, robot=None):
         super().start(robot=robot)
+
+        if self.plot_field:
+            self.exporter = algorithims.fields.PotentialDataExporter(self.robot.get_name())
 
         def follow_ball(m):
             return (m.ball.x, m.ball.y)
         
         def quadratic(x):
             return x**2
+        
+        def slow_quadratic(x):
+            return -(x-1)**2 +1
+        
+        def log2p1(x):
+            return math.log(x) +1
 
         def inveterd_quadratic(x):
             return (-x**2) +1
@@ -79,7 +86,7 @@ class GoalKeeper(Strategy):
         def ball_speed(m):
             speed = min(max(
                 m.ball.vy + 0.2,
-                0.8
+                0.6
             ), 1)
             return speed
 
@@ -88,13 +95,13 @@ class GoalKeeper(Strategy):
                 self.match,
                 target = (0, 0.650),
                 theta = math.pi/2,
-                line_size = 0.2,
-                line_size_max = 0.2,
-                line_dist = 0.2,
-                line_dist_max = 0.2,
+                line_size = 0.25,
+                line_size_max = 0.25,
+                line_dist = 0.25,
+                line_dist_max = 0.25,
                 line_dist_single_side = True,
                 decay = inveterd_quadratic,
-                multiplier = 1.0
+                multiplier = 0.7
             )
         )
         self.base_rules.add_field(
@@ -119,58 +126,61 @@ class GoalKeeper(Strategy):
             algorithims.fields.PointField(
                 self.match,
                 target = (0 + 0.05, 0.650), # centro do campo
-                radius = 0.05, # 30cm
+                radius = 0.1, # 30cm
                 decay = quadratic,
+                field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 0.5 # 50 cm/s
             )
         )
 
 
-        self.alert.add_field(
-            algorithims.fields.LineField(
-                self.match,
-                target = follow_ball,
-                theta = 0,
-                line_size = 1.8, # 30cm
-                line_dist = 0.2,
-                decay = inveterd_quadratic,
-                multiplier = ball_speed # 50 cm/s
-                )
-        )
+        # self.alert.add_field(
+        #     algorithims.fields.LineField(
+        #         self.match,
+        #         target = follow_ball,
+        #         theta = 0,
+        #         line_size = 1.8, # 30cm
+        #         line_dist = 0.2,
+        #         decay = inveterd_quadratic,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = ball_speed # 50 cm/s
+        #         )
+        # )
 
         self.alert.add_field(
-            algorithims.fields.LineField(
-                self.match,
-                target = follow_ball,
-                theta = 0,
-                line_size = 1.8, # 30cm
-                line_dist = 0.05,
-                decay = None,
-                multiplier = 0.8 # 50 cm/s
-            )
-        )
-
-        self.alert.add_field(
-            algorithims.fields.LineField(
-                self.match,
-                target = (0 + 0.05, 0.650),
-                theta = math.pi/2,
-                line_size = 1.8, # 30cm
-                line_dist = 0.05,
-                decay = quadratic,
-                multiplier = 0.5 # 50 cm/s
-                )
-        )
-
-        self.push.add_field(
             algorithims.fields.PointField(
                 self.match,
-                target = follow_ball, # centro do campo
-                radius = 0.05, # 30cm
-                decay = constant,
-                multiplier = 1 # 50 cm/s
+                target = lambda m : (0.1, m.ball.y), # centro do campo
+                radius = 0.1, # 30cm
+                decay = quadratic,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 0.5 # 50 cm/s
             )
         )
+
+        # self.alert.add_field(
+        #     algorithims.fields.LineField(
+        #         self.match,
+        #         target = (0 + 0.1, 0.650),
+        #         theta = math.pi/2,
+        #         line_size = 1.8, # 30cm
+        #         line_dist = 0.1,
+        #         decay = slow_quadratic,
+        #         field_limits = [0.75 * 2 , 0.65 * 2],
+        #         multiplier = 0.6 # 50 cm/s
+        #         )
+        # )
+
+        # self.push.add_field(
+        #     algorithims.fields.PointField(
+        #         self.match,
+        #         target = follow_ball, # centro do campo
+        #         radius = 0.05, # 30cm
+        #         decay = constant,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 1 # 50 cm/s
+        #     )
+        # )
 
     def reset(self, robot=None):
         super().reset()
@@ -194,35 +204,9 @@ class GoalKeeper(Strategy):
             behaviour = self.alert
         
         behaviour = self.alert
-        print("BEHAVIOUR:", behaviour.name)
-        X = []
-        Y = []
-        U = []
-        V = []
 
-        if self.plot_field:
-            for x in range(-10, 150 + 10, 2):
-                x = x/100.0
-                for y in range(-10, 130 + 10, 2):
-                    y = y/100.0
-                    res = behaviour.compute([x, y])
-                    X.append(x)
-                    Y.append(y)
-                    U.append(res[0])
-                    V.append(res[1])
-
-        plot_file = {
-            "x": X,
-            "y": Y,
-            "u": U,
-            "v": V,
-            "robot_x": self.robot.x,
-            "robot_y": self.robot.y,
-            "ball_x": self.match.ball.x,
-            "ball_y": self.match.ball.y,
-            "behaviour": behaviour.name
-        }
-
-        self.field_file.write(json.dumps(plot_file) + "||")
+        if self.exporter:
+            self.exporter.export(behaviour, self.robot, self.match.ball)
 
         return behaviour.compute([self.robot.x, self.robot.y])
+

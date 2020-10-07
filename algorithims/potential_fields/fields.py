@@ -1,4 +1,5 @@
 import random
+import json
 import numpy as np
 
 import commons
@@ -17,6 +18,43 @@ def apply_decay(decay_fn, value):
     out = decay_fn(abs(value))
 
     return out if value >= 0 else -out
+
+class PotentialDataExporter(object):
+    def __init__(self, name):
+        self.file = open(
+            '{}|potential_field.log'.format(name),
+            'w'
+        )
+
+    def export(self, behaviour, robot, ball):
+        X = []
+        Y = []
+        U = []
+        V = []
+
+        for x in range(-10, 150 + 10, 2):
+            x = x/100.0
+            for y in range(-10, 130 + 10, 2):
+                y = y/100.0
+                res = behaviour.compute([x, y])
+                X.append(x)
+                Y.append(y)
+                U.append(res[0])
+                V.append(res[1])
+
+        plot_file = {
+            "x": X,
+            "y": Y,
+            "u": U,
+            "v": V,
+            "robot_x": robot.x,
+            "robot_y": robot.y,
+            "ball_x": ball.x,
+            "ball_y": ball.y,
+            "behaviour": behaviour.name
+        }
+
+        self.file.write(json.dumps(plot_file) + "||")
 
 class PotentialField(object):
     def __init__(self, match, **kwargs):
@@ -62,6 +100,8 @@ class PointField(PotentialField):
         self.radius_max = kwargs.get('radius_max')
         self.multiplier = kwargs.get('multiplier', 1)
 
+        self.field_limits = kwargs.get('field_limits', None)
+
     def compute(self, input):
         target_go_to = call_or_return(self.target, self.match)
         radius_max = call_or_return(self.radius_max, self.match)
@@ -70,6 +110,11 @@ class PointField(PotentialField):
         to_target = np.subtract(target_go_to, input)
         to_taget_scalar = np.linalg.norm(to_target)
 
+        if self.field_limits and not(0 <= input[0] <= self.field_limits[0]):
+            return (0, 0)
+        
+        if self.field_limits and not(0 <= input[1] <= self.field_limits[1]):
+            return (0, 0)
 
         if radius_max and to_taget_scalar > radius_max:
             return (0, 0)
@@ -102,6 +147,8 @@ class LineField(PotentialField):
         self.line_size_single_side = kwargs.get('line_size_single_side', False)
         self.line_dist_single_side = kwargs.get('line_dist_single_side', False)
 
+        self.field_limits = kwargs.get('field_limits', None)
+
     def compute(self, input):
         target_line = call_or_return(self.target, self.match)
         target_theta = call_or_return(self.theta, self.match)
@@ -111,6 +158,12 @@ class LineField(PotentialField):
 
         to_line = np.subtract(target_line, input)
         to_line_with_theta = commons.math.rotate_via_numpy(to_line, -target_theta)
+
+        if self.field_limits and not(0 <= input[0] <= self.field_limits[0]):
+            return (0, 0)
+        
+        if self.field_limits and not(0 <= input[1] <= self.field_limits[1]):
+            return (0, 0)
 
         if self.line_size and abs(to_line_with_theta[0]) > self.line_size:
             return (0, 0)

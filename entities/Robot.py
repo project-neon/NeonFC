@@ -38,7 +38,7 @@ class Robot(object):
             'R': 0.02
         }
 
-        self.controller = controller.SimpleLQR(self)
+        self.controller = controller.Robot_PID(self)
         self.power_left, self.power_right = 0, 0
 
         self._frames = {
@@ -97,14 +97,21 @@ class Robot(object):
         vl = robot_world_speed[0] * speed_norm
 
         # # code to make the robot move to both directions
-        if robot_world_speed[0] > 0.0:
-            robot_world_speed[1] = -robot_world_speed[1]
-            robot_world_speed[0] = -robot_world_speed[0]
+        # if robot_world_speed[0] > 0.0:
+        #     robot_world_speed[1] = -robot_world_speed[1]
+        #     robot_world_speed[0] = -robot_world_speed[0]
+        
+        def _map(min_i, max_i, min_o, max_o, x):
+            return (x - min_i) * (max_o - min_o) / (max_i - min_i) + min_o
         
         robot_angle_speed = -math.atan2(robot_world_speed[1], robot_world_speed[0])
-        # TODO Discover magic number after PID testing
-        va = robot_angle_speed 
 
+        damping = 1
+        if (abs(robot_world_speed[1]) + abs(robot_world_speed[0])):
+            damping = max(1, abs((robot_world_speed[1])/(abs(robot_world_speed[1]) + abs(robot_world_speed[0])))) * min(1, max(0, _map(0.01, 0.05, 0, 1, speed_norm)))
+        
+        # TODO Discover magic number after PID testing
+        va = robot_angle_speed * damping
         return vl, va
 
 
