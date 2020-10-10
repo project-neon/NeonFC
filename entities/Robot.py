@@ -21,9 +21,9 @@ class Robot(object):
         self.current_data = {}
 
         if self.robot_id == 0:
-            self.strategy = strategy.tests.GoalKeeper(game.match)
+            self.strategy = strategy.tests.Attacker(game.match)
         elif self.robot_id == 1:
-            self.strategy = strategy.tests.FollowBall(game.match)
+            self.strategy = strategy.tests.GoalKeeper(game.match)
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()
@@ -38,7 +38,7 @@ class Robot(object):
             'R': 0.02
         }
 
-        self.controller = controller.Robot_PID(self)
+        self.controller = controller.SimpleLQR(self)
         self.power_left, self.power_right = 0, 0
 
         self._frames = {
@@ -97,9 +97,9 @@ class Robot(object):
         vl = robot_world_speed[0] * speed_norm
 
         # # code to make the robot move to both directions
-        # if robot_world_speed[0] > 0.0:
-        #     robot_world_speed[1] = -robot_world_speed[1]
-        #     robot_world_speed[0] = -robot_world_speed[0]
+        if robot_world_speed[0] > 0.0:
+            robot_world_speed[1] = -robot_world_speed[1]
+            robot_world_speed[0] = -robot_world_speed[0]
         
         def _map(min_i, max_i, min_o, max_o, x):
             return (x - min_i) * (max_o - min_o) / (max_i - min_i) + min_o
@@ -136,6 +136,9 @@ class Robot(object):
         # desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) / 2
 
         self.controller.set_desired(desired)
+
+        if self.robot_id == 1:
+            print('SPEEEEEEEEEED:  ', math.sqrt(self.vx**2 + self.vy**2))
 
         self.power_left, self.power_right = self.controller.update()
         if self.robot_id == 0:

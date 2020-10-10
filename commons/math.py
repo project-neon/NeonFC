@@ -61,3 +61,12 @@ def rotate_via_numpy(xy, radians):
     m = np.dot(j, [x, y])
 
     return float(m.T[0]), float(m.T[1])
+
+def dotproduct(v1, v2):
+  return sum((a*b) for a, b in zip(v1, v2))
+
+def length(v):
+  return math.sqrt(dotproduct(v, v))
+
+def angle_between(v1, v2):
+  return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))

@@ -101,7 +101,7 @@ class GoalKeeper(Strategy):
                 line_dist_max = 0.25,
                 line_dist_single_side = True,
                 decay = inveterd_quadratic,
-                multiplier = 0.7
+                multiplier = 0.8
             )
         )
         self.base_rules.add_field(
@@ -114,7 +114,7 @@ class GoalKeeper(Strategy):
                 line_dist = 0.2,
                 line_dist_max = 0.2,
                 decay = quadratic,
-                multiplier = 1.0
+                multiplier = 1.2
             )
         )
 
@@ -129,7 +129,7 @@ class GoalKeeper(Strategy):
                 radius = 0.1, # 30cm
                 decay = quadratic,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.5 # 50 cm/s
+                multiplier = 0.75 # 50 cm/s
             )
         )
 
@@ -154,7 +154,7 @@ class GoalKeeper(Strategy):
                 radius = 0.1, # 30cm
                 decay = quadratic,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.5 # 50 cm/s
+                multiplier = 0.75 # 50 cm/s
             )
         )
 

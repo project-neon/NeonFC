@@ -192,4 +192,3 @@ class LineField(PotentialField):
             to_line_norm[0] * force * multiplier,
             to_line_norm[1] * force * multiplier
         )
-
