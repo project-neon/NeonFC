@@ -20,7 +20,7 @@ class Robot(object):
         self.team_color = team_color
         self.current_data = {}
 
-        self.strategy = strategy.tests.FollowBall(game.match)
+        self.strategy = algorithims.DynamicWindowApproach(self, game)
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()
