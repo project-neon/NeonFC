@@ -38,7 +38,6 @@ class Robot(object):
             'R': 0.02
         }
 
-        self.controller = controller.SimpleLQR(self)
         self.power_left, self.power_right = 0, 0
 
         self._frames = {
@@ -133,15 +132,10 @@ class Robot(object):
 
     def decide(self):
         desired = self.strategy.decide()
-        # desired = unit_vector( [(self.game.match.ball.x - self.x), (self.game.match.ball.y - self.y)]) / 2
+        
+        self.strategy.set_desired(desired)
+        self.power_left, self.power_right = self.strategy.update()
 
-        self.controller.set_desired(desired)
-
-        self.power_left, self.power_right = self.controller.update()
-        if self.robot_id == 0:
-            # print("--------------", self.power_left, self.power_right)
-            # print('::::::::::::::::::::', self._get_differential_robot_speeds(self.vx, self.vy, self.theta))
-            pass
         return self._get_command(self.power_left, self.power_right)
 
 
