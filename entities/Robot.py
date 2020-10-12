@@ -132,7 +132,6 @@ class Robot(object):
 
     def decide(self):
         desired = self.strategy.decide()
-        
         self.strategy.set_desired(desired)
         self.power_left, self.power_right = self.strategy.update()
 

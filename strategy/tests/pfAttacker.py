@@ -7,7 +7,7 @@ import json
 import numpy as np
 
 class Attacker(Strategy):
-    def __init__(self, match, plot_field=False):
+    def __init__(self, match, plot_field=True):
         super().__init__(match)
 
         """
@@ -73,72 +73,164 @@ class Attacker(Strategy):
         def inveterd_quadratic(x):
             return -((-x**2) +1)
         
+        def repulse(x):
+            return (-x**2) +1
+        
         def inveterd_quadratic_s(x):
             return -((-x**6) +1)
+        
+        def ball_speed(m):
+            speed = min(max(
+                m.ball.vy + 0.2,
+                0.7
+            ), 1)
+            return speed
 
-        self.tangential = algorithims.fields.TangentialField(
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
                 self.match,
-                target=follow_ball,
-                radius = 0.06,
-                radius_max = 0.30,
-                clockwise = 1,
+                target = (0, 0.650),
+                theta = math.pi/2,
+                line_size = 0.25,
+                line_size_max = 0.25,
+                line_dist = 0.25,
+                line_dist_max = 0.25,
+                line_dist_single_side = True,
+                decay = repulse,
+                multiplier = 0.8
+            )
+        )
+        
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (-0.2, 0.650),
+                theta = 0,
+                line_size = 0.2,
+                line_size_max = 0.2,
+                line_dist = 0.2,
+                line_dist_max = 0.2,
+                decay = quadratic,
+                multiplier = 1.2
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*0.750, 0.650),
+                theta = 3*math.pi/2,
+                line_size = 0.25,
+                line_size_max = 0.25,
+                line_dist = 0.25,
+                line_dist_max = 0.25,
+                line_dist_single_side = True,
+                decay = repulse,
+                multiplier = 0.8
+            )
+        )
+        
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*0.750+0.2, 0.650),
+                theta = 2*math.pi,
+                line_size = 0.2,
+                line_size_max = 0.2,
+                line_dist = 0.2,
+                line_dist_max = 0.2,
+                decay = quadratic,
+                multiplier = 1.2
+            )
+        )
+
+        self.seek.add_field(self.base_rules)
+        self.carry.add_field(self.base_rules)
+
+        self.seek.add_field(
+            algorithims.fields.TangentialField(
+                self.match,
+                target=lambda m: (
+                    m.ball.x + math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
+                    m.ball.y + math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2
+                ),                                                                                                                                                                                                                                                                                                                                          
+                radius = 0.10,
+                radius_max = 0.20,
+                clockwise = True,
                 decay=lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.7
+                multiplier = 0.9
             )
+        )
 
-        self.carry.add_field(self.tangential)
+        self.seek.add_field(
+            algorithims.fields.TangentialField(
+                self.match,
+                target=lambda m: (
+                    m.ball.x - math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
+                    m.ball.y - math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2
+                ),                                                                                                                                                                                                                                                                                                                                          
+                radius = 0.10,
+                radius_max = 0.20,
+                clockwise = False,
+                decay=lambda x: 1,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 0.9
+            )
+        )
         
-        # self.carry.add_field(
-        #     algorithims.fields.PointField(
-        #         self.match,
-        #         target = follow_ball, # centro do campo
-        #         radius = 0.2, # 10cm
-        #         decay = quadratic,
-        #         field_limits = [0.75* 2 , 0.65*2],
-        #         multiplier = 0.75 # 75 cm/s
-        #     )
-        # )
+        self.seek.add_field(
+            algorithims.fields.PointField(
+                self.match,
+                target = follow_ball, # centro do campo
+                radius = 0.2, # 10cm
+                decay = quadratic,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 0.6 # 75 cm/s
+            )
+        )
 
-        # self.carry.add_field(
-        #     algorithims.fields.PointField(
-        #         self.match,
-        #         target = follow_ball, # centro do campo
-        #         radius = 0.2, # 10cm
-        #         radius_max = 0.2, # 10cm
-        #         decay = quadratic,
-        #         field_limits = [0.75* 2 , 0.65*2],
-        #         multiplier = 0.75 # 75 cm/s
-        #     )
-        # )
+        self.seek.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target=follow_ball,
+                theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
+                line_size = 1,
+                line_size_single_side = True,
+                line_dist = 0.10,
+                line_dist_max = 0.10,
+                decay = quadratic,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 0.9 # 75 cm/s
+            )
+        )
 
-        # self.carry.add_field(
-        #     algorithims.fields.PointField(
-        #         self.match,
-        #         target = avoid_opposite, # centro do campo
-        #         radius = 0.2, # 10cm
-        #         radius_max = 0.2, # 10cm
-        #         decay = quadratic,
-        #         field_limits = [0.75* 2 , 0.65*2],
-        #         multiplier = 1.5 # 75 cm/s
-        #     )
-        # )
+        self.seek.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target=follow_ball,
+                theta=lambda m: ( -math.atan2((m.ball.y - 0.65), (m.ball.x - 0.75*2))),
+                line_size = 0.18,
+                line_size_max = 0.18,
+                line_size_single_side = True,
+                line_dist = 0.05,
+                line_dist_max = 0.05,
+                decay = inveterd_quadratic_s,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 1 # 75 cm/s
+            )
+        )
 
-        # self.carry.add_field(
-        #     algorithims.fields.LineField(
-        #         self.match,
-        #         target=follow_ball,
-        #         theta=math.pi,
-        #         line_size = 0.12,
-        #         line_size_max = 0.12,
-        #         line_size_single_side=True,
-        #         line_dist = 0.12,
-        #         line_dist_max = 0.12,
-        #         decay = inveterd_quadratic_s,
-        #         field_limits = [0.75* 2 , 0.65*2],
-        #         multiplier = 1.5 # 75 cm/s
-        #     )
-        # )
+        self.carry.add_field(
+            algorithims.fields.PointField(
+                self.match,
+                target = follow_ball, # centro do campo
+                radius = 0.05, # 10cm
+                decay = None,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = ball_speed # 75 cm/s
+            )
+        )
 
 
     def reset(self, robot=None):
@@ -148,10 +240,21 @@ class Attacker(Strategy):
 
 
     def decide(self):
+        angle_ball_to_goal = -math.atan2((self.match.ball.y - 0.65), (self.match.ball.x - 0.75*2))
+        angle_robot_to_ball = -math.atan2((self.robot.y - self.match.ball.y), (self.robot.x - self.match.ball.x ))
         
-        # self.tangential.clockwise = (self.match.ball.y - self.robot.y) > 0
+        angle_to_goal = abs(angle_ball_to_goal - angle_robot_to_ball)
 
-        behaviour = self.carry
+        dist_to_ball = math.sqrt(
+            (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
+        )
+
+        if (angle_to_goal <= 0.5) and (dist_to_ball <= 0.10):
+            behaviour = self.carry
+        else:
+            behaviour = self.seek
+        
+        print(behaviour.name)
 
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)
