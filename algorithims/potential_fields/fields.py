@@ -7,9 +7,9 @@ import commons
 
 MIN_WEIGHT_ACTIVE = 0.0
 
-def call_or_return(func, context):
+def call_or_return(func, match_context):
     if callable(func):
-        return func(context)
+        return func(match_context)
     return func
 
 def apply_decay(decay_fn, value):
@@ -219,8 +219,6 @@ class TangentialField(PotentialField):
         to_target = np.subtract(target_go_to, input)
         to_taget_scalar = np.linalg.norm(to_target)
         
-        print(to_taget_scalar)
-
         angle_to_target = math.atan2(target_go_to[1] - input[1], target_go_to[0] - input[0] )
 
         if self.field_limits and not(0 <= input[0] <= self.field_limits[0]):

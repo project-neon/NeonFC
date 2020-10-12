@@ -134,19 +134,6 @@ class GoalKeeper(Strategy):
         )
 
 
-        # self.alert.add_field(
-        #     algorithims.fields.LineField(
-        #         self.match,
-        #         target = follow_ball,
-        #         theta = 0,
-        #         line_size = 1.8, # 30cm
-        #         line_dist = 0.2,
-        #         decay = inveterd_quadratic,
-        #         field_limits = [0.75* 2 , 0.65*2],
-        #         multiplier = ball_speed # 50 cm/s
-        #         )
-        # )
-
         self.alert.add_field(
             algorithims.fields.PointField(
                 self.match,
@@ -157,30 +144,6 @@ class GoalKeeper(Strategy):
                 multiplier = 0.75 # 50 cm/s
             )
         )
-
-        # self.alert.add_field(
-        #     algorithims.fields.LineField(
-        #         self.match,
-        #         target = (0 + 0.1, 0.650),
-        #         theta = math.pi/2,
-        #         line_size = 1.8, # 30cm
-        #         line_dist = 0.1,
-        #         decay = slow_quadratic,
-        #         field_limits = [0.75 * 2 , 0.65 * 2],
-        #         multiplier = 0.6 # 50 cm/s
-        #         )
-        # )
-
-        # self.push.add_field(
-        #     algorithims.fields.PointField(
-        #         self.match,
-        #         target = follow_ball, # centro do campo
-        #         radius = 0.05, # 30cm
-        #         decay = constant,
-        #         field_limits = [0.75* 2 , 0.65*2],
-        #         multiplier = 1 # 50 cm/s
-        #     )
-        # )
 
     def reset(self, robot=None):
         super().reset()

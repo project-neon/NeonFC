@@ -7,7 +7,7 @@ import json
 import numpy as np
 
 class Attacker(Strategy):
-    def __init__(self, match, plot_field=False):
+    def __init__(self, match, plot_field=True):
         super().__init__(match)
 
         """
@@ -76,16 +76,18 @@ class Attacker(Strategy):
         def inveterd_quadratic_s(x):
             return -((-x**6) +1)
 
-        self.carry.add_field(
-            algorithims.fields.TangentialField(
+        self.tangential = algorithims.fields.TangentialField(
                 self.match,
                 target=follow_ball,
                 radius = 0.06,
+                radius_max = 0.30,
+                clockwise = 1,
                 decay=lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 0.7
             )
-        )
+
+        self.carry.add_field(self.tangential)
         
         # self.carry.add_field(
         #     algorithims.fields.PointField(
@@ -147,6 +149,8 @@ class Attacker(Strategy):
 
     def decide(self):
         
+        # self.tangential.clockwise = (self.match.ball.y - self.robot.y) > 0
+
         behaviour = self.carry
 
         if self.exporter:
