@@ -5,3 +5,5 @@ from algorithims.astar import AStar
 
 # potential fields
 from algorithims.potential_fields import fields
+from algorithims.astar import AStar
+from algorithims.dynamicWindowApproach import DynamicWindowApproach
