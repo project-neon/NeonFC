@@ -8,7 +8,7 @@
         "command_port": 20011
     },
     "match" : {
-        "num_robots": 1,
+        "num_robots": 2,
         "team_color": "blue"
     }
 }

@@ -41,10 +41,10 @@ class FiraVision(threading.Thread):
         self._fps = len(fps_frame_by_frame)/sum(fps_frame_by_frame)
 
     def run(self):
-        # print("Starting vision...")
+        print("Starting vision...")
         self.vision_sock = self._create_socket()
         self._wait_to_connect()
-        # print("Vision completed!")
+        print("Vision completed!")
 
         while True:
             env = packet_pb2.Environment()
@@ -91,8 +91,8 @@ def assign_empty_values(raw_frame):
     frame = raw_frame.get('frame')
     # 2 m comprimento = x
     # 1.8 m largura = y
-    w = 2.0
-    h = 1.8
+    w = 0.750 * 2
+    h = 0.650 * 2
     if frame.get('ball'):
         frame['ball']['x'] = frame['ball'].get('x', 0) + w/2
         frame['ball']['y'] = frame['ball'].get('y', 0) + h/2

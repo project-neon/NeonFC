@@ -1,13 +1,15 @@
 import random
+import json
+import math
 import numpy as np
 
 import commons
 
 MIN_WEIGHT_ACTIVE = 0.0
 
-def call_or_return(func, context):
+def call_or_return(func, match_context):
     if callable(func):
-        return func(context)
+        return func(match_context)
     return func
 
 def apply_decay(decay_fn, value):
@@ -17,6 +19,43 @@ def apply_decay(decay_fn, value):
     out = decay_fn(abs(value))
 
     return out if value >= 0 else -out
+
+class PotentialDataExporter(object):
+    def __init__(self, name):
+        self.file = open(
+            '{}|potential_field.log'.format(name),
+            'w'
+        )
+
+    def export(self, behaviour, robot, ball):
+        X = []
+        Y = []
+        U = []
+        V = []
+
+        for x in range(-10, 150 + 10, 2):
+            x = x/100.0
+            for y in range(-10, 130 + 10, 2):
+                y = y/100.0
+                res = behaviour.compute([x, y])
+                X.append(x)
+                Y.append(y)
+                U.append(res[0])
+                V.append(res[1])
+
+        plot_file = {
+            "x": X,
+            "y": Y,
+            "u": U,
+            "v": V,
+            "robot_x": robot.x,
+            "robot_y": robot.y,
+            "ball_x": ball.x,
+            "ball_y": ball.y,
+            "behaviour": behaviour.name
+        }
+
+        self.file.write(json.dumps(plot_file) + "||")
 
 class PotentialField(object):
     def __init__(self, match, **kwargs):
@@ -62,6 +101,8 @@ class PointField(PotentialField):
         self.radius_max = kwargs.get('radius_max')
         self.multiplier = kwargs.get('multiplier', 1)
 
+        self.field_limits = kwargs.get('field_limits', None)
+
     def compute(self, input):
         target_go_to = call_or_return(self.target, self.match)
         radius_max = call_or_return(self.radius_max, self.match)
@@ -70,6 +111,11 @@ class PointField(PotentialField):
         to_target = np.subtract(target_go_to, input)
         to_taget_scalar = np.linalg.norm(to_target)
 
+        if self.field_limits and not(0 <= input[0] <= self.field_limits[0]):
+            return (0, 0)
+        
+        if self.field_limits and not(0 <= input[1] <= self.field_limits[1]):
+            return (0, 0)
 
         if radius_max and to_taget_scalar > radius_max:
             return (0, 0)
@@ -102,6 +148,8 @@ class LineField(PotentialField):
         self.line_size_single_side = kwargs.get('line_size_single_side', False)
         self.line_dist_single_side = kwargs.get('line_dist_single_side', False)
 
+        self.field_limits = kwargs.get('field_limits', None)
+
     def compute(self, input):
         target_line = call_or_return(self.target, self.match)
         target_theta = call_or_return(self.theta, self.match)
@@ -112,7 +160,13 @@ class LineField(PotentialField):
         to_line = np.subtract(target_line, input)
         to_line_with_theta = commons.math.rotate_via_numpy(to_line, -target_theta)
 
-        if self.line_size and to_line_with_theta[0] > self.line_size:
+        if self.field_limits and not(0 <= input[0] <= self.field_limits[0]):
+            return (0, 0)
+        
+        if self.field_limits and not(0 <= input[1] <= self.field_limits[1]):
+            return (0, 0)
+
+        if self.line_size and abs(to_line_with_theta[0]) > self.line_size:
             return (0, 0)
 
         if self.line_size_single_side and to_line_with_theta[0] < 0:
@@ -140,3 +194,54 @@ class LineField(PotentialField):
             to_line_norm[1] * force * multiplier
         )
 
+class TangentialField(PotentialField):
+    def __init__(self, match, **kwargs):
+        super().__init__(match, **kwargs)
+        self.target = kwargs['target']
+        self.clockwise = kwargs.get('clockwise', False)
+        self.decay = kwargs['decay']
+        self.radius = kwargs.get('radius', kwargs.get('radius_max'))
+        self.radius_max = kwargs.get('radius_max')
+        self.multiplier = kwargs.get('multiplier', 1)
+        self.orbitation_speed = kwargs.get('orbitation_speed', self.multiplier)
+
+        self.K = kwargs.get('K', 1/25000)
+
+        self.field_limits = kwargs.get('field_limits', None)
+    
+    def compute(self, input):
+        target_go_to = call_or_return(self.target, self.match)
+        radius_max = call_or_return(self.radius_max, self.match)
+        multiplier = call_or_return(self.multiplier, self.match)
+
+        cwo = 1 if call_or_return(self.clockwise, self.match) else -1 # clockwise ou counterclockwise
+
+        to_target = np.subtract(target_go_to, input)
+        to_taget_scalar = np.linalg.norm(to_target)
+        
+        angle_to_target = math.atan2(target_go_to[1] - input[1], target_go_to[0] - input[0] )
+
+        if self.field_limits and not(0 <= input[0] <= self.field_limits[0]):
+            return (0, 0)
+        
+        if self.field_limits and not(0 <= input[1] <= self.field_limits[1]):
+            return (0, 0)
+
+        if radius_max and to_taget_scalar > radius_max:
+            return (0, 0)
+
+        to_target_scalar_norm = max(0, min(1, to_taget_scalar/self.radius))
+        end_angle = 0
+        if to_taget_scalar > self.radius:
+            end_angle = angle_to_target + cwo * (math.pi/2) * (2 - ( (self.radius + self.K)/(to_taget_scalar + self.K) ))
+        else:
+            end_angle = angle_to_target + cwo * (math.pi/2) * math.sqrt(to_taget_scalar/self.radius)
+
+        to_target_norm = -commons.math.unit_vector( (math.cos(end_angle), math.sin(end_angle)) )
+
+        force = apply_decay(self.decay, to_target_scalar_norm)
+
+        return (
+            to_target_norm[0] * force * multiplier,
+            to_target_norm[1] * force * multiplier
+        )
