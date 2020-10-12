@@ -137,9 +137,6 @@ class Robot(object):
 
         self.controller.set_desired(desired)
 
-        if self.robot_id == 1:
-            print('SPEEEEEEEEEED:  ', math.sqrt(self.vx**2 + self.vy**2))
-
         self.power_left, self.power_right = self.controller.update()
         if self.robot_id == 0:
             # print("--------------", self.power_left, self.power_right)

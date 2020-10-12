@@ -75,57 +75,68 @@ class Attacker(Strategy):
         
         def inveterd_quadratic_s(x):
             return -((-x**6) +1)
-        
-        self.carry.add_field(
-            algorithims.fields.PointField(
-                self.match,
-                target = follow_ball, # centro do campo
-                radius = 0.2, # 10cm
-                decay = quadratic,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.75 # 75 cm/s
-            )
-        )
 
         self.carry.add_field(
-            algorithims.fields.PointField(
-                self.match,
-                target = follow_ball, # centro do campo
-                radius = 0.2, # 10cm
-                radius_max = 0.2, # 10cm
-                decay = quadratic,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.75 # 75 cm/s
-            )
-        )
-
-        self.carry.add_field(
-            algorithims.fields.PointField(
-                self.match,
-                target = avoid_opposite, # centro do campo
-                radius = 0.2, # 10cm
-                radius_max = 0.2, # 10cm
-                decay = quadratic,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 1.5 # 75 cm/s
-            )
-        )
-
-        self.carry.add_field(
-            algorithims.fields.LineField(
+            algorithims.fields.TangentialField(
                 self.match,
                 target=follow_ball,
-                theta=math.pi,
-                line_size = 0.12,
-                line_size_max = 0.12,
-                line_size_single_side=True,
-                line_dist = 0.12,
-                line_dist_max = 0.12,
-                decay = inveterd_quadratic_s,
+                radius = 0.06,
+                decay=lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 1.5 # 75 cm/s
+                multiplier = 0.7
             )
         )
+        
+        # self.carry.add_field(
+        #     algorithims.fields.PointField(
+        #         self.match,
+        #         target = follow_ball, # centro do campo
+        #         radius = 0.2, # 10cm
+        #         decay = quadratic,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 0.75 # 75 cm/s
+        #     )
+        # )
+
+        # self.carry.add_field(
+        #     algorithims.fields.PointField(
+        #         self.match,
+        #         target = follow_ball, # centro do campo
+        #         radius = 0.2, # 10cm
+        #         radius_max = 0.2, # 10cm
+        #         decay = quadratic,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 0.75 # 75 cm/s
+        #     )
+        # )
+
+        # self.carry.add_field(
+        #     algorithims.fields.PointField(
+        #         self.match,
+        #         target = avoid_opposite, # centro do campo
+        #         radius = 0.2, # 10cm
+        #         radius_max = 0.2, # 10cm
+        #         decay = quadratic,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 1.5 # 75 cm/s
+        #     )
+        # )
+
+        # self.carry.add_field(
+        #     algorithims.fields.LineField(
+        #         self.match,
+        #         target=follow_ball,
+        #         theta=math.pi,
+        #         line_size = 0.12,
+        #         line_size_max = 0.12,
+        #         line_size_single_side=True,
+        #         line_dist = 0.12,
+        #         line_dist_max = 0.12,
+        #         decay = inveterd_quadratic_s,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 1.5 # 75 cm/s
+        #     )
+        # )
 
 
     def reset(self, robot=None):
