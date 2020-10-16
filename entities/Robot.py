@@ -20,7 +20,7 @@ class Robot(object):
         self.team_color = team_color
         self.current_data = {}
 
-        if self.robot_id == 0:
+        if self.robot_id in (0, 2):
             self.strategy = strategy.tests.Attacker(game.match)
         elif self.robot_id == 1:
             self.strategy = strategy.tests.GoalKeeper(game.match)
@@ -48,6 +48,7 @@ class Robot(object):
 
         self.vx, self.vy, self.vtheta = 0, 0, 0
 
+    def start(self):
         self.strategy.start(self)
     
     def get_name(self):

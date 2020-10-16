@@ -148,6 +148,8 @@ class LineField(PotentialField):
         self.line_size_single_side = kwargs.get('line_size_single_side', False)
         self.line_dist_single_side = kwargs.get('line_dist_single_side', False)
 
+        self.inverse = kwargs.get('inverse', False)
+
         self.field_limits = kwargs.get('field_limits', None)
 
     def compute(self, input):
@@ -175,7 +177,10 @@ class LineField(PotentialField):
         if self.line_dist_max and abs(to_line_with_theta[1]) > line_dist_max:
             return (0, 0)
 
-        if self.line_dist_single_side and to_line_with_theta[1] < 0:
+        if self.line_dist_single_side and to_line_with_theta[1] < 0 and not self.inverse:
+            return(0, 0)
+        
+        if self.line_dist_single_side and to_line_with_theta[1] > 0 and self.inverse:
             return(0, 0)
 
         to_line_norm = commons.math.unit_vector(

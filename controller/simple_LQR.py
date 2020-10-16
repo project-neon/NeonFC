@@ -30,7 +30,6 @@ class SimpleLQR(object):
         inverted = False
         theta = self.robot.theta
         robot_to_target = self.desired
-        robot_target = angle_between(robot_to_target, [math.cos(theta), math.sin(theta)] )
 
         v = self.desired[0] * math.cos(-theta) - self.desired[1] * math.sin(-theta)
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))

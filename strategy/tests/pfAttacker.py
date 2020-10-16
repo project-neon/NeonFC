@@ -6,8 +6,17 @@ from commons.math import unit_vector
 import json
 import numpy as np
 
+def point_in_rect(point,rect):
+    x1, y1, w, h = rect
+    x2, y2 = x1+w, y1+h
+    x, y = point
+    if (x1 < x and x < x2):
+        if (y1 < y and y < y2):
+            return True
+    return False
+
 class Attacker(Strategy):
-    def __init__(self, match, plot_field=True):
+    def __init__(self, match, plot_field=False):
         super().__init__(match)
 
         """
@@ -42,6 +51,16 @@ class Attacker(Strategy):
         self.base_rules = algorithims.fields.PotentialField(
             self.match,
             name="{}|BaseRulesBehaviour".format(self.__class__)
+        )
+
+        self.maintain = algorithims.fields.PotentialField(
+            self.match,
+            name="{}|MaintainRulesBehaviour".format(self.__class__)
+        )
+
+        self.avoiance = algorithims.fields.PotentialField(
+            self.match,
+            name="{}|AvoianceBehaviour".format(self.__class__)
         )
         
         self.seek = algorithims.fields.PotentialField(
@@ -144,8 +163,53 @@ class Attacker(Strategy):
             )
         )
 
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.750, 0.650*2 - 0.1),
+                theta = -2*math.pi,
+                line_size = 0.750,
+                line_size_max = 0.750,
+                line_dist = 0.1,
+                line_dist_max = 0.1,
+                line_dist_single_side = True,
+                inverse = True,
+                decay = lambda x: x**(0.5),
+                multiplier = 1.5
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.750, 0.1),
+                theta = 2*math.pi,
+                line_size = 0.750,
+                line_size_max = 0.750,
+                line_dist = 0.1,
+                line_dist_max = 0.1,
+                line_dist_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = 1.5
+            )
+        )
+
+        self.maintain.add_field(
+            algorithims.fields.PointField(
+                self.match,
+                target = lambda m: (0.30, m.ball.y), # centro do campo
+                radius = 0.2, # 10cm
+                decay = quadratic,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 0.75 # 75 cm/s
+            )
+        )
+
         self.seek.add_field(self.base_rules)
+        self.seek.add_field(self.avoiance)
+
         self.carry.add_field(self.base_rules)
+        self.carry.add_field(self.avoiance)
 
         self.seek.add_field(
             algorithims.fields.TangentialField(
@@ -159,7 +223,7 @@ class Attacker(Strategy):
                 clockwise = True,
                 decay=lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.9
+                multiplier = lambda m: 0.9
             )
         )
 
@@ -186,7 +250,7 @@ class Attacker(Strategy):
                 radius = 0.2, # 10cm
                 decay = quadratic,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.6 # 75 cm/s
+                multiplier = 0.75 # 75 cm/s
             )
         )
 
@@ -240,6 +304,9 @@ class Attacker(Strategy):
 
 
     def decide(self):
+        ball = [self.match.ball.x, self.match.ball.y]
+        goal_area = [-0.05, 0.35, 0.20, 0.70]
+
         angle_ball_to_goal = -math.atan2((self.match.ball.y - 0.65), (self.match.ball.x - 0.75*2))
         angle_robot_to_ball = -math.atan2((self.robot.y - self.match.ball.y), (self.robot.x - self.match.ball.x ))
         
@@ -249,12 +316,14 @@ class Attacker(Strategy):
             (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
 
-        if (angle_to_goal <= 0.5) and (dist_to_ball <= 0.10):
+        if point_in_rect(ball, goal_area):
+            behaviour = self.maintain
+        elif (angle_to_goal <= 0.5) and (dist_to_ball <= 0.10):
             behaviour = self.carry
         else:
             behaviour = self.seek
-        
-        print(behaviour.name)
+
+        print(self.robot.get_name(),"::",behaviour.name)
 
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)
