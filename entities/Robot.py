@@ -20,10 +20,17 @@ class Robot(object):
         self.team_color = team_color
         self.current_data = {}
 
-        if self.robot_id in (0, 2):
+        """
+        Essas atribuições serão feitas no Coach quando ele existir
+        """
+        if self.robot_id in 0:
             self.strategy = strategy.tests.Attacker(game.match)
         elif self.robot_id == 1:
             self.strategy = strategy.tests.GoalKeeper(game.match)
+        elif self.robot_id == 2:
+            self.strategy = strategy.tests.MidFielder(game.match)
+        else:
+            self.strategy = strategy.tests.Idle(game.match)
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()

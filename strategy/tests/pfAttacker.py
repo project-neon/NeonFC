@@ -20,24 +20,26 @@ class Attacker(Strategy):
         super().__init__(match)
 
         """
-        Essa estrategia descreve a um goleiro base, simples, que
+        Essa estrategia descreve a um atacante base, simples, que
         pode ser usado como baseline para o desenvolvimento de 
-        outros goleiros.
+        outros atacantes.
 
         Sua estrategia é constituida por alguns contextos que são
         mudados baseados em regras simples dentro do jogo.
         Cada contexto é um campo potencial que rege que tipo de
-        movimentação o goleiro precisa fazer. Sendo elas:
+        movimentação o atacante precisa fazer. Sendo elas:
 
-        1) maintain: O goleiro se mantem estatico no centro do gol
+        1) maintain: O atacante se mantem estatico proximo a pequena area
+        caso a bola esteja na pequena area, para evitar dupla defesa (dois robos 
+        nossos estarem na pequena area enquanto a bola esta lá)
 
-        1) alert: O goleiro se move dentro do gol, na pequena
-        area, seguindo a bola caso ela esteja dentro do eixo X do gol
-        e ficando nas "traves" caso a bola esteja nas laterais e dentro
-        da nossa area
+        1) seek: A etapa mais complexa do atacante, onde ele precisa ir para
+        parte de trás da bola (em relação ao proprio gol). Pega um angulo 
+        adequado e um distancia adequada para ir apra o estado de carry.
 
-        2) push: O goleiro empurra a bola caso ela esteja vindo em sua
-        direção, saindo um pouco da pequena area
+        2) carry: Após um certo valor de angulo e distancia em relação a bola
+        estarem satisfeitos, empurra a bola em direção ao gol em ritmo
+        acelerado
 
         A troca entre os contextos reside no metodo decide()
         """
