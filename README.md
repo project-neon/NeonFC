@@ -25,7 +25,7 @@ git clone https://github.com/project-neon/NeonFC.git
 
 ```bash
 cd NeonFC
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 2.1. Antes de executar, é importante checar o arquivo de configuração para verificar se as portas e endereços de rede estão compativeis com o software de simulação.
