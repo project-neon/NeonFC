@@ -261,11 +261,11 @@ class Attacker(Strategy):
                 theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
                 line_size = 1,
                 line_size_single_side = True,
-                line_dist = 0.10,
-                line_dist_max = 0.10,
+                line_dist = 0.15,
+                line_dist_max = 0.15,
                 decay = quadratic,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.9 # 75 cm/s
+                multiplier = 0.8 # 75 cm/s
             )
         )
 
@@ -282,6 +282,21 @@ class Attacker(Strategy):
                 decay = inveterd_quadratic_s,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 1 # 75 cm/s
+            )
+        )
+
+        self.carry.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target=follow_ball,
+                theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
+                line_size = 1,
+                line_size_single_side = True,
+                line_dist = 0.15,
+                line_dist_max = 0.15,
+                decay = quadratic,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 0.5 # 75 cm/s
             )
         )
 

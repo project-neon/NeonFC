@@ -12,7 +12,7 @@ para um valor coerente a velocidade desejada em m/s
 EXPERIMENTAL_SPEED_CONSTANT = 2678.57
 
 class SimpleLQR(object):
-    def __init__(self, robot, l=0.20):
+    def __init__(self, robot, l=0.2):
         self.desired = np.array([0, 0])
         self.robot = robot
 
@@ -27,7 +27,6 @@ class SimpleLQR(object):
     def update(self):
         n = (1/self.l)
 
-        inverted = False
         theta = self.robot.theta
         robot_to_target = self.desired
 
