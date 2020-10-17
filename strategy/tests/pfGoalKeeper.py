@@ -8,7 +8,7 @@ import numpy as np
 
 class GoalKeeper(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match)
+        super().__init__(match, controller_kwargs={'l': .1})
 
         """
         Essa estrategia descreve a um goleiro base, simples, que
@@ -76,6 +76,9 @@ class GoalKeeper(Strategy):
         
         def log2p1(x):
             return math.log(x) +1
+        
+        def inveterd_quadratic_s(x):
+            return -((-x**6) +1)
 
         def inveterd_quadratic(x):
             return (-x**2) +1
@@ -125,7 +128,7 @@ class GoalKeeper(Strategy):
         self.maintain.add_field(
             algorithims.fields.PointField(
                 self.match,
-                target = (0 + 0.05, 0.650), # centro do campo
+                target = (0 + 0.075, 0.650), # centro do campo
                 radius = 0.1, # 30cm
                 decay = quadratic,
                 field_limits = [0.75* 2 , 0.65*2],
@@ -133,15 +136,43 @@ class GoalKeeper(Strategy):
             )
         )
 
+        keep_behind_ball = algorithims.fields.LineField(
+            self.match,
+            target=follow_ball,
+            theta=lambda m: ( -math.atan2((m.ball.y - 0.65), (m.ball.x - 0.75*2))),
+            line_size = 0.18,
+            line_size_max = 0.18,
+            line_size_single_side = True,
+            line_dist = 0.05,
+            line_dist_max = 0.05,
+            decay = inveterd_quadratic_s,
+            field_limits = [0.75* 2 , 0.65*2],
+            multiplier = 0.75 # 75 cm/s
+        )
+
+        self.alert.add_field(keep_behind_ball)
+        self.push.add_field(keep_behind_ball)
+
 
         self.alert.add_field(
             algorithims.fields.PointField(
                 self.match,
-                target = lambda m : (0.1, m.ball.y), # centro do campo
+                target = lambda m : (0.1, max(0.35, min(m.ball.y, 0.70 + 0.35)) ), # centro do campo
                 radius = 0.1, # 30cm
                 decay = quadratic,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 0.75 # 50 cm/s
+            )
+        )
+
+        self.push.add_field(
+            algorithims.fields.PointField(
+                self.match,
+                target = follow_ball,
+                radius = 0.05, # 30cm
+                decay = lambda x: 1,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 1.2 # 50 cm/s
             )
         )
 
@@ -161,12 +192,12 @@ class GoalKeeper(Strategy):
 
         if self.match.ball.x > 0.650:
             behaviour = self.maintain
-        elif dist_to_ball <= 0.1: # 10cm
+        elif dist_to_ball <= 0.15 and self.robot.x < self.match.ball.x + self.robot.dimensions['L']: # 10cm
             behaviour = self.push
         else:
             behaviour = self.alert
         
-        behaviour = self.alert
+        print(self.robot.get_name(),"::",behaviour.name)
 
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)

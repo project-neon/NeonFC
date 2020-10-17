@@ -15,13 +15,16 @@ class Match(object):
     def start(self):
         self.ball = entities.Ball(self.game)
 
+        self.opposites = [
+            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
+        ]
+
         self.robots = [
             entities.Robot(self.game, i, self.team_color) for i in range(self.n_robots)
         ]
 
-        self.opposites = [
-            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
-        ]
+        for robot in self.robots:
+            robot.start()
 
     def update(self, frame):
         self.ball.update(frame)

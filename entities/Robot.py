@@ -20,10 +20,17 @@ class Robot(object):
         self.team_color = team_color
         self.current_data = {}
 
+        """
+        Essas atribuições serão feitas no Coach quando ele existir
+        """
         if self.robot_id == 0:
-            self.strategy = strategy.tests.Attacker(game.match)
+            self.strategy = strategy.tests.Scratch(game.match)
         elif self.robot_id == 1:
             self.strategy = strategy.tests.GoalKeeper(game.match)
+        elif self.robot_id == 2:
+            self.strategy = strategy.tests.MidFielder(game.match)
+        else:
+            self.strategy = strategy.tests.Idle(game.match)
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()
@@ -48,6 +55,7 @@ class Robot(object):
 
         self.vx, self.vy, self.vtheta = 0, 0, 0
 
+    def start(self):
         self.strategy.start(self)
     
     def get_name(self):
@@ -132,7 +140,6 @@ class Robot(object):
 
     def decide(self):
         desired = self.strategy.decide()
-        
         self.strategy.set_desired(desired)
         self.power_left, self.power_right = self.strategy.update()
 
