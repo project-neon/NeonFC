@@ -21,7 +21,7 @@ class MidFielder(Strategy):
             self.match,
             name="{}|BaseRulesBehaviour".format(self.__class__)
         )
-        
+
 
 
     def start(self, robot=None):
@@ -42,7 +42,7 @@ class MidFielder(Strategy):
             np.array([self.robot.x, self.robot.y]) - 
             np.array([self.match.ball.x, self.match.ball.y])
         )
-        
+
         behaviour = self.base_rules
 
         return behaviour.compute([self.robot.x, self.robot.y])

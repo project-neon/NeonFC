@@ -7,7 +7,7 @@ import json
 import numpy as np
 
 class Scratch(Strategy):
-    def __init__(self, match, plot_field=False):
+    def __init__(self, match, plot_field=True):
         super().__init__(match)
 
         """
@@ -65,7 +65,7 @@ class Scratch(Strategy):
         self.field.add_field(
             algorithims.fields.PointField(
                 self.match,
-                target = lambda m: (m.ball.x, m.ball.y),
+                target = (0.75, 0.65),
                 radius = 0.05, # 30cm
                 decay = lambda x: 1,
                 field_limits = [0.75*2 , 0.65*2],
