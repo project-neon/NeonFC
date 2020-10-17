@@ -7,7 +7,7 @@ import json
 import numpy as np
 
 class Scratch(Strategy):
-    def __init__(self, match, plot_field=True):
+    def __init__(self, match, plot_field=False):
         super().__init__(match)
 
         """
