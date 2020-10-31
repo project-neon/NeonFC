@@ -1,15 +1,11 @@
 import math
 import logging
 import numpy as np
-
 from collections import deque
 from scipy.ndimage.interpolation import rotate
-
 import controller
 import algorithims
-
 import strategy
-
 from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
 
 class Robot(object):
@@ -24,7 +20,7 @@ class Robot(object):
         Essas atribuições serão feitas no Coach quando ele existir
         """
         if self.robot_id == 0:
-            self.strategy = strategy.tests.Attacker(game.match)
+            self.strategy = strategy.tests.DwaScratch(game.match)
         elif self.robot_id == 1:
             self.strategy = strategy.tests.GoalKeeper(game.match)
         elif self.robot_id == 2:
