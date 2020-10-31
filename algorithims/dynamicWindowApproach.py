@@ -84,27 +84,27 @@ class DynamicWindowApproach:
 
         vLpossiblearray = (
             self.vL - MAX_ACCELERATION * dt, 
-            #-self.vL - MAX_ACCELERATION * dt,
+            -self.vL - MAX_ACCELERATION * dt,
             self.vL, 
-            #-self.vL, 
+            -self.vL, 
             self.vL + MAX_ACCELERATION * dt,
-            #-self.vL + MAX_ACCELERATION * dt,
+            -self.vL + MAX_ACCELERATION * dt,
             self.vL - (MAX_ACCELERATION / (2 * ACCELERATION_MULTIPLIER)) * dt, 
-            #-self.vL - (MAX_ACCELERATION / 2) * dt, 
+            -self.vL - (MAX_ACCELERATION / 2) * dt, 
             self.vL + (MAX_ACCELERATION / (2 * ACCELERATION_MULTIPLIER)) * dt,
-            #-self.vL + (MAX_ACCELERATION / 2) * dt,
+            -self.vL + (MAX_ACCELERATION / 2) * dt,
         )
         vRpossiblearray = (
             self.vR - MAX_ACCELERATION * dt, 
-            #-self.vR - MAX_ACCELERATION * dt,
+            -self.vR - MAX_ACCELERATION * dt,
             self.vR, 
-            #-self.vR, 
+            -self.vR, 
             self.vR + MAX_ACCELERATION * dt,
-            #-self.vR + MAX_ACCELERATION * dt,
+            -self.vR + MAX_ACCELERATION * dt,
             self.vR - (MAX_ACCELERATION / (2 * ACCELERATION_MULTIPLIER)) * dt, 
-            #-self.vR - (MAX_ACCELERATION / 2) * dt, 
+            -self.vR - (MAX_ACCELERATION / 2) * dt, 
             self.vR + (MAX_ACCELERATION / (2 * ACCELERATION_MULTIPLIER)) * dt,
-            #-self.vR + (MAX_ACCELERATION / 2) * dt,
+            -self.vR + (MAX_ACCELERATION / 2) * dt,
         )
 
         for vLpossible in vLpossiblearray:
