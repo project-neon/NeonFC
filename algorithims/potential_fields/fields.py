@@ -235,7 +235,7 @@ class TangentialField(PotentialField):
         if radius_max and to_taget_scalar > radius_max:
             return (0, 0)
 
-        to_target_scalar_norm = max(0, min(1, to_taget_scalar/self.radius))
+        to_target_scalar_norm = max(0, min(1, abs((self.radius - to_taget_scalar)/self.radius_max)))
         end_angle = 0
         if to_taget_scalar > self.radius:
             end_angle = angle_to_target + cwo * (math.pi/2) * (2 - ( (self.radius + self.K)/(to_taget_scalar + self.K) ))
