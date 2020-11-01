@@ -196,122 +196,122 @@ class Attacker(Strategy):
             )
         )
 
-        self.maintain.add_field(
-            algorithims.fields.PointField(
-                self.match,
-                target = lambda m: (0.30, m.ball.y), # centro do campo
-                radius = 0.2, # 10cm
-                decay = quadratic,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.75 # 75 cm/s
-            )
-        )
+        # self.maintain.add_field(
+        #     algorithims.fields.PointField(
+        #         self.match,
+        #         target = lambda m: (0.30, m.ball.y), # centro do campo
+        #         radius = 0.2, # 10cm
+        #         decay = quadratic,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 0.75 # 75 cm/s
+        #     )
+        # )
 
-        self.seek.add_field(self.base_rules)
-        self.seek.add_field(self.avoiance)
+        # self.seek.add_field(self.base_rules)
+        # self.seek.add_field(self.avoiance)
 
-        self.carry.add_field(self.base_rules)
-        self.carry.add_field(self.avoiance)
+        # self.carry.add_field(self.base_rules)
+        # self.carry.add_field(self.avoiance)
 
-        self.seek.add_field(
-            algorithims.fields.TangentialField(
-                self.match,
-                target=lambda m: (
-                    m.ball.x + math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
-                    m.ball.y + math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2
-                ),                                                                                                                                                                                                                                                                                                                                          
-                radius = 0.10,
-                radius_max = 0.20,
-                clockwise = True,
-                decay=lambda x: 1,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = lambda m: 0.9
-            )
-        )
+        # self.seek.add_field(
+        #     algorithims.fields.TangentialField(
+        #         self.match,
+        #         target=lambda m: (
+        #             m.ball.x + math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
+        #             m.ball.y + math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2
+        #         ),                                                                                                                                                                                                                                                                                                                                          
+        #         radius = 0.10,
+        #         radius_max = 0.20,
+        #         clockwise = True,
+        #         decay=lambda x: 1,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = lambda m: 0.9
+        #     )
+        # )
 
-        self.seek.add_field(
-            algorithims.fields.TangentialField(
-                self.match,
-                target=lambda m: (
-                    m.ball.x - math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
-                    m.ball.y - math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2
-                ),                                                                                                                                                                                                                                                                                                                                          
-                radius = 0.10,
-                radius_max = 0.20,
-                clockwise = False,
-                decay=lambda x: 1,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.9
-            )
-        )
+        # self.seek.add_field(
+        #     algorithims.fields.TangentialField(
+        #         self.match,
+        #         target=lambda m: (
+        #             m.ball.x - math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
+        #             m.ball.y - math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2
+        #         ),                                                                                                                                                                                                                                                                                                                                          
+        #         radius = 0.10,
+        #         radius_max = 0.20,
+        #         clockwise = False,
+        #         decay=lambda x: 1,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 0.9
+        #     )
+        # )
         
-        self.seek.add_field(
-            algorithims.fields.PointField(
-                self.match,
-                target = follow_ball, # centro do campo
-                radius = 0.2, # 10cm
-                decay = quadratic,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.75 # 75 cm/s
-            )
-        )
+        # self.seek.add_field(
+        #     algorithims.fields.PointField(
+        #         self.match,
+        #         target = follow_ball, # centro do campo
+        #         radius = 0.2, # 10cm
+        #         decay = quadratic,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 0.75 # 75 cm/s
+        #     )
+        # )
 
-        self.seek.add_field(
-            algorithims.fields.LineField(
-                self.match,
-                target=follow_ball,
-                theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
-                line_size = 1,
-                line_size_single_side = True,
-                line_dist = 0.15,
-                line_dist_max = 0.15,
-                decay = quadratic,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.8 # 75 cm/s
-            )
-        )
+        # self.seek.add_field(
+        #     algorithims.fields.LineField(
+        #         self.match,
+        #         target=follow_ball,
+        #         theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
+        #         line_size = 1,
+        #         line_size_single_side = True,
+        #         line_dist = 0.15,
+        #         line_dist_max = 0.15,
+        #         decay = quadratic,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 0.8 # 75 cm/s
+        #     )
+        # )
 
-        self.seek.add_field(
-            algorithims.fields.LineField(
-                self.match,
-                target=follow_ball,
-                theta=lambda m: ( -math.atan2((m.ball.y - 0.65), (m.ball.x - 0.75*2))),
-                line_size = 0.18,
-                line_size_max = 0.18,
-                line_size_single_side = True,
-                line_dist = 0.05,
-                line_dist_max = 0.05,
-                decay = inveterd_quadratic_s,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 1 # 75 cm/s
-            )
-        )
+        # self.seek.add_field(
+        #     algorithims.fields.LineField(
+        #         self.match,
+        #         target=follow_ball,
+        #         theta=lambda m: ( -math.atan2((m.ball.y - 0.65), (m.ball.x - 0.75*2))),
+        #         line_size = 0.18,
+        #         line_size_max = 0.18,
+        #         line_size_single_side = True,
+        #         line_dist = 0.05,
+        #         line_dist_max = 0.05,
+        #         decay = inveterd_quadratic_s,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 1 # 75 cm/s
+        #     )
+        # )
 
-        self.carry.add_field(
-            algorithims.fields.LineField(
-                self.match,
-                target=follow_ball,
-                theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
-                line_size = 1,
-                line_size_single_side = True,
-                line_dist = 0.15,
-                line_dist_max = 0.15,
-                decay = quadratic,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.5 # 75 cm/s
-            )
-        )
+        # self.carry.add_field(
+        #     algorithims.fields.LineField(
+        #         self.match,
+        #         target=follow_ball,
+        #         theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
+        #         line_size = 1,
+        #         line_size_single_side = True,
+        #         line_dist = 0.15,
+        #         line_dist_max = 0.15,
+        #         decay = quadratic,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 0.5 # 75 cm/s
+        #     )
+        # )
 
-        self.carry.add_field(
-            algorithims.fields.PointField(
-                self.match,
-                target = follow_ball, # centro do campo
-                radius = 0.05, # 10cm
-                decay = None,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = ball_speed # 75 cm/s
-            )
-        )
+        # self.carry.add_field(
+        #     algorithims.fields.PointField(
+        #         self.match,
+        #         target = follow_ball, # centro do campo
+        #         radius = 0.05, # 10cm
+        #         decay = None,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = ball_speed # 75 cm/s
+        #     )
+        # )
 
 
     def reset(self, robot=None):
