@@ -4,7 +4,7 @@
         "host_ip": "localhost",
         "blue_port": 30011,
         "yellow_port": 30012,
-        "vision_port": 10020,
+        "vision_port": 10002,
         "command_port": 20011
     },
     "match" : {

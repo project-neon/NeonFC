@@ -1,15 +1,11 @@
 import math
 import logging
 import numpy as np
-
 from collections import deque
 from scipy.ndimage.interpolation import rotate
-
 import controller
 import algorithims
-
 import strategy
-
 from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
 
 class Robot(object):

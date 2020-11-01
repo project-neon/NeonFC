@@ -5,7 +5,8 @@ ROBOT_RADIUS = 0.04
 SAFE_DIST = 0.0375
 BARRIER_RADIUS = 0.08
 MAX_VELOCITY = 50.0
-MAX_ACCELERATION = 50.0
+ACCELERATION_MULTIPLIER = 3
+MAX_ACCELERATION = 10.0 * ACCELERATION_MULTIPLIER
 STEPS_AHEAD_TO_PLAN = 2
 
 class DynamicWindowApproach:
@@ -47,11 +48,9 @@ class DynamicWindowApproach:
         # Calculate distance to closest obstacle
         opposites = self.get_obstacles()
         for (i,opposites) in enumerate(opposites):
-            dx = opposites.x - x
-            dy = opposites.y - y
-            d = math.sqrt(dx**2 + dy**2)
-            # Distance between closest touching point of circular robot and circular barrier
-            dist = d - BARRIER_RADIUS - ROBOT_RADIUS
+            dx = (opposites.x + ROBOT_RADIUS) - (x + ROBOT_RADIUS)
+            dy = (opposites.y + ROBOT_RADIUS) - (y + ROBOT_RADIUS)
+            dist = math.sqrt(dx**2 + dy**2)
             if (dist < closestdist):
                 closestdist = dist
         return closestdist
@@ -90,12 +89,10 @@ class DynamicWindowApproach:
             -self.vL, 
             self.vL + MAX_ACCELERATION * dt,
             -self.vL + MAX_ACCELERATION * dt,
-            self.vL - (MAX_ACCELERATION / 2) * dt, 
+            self.vL - (MAX_ACCELERATION / (2 * ACCELERATION_MULTIPLIER)) * dt, 
             -self.vL - (MAX_ACCELERATION / 2) * dt, 
-            self.vL + (MAX_ACCELERATION / 2) * dt,
+            self.vL + (MAX_ACCELERATION / (2 * ACCELERATION_MULTIPLIER)) * dt,
             -self.vL + (MAX_ACCELERATION / 2) * dt,
-            self.vL + MAX_ACCELERATION * dt,
-            -self.vL + MAX_ACCELERATION * dt,
         )
         vRpossiblearray = (
             self.vR - MAX_ACCELERATION * dt, 
@@ -104,12 +101,10 @@ class DynamicWindowApproach:
             -self.vR, 
             self.vR + MAX_ACCELERATION * dt,
             -self.vR + MAX_ACCELERATION * dt,
-            self.vR - (MAX_ACCELERATION / 2) * dt, 
+            self.vR - (MAX_ACCELERATION / (2 * ACCELERATION_MULTIPLIER)) * dt, 
             -self.vR - (MAX_ACCELERATION / 2) * dt, 
-            self.vR + (MAX_ACCELERATION / 2) * dt,
+            self.vR + (MAX_ACCELERATION / (2 * ACCELERATION_MULTIPLIER)) * dt,
             -self.vR + (MAX_ACCELERATION / 2) * dt,
-            self.vR + MAX_ACCELERATION * dt,
-            -self.vR + MAX_ACCELERATION * dt,
         )
 
         for vLpossible in vLpossiblearray:
