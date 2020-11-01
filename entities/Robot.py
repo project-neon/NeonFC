@@ -25,10 +25,6 @@ class Robot(object):
         """
         if self.robot_id == 0:
             self.strategy = strategy.tests.Attacker(game.match)
-        elif self.robot_id == 1:
-            self.strategy = strategy.tests.GoalKeeper(game.match)
-        elif self.robot_id == 2:
-            self.strategy = strategy.tests.MidFielder(game.match)
         else:
             self.strategy = strategy.tests.Idle(game.match)
 
