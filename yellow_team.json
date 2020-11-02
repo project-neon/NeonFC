@@ -9,6 +9,6 @@
     },
     "match" : {
         "num_robots": 3,
-        "team_color": "blue"
+        "team_color": "yellow"
     }
 }

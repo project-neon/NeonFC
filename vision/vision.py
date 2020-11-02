@@ -87,23 +87,37 @@ class FiraVision(threading.Thread):
         return sock
 
 
-def assign_empty_values(raw_frame):
+def assign_empty_values(raw_frame, color):
     frame = raw_frame.get('frame')
     # 2 m comprimento = x
     # 1.8 m largura = y
     w = 0.750 * 2
     h = 0.650 * 2
     if frame.get('ball'):
+        if color == 'yellow':
+            frame['ball']['x'] = -frame['ball'].get('x', 0)
+            frame['ball']['y'] = -frame['ball'].get('y', 0)
+
         frame['ball']['x'] = frame['ball'].get('x', 0) + w/2
         frame['ball']['y'] = frame['ball'].get('y', 0) + h/2
     
     for robot in frame.get("robotsYellow"):
+        if color == 'yellow':
+            robot['x'] = - robot.get('x', 0)
+            robot['y'] = - robot.get('y', 0)
+            robot['orientation'] = robot.get('orientation', 0) + math.pi
+
         robot['x'] = robot.get('x', 0) + w/2
         robot['y'] = robot.get('y', 0) + h/2
         robot['robotId'] = robot.get('robotId', 0)
         robot['orientation'] = robot.get('orientation', 0)
     
     for robot in frame.get("robotsBlue"):
+        if color == 'yellow':
+            robot['x'] = - robot.get('x', 0)
+            robot['y'] = - robot.get('y', 0)
+            robot['orientation'] = robot.get('orientation', 0) + math.pi
+
         robot['x'] = robot.get('x', 0) + w/2
         robot['y'] = robot.get('y', 0) + h/2
         robot['robotId'] = robot.get('robotId', 0)

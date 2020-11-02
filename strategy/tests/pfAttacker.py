@@ -43,9 +43,9 @@ class Attacker(Strategy):
 
         A troca entre os contextos reside no metodo decide()
         """
-        
-        self.normal_speed = 0.65
-        self.push_speed = 0.8
+
+        self.obey_rules_speed = 0.5
+        self.seek_speed = 0.3
 
         self.plot_field = plot_field
         self.exporter = None
@@ -57,12 +57,7 @@ class Attacker(Strategy):
 
         self.maintain = algorithims.fields.PotentialField(
             self.match,
-            name="{}|MaintainRulesBehaviour".format(self.__class__)
-        )
-
-        self.avoiance = algorithims.fields.PotentialField(
-            self.match,
-            name="{}|AvoianceBehaviour".format(self.__class__)
+            name="{}|MaintainBehaviour".format(self.__class__)
         )
         
         self.seek = algorithims.fields.PotentialField(
@@ -117,8 +112,8 @@ class Attacker(Strategy):
                 line_dist = 0.25,
                 line_dist_max = 0.25,
                 line_dist_single_side = True,
-                decay = repulse,
-                multiplier = 0.8
+                decay = lambda x: (-x**2) + 1,
+                multiplier = self.obey_rules_speed
             )
         )
         
@@ -131,8 +126,8 @@ class Attacker(Strategy):
                 line_size_max = 0.2,
                 line_dist = 0.2,
                 line_dist_max = 0.2,
-                decay = quadratic,
-                multiplier = 1.2
+                decay = lambda x: x**2,
+                multiplier = self.obey_rules_speed * 1.5
             )
         )
 
@@ -146,8 +141,8 @@ class Attacker(Strategy):
                 line_dist = 0.25,
                 line_dist_max = 0.25,
                 line_dist_single_side = True,
-                decay = repulse,
-                multiplier = 0.8
+                decay = lambda x: (-x**2) + 1,
+                multiplier = self.obey_rules_speed
             )
         )
         
@@ -160,8 +155,8 @@ class Attacker(Strategy):
                 line_size_max = 0.2,
                 line_dist = 0.2,
                 line_dist_max = 0.2,
-                decay = quadratic,
-                multiplier = 1.2
+                decay = lambda x: x**2,
+                multiplier = self.obey_rules_speed * 1.5
             )
         )
 
@@ -177,7 +172,7 @@ class Attacker(Strategy):
                 line_dist_single_side = True,
                 inverse = True,
                 decay = lambda x: x**(0.5),
-                multiplier = 1.5
+                multiplier = self.obey_rules_speed * 1.75
             )
         )
 
@@ -187,20 +182,79 @@ class Attacker(Strategy):
                 target = (0.750, 0.1),
                 theta = 2*math.pi,
                 line_size = 0.750,
-                line_size_max = 0.750,
                 line_dist = 0.1,
                 line_dist_max = 0.1,
                 line_dist_single_side = True,
                 decay = lambda x: x**(0.5),
-                multiplier = 1.5
+                multiplier = self.obey_rules_speed * 1.75
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.075, 0.85),
+                theta = math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.075, 0.0),
+                theta = math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*(0.75)-0.075, 0.85 + 0.45),
+                theta = 3*math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*(0.75)-0.075, 0.0 + 0.45),
+                theta = 3*math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
             )
         )
 
         self.maintain.add_field(
             algorithims.fields.PointField(
                 self.match,
-                target = lambda m: (0.30, m.ball.y), # centro do campo
-                radius = 0.2, # 10cm
+                target = lambda m: (0.50, (m.ball.y - 0.65)/2 + 0.65), # centro do campo
+                radius = 0.1, # 10cm
                 decay = quadratic,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 0.75 # 75 cm/s
@@ -208,10 +262,7 @@ class Attacker(Strategy):
         )
 
         self.seek.add_field(self.base_rules)
-        self.seek.add_field(self.avoiance)
-
         self.carry.add_field(self.base_rules)
-        self.carry.add_field(self.avoiance)
 
         self.seek.add_field(
             algorithims.fields.TangentialField(
@@ -225,7 +276,7 @@ class Attacker(Strategy):
                 clockwise = True,
                 decay=lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = lambda m: 0.9
+                multiplier = 0.85
             )
         )
 
@@ -241,7 +292,7 @@ class Attacker(Strategy):
                 clockwise = False,
                 decay=lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.9
+                multiplier = 0.85
             )
         )
         
@@ -249,8 +300,8 @@ class Attacker(Strategy):
             algorithims.fields.PointField(
                 self.match,
                 target = follow_ball, # centro do campo
-                radius = 0.2, # 10cm
-                decay = quadratic,
+                radius = 0.45, # 45cm
+                decay = lambda x: x**3,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 0.75 # 75 cm/s
             )
@@ -265,7 +316,7 @@ class Attacker(Strategy):
                 line_size_single_side = True,
                 line_dist = 0.15,
                 line_dist_max = 0.15,
-                decay = quadratic,
+                decay = lambda x: x,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 0.8 # 75 cm/s
             )
@@ -340,10 +391,7 @@ class Attacker(Strategy):
         else:
             behaviour = self.seek
 
-        print(self.robot.get_name(),"::",behaviour.name)
-
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)
 
         return behaviour.compute([self.robot.x, self.robot.y])
-

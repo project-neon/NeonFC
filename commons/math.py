@@ -70,3 +70,19 @@ def length(v):
 
 def angle_between(v1, v2):
   return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
+
+from numpy import arccos, array, dot, pi, cross
+from numpy.linalg import det, norm
+
+def distance(A, B, P):
+    """ segment line AB, point P, where each one is an array([x, y]) """
+    A = np.array(A)
+    B = np.array(B)
+    P = np.array(P)
+    if all(A == P) or all(B == P) or all(A == B):
+        return 0
+    if arccos(dot((P - A) / norm(P - A), (B - A) / norm(B - A))) > pi / 2:
+        return norm(P - A)
+    if arccos(dot((P - B) / norm(P - B), (A - B) / norm(A - B))) > pi / 2:
+        return norm(P - B)
+    return norm(cross(A-B, A-P))/norm(B-A)
