@@ -90,7 +90,6 @@ class Attacker(Strategy):
                 goal_pos = [0.75, 0.65]
 
                 dist = distance(goal_pos, ball_pos, robot_pos)
-                print(dist)
 
                 weight = 1/2 + 1/2 * min((dist/0.2), 1)
 
