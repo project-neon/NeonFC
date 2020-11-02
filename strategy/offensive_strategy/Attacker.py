@@ -32,6 +32,7 @@ class Attacker(Strategy):
         """
         
         self.plot_field = plot_field
+        self.obey_rules_speed = 0.5
         self.exporter = None
 
         """
@@ -40,9 +41,19 @@ class Attacker(Strategy):
         nesse caso convencionamos que sera 'NOME_CLASSE|NOME_COMPORTAMENTO', o nome da classe
         já é dado pelo cósigo e o nome do comportamento você decide, nesse caso é FieldBehaviour
         """
-        self.field = algorithims.fields.PotentialField(
+        self.seek = algorithims.fields.PotentialField(
             self.match,
-            name="{}|FieldBehaviour".format(self.__class__)
+            name="{}|SeekBehaviour".format(self.__class__)
+        )
+
+        self.carry = algorithims.fields.PotentialField(
+            self.match, 
+            name="{}|CarryBehaviour".format(self.__class__)
+        )
+
+        self.base_rules = algorithims.fields.PotentialField(
+            self.match,
+            name="{}|BaseRulesBehaviour".format(self.__class__)
         )
         """
         Crie quantos você quiser, cada um irá representar um comportamento que você definiu no passo (1)
@@ -76,7 +87,7 @@ class Attacker(Strategy):
 
                 weight = 1/2 + 1/2 * min((dist/0.2), 1)
 
-                return weight * 0.75 if m.ball.y < 0.65 else 0
+                return weight * 0.85 if m.ball.y < 0.65 else 0
             
             return s
         
@@ -92,12 +103,161 @@ class Attacker(Strategy):
 
                 weight = 1/2 + 1/2 * min((dist/0.2), 1)
 
-                return weight * 0.75 if m.ball.y >= 0.65 else 0
+                return weight * 0.85 if m.ball.y >= 0.65 else 0
             
             return s
-            
 
-        self.field.add_field(
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0, 0.650),
+                theta = math.pi/2,
+                line_size = 0.25,
+                line_size_max = 0.25,
+                line_dist = 0.25,
+                line_dist_max = 0.25,
+                line_dist_single_side = True,
+                decay = lambda x: (-x**2) + 1,
+                multiplier = self.obey_rules_speed
+            )
+        )
+        
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (-0.2, 0.650),
+                theta = 0,
+                line_size = 0.2,
+                line_size_max = 0.2,
+                line_dist = 0.2,
+                line_dist_max = 0.2,
+                decay = lambda x: x**2,
+                multiplier = self.obey_rules_speed * 1.5
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*0.750, 0.650),
+                theta = 3*math.pi/2,
+                line_size = 0.25,
+                line_size_max = 0.25,
+                line_dist = 0.25,
+                line_dist_max = 0.25,
+                line_dist_single_side = True,
+                decay = lambda x: (-x**2) + 1,
+                multiplier = self.obey_rules_speed
+            )
+        )
+        
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*0.750+0.2, 0.650),
+                theta = 2*math.pi,
+                line_size = 0.2,
+                line_size_max = 0.2,
+                line_dist = 0.2,
+                line_dist_max = 0.2,
+                decay = lambda x: x**2,
+                multiplier = self.obey_rules_speed * 1.5
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.750, 0.650*2 - 0.1),
+                theta = -2*math.pi,
+                line_size = 0.750,
+                line_size_max = 0.750,
+                line_dist = 0.1,
+                line_dist_max = 0.1,
+                line_dist_single_side = True,
+                inverse = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.75
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.750, 0.1),
+                theta = 2*math.pi,
+                line_size = 0.750,
+                line_dist = 0.1,
+                line_dist_max = 0.1,
+                line_dist_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.75
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.075, 0.85),
+                theta = math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.075, 0.0),
+                theta = math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*(0.75)-0.075, 0.85 + 0.45),
+                theta = 3*math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*(0.75)-0.075, 0.0 + 0.45),
+                theta = 3*math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+        
+        self.seek.add_field(self.base_rules)
+
+        self.seek.add_field(
             algorithims.fields.TangentialField(
                 self.match,
                 target=lambda m: (
@@ -113,7 +273,7 @@ class Attacker(Strategy):
             )
         )
 
-        self.field.add_field(
+        self.seek.add_field(
             algorithims.fields.TangentialField(
                 self.match,
                 target=lambda m: (
@@ -126,6 +286,19 @@ class Attacker(Strategy):
                 decay=lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = pr(self)
+            )
+        )
+
+        self.carry.add_field(self.base_rules)
+
+        self.carry.add_field(
+            algorithims.fields.PointField(
+                self.match,
+                target = lambda m: (m.ball.x, m.ball.y),
+                radius = 0.05, # 30cm
+                decay = lambda x: 1,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = lambda m: math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.05 # 50 cm/s
             )
         )
 
@@ -142,7 +315,24 @@ class Attacker(Strategy):
         comportamento sera execuetado nesse momento. crie o conjunto de regras
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
-        behaviour = self.field
+        ball = [self.match.ball.x, self.match.ball.y]
+        goal_area = [-0.05, 0.35, 0.20, 0.70]
+
+        angle_ball_to_goal = -math.atan2((self.match.ball.y - 0.65), (self.match.ball.x - 0.75*2))
+        angle_robot_to_ball = -math.atan2((self.robot.y - self.match.ball.y), (self.robot.x - self.match.ball.x ))
+        
+        angle_to_goal = abs(angle_ball_to_goal - angle_robot_to_ball)
+
+        dist_to_ball = math.sqrt(
+            (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
+        )
+        if (angle_to_goal <= 0.75) and (dist_to_ball <= 0.20):
+            behaviour = self.carry
+        else:
+            behaviour = self.seek
+
+
+        print(self.robot.get_name(), ":::", behaviour.name)
 
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)

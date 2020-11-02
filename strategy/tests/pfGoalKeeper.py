@@ -1,5 +1,6 @@
 import math
 import algorithims
+import controller
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 
@@ -8,7 +9,8 @@ import numpy as np
 
 class GoalKeeper(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match, controller_kwargs={'l': .1})
+        super().__init__(
+            match)
 
         """
         Essa estrategia descreve a um goleiro base, simples, que
@@ -293,8 +295,6 @@ class GoalKeeper(Strategy):
         else:
             behaviour = self.alert
         
-        print(self.robot.get_name(),"::",behaviour.name)
-
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)
 
