@@ -79,7 +79,7 @@ def distance(A, B, P):
     A = np.array(A)
     B = np.array(B)
     P = np.array(P)
-    if all(A == P) or all(B == P):
+    if all(A == P) or all(B == P) or all(A == B):
         return 0
     if arccos(dot((P - A) / norm(P - A), (B - A) / norm(B - A))) > pi / 2:
         return norm(P - A)
