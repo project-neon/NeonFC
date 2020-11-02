@@ -34,6 +34,7 @@ class GoalKeeper(Strategy):
         """
         
         self.normal_speed = 0.5
+        self.obey_rules_speed = 0.5
         self.push_speed = 0.8
 
         self.plot_field = plot_field
@@ -67,31 +68,6 @@ class GoalKeeper(Strategy):
 
         def follow_ball(m):
             return (m.ball.x, m.ball.y)
-        
-        def quadratic(x):
-            return x**2
-        
-        def slow_quadratic(x):
-            return -(x-1)**2 +1
-        
-        def log2p1(x):
-            return math.log(x) +1
-        
-        def inveterd_quadratic_s(x):
-            return -((-x**6) +1)
-
-        def inveterd_quadratic(x):
-            return (-x**2) +1
-        
-        def constant(x):
-            return 1
-
-        def ball_speed(m):
-            speed = min(max(
-                m.ball.vy + 0.2,
-                0.6
-            ), 1)
-            return speed
 
         self.base_rules.add_field(
             algorithims.fields.LineField(
@@ -103,10 +79,11 @@ class GoalKeeper(Strategy):
                 line_dist = 0.25,
                 line_dist_max = 0.25,
                 line_dist_single_side = True,
-                decay = inveterd_quadratic,
-                multiplier = 0.8
+                decay = lambda x: (-x**2) + 1,
+                multiplier = self.obey_rules_speed
             )
         )
+        
         self.base_rules.add_field(
             algorithims.fields.LineField(
                 self.match,
@@ -116,8 +93,127 @@ class GoalKeeper(Strategy):
                 line_size_max = 0.2,
                 line_dist = 0.2,
                 line_dist_max = 0.2,
-                decay = quadratic,
-                multiplier = 1.2
+                decay = lambda x: x**2,
+                multiplier = self.obey_rules_speed * 1.5
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*0.750, 0.650),
+                theta = 3*math.pi/2,
+                line_size = 0.25,
+                line_size_max = 0.25,
+                line_dist = 0.25,
+                line_dist_max = 0.25,
+                line_dist_single_side = True,
+                decay = lambda x: (-x**2) + 1,
+                multiplier = self.obey_rules_speed
+            )
+        )
+        
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*0.750+0.2, 0.650),
+                theta = 2*math.pi,
+                line_size = 0.2,
+                line_size_max = 0.2,
+                line_dist = 0.2,
+                line_dist_max = 0.2,
+                decay = lambda x: x**2,
+                multiplier = self.obey_rules_speed * 1.5
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.750, 0.650*2 - 0.1),
+                theta = -2*math.pi,
+                line_size = 0.750,
+                line_size_max = 0.750,
+                line_dist = 0.1,
+                line_dist_max = 0.1,
+                line_dist_single_side = True,
+                inverse = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.75
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.750, 0.1),
+                theta = 2*math.pi,
+                line_size = 0.750,
+                line_dist = 0.1,
+                line_dist_max = 0.1,
+                line_dist_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.75
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.075, 0.85),
+                theta = math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.075, 0.0),
+                theta = math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*(0.75)-0.075, 0.85 + 0.45),
+                theta = 3*math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
+            )
+        )
+
+        self.base_rules.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (2*(0.75)-0.075, 0.0 + 0.45),
+                theta = 3*math.pi/2,
+                line_size = 0.45,
+                line_dist = 0.075,
+                line_dist_max = 0.075,
+                line_dist_single_side = True,
+                line_size_single_side = True,
+                decay = lambda x: x**(0.5),
+                multiplier = self.obey_rules_speed * 1.8
             )
         )
 
@@ -130,24 +226,24 @@ class GoalKeeper(Strategy):
                 self.match,
                 target = (0 + 0.075, 0.650), # centro do campo
                 radius = 0.1, # 30cm
-                decay = quadratic,
+                decay = lambda x: x**2,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.75 # 50 cm/s
+                multiplier = self.normal_speed # 50 cm/s
             )
         )
 
         keep_behind_ball = algorithims.fields.LineField(
             self.match,
-            target=follow_ball,
-            theta=lambda m: ( -math.atan2((m.ball.y - 0.65), (m.ball.x - 0.75*2))),
+            target = follow_ball,
+            theta = lambda m: ( -math.atan2((m.ball.y - 0.65), (m.ball.x - 0.75*2))),
             line_size = 0.18,
             line_size_max = 0.18,
             line_size_single_side = True,
             line_dist = 0.05,
             line_dist_max = 0.05,
-            decay = inveterd_quadratic_s,
+            decay = lambda x: -((-x**6) +1),
             field_limits = [0.75* 2 , 0.65*2],
-            multiplier = 0.75 # 75 cm/s
+            multiplier = self.normal_speed # 75 cm/s
         )
 
         self.alert.add_field(keep_behind_ball)
@@ -159,9 +255,9 @@ class GoalKeeper(Strategy):
                 self.match,
                 target = lambda m : (0.1, max(0.35, min(m.ball.y, 0.70 + 0.35)) ), # centro do campo
                 radius = 0.1, # 30cm
-                decay = quadratic,
+                decay = lambda x: x**2,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.75 # 50 cm/s
+                multiplier = self.normal_speed # 50 cm/s
             )
         )
 
@@ -172,7 +268,7 @@ class GoalKeeper(Strategy):
                 radius = 0.05, # 30cm
                 decay = lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 1.2 # 50 cm/s
+                multiplier = self.push_speed # 50 cm/s
             )
         )
 

@@ -23,7 +23,10 @@ class Game():
         self.comm.start()
 
     def update(self):
-        frame = vision.assign_empty_values(self.vision.frame)
+        frame = vision.assign_empty_values(
+            self.vision.frame, 
+            color=self.config['match']['team_color']
+        )
         self.match.update(frame)
         subject_command = self.match.decide()
         self.comm.send(subject_command)

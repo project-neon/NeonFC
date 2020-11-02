@@ -391,10 +391,7 @@ class Attacker(Strategy):
         else:
             behaviour = self.seek
 
-        
-        print(behaviour.name)
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)
 
         return behaviour.compute([self.robot.x, self.robot.y])
-
