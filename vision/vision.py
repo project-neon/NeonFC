@@ -95,17 +95,17 @@ def assign_empty_values(raw_frame, color):
     h = 0.650 * 2
     if frame.get('ball'):
         if color == 'yellow':
-            frame['ball']['x'] = -frame['ball']['x']
-            frame['ball']['y'] = -frame['ball']['y']
-            
+            frame['ball']['x'] = -frame['ball'].get('x', 0)
+            frame['ball']['y'] = -frame['ball'].get('y', 0)
+
         frame['ball']['x'] = frame['ball'].get('x', 0) + w/2
         frame['ball']['y'] = frame['ball'].get('y', 0) + h/2
     
     for robot in frame.get("robotsYellow"):
         if color == 'yellow':
-            robot['x'] = - robot['x']
-            robot['y'] = - robot['y']
-            robot['orientation'] += math.pi
+            robot['x'] = - robot.get('x', 0)
+            robot['y'] = - robot.get('y', 0)
+            robot['orientation'] = robot.get('orientation', 0) + math.pi
 
         robot['x'] = robot.get('x', 0) + w/2
         robot['y'] = robot.get('y', 0) + h/2
@@ -114,9 +114,9 @@ def assign_empty_values(raw_frame, color):
     
     for robot in frame.get("robotsBlue"):
         if color == 'yellow':
-            robot['x'] = - robot['x']
-            robot['y'] = - robot['y']
-            robot['orientation'] += math.pi
+            robot['x'] = - robot.get('x', 0)
+            robot['y'] = - robot.get('y', 0)
+            robot['orientation'] = robot.get('orientation', 0) + math.pi
 
         robot['x'] = robot.get('x', 0) + w/2
         robot['y'] = robot.get('y', 0) + h/2

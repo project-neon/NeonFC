@@ -1,0 +1,14 @@
+{
+    "network" : {
+        "multicast_ip": "224.0.0.1",
+        "host_ip": "localhost",
+        "blue_port": 30011,
+        "yellow_port": 30012,
+        "vision_port": 10002,
+        "command_port": 20011
+    },
+    "match" : {
+        "num_robots": 3,
+        "team_color": "blue"
+    }
+}

@@ -1,13 +1,18 @@
 import comm
 import vision
 import match
+import argparse
 
 from commons.utils import get_config
 
+parser = argparse.ArgumentParser(description='NeonFC')
+parser.add_argument('--config_file', default='config.json')
+
+args = parser.parse_args()
 
 class Game():
-    def __init__(self):
-        self.config = get_config()
+    def __init__(self, config_file=None):
+        self.config = get_config(config_file)
         self.match = match.Match(self,
             **self.config.get('match')
         )
@@ -33,4 +38,4 @@ class Game():
 
 
 
-g = Game()
+g = Game(config_file=args.config_file)
