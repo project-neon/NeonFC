@@ -36,6 +36,4 @@ class Game():
         subject_command = self.match.decide()
         self.comm.send(subject_command)
 
-
-
 g = Game(config_file=args.config_file)

@@ -250,3 +250,84 @@ class TangentialField(PotentialField):
             to_target_norm[0] * force * multiplier,
             to_target_norm[1] * force * multiplier
         )
+
+class UniVectorField(PotentialField):
+    def __init__(self, match, **kwargs):
+        super().__init__(match, **kwargs)
+        self.target = kwargs['target']
+        self.clockwise = kwargs.get('clockwise', False)
+        self.decay = kwargs['decay']
+        self.radius = kwargs.get('radius', kwargs.get('radius_max'))
+        self.radius_max = kwargs.get('radius_max')
+        self.multiplier = kwargs.get('multiplier', 1)
+        self.orbitation_speed = kwargs.get('orbitation_speed', self.multiplier)
+
+        self.K = kwargs.get('K', 1/25000)
+
+        self.field_limits = kwargs.get('field_limits', None)
+    
+    def hsuf(self, c, p, de, input):
+        """
+        Hyperbolic spiral univector field
+        """
+        to_target = np.subtract(p, input)
+        angle_to_target = math.atan2(p[1] - input[1], p[0] - input[0] )
+        to_taget_scalar = np.linalg.norm(to_target)
+
+        end_angle = 0
+        if to_taget_scalar > de:
+            end_angle = angle_to_target + c * (math.pi/2) * (2 - ( (de + self.K)/(to_taget_scalar + self.K) ))
+        else:
+            end_angle = angle_to_target + c * (math.pi/2) * math.sqrt(to_taget_scalar/de)
+        
+        return end_angle
+    
+    def v_hsuf(self, c, p, de, input):
+        ang = self.hsuf(c, p, de, input)
+        return -commons.math.unit_vector( (math.cos(ang), math.sin(ang)) )
+
+    def tuf(self, input):
+        yl = input[1] + self.radius
+        yr = input[1] - self.radius
+
+        pl = (input[0], input[1] - self.radius)
+        pr = (input[0], input[1] + self.radius)
+        de = self.radius
+        x, y = input
+        return self.v_hsuf(1, pl, de, input)
+
+        if (input[1]-de) <= y < (input[1]+de):
+            return (yl * self.v_hsuf(-1, pl, de, input) + yr * self.v_hsuf(1, pr, de, input))/2*de
+        elif y < input[1]-de:
+            return self.v_hsuf(1, pl, de, input)
+        else:
+            return self.v_hsuf(-1, pr, de, input)
+    
+    def compute(self, input):
+        target_go_to = call_or_return(self.target, self.match)
+        radius_max = call_or_return(self.radius_max, self.match)
+        multiplier = call_or_return(self.multiplier, self.match)
+
+        # cwo = 1 if call_or_return(self.clockwise, self.match) else -1 # clockwise ou counterclockwise
+
+        # to_target = np.subtract(target_go_to, input)
+        # to_taget_scalar = np.linalg.norm(to_target)
+        
+        # angle_to_target = math.atan2(target_go_to[1] - input[1], target_go_to[0] - input[0] )
+
+        if self.field_limits and not(0 <= input[0] <= self.field_limits[0]):
+            return (0, 0)
+        
+        if self.field_limits and not(0 <= input[1] <= self.field_limits[1]):
+            return (0, 0)
+
+        # to_target_scalar_norm = max(0, min(1, abs((self.radius - to_taget_scalar)/self.radius_max)))
+       
+        force = apply_decay(self.decay, 1)
+
+        to_target_norm = self.tuf(input)
+
+        return (
+            to_target_norm[0] * force * multiplier,
+            to_target_norm[1] * force * multiplier
+        )

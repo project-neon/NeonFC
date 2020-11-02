@@ -21,7 +21,7 @@ class Robot(object):
         """
         if self.team_color == 'blue':
             if self.robot_id == 0:
-                self.strategy = strategy.tests.Attacker(game.match)
+                self.strategy = strategy.offensive_strategy.Attacker(game.match)
             elif self.robot_id == 1:
                 self.strategy = strategy.tests.GoalKeeper(game.match)
             else:
