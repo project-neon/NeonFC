@@ -6,6 +6,15 @@ from commons.math import unit_vector, distance
 import json
 import numpy as np
 
+def point_in_rect(point,rect):
+    x1, y1, w, h = rect
+    x2, y2 = x1+w, y1+h
+    x, y = point
+    if (x1 < x and x < x2):
+        if (y1 < y and y < y2):
+            return True
+    return False
+
 class Attacker(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(match)
@@ -51,6 +60,11 @@ class Attacker(Strategy):
             name="{}|CarryBehaviour".format(self.__class__)
         )
 
+        self.maintain = algorithims.fields.PotentialField(
+            self.match, 
+            name="{}|MaintainBehaviour".format(self.__class__)
+        )
+
         self.base_rules = algorithims.fields.PotentialField(
             self.match,
             name="{}|BaseRulesBehaviour".format(self.__class__)
@@ -87,7 +101,7 @@ class Attacker(Strategy):
 
                 weight = 1/2 + 1/2 * min((dist/0.2), 1)
 
-                return weight * 0.85 if m.ball.y < 0.65 else 0
+                return weight * 0.75 if m.ball.y < 0.65 else 0
             
             return s
         
@@ -103,7 +117,7 @@ class Attacker(Strategy):
 
                 weight = 1/2 + 1/2 * min((dist/0.2), 1)
 
-                return weight * 0.85 if m.ball.y >= 0.65 else 0
+                return weight * 0.75 if m.ball.y >= 0.65 else 0
             
             return s
 
@@ -298,7 +312,18 @@ class Attacker(Strategy):
                 radius = 0.05, # 30cm
                 decay = lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = lambda m: math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.05 # 50 cm/s
+                multiplier = lambda m: math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.1 # 50 cm/s
+            )
+        )
+
+        self.maintain.add_field(
+            algorithims.fields.PointField(
+                self.match,
+                target = (0.40, 0.65),
+                radius = 0.1,
+                decay = lambda x: x,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 0.60
             )
         )
 
@@ -316,7 +341,7 @@ class Attacker(Strategy):
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
         ball = [self.match.ball.x, self.match.ball.y]
-        goal_area = [-0.05, 0.35, 0.20, 0.70]
+        goal_area = [-0.05, 0.30, 0.20, 0.70]
 
         angle_ball_to_goal = -math.atan2((self.match.ball.y - 0.65), (self.match.ball.x - 0.75*2))
         angle_robot_to_ball = -math.atan2((self.robot.y - self.match.ball.y), (self.robot.x - self.match.ball.x ))
@@ -326,7 +351,10 @@ class Attacker(Strategy):
         dist_to_ball = math.sqrt(
             (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
-        if (angle_to_goal <= 0.75) and (dist_to_ball <= 0.20):
+
+        if point_in_rect(ball ,goal_area):
+            behaviour = self.maintain
+        elif (angle_to_goal <= 0.75) and (dist_to_ball <= 0.20):
             behaviour = self.carry
         else:
             behaviour = self.seek
