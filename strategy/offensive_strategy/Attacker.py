@@ -41,8 +41,12 @@ class Attacker(Strategy):
         """
         
         self.plot_field = plot_field
-        self.obey_rules_speed = 0.5
         self.exporter = None
+
+        self.obey_rules_speed = 0.5
+
+        self.v_radius = 0.2
+        self.v_radius_2 = 0.1
 
         """
         Essa é uma definição basica de campo, você sempre irá usar o objeto 
@@ -91,6 +95,7 @@ class Attacker(Strategy):
 
         def pl(self):
             robot_id = self.robot.robot_id
+            radius = self.v_radius
 
             def s(m):
                 robot_pos = [m.robots[robot_id].x, m.robots[robot_id].y]
@@ -99,7 +104,7 @@ class Attacker(Strategy):
 
                 dist = distance(goal_pos, ball_pos, robot_pos)
 
-                weight = 1/2 + 1/2 * min((dist/0.2), 1)
+                weight = 1/2 + 1/2 * min((dist/radius), 1)
 
                 return weight * 0.75 if m.ball.y < 0.65 else 0
             
@@ -107,6 +112,7 @@ class Attacker(Strategy):
         
         def pr(self):
             robot_id = self.robot.robot_id
+            radius = self.v_radius
 
             def s(m):
                 robot_pos = [m.robots[robot_id].x, m.robots[robot_id].y]
@@ -115,7 +121,7 @@ class Attacker(Strategy):
 
                 dist = distance(goal_pos, ball_pos, robot_pos)
 
-                weight = 1/2 + 1/2 * min((dist/0.2), 1)
+                weight = 1/2 + 1/2 * min((dist/radius), 1)
 
                 return weight * 0.75 if m.ball.y >= 0.65 else 0
             
@@ -275,10 +281,10 @@ class Attacker(Strategy):
             algorithims.fields.TangentialField(
                 self.match,
                 target=lambda m: (
-                    m.ball.x + math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
-                    m.ball.y + math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2
+                    m.ball.x + math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*self.v_radius , 
+                    m.ball.y + math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*self.v_radius
                 ),                                                                                                                                                                                                                                                                                                                                          
-                radius = 0.10,
+                radius = self.v_radius_2,
                 radius_max = 2,
                 clockwise = True,
                 decay=lambda x: 1,
@@ -291,10 +297,10 @@ class Attacker(Strategy):
             algorithims.fields.TangentialField(
                 self.match,
                 target=lambda m: (
-                    m.ball.x - math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
-                    m.ball.y - math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2
+                    m.ball.x - math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*self.v_radius , 
+                    m.ball.y - math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*self.v_radius
                 ),                                                                                                                                                                                                                                                                                                                                          
-                radius = 0.10,
+                radius = self.v_radius_2,
                 radius_max = 2,
                 clockwise = False,
                 decay=lambda x: 1,
@@ -359,8 +365,7 @@ class Attacker(Strategy):
         else:
             behaviour = self.seek
 
-
-        print(self.robot.get_name(), ":::", behaviour.name)
+        print(self.robot.get_name(), "::", behaviour.name)
 
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)
