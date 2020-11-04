@@ -74,9 +74,9 @@ class Attacker(Strategy):
             name="{}|BaseRulesBehaviour".format(self.__class__)
         )
 
-        self._t = algorithims.fields.PotentialField(
+        self.heading = algorithims.fields.PotentialField(
             self.match,
-            name="{}|TestBehaviour".format(self.__class__)
+            name="{}|HeadingBehaviour".format(self.__class__)
         )
         """
         Crie quantos você quiser, cada um irá representar um comportamento que você definiu no passo (1)
@@ -284,44 +284,34 @@ class Attacker(Strategy):
 
         def ttl(m):
             "target tangetial left"
-            y_proj = 0.65
-            if m.ball.y >= 0.85:
-                y_proj = 0.55
-            elif m.ball.y <= 0.45:
-                y_proj = 0.75
 
             pos_x = (
                 m.ball.x -
-                math.cos(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 -
-                math.cos(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vx/10
+                math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 -
+                math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vx/10
             )
 
             pos_y = (
                 m.ball.y -
-                math.sin(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 -
-                math.sin(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vy/10
+                math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 -
+                math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vy/10
             )
 
             return (pos_x, pos_y)
 
         def ttr(m):
             "target tangetial left"
-            y_proj = 0.65
-            if m.ball.y >= 0.85:
-                y_proj = 0.55
-            elif m.ball.y <= 0.45:
-                y_proj = 0.75
 
             pos_x = (
                 m.ball.x -
-                math.cos(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 +
-                math.cos(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vx/10
+                math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 +
+                math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vx/10
             )
 
             pos_y = (
                 m.ball.y -
-                math.sin(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 +
-                math.sin(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vy/10
+                math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 +
+                math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vy/10
             )
 
             return (pos_x, pos_y)
@@ -397,7 +387,7 @@ class Attacker(Strategy):
                 radius = 0.05, # 30cm
                 decay = lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = lambda m: max(0.65, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.1) # 50 cm/s
+                multiplier = lambda m: max(0.80, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.1) # 50 cm/s
             )
         )
 
@@ -426,7 +416,9 @@ class Attacker(Strategy):
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
         ball = [self.match.ball.x, self.match.ball.y]
+        of_goal_area = [1.30, 0.30, 0.30, 0.70]
         goal_area = [-0.05, 0.30, 0.20, 0.70]
+
         angle_ball_to_goal = -math.atan2((self.match.ball.y - 0.65), (self.match.ball.x - 0.75*2))
         angle_robot_to_ball = -math.atan2((self.robot.y - self.match.ball.y), (self.robot.x - self.match.ball.x ))
         
@@ -436,7 +428,9 @@ class Attacker(Strategy):
             (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
 
-        if point_in_rect(ball ,goal_area):
+        if point_in_rect(ball, of_goal_area):
+            behaviour = self.carry
+        elif point_in_rect(ball ,goal_area):
             behaviour = self.maintain
         elif (angle_to_goal <= 0.75) and (dist_to_ball <= 0.20):
             behaviour = self.carry
