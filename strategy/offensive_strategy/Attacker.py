@@ -73,6 +73,11 @@ class Attacker(Strategy):
             self.match,
             name="{}|BaseRulesBehaviour".format(self.__class__)
         )
+
+        self._t = algorithims.fields.PotentialField(
+            self.match,
+            name="{}|TestBehaviour".format(self.__class__)
+        )
         """
         Crie quantos você quiser, cada um irá representar um comportamento que você definiu no passo (1)
         """
@@ -277,13 +282,54 @@ class Attacker(Strategy):
         
         self.seek.add_field(self.base_rules)
 
+        def ttl(m):
+            "target tangetial left"
+            y_proj = 0.65
+            if m.ball.y >= 0.85:
+                y_proj = 0.55
+            elif m.ball.y <= 0.45:
+                y_proj = 0.75
+
+            pos_x = (
+                m.ball.x -
+                math.cos(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 -
+                math.cos(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vx/10
+            )
+
+            pos_y = (
+                m.ball.y -
+                math.sin(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 -
+                math.sin(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vy/10
+            )
+
+            return (pos_x, pos_y)
+
+        def ttr(m):
+            "target tangetial left"
+            y_proj = 0.65
+            if m.ball.y >= 0.85:
+                y_proj = 0.55
+            elif m.ball.y <= 0.45:
+                y_proj = 0.75
+
+            pos_x = (
+                m.ball.x -
+                math.cos(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 +
+                math.cos(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vx/10
+            )
+
+            pos_y = (
+                m.ball.y -
+                math.sin(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))) * 0.025 +
+                math.sin(math.atan2((y_proj-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 + m.ball.vy/10
+            )
+
+            return (pos_x, pos_y)
+
         self.seek.add_field(
             algorithims.fields.TangentialField(
                 self.match,
-                target=lambda m: (
-                    m.ball.x + math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*self.v_radius , 
-                    m.ball.y + math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*self.v_radius
-                ),                                                                                                                                                                                                                                                                                                                                          
+                target=ttr,                                                                                                                                                                                                                                                                                                                                          
                 radius = self.v_radius_2,
                 radius_max = 2,
                 clockwise = True,
@@ -296,16 +342,49 @@ class Attacker(Strategy):
         self.seek.add_field(
             algorithims.fields.TangentialField(
                 self.match,
-                target=lambda m: (
-                    m.ball.x - math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*self.v_radius , 
-                    m.ball.y - math.sin(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*self.v_radius
-                ),                                                                                                                                                                                                                                                                                                                                          
+                target=ttl,                                                                                                                                                                                                                                                                                                                                          
                 radius = self.v_radius_2,
                 radius_max = 2,
                 clockwise = False,
                 decay=lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = pr(self)
+            )
+        )
+
+        self.seek.add_field(
+            algorithims.fields.PointField(
+                self.match,
+                target= lambda m: (m.opposites[0].x, m.opposites[0].y),
+                radius=0.20,
+                radius_max=0.20,
+                decay = lambda x: x-1,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 1.2
+            )
+        )
+
+        self.seek.add_field(
+            algorithims.fields.PointField(
+                self.match,
+                target= lambda m: (m.opposites[1].x, m.opposites[1].y),
+                radius=0.20,
+                radius_max=0.20,
+                decay = lambda x: x-1,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 1.2
+            )
+        )
+
+        self.seek.add_field(
+            algorithims.fields.PointField(
+                self.match,
+                target= lambda m: (m.opposites[2].x, m.opposites[2].y),
+                radius=0.20,
+                radius_max=0.20,
+                decay = lambda x: x-1,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 1.2
             )
         )
 
@@ -318,7 +397,7 @@ class Attacker(Strategy):
                 radius = 0.05, # 30cm
                 decay = lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = lambda m: math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.1 # 50 cm/s
+                multiplier = lambda m: max(0.65, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.1) # 50 cm/s
             )
         )
 
@@ -348,7 +427,6 @@ class Attacker(Strategy):
         """
         ball = [self.match.ball.x, self.match.ball.y]
         goal_area = [-0.05, 0.30, 0.20, 0.70]
-
         angle_ball_to_goal = -math.atan2((self.match.ball.y - 0.65), (self.match.ball.x - 0.75*2))
         angle_robot_to_ball = -math.atan2((self.robot.y - self.match.ball.y), (self.robot.x - self.match.ball.x ))
         
