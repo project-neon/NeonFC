@@ -346,8 +346,8 @@ class Attacker(Strategy):
             algorithims.fields.PointField(
                 self.match,
                 target= lambda m: (m.opposites[0].x, m.opposites[0].y),
-                radius=0.20,
-                radius_max=0.20,
+                radius=0.25,
+                radius_max=0.25,
                 decay = lambda x: x-1,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 1.2
@@ -358,8 +358,8 @@ class Attacker(Strategy):
             algorithims.fields.PointField(
                 self.match,
                 target= lambda m: (m.opposites[1].x, m.opposites[1].y),
-                radius=0.20,
-                radius_max=0.20,
+                radius=0.25,
+                radius_max=0.25,
                 decay = lambda x: x-1,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 1.2
@@ -370,8 +370,8 @@ class Attacker(Strategy):
             algorithims.fields.PointField(
                 self.match,
                 target= lambda m: (m.opposites[2].x, m.opposites[2].y),
-                radius=0.20,
-                radius_max=0.20,
+                radius=0.25,
+                radius_max=0.25,
                 decay = lambda x: x-1,
                 field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 1.2

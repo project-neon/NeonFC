@@ -23,16 +23,16 @@ class Robot(object):
             if self.robot_id == 0:
                 self.strategy = strategy.offensive_strategy.Attacker(game.match)
             elif self.robot_id == 1:
-                self.strategy = strategy.tests.GoalKeeper(game.match)
+                self.strategy = strategy.offensive_strategy.GoalKeeper(game.match)
             else:
-                self.strategy = strategy.tests.Idle(game.match)
+                self.strategy = strategy.offensive_strategy.MidFielder(game.match)
         else:
             if self.robot_id == 0:
                 self.strategy = strategy.offensive_strategy.Attacker(game.match)
             elif self.robot_id == 1:
-                self.strategy = strategy.tests.GoalKeeper(game.match)
+                self.strategy = strategy.offensive_strategy.GoalKeeper(game.match)
             else:
-                self.strategy = strategy.tests.Idle(game.match)
+                self.strategy = strategy.offensive_strategy.MidFielder(game.match)
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()
