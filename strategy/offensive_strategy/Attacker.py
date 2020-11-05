@@ -59,6 +59,11 @@ class Attacker(Strategy):
             name="{}|SeekBehaviour".format(self.__class__)
         )
 
+        self.defend = algorithims.fields.PotentialField(
+            self.match,
+            name="{}|DefendBehaviour".format(self.__class__)
+        )
+
         self.carry = algorithims.fields.PotentialField(
             self.match, 
             name="{}|CarryBehaviour".format(self.__class__)
@@ -402,6 +407,25 @@ class Attacker(Strategy):
             )
         )
 
+        self.defend.add_field(self.base_rules)
+
+        self.defend.add_field(
+            algorithims.fields.TangentialField(
+                self.match,
+                target=lambda m: (
+                    m.ball.x + (math.cos(math.pi/3) if m.ball.y < 0.65 else math.cos(5*math.pi/3)) * 0.1,
+                    m.ball.y + (math.sin(math.pi/3) if m.ball.y < 0.65 else math.sin(5*math.pi/3)) * 0.1
+                ),                                                                                                                                                                                                                                                                                                                                          
+                radius = 0.04,
+                radius_max = 2,
+                clockwise = lambda m: (m.ball.y < 0.65),
+                decay=lambda x: 1,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 1
+            )
+        )
+
+
 
     def reset(self, robot=None):
         super().reset()
@@ -428,8 +452,14 @@ class Attacker(Strategy):
             (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
 
+        dist_to_ball_goal = math.sqrt(
+            (0 - self.match.ball.x)**2 + (0.65 - self.match.ball.y)**2
+        )
+
         if point_in_rect(ball, of_goal_area):
             behaviour = self.carry
+        elif dist_to_ball_goal <= 0.65 and self.match.ball.x <= 0.30:
+            behaviour = self.defend
         elif point_in_rect(ball ,goal_area):
             behaviour = self.maintain
         elif (angle_to_goal <= 0.75) and (dist_to_ball <= 0.20):
