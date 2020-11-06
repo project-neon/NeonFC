@@ -1,4 +1,4 @@
 build:
-	docker build -t neon-fc .
+	docker build --no-cache -t neon-fc .
 run:
-	docker run --net=host --name neon-fc python
+	docker run --net=host neon-fc
