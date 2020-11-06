@@ -383,6 +383,45 @@ class Attacker(Strategy):
             )
         )
 
+        if self.robot.robot_id != 0:
+            self.seek.add_field(
+                algorithims.fields.PointField(
+                    self.match,
+                    target= lambda m: (m.robots[0].x, m.robots[0].y),
+                    radius=0.25,
+                    radius_max=0.25,
+                    decay = lambda x: x**2 - 1,
+                    field_limits = [0.75* 2 , 0.65*2],
+                    multiplier = 1
+                )
+            )
+
+        if self.robot.robot_id != 1:
+            self.seek.add_field(
+                algorithims.fields.PointField(
+                    self.match,
+                    target= lambda m: (m.robots[1].x, m.robots[1].y),
+                    radius=0.25,
+                    radius_max=0.25,
+                    decay = lambda x: x**2 - 1,
+                    field_limits = [0.75* 2 , 0.65*2],
+                    multiplier = 1
+                )
+            )
+
+        if self.robot.robot_id != 2:
+            self.seek.add_field(
+                algorithims.fields.PointField(
+                    self.match,
+                    target= lambda m: (m.robots[2].x, m.robots[2].y),
+                    radius=0.25,
+                    radius_max=0.25,
+                    decay = lambda x: x**2 - 1,
+                    field_limits = [0.75* 2 , 0.65*2],
+                    multiplier = 1
+                )
+            )
+
         self.carry.add_field(self.base_rules)
 
         self.carry.add_field(
