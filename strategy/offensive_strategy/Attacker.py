@@ -17,7 +17,7 @@ def point_in_rect(point,rect):
 
 class Attacker(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match)
+        super().__init__(match, "attacker")
 
         """
         Ambiente para rascunhar novas estrategias com

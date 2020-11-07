@@ -10,7 +10,7 @@ import numpy as np
 class MidFielder(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(
-            match)
+            match, "midfielder")
 
         """
         Essa estrategia descreve a um goleiro base, simples, que

@@ -3,10 +3,11 @@ from abc import ABC
 import controller
 
 class Strategy(ABC):
-    def __init__(self, match, controller=controller.SimpleLQR, controller_kwargs={}):
+    def __init__(self, match, name, controller=controller.SimpleLQR, controller_kwargs={}):
         self.match = match
         self._controller = controller
         self._ctr_kwargs = controller_kwargs
+        self.name = name
 
     def start(self, robot=None):
         '''

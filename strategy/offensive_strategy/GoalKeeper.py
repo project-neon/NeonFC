@@ -45,7 +45,7 @@ def proj_goaline(pos_ball, speed_ball):
 class GoalKeeper(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(
-            match)
+            match, "goalkeeper")
 
         """
         Essa estrategia descreve a um goleiro base, simples, que
