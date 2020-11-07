@@ -383,45 +383,6 @@ class Attacker(Strategy):
             )
         )
 
-        if self.robot.robot_id != 0:
-            self.seek.add_field(
-                algorithims.fields.PointField(
-                    self.match,
-                    target= lambda m: (m.robots[0].x, m.robots[0].y),
-                    radius=0.25,
-                    radius_max=0.25,
-                    decay = lambda x: x**2 - 1,
-                    field_limits = [0.75* 2 , 0.65*2],
-                    multiplier = 1
-                )
-            )
-
-        if self.robot.robot_id != 1:
-            self.seek.add_field(
-                algorithims.fields.PointField(
-                    self.match,
-                    target= lambda m: (m.robots[1].x, m.robots[1].y),
-                    radius=0.25,
-                    radius_max=0.25,
-                    decay = lambda x: x**2 - 1,
-                    field_limits = [0.75* 2 , 0.65*2],
-                    multiplier = 1
-                )
-            )
-
-        if self.robot.robot_id != 2:
-            self.seek.add_field(
-                algorithims.fields.PointField(
-                    self.match,
-                    target= lambda m: (m.robots[2].x, m.robots[2].y),
-                    radius=0.25,
-                    radius_max=0.25,
-                    decay = lambda x: x**2 - 1,
-                    field_limits = [0.75* 2 , 0.65*2],
-                    multiplier = 1
-                )
-            )
-
         self.carry.add_field(self.base_rules)
 
         self.carry.add_field(
@@ -435,6 +396,8 @@ class Attacker(Strategy):
             )
         )
 
+        self.maintain.add_field(self.base_rules)
+
         self.maintain.add_field(
             algorithims.fields.PointField(
                 self.match,
@@ -447,6 +410,21 @@ class Attacker(Strategy):
         )
 
         self.defend.add_field(self.base_rules)
+
+        self.defend.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.05, 0.650),
+                theta = math.pi/2,
+                line_size = 0.25,
+                line_size_max = 0.25,
+                line_dist = 0.25,
+                line_dist_max = 0.25,
+                line_dist_single_side = True,
+                decay = lambda x: (-x**2) + 1,
+                multiplier = self.obey_rules_speed * 1.2
+            )
+        )
 
         self.defend.add_field(
             algorithims.fields.TangentialField(
@@ -497,10 +475,15 @@ class Attacker(Strategy):
 
         if point_in_rect(ball, of_goal_area):
             behaviour = self.carry
-        elif dist_to_ball_goal <= 0.65 and self.match.ball.x <= 0.30:
-            behaviour = self.defend
         elif point_in_rect(ball ,goal_area):
             behaviour = self.maintain
+        elif dist_to_ball_goal <= 0.65 and self.match.ball.x <= 0.35:
+            behaviour = self.defend
+        elif (
+            (ball[1] >= 1.1 and self.robot.y >= 1.05) 
+            or 
+            (ball[1] <= 0.2 and self.robot.y <= 0.25)) and self.robot.x < ball[0]:
+            behaviour = self.carry
         elif (angle_to_goal <= 0.75) and (dist_to_ball <= 0.20):
             behaviour = self.carry
         else:

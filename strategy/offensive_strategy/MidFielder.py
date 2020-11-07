@@ -7,6 +7,15 @@ from commons.math import unit_vector, distance
 import json
 import numpy as np
 
+def point_in_rect(point,rect):
+    x1, y1, w, h = rect
+    x2, y2 = x1+w, y1+h
+    x, y = point
+    if (x1 < x and x < x2):
+        if (y1 < y and y < y2):
+            return True
+    return False
+
 class MidFielder(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(
@@ -55,6 +64,11 @@ class MidFielder(Strategy):
         self.wait = algorithims.fields.PotentialField(
             self.match, 
             name="{}|WaitBehaviour".format(self.__class__)
+        )
+
+        self.defend = algorithims.fields.PotentialField(
+            self.match,
+            name="{}|DefendBehaviour".format(self.__class__)
         )
 
     
@@ -292,9 +306,9 @@ class MidFielder(Strategy):
                 algorithims.fields.PointField(
                     self.match,
                     target= lambda m: (m.robots[0].x, m.robots[0].y),
-                    radius=0.25,
-                    radius_max=0.25,
-                    decay = lambda x: x**2 - 1,
+                    radius=0.27,
+                    radius_max=0.27,
+                    decay = lambda x: x**5 - 1,
                     field_limits = [0.75* 2 , 0.65*2],
                     multiplier = 1.5
                 )
@@ -305,9 +319,9 @@ class MidFielder(Strategy):
                 algorithims.fields.PointField(
                     self.match,
                     target= lambda m: (m.robots[1].x, m.robots[1].y),
-                    radius=0.25,
-                    radius_max=0.25,
-                    decay = lambda x: x**2 - 1,
+                    radius=0.27,
+                    radius_max=0.27,
+                    decay = lambda x: x**5 - 1,
                     field_limits = [0.75* 2 , 0.65*2],
                     multiplier = 1.5
                 )
@@ -318,13 +332,46 @@ class MidFielder(Strategy):
                 algorithims.fields.PointField(
                     self.match,
                     target= lambda m: (m.robots[2].x, m.robots[2].y),
-                    radius=0.25,
-                    radius_max=0.25,
-                    decay = lambda x: x**2 - 1,
+                    radius=0.27,
+                    radius_max=0.27,
+                    decay = lambda x: x**5 - 1,
                     field_limits = [0.75* 2 , 0.65*2],
                     multiplier = 1.5
                 )
             )
+
+        self.defend.add_field(self.base_rules)
+
+        self.defend.add_field(
+            algorithims.fields.LineField(
+                self.match,
+                target = (0.05, 0.650),
+                theta = math.pi/2,
+                line_size = 0.25,
+                line_size_max = 0.25,
+                line_dist = 0.25,
+                line_dist_max = 0.25,
+                line_dist_single_side = True,
+                decay = lambda x: (-x**2) + 1,
+                multiplier = self.obey_rules_speed * 1.2
+            )
+        )
+
+        self.defend.add_field(
+            algorithims.fields.TangentialField(
+                self.match,
+                target=lambda m: (
+                    m.ball.x + (math.cos(math.pi/3) if m.ball.y < 0.65 else math.cos(5*math.pi/3)) * 0.1,
+                    m.ball.y + (math.sin(math.pi/3) if m.ball.y < 0.65 else math.sin(5*math.pi/3)) * 0.1
+                ),                                                                                                                                                                                                                                                                                                                                          
+                radius = 0.04,
+                radius_max = 2,
+                clockwise = lambda m: (m.ball.y < 0.65),
+                decay=lambda x: 1,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 1
+            )
+        )
 
 
     def reset(self, robot=None):
@@ -338,10 +385,19 @@ class MidFielder(Strategy):
             np.array([self.robot.x, self.robot.y]) - 
             np.array([self.match.ball.x, self.match.ball.y])
         )
-        
-        behaviour = self.detain
+        ball = [self.match.ball.x, self.match.ball.y]
+        goal_area = [-0.05, 0.30, 0.20, 0.70]
+        dist_to_ball_goal = math.sqrt(
+            (0 - self.match.ball.x)**2 + (0.65 - self.match.ball.y)**2
+        )
 
-        if self.match.ball.x <= 0.750:
+        behaviour = None
+
+        if point_in_rect(ball ,goal_area):
+            behaviour = self.wait
+        elif dist_to_ball_goal <= 0.65 and self.match.ball.x <= 0.35:
+            behaviour = self.defend
+        elif self.match.ball.x <= 0.750:
             behaviour = self.detain
         else:
             behaviour = self.wait
