@@ -479,6 +479,11 @@ class Attacker(Strategy):
             behaviour = self.maintain
         elif dist_to_ball_goal <= 0.65 and self.match.ball.x <= 0.35:
             behaviour = self.defend
+        elif (
+            (ball[1] >= 1.1 and self.robot.y >= 1.05) 
+            or 
+            (ball[1] <= 0.2 and self.robot.y <= 0.25)) and self.robot.x < ball[0]:
+            behaviour = self.carry
         elif (angle_to_goal <= 0.75) and (dist_to_ball <= 0.20):
             behaviour = self.carry
         else:
