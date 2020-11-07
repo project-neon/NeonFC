@@ -12,7 +12,7 @@ class FiraComm(object):
 
         self.commands = []
 
-        self.command_port = os.environ.get('COMMAND_PORT', self.config['network']['command_port'])
+        self.command_port = int(os.environ.get('COMMAND_PORT', self.config['network']['command_port']))
         self.host = os.environ.get('HOST_IP', self.config['network']['host_ip'])
     
     def start(self):

@@ -24,7 +24,7 @@ class FiraVision(threading.Thread):
 
         self.frame = {}
         
-        self.vision_port = os.environ.get('VISION_PORT', self.config['network']['vision_port'])
+        self.vision_port = int(os.environ.get('VISION_PORT', self.config['network']['vision_port']))
         self.host = os.environ.get('MULTICAST_IP', self.config['network']['multicast_ip'])
 
         self._fps = 0
