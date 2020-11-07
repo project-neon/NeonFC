@@ -1,3 +1,4 @@
+import os
 import entities
 import algorithims
 
@@ -8,7 +9,7 @@ class Match(object):
         super().__init__()
         self.game = game
         self.n_robots = num_robots
-        self.team_color = team_color
+        self.team_color = os.environ.get('TEAM_COLOR', team_color)
 
         self.opposite_team_color = 'yellow' if team_color == 'blue' else 'blue'
     
