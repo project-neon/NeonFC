@@ -13,7 +13,6 @@ _sym_db = _symbol_database.Default()
 
 
 
-
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='command.proto',
   package='fira_message.sim_to_ref',

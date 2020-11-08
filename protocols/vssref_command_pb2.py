@@ -12,7 +12,7 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-import vssref_common_pb2 as vssref__common__pb2
+from protocols import vssref_common_pb2 as vssref__common__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(

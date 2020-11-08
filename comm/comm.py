@@ -1,13 +1,13 @@
 import os
-import json.scanner
-import socket
+import json
 import struct
+import socket
 import threading
 
 from commons.utils import get_config
 
 from google.protobuf.json_format import MessageToJson
-from protocols import command_pb2, packet_pb2
+from protocols import command_pb2, packet_pb2, vssref_command_pb2
 
 class FiraComm(object):
     def __init__(self):
@@ -63,26 +63,28 @@ class FiraComm(object):
 
 class RefereeComm(threading.Thread):
         def __init__(self):
-            super(FiraComm, self).__init__()
+            super(RefereeComm, self).__init__()
             self.config = get_config()
-
             self.commands = []
+
+            self.status = None
 
             self.referee_port = int(os.environ.get('REFEREE_PORT', self.config['network']['referee_port']))
             self.host = os.environ.get('MULTICAST_IP', self.config['network']['multicast_ip'])
+
+            self.can_play = False
         
         def run(self):
             print("Starting referee...")
             self.referee_sock = self._create_socket()
-            self._wait_to_connect()
             print("Referee completed!")
             while True:
-                env = packet_pb2.Environment()
-                data = self.vision_sock.recv(1024)
-                self.set_fps()
-                env.ParseFromString(data)
-                self.frame = json.loads(MessageToJson(env))
-                self.game.update()
+                c = vssref_command_pb2.VSSRef_Command()
+                data = self.referee_sock.recv(1024)
+                c.ParseFromString(data)
+                self.status = json.loads(MessageToJson(c))
+
+                self.can_play = self.status.get('foul') == 'GAME_ON'
 
         def _create_socket(self):
             sock = socket.socket(
@@ -112,16 +114,22 @@ class RefereeComm(threading.Thread):
 
             return sock
 
-        def _wait_to_connect(self):
-            self.vision_sock.recv(1024)
-
 
 if __name__ == "__main__":
     import time
-    v = RefereeComm()
+    c = FiraComm()
 
-    v.start()
+    c.start()
 
     while True:
         time.sleep(1)
-        print(v.frame)
+        c.send(
+            [
+                {
+                    'robot_id': 0,
+                    'wheel_left': 20,
+                    'wheel_right': -20,
+                    'color': 'blue'
+                }
+            ]
+        )
