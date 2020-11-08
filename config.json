@@ -11,7 +11,7 @@
     },
     "match" : {
         "num_robots": 3,
-        "team_color": "blue",
-        "referee": true
-    }
+        "team_color": "blue"
+    },
+    "referee": true
 }
