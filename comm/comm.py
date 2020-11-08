@@ -1,8 +1,12 @@
 import os
+import json.scanner
 import socket
+import struct
+import threading
 
 from commons.utils import get_config
 
+from google.protobuf.json_format import MessageToJson
 from protocols import command_pb2, packet_pb2
 
 class FiraComm(object):
@@ -57,23 +61,67 @@ class FiraComm(object):
     def _create_socket(self):
         return socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+class RefereeComm(threading.Thread):
+        def __init__(self):
+            super(FiraComm, self).__init__()
+            self.config = get_config()
+
+            self.commands = []
+
+            self.referee_port = int(os.environ.get('REFEREE_PORT', self.config['network']['referee_port']))
+            self.host = os.environ.get('MULTICAST_IP', self.config['network']['multicast_ip'])
+        
+        def run(self):
+            print("Starting referee...")
+            self.referee_sock = self._create_socket()
+            self._wait_to_connect()
+            print("Referee completed!")
+            while True:
+                env = packet_pb2.Environment()
+                data = self.vision_sock.recv(1024)
+                self.set_fps()
+                env.ParseFromString(data)
+                self.frame = json.loads(MessageToJson(env))
+                self.game.update()
+
+        def _create_socket(self):
+            sock = socket.socket(
+                socket.AF_INET, 
+                socket.SOCK_DGRAM, 
+                socket.IPPROTO_UDP
+            )
+
+            sock.setsockopt(
+                socket.SOL_SOCKET, 
+                socket.SO_REUSEADDR, 1
+            )
+
+            sock.bind((self.host, self.referee_port))
+
+            mreq = struct.pack(
+                "4sl",
+                socket.inet_aton(self.host),
+                socket.INADDR_ANY
+            )
+
+            sock.setsockopt(
+                socket.IPPROTO_IP, 
+                socket.IP_ADD_MEMBERSHIP, 
+                mreq
+            )
+
+            return sock
+
+        def _wait_to_connect(self):
+            self.vision_sock.recv(1024)
 
 
 if __name__ == "__main__":
     import time
-    c = FiraComm()
+    v = RefereeComm()
 
-    c.start()
+    v.start()
 
     while True:
         time.sleep(1)
-        c.send(
-            [
-                {
-                    'robot_id': 0,
-                    'wheel_left': 20,
-                    'wheel_right': -20,
-                    'color': 'blue'
-                }
-            ]
-        )
+        print(v.frame)
