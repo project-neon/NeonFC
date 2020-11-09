@@ -16,23 +16,11 @@ class Robot(object):
         self.team_color = team_color
         self.current_data = {}
 
+        self.strategy = None
+
         """
         Essas atribuições serão feitas no Coach quando ele existir
         """
-        if self.team_color == 'blue':
-            if self.robot_id == 0:
-                self.strategy = strategy.offensive_strategy.GoalKeeper(game.match)
-            elif self.robot_id == 1:
-                self.strategy = strategy.offensive_strategy.Attacker(game.match)
-            else:
-                self.strategy = strategy.offensive_strategy.MidFielder(game.match)
-        else:
-            if self.robot_id == 0:
-                self.strategy = strategy.offensive_strategy.GoalKeeper(game.match)
-            elif self.robot_id == 1:
-                self.strategy = strategy.offensive_strategy.Attacker(game.match)
-            else:
-                self.strategy = strategy.offensive_strategy.MidFielder(game.match)
 
         self.log = logging.getLogger(self.get_name())
         ch = logging.StreamHandler()
@@ -56,6 +44,7 @@ class Robot(object):
         }
 
         self.vx, self.vy, self.vtheta = 0, 0, 0
+        self.x, self.y = 0, 0
 
     def start(self):
         self.strategy.start(self)

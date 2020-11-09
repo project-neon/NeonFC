@@ -45,7 +45,7 @@ def proj_goaline(pos_ball, speed_ball):
 class GoalKeeper(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(
-            match)
+            match, "goalkeeper")
 
         """
         Essa estrategia descreve a um goleiro base, simples, que
@@ -77,6 +77,25 @@ class GoalKeeper(Strategy):
         self.plot_field = plot_field
         self.exporter = None
 
+    
+    # def spin(self):
+    #     if (self.match.ball.y - self.robot.y) > 0:
+    #         return 120, -120
+    #     return -120, 120
+
+    # def spinning_time(self):
+    #     if math.sqrt((self.match.ball.x - self.robot.x)**2 + (self.match.ball.y - self.robot.y)**2) <= 0.080:
+    #         return True
+    #     return False
+
+    # def update(self):
+    #     if self.spinning_time():
+    #         return self.spin()
+    #     return self.controller.update()
+
+    def start(self, robot=None):
+        super().start(robot=robot)
+
         self.base_rules = algorithims.fields.PotentialField(
             self.match,
             name="{}|BaseRulesBehaviour".format(self.__class__)
@@ -96,24 +115,6 @@ class GoalKeeper(Strategy):
             self.match, 
             name="{}|PushBehaviour".format(self.__class__)
         )
-    
-    # def spin(self):
-    #     if (self.match.ball.y - self.robot.y) > 0:
-    #         return 120, -120
-    #     return -120, 120
-
-    # def spinning_time(self):
-    #     if math.sqrt((self.match.ball.x - self.robot.x)**2 + (self.match.ball.y - self.robot.y)**2) <= 0.080:
-    #         return True
-    #     return False
-
-    # def update(self):
-    #     if self.spinning_time():
-    #         return self.spin()
-    #     return self.controller.update()
-
-    def start(self, robot=None):
-        super().start(robot=robot)
 
         if self.plot_field:
             self.exporter = algorithims.fields.PotentialDataExporter(self.robot.get_name())

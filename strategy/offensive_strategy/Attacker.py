@@ -17,7 +17,7 @@ def point_in_rect(point,rect):
 
 class Attacker(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match, controller_kwargs={'l': 0.0765})
+        super().__init__(match, "attacker", controller_kwargs={'l': 0.0765})
 
         """
         Ambiente para rascunhar novas estrategias com
@@ -54,6 +54,16 @@ class Attacker(Strategy):
         nesse caso convencionamos que sera 'NOME_CLASSE|NOME_COMPORTAMENTO', o nome da classe
         já é dado pelo cósigo e o nome do comportamento você decide, nesse caso é FieldBehaviour
         """
+
+        """
+        Crie quantos você quiser, cada um irá representar um comportamento que você definiu no passo (1)
+        """
+
+
+
+    def start(self, robot=None):
+        super().start(robot=robot)
+
         self.seek = algorithims.fields.PotentialField(
             self.match,
             name="{}|SeekBehaviour".format(self.__class__)
@@ -83,14 +93,6 @@ class Attacker(Strategy):
             self.match,
             name="{}|HeadingBehaviour".format(self.__class__)
         )
-        """
-        Crie quantos você quiser, cada um irá representar um comportamento que você definiu no passo (1)
-        """
-
-
-
-    def start(self, robot=None):
-        super().start(robot=robot)
 
         if self.plot_field:
             self.exporter = algorithims.fields.PotentialDataExporter(self.robot.get_name())

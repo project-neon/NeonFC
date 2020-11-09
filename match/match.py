@@ -24,6 +24,9 @@ class Match(object):
             entities.Robot(self.game, i, self.team_color) for i in range(self.n_robots)
         ]
 
+        self.coach = entities.Coach(self)
+        self.coach.decide()
+
         for robot in self.robots:
             robot.start()
 
@@ -42,6 +45,9 @@ class Match(object):
         '''
         https://docs.python.org/3/library/concurrent.futures.html
         '''
+
+        self.coach.decide()
+
         with futures.ThreadPoolExecutor(max_workers=self.n_robots) as executor:
             commands = [
                 executor.submit(robot.decide).result() for robot in self.robots
