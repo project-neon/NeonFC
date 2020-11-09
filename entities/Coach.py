@@ -27,7 +27,6 @@ class Coach(object):
                 self.match.robots[elected].strategy = strategy
             elif self.match.robots[elected].strategy.name != strategy.name:
                 self.match.robots[elected].strategy = strategy
-                strategy.reset()
                 self.match.robots[elected].start()
             robots.remove(elected)
     

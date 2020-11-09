@@ -42,6 +42,12 @@ class MidFielder(Strategy):
         self.plot_field = plot_field
         self.exporter = None
 
+    
+
+    def start(self, robot=None):
+        super().start(robot=robot)
+
+
         self.base_rules = algorithims.fields.PotentialField(
             self.match,
             name="{}|BaseRulesBehaviour".format(self.__class__)
@@ -56,11 +62,6 @@ class MidFielder(Strategy):
             self.match, 
             name="{}|WaitBehaviour".format(self.__class__)
         )
-
-    
-
-    def start(self, robot=None):
-        super().start(robot=robot)
 
         if self.plot_field:
             self.exporter = algorithims.fields.PotentialDataExporter(self.robot.get_name())

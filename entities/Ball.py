@@ -27,6 +27,7 @@ class Ball(object):
         }
 
         self.vx, self.vy = 0, 0
+        self.x, self.y = 0, 0
 
     def get_name(self):
         return 'BALL'
