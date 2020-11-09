@@ -19,6 +19,7 @@ class Game():
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
         self.referee = comm.RefereeComm()
+
         self.use_referee = self.config.get('referee')
         
         self.start()
@@ -34,7 +35,7 @@ class Game():
     def update(self):
         frame = vision.assign_empty_values(
             self.vision.frame, 
-            color=self.config['match']['team_color']
+            color=self.match.team_color
         )
         self.match.update(frame)
         commands = self.match.decide()
