@@ -8,9 +8,9 @@ class Coach(object):
         self.match = match
         self.constraints = [
             #estratégia - função eleitora - prioridade
-            (strategy.offensive_strategy.GoalKeeper(self.match), lambda x: True, 0),
-            (strategy.offensive_strategy.Attacker(self.match), lambda x: True, 0),
-            (strategy.offensive_strategy.MidFielder(self.match), lambda x: True, 0)
+            (strategy.offensive_strategy.GoalKeeper(self.match), self.elect_goalkeeper, 0),
+            (strategy.offensive_strategy.Attacker(self.match), self.elect_attacker, 0),
+            (strategy.offensive_strategy.MidFielder(self.match), self.elect_midfielder, 0)
         ]
     
     def decide (self):
