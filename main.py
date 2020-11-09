@@ -18,22 +18,39 @@ class Game():
         )
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
+        self.referee = comm.RefereeComm()
+
+        self.use_referee = self.config.get('referee')
         
         self.start()
 
     def start(self):
         self.vision.assign_vision(self)
         self.match.start()
+
         self.vision.start()
         self.comm.start()
+        self.referee.start()
 
     def update(self):
         frame = vision.assign_empty_values(
             self.vision.frame, 
-            color=self.config['match']['team_color']
+            color=self.match.team_color
         )
         self.match.update(frame)
-        subject_command = self.match.decide()
-        self.comm.send(subject_command)
+        commands = self.match.decide()
+
+        if self.referee.can_play or (not self.use_referee):
+            self.comm.send(commands)
+        else:
+            commands = [
+                {
+                    'robot_id': r['robot_id'],
+                    'color': r['color'],
+                    'wheel_left': 0,
+                    'wheel_right': 0
+                } for r in commands
+            ]
+            self.comm.send(commands)
 
 g = Game(config_file=args.config_file)

@@ -1,4 +1,4 @@
 build:
 	docker build --no-cache -t neon-fc .
 run:
-	docker run --net=host neon-fc
+	docker run --net=host $(params) neon-fc
