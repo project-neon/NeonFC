@@ -1,4 +1,5 @@
 {
+    "referee": true,
     "network" : {
         "multicast_ip": "224.0.0.1",
         "host_ip": "localhost",
