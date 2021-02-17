@@ -4,14 +4,21 @@ import algorithims
 
 from concurrent import futures
 
+AVAILABLE_COACHES = {
+    'LARC2020Coach': entities.coach.LARC2020Coach,
+    'Iron2020Coach': entities.coach.IronCupCoach,
+}
+
 class Match(object):
-    def __init__(self, game, team_color, num_robots=3):
+    def __init__(self, game, team_color, num_robots=3, coach_name=None):
         super().__init__()
         self.game = game
         self.n_robots = num_robots
+        self.coach_name = coach_name
         self.team_color = os.environ.get('TEAM_COLOR', team_color)
 
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+
     
     def start(self):
         self.ball = entities.Ball(self.game)
@@ -24,7 +31,7 @@ class Match(object):
             entities.Robot(self.game, i, self.team_color) for i in range(self.n_robots)
         ]
 
-        self.coach = entities.Coach(self)
+        self.coach = AVAILABLE_COACHES[self.coach_name](self)
         self.coach.decide()
 
         for robot in self.robots:

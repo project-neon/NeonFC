@@ -9,6 +9,7 @@
     },
     "match" : {
         "num_robots": 3,
-        "team_color": "blue"
+        "team_color": "blue",
+        "coach_name": "LARC2020Coach"
     }
 }

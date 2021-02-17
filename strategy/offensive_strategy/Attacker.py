@@ -16,8 +16,8 @@ def point_in_rect(point,rect):
     return False
 
 class Attacker(Strategy):
-    def __init__(self, match, plot_field=False):
-        super().__init__(match, "attacker", controller_kwargs={'l': 0.0765})
+    def __init__(self, match, plot_field=False, name="attacker"):
+        super().__init__(match, name, controller_kwargs={'l': 0.0765})
 
         """
         Ambiente para rascunhar novas estrategias com
