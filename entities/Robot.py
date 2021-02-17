@@ -6,7 +6,8 @@ from scipy.ndimage.interpolation import rotate
 import controller
 import algorithims
 import strategy
-from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
+from commons.math import angular_speed, rotate_via_numpy, unit_vector
+from commons.math import speed as avg_speed
 
 class Robot(object):
 
@@ -17,6 +18,8 @@ class Robot(object):
         self.current_data = {}
 
         self.strategy = None
+
+        self.stuck_time = 0
 
         """
         Essas atribuições serão feitas no Coach quando ele existir
@@ -64,6 +67,7 @@ class Robot(object):
             return
 
         self._update_speeds()
+        self.update_stuckness()
 
     def _update_speeds(self):
         self._frames['x'].append(self.current_data['x'])
@@ -76,11 +80,32 @@ class Robot(object):
         self.x = self.current_data['x']
         self.y = self.current_data['y']
 
-        self.vx = speed(self._frames['x'], self.game.vision._fps)
-        self.vy = speed(self._frames['y'], self.game.vision._fps)
+        self.vx = avg_speed(self._frames['x'], self.game.vision._fps)
+        self.vy = avg_speed(self._frames['y'], self.game.vision._fps)
         self.vtheta = angular_speed(self._frames['theta'], self.game.vision._fps)
 
+        self.speed = math.sqrt(self.vx**2 + self.vy**2)
+
         # print(self.get_name(), '= speeds: vx: {:.4f} m/s :: vy: {:.4f} m/s :: vt: {:.2f} RAD/s'.format(self.vx, self.vy, self.vtheta))
+
+    def update_stuckness(self):
+        MIN_STUCK_SPEED = 0.005
+
+        if self.game.use_referee and not self.game.referee.can_play:
+            self.stuck_time = 0
+
+        if(self.speed <= MIN_STUCK_SPEED):
+            self.stuck_time += 1
+        else:
+            self.stuck_time = 0
+    
+    def is_stuck(self):
+        MIN_STUCK_TIME = 1 # in seconds
+        if self.game.vision._fps > 0:
+            time_in_seconds = self.stuck_time/self.game.vision._fps
+            if time_in_seconds > MIN_STUCK_TIME:
+                return True
+        return False
 
 
     def _get_desired_differential_robot_speeds(self, vx, vy, theta):

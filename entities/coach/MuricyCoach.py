@@ -1,21 +1,32 @@
 import algorithims
 import strategy
 import math
+import time
+
 from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
 
 class IronCupCoach(object):
     def __init__(self, match):
         self.match = match
         self.constraints = [
-            #estratégia - função eleitora - prioridade
+            #estratégia - função eleitora - robot_id
             (strategy.iron2021.GoalKeeper(self.match), self.elect_goalkeeper, 0),
             (strategy.iron2021.Attacker(self.match), self.elect_attacker, 0),
             (strategy.iron2021.MidFielder(self.match), self.elect_midfielder, 0)
         ]
+
+        self.avoid_strategy = strategy.iron2021.Avoid(self.match)
+
+        self.attacker = None
+        self.midfielder = None
+        self.goalkeeper = None
     
     def decide (self):
-        
         robots = [r.robot_id for r in self.match.robots]
+
+        for robot in robots:
+            if self.match.robots[robot].is_stuck():
+                print('{} is stuck! {}'.format(self.match.robots[robot].get_name(), time.time()))
     
         for strategy, fit_fuction, priority in self.constraints:
             elected = -1
@@ -25,12 +36,15 @@ class IronCupCoach(object):
                 if (robot_fit > best_fit):
                     best_fit = robot_fit
                     elected = robot_id
+            
+            priority = elected
             if self.match.robots[elected].strategy is None:
                 self.match.robots[elected].strategy = strategy
             elif self.match.robots[elected].strategy.name != strategy.name:
                 self.match.robots[elected].strategy = strategy
                 self.match.robots[elected].start()
             robots.remove(elected)
+        
     
     def elect_attacker(self, robot):
 

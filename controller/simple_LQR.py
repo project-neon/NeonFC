@@ -41,7 +41,7 @@ class SimpleLQR(object):
         return pwr_left, pwr_right
 
 class TwoSidesLQR(object):
-    def __init__(self, robot, l=0.185):
+    def __init__(self, robot, l=0.195):
         self.desired = np.array([0, 0])
         self.robot = robot
 

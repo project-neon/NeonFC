@@ -541,8 +541,6 @@ class Attacker(Strategy):
         else:
             behaviour = self.seek
         
-        print(self.robot.get_name(), "::", behaviour.name)
-
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)
             return (0, 0)
