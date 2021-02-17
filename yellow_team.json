@@ -12,6 +12,7 @@
     },
     "match" : {
         "num_robots": 3,
-        "team_color": "yellow"
+        "team_color": "yellow",
+        "coach_name": "Iron2020Coach"
     }
 }

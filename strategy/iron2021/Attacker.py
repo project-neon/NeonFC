@@ -1,10 +1,13 @@
 import math
 import algorithims
+import controller
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector, distance
 
 import json
 import numpy as np
+
+SPEED_FACTOR = 1.2
 
 def point_in_rect(point,rect):
     x1, y1, w, h = rect
@@ -17,7 +20,7 @@ def point_in_rect(point,rect):
 
 class Attacker(Strategy):
     def __init__(self, match, plot_field=False, name="attacker"):
-        super().__init__(match, name, controller_kwargs={'l': 0.0765})
+        super().__init__(match, name, controller=controller.TwoSidesLQR)
 
         """
         Ambiente para rascunhar novas estrategias com
@@ -118,7 +121,7 @@ class Attacker(Strategy):
 
                 weight = 1/2 + 1/2 * min((dist/radius), 1)
 
-                return weight * 0.85 if m.ball.y < 0.65 else 0
+                return weight * 0.85 * SPEED_FACTOR if m.ball.y < 0.65 else 0
             
             return s
         
@@ -135,7 +138,7 @@ class Attacker(Strategy):
 
                 weight = 1/2 + 1/2 * min((dist/radius), 1)
 
-                return weight * 0.85 if m.ball.y >= 0.65 else 0
+                return weight * 0.85 * SPEED_FACTOR if m.ball.y >= 0.65 else 0
             
             return s
 
@@ -375,7 +378,7 @@ class Attacker(Strategy):
                 line_dist_max = 0.15,
                 decay = lambda x: x**2,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 1 # 75 cm/s
+                multiplier = 1 * SPEED_FACTOR # 75 cm/s
             )
         )
 
@@ -387,7 +390,7 @@ class Attacker(Strategy):
                 radius_max=0.25,
                 decay = lambda x: x-1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 1.2
+                multiplier = 1.2 * SPEED_FACTOR
             )
         )
 
@@ -399,7 +402,7 @@ class Attacker(Strategy):
                 radius_max=0.25,
                 decay = lambda x: x-1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 1.2
+                multiplier = 1.2 * SPEED_FACTOR
             )
         )
 
@@ -411,7 +414,7 @@ class Attacker(Strategy):
                 radius_max=0.25,
                 decay = lambda x: x-1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 1.2
+                multiplier = 1.2 * SPEED_FACTOR
             )
         )
 
@@ -424,7 +427,7 @@ class Attacker(Strategy):
                 radius = 0.05, # 30cm
                 decay = lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = lambda m: max(0.80, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.1) # 50 cm/s
+                multiplier = lambda m: max(0.80, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.25) # 50 cm/s
             )
         )
         self.carry.add_field(
@@ -441,7 +444,7 @@ class Attacker(Strategy):
                 line_dist_max = 0.15,
                 decay = lambda x: x**2,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 1 # 75 cm/s
+                multiplier = 1.3 # 75 cm/s
             )
         )
 

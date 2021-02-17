@@ -18,7 +18,7 @@ def point_in_rect(point,rect):
 
 class MidFielder(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match, "midfielder", controller_kwargs={'l': 0.0765})
+        super().__init__(match, "midfielder", controller=controller.TwoSidesLQR)
 
         """
         Essa estrategia descreve a um goleiro base, simples, que

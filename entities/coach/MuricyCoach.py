@@ -8,9 +8,9 @@ class IronCupCoach(object):
         self.match = match
         self.constraints = [
             #estratégia - função eleitora - prioridade
-            (strategy.offensive_strategy.GoalKeeper(self.match), self.elect_goalkeeper, 0),
-            (strategy.offensive_strategy.Attacker(self.match), self.elect_attacker, 0),
-            (strategy.offensive_strategy.Attacker(self.match, name="scn_attacker"), self.elect_midfielder, 0)
+            (strategy.iron2021.GoalKeeper(self.match), self.elect_goalkeeper, 0),
+            (strategy.iron2021.Attacker(self.match), self.elect_attacker, 0),
+            (strategy.iron2021.MidFielder(self.match), self.elect_midfielder, 0)
         ]
     
     def decide (self):
@@ -33,10 +33,13 @@ class IronCupCoach(object):
             robots.remove(elected)
     
     def elect_attacker(self, robot):
+
+        is_behind = 2 if robot.x > self.match.ball.x else 1
+
         dist_to_ball = math.sqrt(
             (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
         )
-        return 1000 - dist_to_ball
+        return 1000 - dist_to_ball * is_behind
 
     def elect_goalkeeper(self, robot):
         dist_to_goal = math.sqrt(
