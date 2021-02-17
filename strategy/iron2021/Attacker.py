@@ -20,7 +20,7 @@ def point_in_rect(point,rect):
 
 class Attacker(Strategy):
     def __init__(self, match, plot_field=False, name="attacker"):
-        super().__init__(match, name, controller=controller.TwoSidesLQR)
+        super().__init__(match, name)
 
         """
         Ambiente para rascunhar novas estrategias com
@@ -352,18 +352,6 @@ class Attacker(Strategy):
             )
         )
 
-        # self.seek.add_field(
-        #     algorithims.fields.PointField(
-        #         self.match,
-        #         target= lambda m: (m.ball.x, m.ball.y - 0.05),
-        #         radius=0.15,
-        #         radius_max=0.15,
-        #         decay = lambda x: x,
-        #         field_limits = [0.75* 2 , 0.65*2],
-        #         multiplier = 1
-        #     )
-        # )
-
         self.seek.add_field(
             algorithims.fields.LineField(
                 self.match,
@@ -494,8 +482,6 @@ class Attacker(Strategy):
             )
         )
 
-
-
     def reset(self, robot=None):
         super().reset()
         if robot:
@@ -524,7 +510,7 @@ class Attacker(Strategy):
         dist_to_ball_goal = math.sqrt(
             (0 - self.match.ball.x)**2 + (0.65 - self.match.ball.y)**2
         )
-        
+
         if point_in_rect(ball, of_goal_area):
             behaviour = self.carry
         elif point_in_rect(ball ,goal_area):
@@ -540,12 +526,9 @@ class Attacker(Strategy):
             behaviour = self.carry
         else:
             behaviour = self.seek
-        
-        print(self.robot.get_name(), "::", behaviour.name)
 
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)
             return (0, 0)
 
         return behaviour.compute([self.robot.x, self.robot.y])
-

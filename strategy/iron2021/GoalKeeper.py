@@ -2,7 +2,7 @@ import math
 import algorithims
 import controller
 from strategy.BaseStrategy import Strategy
-from commons.math import unit_vector
+from commons.math import unit_vector, distance
 
 import json
 import numpy as np
@@ -32,7 +32,8 @@ def proj_goaline(pos_ball, speed_ball):
         line1 = [pos_ball, [0, 0.65]]
     else:
         line1 = [pos_ball, [pos_ball[0] + speed_ball[0], pos_ball[1] + speed_ball[1]]]
-    line2 = [[0.10, 0.65], [0.10, 0]]
+
+    line2 = [[0.125, 0.65], [0.125, 0]]
 
     res = None
     try:
@@ -70,12 +71,15 @@ class GoalKeeper(Strategy):
         A troca entre os contextos reside no metodo decide()
         """
         
-        self.normal_speed = 0.75
+        self.normal_speed = 0.95
         self.obey_rules_speed = 0.5
         self.push_speed = 0.8
 
         self.plot_field = plot_field
         self.exporter = None
+
+        self.v_radius = 0.1
+        self.v_radius_2 = 0.05
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -288,12 +292,12 @@ class GoalKeeper(Strategy):
 
         def projection_ball(m):
             if m.ball.vy > 0:
-                return (0.1, max(0.35, min(m.ball.y, 0.70 + 0.35)) )
+                return (0.075, max(0.30, min(m.ball.y, 0.70 + 0.30)) )
             proj = proj_goaline(
                 [m.ball.x, m.ball.y],
                 [m.ball.vx, m.ball.vy]
             )
-            proj_with_bars = (0.1, max(0.35, min(proj, 0.70 + 0.35)) )
+            proj_with_bars = (0.075, max(0.30, min(proj, 0.70 + 0.30)) )
             return proj_with_bars
 
         self.alert.add_field(
@@ -301,32 +305,64 @@ class GoalKeeper(Strategy):
                 self.match,
                 target = projection_ball, # centro do campo
                 radius = 0.1, # 30cm
-                decay = lambda x: x**2,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = self.normal_speed # 50 cm/s
-            )
-        )
-
-        self.push.add_field(
-            algorithims.fields.PointField(
-                self.match,
-                target = lambda m : (m.ball.x - 0.10, m.ball.y),
-                radius = 0.05, # 30cm
                 decay = lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = lambda m: 0.75 #max(0.80, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.5) # 50 cm/s
+                multiplier = 1.2 # 50 cm/s
+            )
+        )
+
+        # self.push.add_field(
+        #     algorithims.fields.PointField(
+        #         self.match,
+        #         target = lambda m : (m.ball.x - 0.10, m.ball.y),
+        #         radius = 0.05, # 30cm
+        #         decay = lambda x: 1,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = lambda m: 0.75 #max(0.80, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.5) # 50 cm/s
+        #     )
+        # )
+
+        # self.push.add_field(
+        #     algorithims.fields.PointField(
+        #         self.match,
+        #         target = lambda m : (m.ball.x, m.ball.y),
+        #         radius = 0.05, # 5cm
+        #         radius_max = 0.05, # 5cm
+        #         decay = lambda x: -1,
+        #         field_limits = [0.75* 2 , 0.65*2],
+        #         multiplier = 0.8 # 50 cm/s
+        #     )
+        # )
+
+        self.push.add_field(
+            algorithims.fields.TangentialField(
+                self.match,
+                target=lambda m: (
+                    m.ball.x + (math.cos(math.pi/3) if m.ball.y < 0.65 else math.cos(5*math.pi/3)) * 0.1,
+                    m.ball.y + (math.sin(math.pi/3) if m.ball.y < 0.65 else math.sin(5*math.pi/3)) * 0.1
+                ),                                                                                                                                                                                                                                                                                                                                             
+                radius = self.v_radius_2,
+                radius_max = 2,
+                clockwise = True,
+                decay=lambda x: 1,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 1.2
             )
         )
 
         self.push.add_field(
-            algorithims.fields.PointField(
+            algorithims.fields.TangentialField(
                 self.match,
-                target = lambda m : (m.ball.x, m.ball.y),
-                radius = 0.05, # 5cm
-                radius_max = 0.05, # 5cm
-                decay = lambda x: -1,
+                target=lambda m: (
+                    m.ball.x + (math.cos(math.pi/3) if m.ball.y < 0.65 else math.cos(5*math.pi/3)) * 0.1,
+                    m.ball.y + (math.sin(math.pi/3) if m.ball.y < 0.65 else math.sin(5*math.pi/3)) * 0.1
+                ),                                                                                                                                                                                                                                                                                                                                              
+                radius = self.v_radius_2,
+                radius_max = 2,
+                clockwise = False,
+                decay=lambda x: 1,
                 field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.8 # 50 cm/s
+                multiplier = 1.2
             )
         )
 
@@ -350,7 +386,10 @@ class GoalKeeper(Strategy):
             behaviour = self.push
         else:
             behaviour = self.alert
-        
+
+        print('{}::{}'.format(self.robot.get_name(), behaviour.name))
+        # print(self.match.ball.x)
+
         if self.exporter:
             self.exporter.export(behaviour, self.robot, self.match.ball)
 
