@@ -70,7 +70,7 @@ class RefereeComm(threading.Thread):
             self.status = None
 
             self.referee_port = int(os.environ.get('REFEREE_PORT', self.config['network']['referee_port']))
-            self.host = os.environ.get('MULTICAST_IP', self.config['network']['multicast_ip'])
+            self.host = os.environ.get('REFEREE_IP', self.config['network']['referee_ip'])
 
             self.can_play = False
         
