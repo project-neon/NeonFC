@@ -303,11 +303,14 @@ class GoalKeeper(Strategy):
         self.push.add_field(keep_behind_ball)
 
         def projection_ball(m):
+            if m.ball.vy > 0:
+                return (0.075, max(0.30, min(m.ball.y, 0.70 + 0.30)) )
             proj = proj_goaline(
                 [m.ball.x, m.ball.y],
                 [m.ball.vx, m.ball.vy]
             )
-            return (0.1, max(0.35, min(proj, 0.70 + 0.35)) )
+            proj_with_bars = (0.075, max(0.30, min(proj, 0.70 + 0.30)) )
+            return proj_with_bars
 
         self.alert.add_field(
             algorithims.fields.PointField(
