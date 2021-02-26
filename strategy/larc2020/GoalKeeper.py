@@ -43,9 +43,9 @@ def proj_goaline(pos_ball, speed_ball):
     return res
 
 class GoalKeeper(Strategy):
-    def __init__(self, match, plot_field=False):
+    def __init__(self, match, plot_field=False, ctr_kwargs={'l': 0.185}):
         super().__init__(
-            match, "goalkeeper")
+            match, "goalkeeper", controller_kwargs=ctr_kwargs)
 
         """
         Essa estrategia descreve a um goleiro base, simples, que

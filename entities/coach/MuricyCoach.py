@@ -11,8 +11,8 @@ class IronCupCoach(object):
         self.constraints = [
             #estratégia - função eleitora - robot_id
             (strategy.larc2020.GoalKeeper(self.match), self.elect_goalkeeper, 0),
-            (strategy.larc2020.Attacker(self.match), self.elect_attacker, 0),
-            (strategy.larc2020.MidFielder(self.match), self.elect_midfielder, 0)
+            (strategy.larc2020.Attacker(self.match, ctr_kwargs={'l': 0.175}), self.elect_attacker, 0),
+            (strategy.larc2020.MidFielder(self.match, ctr_kwargs={'l': 0.175}), self.elect_midfielder, 0)
         ]
 
         self.avoid_strategy = strategy.iron2021.Avoid(self.match)
