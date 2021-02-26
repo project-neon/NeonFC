@@ -21,7 +21,7 @@ class Game():
         self.comm = comm.FiraComm()
         self.referee = comm.RefereeComm()
 
-        self.use_referee = bool(os.environ.get('USE_REFEREE', self.config.get('referee')))
+        self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
         
         self.start()
 
