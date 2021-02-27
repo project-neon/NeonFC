@@ -20,8 +20,11 @@ class Game():
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
         self.referee = comm.RefereeComm()
-
-        self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
+        
+        if os.environ.get('USE_REFEREE'):
+            self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
+        else:
+            self.use_referee = self.config.get('referee')
         
         self.start()
 
