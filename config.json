@@ -13,7 +13,7 @@
     "match" : {
         "num_robots": 3,
         "team_color": "blue",
-        "coach_name": "Iron2021Coach"
+        "coach_name": "LARC2020Coach"
     },
     "referee": true
 }
