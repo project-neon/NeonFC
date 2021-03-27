@@ -7,3 +7,4 @@ from strategy.tests.pfMidFielder import MidFielder
 from strategy.tests.Idle import Idle
 from strategy.tests.pfScratch import Scratch
 from strategy.tests.dwaScratch import DwaScratch
+from strategy.tests.ControlSystemTroubleshoot import ControlSystemTroubleshoot
