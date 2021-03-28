@@ -15,5 +15,6 @@
         "team_color": "blue",
         "coach_name": "Training"
     },
-    "referee": false
+    "referee": false,
+    "data_sender": true
 }
