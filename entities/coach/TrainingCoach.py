@@ -5,7 +5,7 @@ class TrainingCoach(object):
     def __init__(self, match):
         self.match = match
 
-        self.test_strategy = strategy.tests.ControlSystemTroubleshoot(self.match)
+        self.test_strategy = strategy.tests.AstarAttacker(self.match)
 
         self.idle_strategy = [
             strategy.tests.Idle(self.match) for _ in self.match.robots
