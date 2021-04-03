@@ -124,17 +124,10 @@ class Robot(object):
             robot_world_speed[1] = -robot_world_speed[1]
             robot_world_speed[0] = -robot_world_speed[0]
         
-        def _map(min_i, max_i, min_o, max_o, x):
-            return (x - min_i) * (max_o - min_o) / (max_i - min_i) + min_o
-        
         robot_angle_speed = -math.atan2(robot_world_speed[1], robot_world_speed[0])
 
-        damping = 1
-        if (abs(robot_world_speed[1]) + abs(robot_world_speed[0])):
-            damping = max(1, abs((robot_world_speed[1])/(abs(robot_world_speed[1]) + abs(robot_world_speed[0])))) * min(1, max(0, _map(0.01, 0.05, 0, 1, speed_norm)))
-        
-        # TODO Discover magic number after PID testing
-        va = robot_angle_speed * damping
+        # va = signal of robot_angle_speed {-1, 1} * robot_world_speed.y [0, 1] * math.pi (max_speed = PI rad/s )
+        va = (robot_angle_speed/abs(robot_angle_speed)) * robot_world_speed[1] * math.pi
         return vl, va
 
 
