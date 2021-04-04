@@ -35,8 +35,8 @@ class Match(object):
         self.coach = AVAILABLE_COACHES[self.coach_name](self)
         self.coach.decide()
 
-        # for robot in self.robots:
-        #     robot.start()
+        for robot in self.robots:
+            robot.start()
 
     def update(self, frame):
         self.ball.update(frame)
