@@ -8,7 +8,7 @@ import numpy as np
 
 class Idle(Strategy):
     def __init__(self, match):
-        super().__init__(match)
+        super().__init__(match, 'Idle')
 
 
     def start(self, robot=None):

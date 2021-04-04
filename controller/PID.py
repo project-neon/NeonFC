@@ -1,3 +1,4 @@
+import api
 import math
 import numpy as np
 
@@ -34,10 +35,8 @@ class PID(object):
 
         return output
 
-   
-
 class Robot_PID(object):
-    def __init__(self, robot):
+    def __init__(self, robot, send_data=False):
         self.robot = robot
         self.game = self.robot.game
 
@@ -46,7 +45,7 @@ class Robot_PID(object):
         self.angular_pid = PID(12, 4, 0)
         self.power_left , self.power_right = 0, 0
 
-        self.pid_file = open("pid.log", "a")
+        # self.pid_file = open("pid.log", "a")
         
     def update(self):
         linear_speed, angular_speed = self.robot._get_differential_robot_speeds(self.robot.vx, self.robot.vy, self.robot.theta)
@@ -89,5 +88,13 @@ class Robot_PID(object):
             vl = self.linear_pid.update_PID(now_linear, self.game.vision._fps)
             va = self.angular_pid.update_PID(now_angular, self.game.vision._fps)
 
-        self.pid_file.write(str(self.linear_desired) + "," + str(now_linear) + "," + str(vl) + "," +  str(self.angular_desired) + "," + str(now_angular) + "," + str(0) + '\n')
+        api.DataSender().get_node(f'PID_{self.robot.get_name()}').capture(
+            desired_linear=self.linear_desired,
+            now_linear=now_linear,
+            new_linear=vl,
+            desired_angular=self.angular_desired,
+            now_angular=now_angular,
+            new_angular=va,
+        )
+        # self.pid_file.write(str() + "," + str(now_linear) + "," + str(vl) + "," +  str(self.angular_desired) + "," + str(now_angular) + "," + str(0) + '\n')
         return vl, va

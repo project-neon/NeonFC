@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 class DiscreteField(object):
-    def __init__(self, geometry={}, resolution=10):
+    def __init__(self, geometry={}, resolution=50):
         '''
         resolution: area em centimetro da discretização do espaço.
         '''
