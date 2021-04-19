@@ -1,3 +1,7 @@
+"""
+Código adaptado de https://www.bogotobogo.com/python/python_Dijkstras_Shortest_Path_Algorithm.php
+"""
+
 import sys
 import math
 
