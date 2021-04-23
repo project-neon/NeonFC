@@ -42,7 +42,7 @@ class Game():
         self.vision.start()
         self.comm.start()
         self.referee.start()
-        # self.data_sender.start()
+        self.data_sender.start()
 
     def update(self):
         frame = vision.assign_empty_values(
@@ -64,5 +64,8 @@ class Game():
                 } for r in commands
             ]
             self.comm.send(commands)
+        
+        if self.use_data_sender:
+            api.DataSender().send_data()
 
 g = Game(config_file=args.config_file)

@@ -76,9 +76,9 @@ class WaypointSystem():
         return [
             (target.x - robot.x)/dist,
             (target.y - robot.y)/dist
-        ] * 8
+        ]
 
-    def decide(self, robot, target):
+    def decide(self, robot, target, speed):
         robot_name = robot.get_name()
         target_name = target.get_name()
 
@@ -90,5 +90,5 @@ class WaypointSystem():
 
         dijkstra.shortest(target, path)
 
-        return self.dir_vector(path[::-1], robot)
+        return [v * speed for v in self.dir_vector(path[::-1], robot)]
 

@@ -1,3 +1,4 @@
+import api
 import math
 import algorithims
 from strategy.BaseStrategy import Strategy
@@ -29,6 +30,23 @@ class DijkstraSeeker(Strategy):
         
         dijkstra.update(self.robot, self.match.ball, obstacles)
         
-        # print(dijkstra.decide(self.robot.get_name(), self.match.ball.get_name()))
-        return dijkstra.decide(self.robot, self.match.ball)
+        api.DataSender().get_node(f'waypoint.{self.robot.get_name()}').capture(
+            nodes=[
+                {
+                    'name': n.get_id(),
+                    'x': n.x,
+                    'y': n.y
+                } for n in dijkstra.graph.vert_dict.values()
+            ],
+            obstacles=[
+                {
+                    'name': n.get_name(),
+                    'x': n.x,
+                    'y': n.y,
+                } for n in obstacles
+            ],
+            edges=dijkstra.graph.edges
+        )
+        
+        return dijkstra.decide(self.robot, self.match.ball, 0.65)
 

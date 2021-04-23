@@ -51,6 +51,8 @@ class Graph:
         self.vert_dict = {}
         self.num_vertices = 0
 
+        self.edges = []
+
     def __iter__(self):
         return iter(self.vert_dict.values())
 
@@ -71,9 +73,13 @@ class Graph:
             self.add_vertex(frm)
         if to.get_id() not in self.vert_dict:
             self.add_vertex(to)
+        
+        self.edges.append([[frm.x, frm.y], [to.x, to.y]])
 
         if cost == None:
             cost = math.sqrt( (frm.x - to.x)**2 + (frm.y - to.y)**2 )
+        
+
 
         frm.add_neighbor(to, cost)
         to.add_neighbor(frm, cost)
@@ -103,9 +109,9 @@ def shortest(v, path):
     return
 
 def dijkstra(aGraph, start_name, target_name):
-    print("Dijkstra's shortest path")
+    # print("Dijkstra's shortest path")
     # Set the distance for the start node to zero
-    print(start_name, target_name, aGraph.vert_dict.keys())
+    # print(start_name, target_name, aGraph.vert_dict.keys())
     start = aGraph.vert_dict[start_name]
     target = aGraph.vert_dict[target_name]
 
