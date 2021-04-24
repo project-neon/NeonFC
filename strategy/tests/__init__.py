@@ -10,3 +10,4 @@ from strategy.tests.dwaScratch import DwaScratch
 from strategy.tests.ControlSystemTroubleshoot import ControlSystemTroubleshoot
 
 from strategy.tests.astarAttacker import AstarAttacker
+from strategy.tests.dijkSeeker import DijkstraSeeker

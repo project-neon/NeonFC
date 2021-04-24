@@ -7,3 +7,6 @@ from algorithims.astar import AStar
 from algorithims.potential_fields import fields
 from algorithims.astar import AStar
 from algorithims.dynamicWindowApproach import DynamicWindowApproach
+
+# Dijkstra + waypoint planning
+from algorithims import dijkstra_waypoint
