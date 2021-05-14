@@ -1,4 +1,4 @@
-import algorithims
+import algorithms
 import strategy
 
 class TrainingCoach(object):

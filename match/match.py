@@ -1,6 +1,6 @@
 import os
 import entities
-import algorithims
+import algorithms
 
 from concurrent import futures
 

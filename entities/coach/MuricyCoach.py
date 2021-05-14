@@ -1,4 +1,4 @@
-import algorithims
+import algorithms
 import strategy
 from entities import plays
 import math

@@ -1,4 +1,4 @@
-import algorithims
+import algorithms
 import strategy
 import math
 from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector

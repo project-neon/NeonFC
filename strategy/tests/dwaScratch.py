@@ -1,5 +1,5 @@
 import math
-import algorithims
+import algorithms
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 
@@ -13,7 +13,7 @@ class DwaScratch(Strategy):
         super().__init__(match)
 
     def start(self, robot=None):
-        self.dwa = algorithims.DynamicWindowApproach(robot, self.game)
+        self.dwa = algorithms.DynamicWindowApproach(robot, self.game)
         self.controller = self.dwa
         if (robot):
             self.robot = robot

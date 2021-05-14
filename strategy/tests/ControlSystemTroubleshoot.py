@@ -1,5 +1,5 @@
 import math
-import algorithims
+import algorithms
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 from controller.PID import Robot_PID
@@ -18,13 +18,13 @@ class ControlSystemTroubleshoot(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        self.test = algorithims.fields.PotentialField(
+        self.test = algorithms.fields.PotentialField(
             self.match, 
             name="{}|TestBehaviour".format(self.__class__)
         )
 
         self.test.add_field(
-            algorithims.fields.PointField(
+            algorithms.fields.PointField(
                 self.match,
                 target = lambda m: (m.ball.x, m.ball.y), # segue a bola
                 radius = 0.1, # 30cm

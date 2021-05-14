@@ -1,7 +1,7 @@
 import math
 import time
 import api
-import algorithims
+import algorithms
 import threading
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
@@ -15,7 +15,7 @@ class AstarAttacker(Strategy):
     def __init__(self, match):
         super().__init__(match, 'AstarAttacker')
 
-        self.astar = algorithims.AStar()
+        self.astar = algorithms.AStar()
 
     def start(self, robot=None):
         super().start(robot=robot)

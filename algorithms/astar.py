@@ -1,4 +1,4 @@
-from algorithims.discretizedField import DiscreteField
+from algorithms.discretizedField import DiscreteField
 import heapq, time, math
 from multiprocessing import Process
 from threading import Thread
