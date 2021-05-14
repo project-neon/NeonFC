@@ -1,5 +1,5 @@
 """
-Código adaptado de https://www.bogotobogo.com/python/python_Dijkstras_Shortest_Path_Algorithm.php
+Code adapted from https://www.bogotobogo.com/python/python_Dijkstras_Shortest_Path_Algorithm.php
 """
 
 import sys
@@ -151,4 +151,3 @@ def dijkstra(aGraph, start_name, target_name):
         # 2. Put all vertices not visited into the queue
         unvisited_queue = [(v.get_distance(),v) for v in aGraph if not v.visited]
         heapq.heapify(unvisited_queue)
-
