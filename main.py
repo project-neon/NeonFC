@@ -26,7 +26,7 @@ class Game():
         if os.environ.get('USE_DATA_SENDER'):
             self.use_data_sender = bool(int(os.environ.get('USE_DATA_SENDER')))
         else:
-            self.use_data_sender = self.config.get('data_sender')
+            self.use_data_sender = self.config.get('data_sender', False)
         
         if os.environ.get('USE_REFEREE'):
             self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
@@ -64,5 +64,8 @@ class Game():
                 } for r in commands
             ]
             self.comm.send(commands)
+        
+        if self.use_data_sender:
+            api.DataSender().send_data()
 
 g = Game(config_file=args.config_file)

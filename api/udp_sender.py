@@ -27,14 +27,14 @@ class SingletonMeta(type):
             cls._instances[cls] = instance
         return cls._instances[cls]
 
-class DataSender(threading.Thread, metaclass=SingletonMeta):
+class DataSender(metaclass=SingletonMeta):
     def __init__(self):
         super(DataSender, self).__init__()
         self.nodes = {}
         # talvez arquivo de congf?
         self.multicast_group = '224.1.2.3'
         self.multicast_port = 5007
-        self.multicast_ttl = 2
+        self.multicast_ttl = 1
 
         self.sock = None
         
@@ -51,14 +51,14 @@ class DataSender(threading.Thread, metaclass=SingletonMeta):
 
         return self.nodes.get(name)
     
-    def run(self):
+    def start(self):
         print("Starting Data Sender...")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, self.multicast_ttl)
         print(f"Data Sender started at {self.multicast_group}:{self.multicast_port}!")
 
-        while True:
-            self.send_data()
+        # while True:
+        #     self.send_data()
 
     def send_data(self):
         data_pack = []
