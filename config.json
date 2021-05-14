@@ -13,8 +13,8 @@
     "match" : {
         "num_robots": 3,
         "team_color": "blue",
-        "coach_name": "Training"
+        "coach_name": "LARC2020Coach"
     },
-    "referee": true,
-    "data_sender": true
+    "referee": false,
+    "data_sender": false
 }

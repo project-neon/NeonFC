@@ -52,14 +52,12 @@ class AStar():
         if (not start) or (not target):
             return
 
-        print('Running')
         if time.time() - self.last_calculation > timespan:
             x = time.time()
             self.calculate(start, target)
 
     def recalculate(self):
         while True:
-            print(self.start_pos_last_calc)
             self.calculate_when(
                 self.start_pos_last_calc,
                 self.target_pos_last_calc,
