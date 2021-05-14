@@ -34,7 +34,7 @@ class DataSender(metaclass=SingletonMeta):
         # talvez arquivo de congf?
         self.multicast_group = '224.1.2.3'
         self.multicast_port = 5007
-        self.multicast_ttl = 2
+        self.multicast_ttl = 1
 
         self.sock = None
         
