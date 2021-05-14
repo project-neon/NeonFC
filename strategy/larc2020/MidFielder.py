@@ -17,8 +17,8 @@ def point_in_rect(point,rect):
     return False
 
 class MidFielder(Strategy):
-    def __init__(self, match, plot_field=False):
-        super().__init__(match, "midfielder")
+    def __init__(self, match, plot_field=False, ctr_kwargs={'l': 0.185}):
+        super().__init__(match, "midfielder", controller_kwargs=ctr_kwargs)
 
         """
         Essa estrategia descreve a um goleiro base, simples, que

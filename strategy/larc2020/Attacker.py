@@ -19,8 +19,8 @@ def point_in_rect(point,rect):
     return False
 
 class Attacker(Strategy):
-    def __init__(self, match, plot_field=False, name="attacker"):
-        super().__init__(match, name)
+    def __init__(self, match, plot_field=False, name="attacker", ctr_kwargs={'l': 0.185}):
+        super().__init__(match, name, controller_kwargs=ctr_kwargs)
 
         """
         Ambiente para rascunhar novas estrategias com
@@ -509,7 +509,7 @@ class Attacker(Strategy):
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
         ball = [self.match.ball.x, self.match.ball.y]
-        of_goal_area = [1.30, 0.30, 0.30, 0.70]
+        of_goal_area = [1.30, 0.30, 0.20, 0.70]
         goal_area = [-0.05, 0.30, 0.20, 0.70]
 
         min_angle_ball_to_goal = -math.atan2((self.match.ball.y - 0.55), (self.match.ball.x - 0.75*2))

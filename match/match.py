@@ -6,7 +6,8 @@ from concurrent import futures
 
 AVAILABLE_COACHES = {
     'LARC2020Coach': entities.coach.LARC2020Coach,
-    'Iron2021Coach': entities.coach.IronCupCoach
+    'Iron2021Coach': entities.coach.IronCupCoach,
+    'Training': entities.coach.TrainingCoach
 }
 
 class Match(object):

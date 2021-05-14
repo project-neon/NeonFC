@@ -1,5 +1,8 @@
 from algorithims.discretizedField import DiscreteField
 import heapq, time, math
+from multiprocessing import Process
+from threading import Thread
+import api
 
 class Node:
 
@@ -20,22 +23,51 @@ class Node:
         return self.f > other.f
 
 
-class AStar:
-
+class AStar():
     def __init__(self):
+        super(AStar, self).__init__()
         self.maze = DiscreteField()
         self.last_calculation = 0
         self.path = []
 
+        self.start_pos_last_calc = None
+        self.target_pos_last_calc = None
+
     def reset_calculation_timespan(self):
         self.last_calculation = 0
+
+    def reset(self):
+        self.start_pos_last_calc = None
+        self.target_pos_last_calc = None
+        self.last_calculation = 0
+    
+    def update(self, start, target):
+        self.start_pos_last_calc = start
+        self.target_pos_last_calc = target
 
     def update_field(self, obstacles):
         self.maze.update(avoiances=obstacles)
 
     def calculate_when(self, start, target, timespan=1):
+        if (not start) or (not target):
+            return
+
         if time.time() - self.last_calculation > timespan:
+            x = time.time()
             self.calculate(start, target)
+
+    def recalculate(self):
+        while True:
+            self.calculate_when(
+                self.start_pos_last_calc,
+                self.target_pos_last_calc,
+                timespan=0.25
+            )
+    
+    def start(self):
+        
+        self.__calc_process = Thread(target=self.recalculate, )
+        self.__calc_process.start()
 
     def return_path(self, current_node):
         path = []

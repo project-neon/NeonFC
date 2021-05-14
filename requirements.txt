@@ -1,3 +1,7 @@
 protobuf
 numpy
 scipy
+
+# live plot view stuff
+pyqtgraph
+PyQt5

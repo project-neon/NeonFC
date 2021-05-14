@@ -1,3 +1,5 @@
+import os
+import api
 import comm
 import vision
 import match
@@ -19,8 +21,17 @@ class Game():
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
         self.referee = comm.RefereeComm()
+        self.data_sender = api.DataSender()
 
-        self.use_referee = self.config.get('referee')
+        if os.environ.get('USE_DATA_SENDER'):
+            self.use_data_sender = bool(int(os.environ.get('USE_DATA_SENDER')))
+        else:
+            self.use_data_sender = self.config.get('data_sender', False)
+        
+        if os.environ.get('USE_REFEREE'):
+            self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
+        else:
+            self.use_referee = self.config.get('referee')
         
         self.start()
 
@@ -31,6 +42,7 @@ class Game():
         self.vision.start()
         self.comm.start()
         self.referee.start()
+        self.data_sender.start()
 
     def update(self):
         frame = vision.assign_empty_values(
@@ -52,5 +64,8 @@ class Game():
                 } for r in commands
             ]
             self.comm.send(commands)
+        
+        if self.use_data_sender:
+            api.DataSender().send_data()
 
 g = Game(config_file=args.config_file)
