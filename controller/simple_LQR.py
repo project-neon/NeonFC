@@ -36,8 +36,6 @@ class SimpleLQR(object):
         pwr_left = (2 * v - w * self.L)/2 * self.R
         pwr_right = (2 * v + w * self.L)/2 * self.R
 
-        # if self.robot.robot_id == 0:
-        #     print(pwr_left, pwr_right)
         return pwr_left, pwr_right
 
 class TwoSidesLQR(object):
