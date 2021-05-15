@@ -5,8 +5,8 @@ import algorithms
 from concurrent import futures
 
 AVAILABLE_COACHES = {
-    'LARC2020Coach': entities.coach.LARC2020Coach,
-    'Iron2021Coach': entities.coach.IronCupCoach,
+    'LARC2020Coach': entities.coach.LarcCoach,
+    'Iron2021Coach': entities.coach.IronCoach,
     'Training': entities.coach.TrainingCoach
 }
 

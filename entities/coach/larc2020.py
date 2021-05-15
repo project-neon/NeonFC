@@ -3,7 +3,7 @@ import strategy
 import math
 from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
 
-class LARC2020Coach(object):
+class Coach(object):
     def __init__(self, match):
         self.match = match
         self.constraints = [
