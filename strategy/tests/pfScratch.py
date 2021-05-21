@@ -1,5 +1,5 @@
 import math
-import algorithims
+import algorithms
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 
@@ -40,7 +40,7 @@ class Scratch(Strategy):
         nesse caso convencionamos que sera 'NOME_CLASSE|NOME_COMPORTAMENTO', o nome da classe
         já é dado pelo cósigo e o nome do comportamento você decide, nesse caso é FieldBehaviour
         """
-        self.field = algorithims.fields.PotentialField(
+        self.field = algorithms.fields.PotentialField(
             self.match,
             name="{}|FieldBehaviour".format(self.__class__)
         )
@@ -54,7 +54,7 @@ class Scratch(Strategy):
         super().start(robot=robot)
 
         if self.plot_field:
-            self.exporter = algorithims.fields.PotentialDataExporter(self.robot.get_name())
+            self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
         
         """
         No Start você ira adicionar campos potenciais aos comportamentos criados no metodo __init__
@@ -63,7 +63,7 @@ class Scratch(Strategy):
         referencia util para funções lambdas: https://realpython.com/python-lambda/.
         """
         self.field.add_field(
-            algorithims.fields.PointField(
+            algorithms.fields.PointField(
                 self.match,
                 target = (0.75, 0.65),
                 radius = 0.05, # 30cm

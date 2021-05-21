@@ -1,4 +1,4 @@
-from algorithims.dijkstra_waypoint import dijkstra
+from algorithms.dijkstra_waypoint import dijkstra
 
 def dist_point_line(x1, y1, x2, y2, x3, y3):
     px = x2-x1

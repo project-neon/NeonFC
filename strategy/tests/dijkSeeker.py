@@ -1,6 +1,6 @@
 import api
 import math
-import algorithims
+import algorithms
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 
@@ -24,7 +24,7 @@ class DijkstraSeeker(Strategy):
 
 
     def decide(self):
-        dijkstra = algorithims.dijkstra_waypoint.WaypointSystem()
+        dijkstra = algorithms.dijkstra_waypoint.WaypointSystem()
 
         obstacles = [a for a in self.match.robots if a.robot_id != self.robot.robot_id] + self.match.opposites
         

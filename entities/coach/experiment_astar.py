@@ -1,7 +1,7 @@
-import algorithims
+import algorithms
 import strategy
 
-class TrainingCoach(object):
+class Coach(object):
     def __init__(self, match):
         self.match = match
 

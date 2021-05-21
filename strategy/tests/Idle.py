@@ -1,5 +1,5 @@
 import math
-import algorithims
+import algorithms
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 

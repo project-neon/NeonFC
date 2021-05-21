@@ -1,5 +1,5 @@
 import math
-import algorithims
+import algorithms
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 
@@ -17,7 +17,7 @@ class MidFielder(Strategy):
         self.plot_field = plot_field
         self.exporter = None
 
-        self.base_rules = algorithims.fields.PotentialField(
+        self.base_rules = algorithms.fields.PotentialField(
             self.match,
             name="{}|BaseRulesBehaviour".format(self.__class__)
         )
@@ -28,7 +28,7 @@ class MidFielder(Strategy):
         super().start(robot=robot)
 
         if self.plot_field:
-            self.exporter = algorithims.fields.PotentialDataExporter(self.robot.get_name())
+            self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
 
 
     def reset(self, robot=None):

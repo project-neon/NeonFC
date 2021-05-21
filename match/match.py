@@ -1,13 +1,13 @@
 import os
 import entities
-import algorithims
+import algorithms
 
 from concurrent import futures
 
 AVAILABLE_COACHES = {
-    'LARC2020Coach': entities.coach.LARC2020Coach,
-    'Iron2021Coach': entities.coach.IronCupCoach,
-    'Training': entities.coach.TrainingCoach
+    'LARC2020Coach': entities.coach.LarcCoach,
+    'Iron2021Coach': entities.coach.IronCoach,
+    'Astar': entities.coach.AstarCoach
 }
 
 class Match(object):

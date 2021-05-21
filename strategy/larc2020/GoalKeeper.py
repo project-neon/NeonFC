@@ -1,5 +1,5 @@
 import math
-import algorithims
+import algorithms
 import controller
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
@@ -96,34 +96,34 @@ class GoalKeeper(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        self.base_rules = algorithims.fields.PotentialField(
+        self.base_rules = algorithms.fields.PotentialField(
             self.match,
             name="{}|BaseRulesBehaviour".format(self.__class__)
         )
         
-        self.maintain = algorithims.fields.PotentialField(
+        self.maintain = algorithms.fields.PotentialField(
             self.match, 
             name="{}|MaintainBehaviour".format(self.__class__)
         )
 
-        self.alert = algorithims.fields.PotentialField(
+        self.alert = algorithms.fields.PotentialField(
             self.match, 
             name="{}|AlertBehaviour".format(self.__class__)
         )
 
-        self.push = algorithims.fields.PotentialField(
+        self.push = algorithms.fields.PotentialField(
             self.match, 
             name="{}|PushBehaviour".format(self.__class__)
         )
 
         if self.plot_field:
-            self.exporter = algorithims.fields.PotentialDataExporter(self.robot.get_name())
+            self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
 
         def follow_ball(m):
             return (m.ball.x, m.ball.y)
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0, 0.650),
                 theta = math.pi/2,
@@ -138,7 +138,7 @@ class GoalKeeper(Strategy):
         )
         
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (-0.2, 0.650),
                 theta = 0,
@@ -152,7 +152,7 @@ class GoalKeeper(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (2*0.750, 0.650),
                 theta = 3*math.pi/2,
@@ -167,7 +167,7 @@ class GoalKeeper(Strategy):
         )
         
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (2*0.750+0.2, 0.650),
                 theta = 2*math.pi,
@@ -181,7 +181,7 @@ class GoalKeeper(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0.750, 0.650*2 - 0.1),
                 theta = -2*math.pi,
@@ -197,7 +197,7 @@ class GoalKeeper(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0.750, 0.1),
                 theta = 2*math.pi,
@@ -211,7 +211,7 @@ class GoalKeeper(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0.075, 0.85),
                 theta = math.pi/2,
@@ -226,7 +226,7 @@ class GoalKeeper(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0.075, 0.0),
                 theta = math.pi/2,
@@ -241,7 +241,7 @@ class GoalKeeper(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (2*(0.75)-0.075, 0.85 + 0.45),
                 theta = 3*math.pi/2,
@@ -256,7 +256,7 @@ class GoalKeeper(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (2*(0.75)-0.075, 0.0 + 0.45),
                 theta = 3*math.pi/2,
@@ -275,7 +275,7 @@ class GoalKeeper(Strategy):
         self.push.add_field(self.base_rules)
         
         self.maintain.add_field(
-            algorithims.fields.PointField(
+            algorithms.fields.PointField(
                 self.match,
                 target = (0 + 0.075, 0.650), # centro do campo
                 radius = 0.1, # 30cm
@@ -285,7 +285,7 @@ class GoalKeeper(Strategy):
             )
         )
 
-        keep_behind_ball = algorithims.fields.LineField(
+        keep_behind_ball = algorithms.fields.LineField(
             self.match,
             target = follow_ball,
             theta = lambda m: ( -math.atan2((m.ball.y - 0.65), (m.ball.x - 0.75*2))),
@@ -313,7 +313,7 @@ class GoalKeeper(Strategy):
             return proj_with_bars
 
         self.alert.add_field(
-            algorithims.fields.PointField(
+            algorithms.fields.PointField(
                 self.match,
                 target = projection_ball, # centro do campo
                 radius = 0.1, # 30cm
@@ -324,7 +324,7 @@ class GoalKeeper(Strategy):
         )
 
         self.push.add_field(
-            algorithims.fields.PointField(
+            algorithms.fields.PointField(
                 self.match,
                 target = lambda m : (m.ball.x - 0.05, m.ball.y),
                 radius = 0.05, # 30cm

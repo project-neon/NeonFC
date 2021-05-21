@@ -1,5 +1,5 @@
 import math
-import algorithims
+import algorithms
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 
@@ -50,22 +50,22 @@ class Attacker(Strategy):
         self.plot_field = plot_field
         self.exporter = None
 
-        self.base_rules = algorithims.fields.PotentialField(
+        self.base_rules = algorithms.fields.PotentialField(
             self.match,
             name="{}|BaseRulesBehaviour".format(self.__class__)
         )
 
-        self.maintain = algorithims.fields.PotentialField(
+        self.maintain = algorithms.fields.PotentialField(
             self.match,
             name="{}|MaintainBehaviour".format(self.__class__)
         )
         
-        self.seek = algorithims.fields.PotentialField(
+        self.seek = algorithms.fields.PotentialField(
             self.match, 
             name="{}|SeekBehaviour".format(self.__class__)
         )
 
-        self.carry = algorithims.fields.PotentialField(
+        self.carry = algorithms.fields.PotentialField(
             self.match, 
             name="{}|CarryBehaviour".format(self.__class__)
         )
@@ -75,7 +75,7 @@ class Attacker(Strategy):
         super().start(robot=robot)
 
         if self.plot_field:
-            self.exporter = algorithims.fields.PotentialDataExporter(self.robot.get_name())
+            self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
 
         def follow_ball(m):
             return (m.ball.x, m.ball.y)
@@ -103,7 +103,7 @@ class Attacker(Strategy):
             return speed
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0, 0.650),
                 theta = math.pi/2,
@@ -118,7 +118,7 @@ class Attacker(Strategy):
         )
         
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (-0.2, 0.650),
                 theta = 0,
@@ -132,7 +132,7 @@ class Attacker(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (2*0.750, 0.650),
                 theta = 3*math.pi/2,
@@ -147,7 +147,7 @@ class Attacker(Strategy):
         )
         
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (2*0.750+0.2, 0.650),
                 theta = 2*math.pi,
@@ -161,7 +161,7 @@ class Attacker(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0.750, 0.650*2 - 0.1),
                 theta = -2*math.pi,
@@ -177,7 +177,7 @@ class Attacker(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0.750, 0.1),
                 theta = 2*math.pi,
@@ -191,7 +191,7 @@ class Attacker(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0.075, 0.85),
                 theta = math.pi/2,
@@ -206,7 +206,7 @@ class Attacker(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (0.075, 0.0),
                 theta = math.pi/2,
@@ -221,7 +221,7 @@ class Attacker(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (2*(0.75)-0.075, 0.85 + 0.45),
                 theta = 3*math.pi/2,
@@ -236,7 +236,7 @@ class Attacker(Strategy):
         )
 
         self.base_rules.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target = (2*(0.75)-0.075, 0.0 + 0.45),
                 theta = 3*math.pi/2,
@@ -251,7 +251,7 @@ class Attacker(Strategy):
         )
 
         self.maintain.add_field(
-            algorithims.fields.PointField(
+            algorithms.fields.PointField(
                 self.match,
                 target = lambda m: (0.50, (m.ball.y - 0.65)/2 + 0.65), # centro do campo
                 radius = 0.1, # 10cm
@@ -265,7 +265,7 @@ class Attacker(Strategy):
         self.carry.add_field(self.base_rules)
 
         self.seek.add_field(
-            algorithims.fields.TangentialField(
+            algorithms.fields.TangentialField(
                 self.match,
                 target=lambda m: (
                     m.ball.x + math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
@@ -281,7 +281,7 @@ class Attacker(Strategy):
         )
 
         self.seek.add_field(
-            algorithims.fields.TangentialField(
+            algorithms.fields.TangentialField(
                 self.match,
                 target=lambda m: (
                     m.ball.x - math.cos(math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))+ math.pi/2)*0.2 , 
@@ -297,7 +297,7 @@ class Attacker(Strategy):
         )
         
         self.seek.add_field(
-            algorithims.fields.PointField(
+            algorithms.fields.PointField(
                 self.match,
                 target = follow_ball, # centro do campo
                 radius = 0.45, # 45cm
@@ -308,7 +308,7 @@ class Attacker(Strategy):
         )
 
         self.seek.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target=follow_ball,
                 theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
@@ -323,7 +323,7 @@ class Attacker(Strategy):
         )
 
         self.seek.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target=follow_ball,
                 theta=lambda m: ( -math.atan2((m.ball.y - 0.65), (m.ball.x - 0.75*2))),
@@ -339,7 +339,7 @@ class Attacker(Strategy):
         )
 
         self.carry.add_field(
-            algorithims.fields.LineField(
+            algorithms.fields.LineField(
                 self.match,
                 target=follow_ball,
                 theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
@@ -354,7 +354,7 @@ class Attacker(Strategy):
         )
 
         self.carry.add_field(
-            algorithims.fields.PointField(
+            algorithms.fields.PointField(
                 self.match,
                 target = follow_ball, # centro do campo
                 radius = 0.05, # 10cm

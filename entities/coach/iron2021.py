@@ -1,4 +1,4 @@
-import algorithims
+import algorithms
 import strategy
 from entities import plays
 import math
@@ -6,7 +6,7 @@ import time
 
 from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
 
-class IronCupCoach(object):
+class Coach(object):
     def __init__(self, match):
         self.match = match
 

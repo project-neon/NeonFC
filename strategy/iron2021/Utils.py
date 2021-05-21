@@ -1,5 +1,5 @@
 import math
-import algorithims
+import algorithms
 import controller
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector, distance
@@ -35,9 +35,9 @@ class Avoid(Strategy):
 
         
         if self.plot_field:
-            self.exporter = algorithims.fields.PotentialDataExporter(self.robot.get_name())
+            self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
 
-        self.avoid = algorithims.fields.PotentialField(
+        self.avoid = algorithms.fields.PotentialField(
             self.match,
             name="{}|AvoidBehaviour".format(self.__class__)
         )
@@ -45,7 +45,7 @@ class Avoid(Strategy):
 
         if self.robot.robot_id != 0:
             self.avoid.add_field(
-                algorithims.fields.PointField(
+                algorithms.fields.PointField(
                     self.match,
                     target= lambda m: (m.robots[0].x, m.robots[0].y),
                     radius=0.35,
@@ -58,7 +58,7 @@ class Avoid(Strategy):
 
         if self.robot.robot_id != 1:
             self.avoid.add_field(
-                algorithims.fields.PointField(
+                algorithms.fields.PointField(
                     self.match,
                     target= lambda m: (m.robots[1].x, m.robots[1].y),
                     radius=0.35,
@@ -71,7 +71,7 @@ class Avoid(Strategy):
 
         if self.robot.robot_id != 2:
             self.avoid.add_field(
-                algorithims.fields.PointField(
+                algorithms.fields.PointField(
                     self.match,
                     target= lambda m: (m.robots[2].x, m.robots[2].y),
                     radius=0.35,
