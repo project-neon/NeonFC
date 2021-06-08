@@ -16,7 +16,7 @@ def distance(pos1, pos2):
 
 class AStar():
     def __init__(self, start_position, target_position):
-        self.start = FieldGraph().start
+        self.start = FieldGraph(start_position).create_graph()
         self.target_position = target_position
         self.open_list = []
         self.closed_list = []
@@ -36,18 +36,23 @@ class AStar():
             # in case of a tie, lowest h is prioritized
             # current is the node with the smallest f value and is the first in the open_list
             current = self.open_list[0]
-            if current.pos == self.target_position:
-                path = self.create_path(current)
-                return path
+            if current.position == self.target_position:
+                path_to_target = self.create_path(current)
+                return path_to_target
+            self.closed_list.append(heapq.heappop(self.open_list))
             for neighbor in current.neighbours:
                 if neighbor not in self.closed_list:
-                    dist_from_previous = current.g + distance(neighbor.position, current.position)
-                    if neighbor.h == 0:
+                    if neighbor not in self.open_list:
                         neighbor.h = distance(neighbor.position, self.target_position)
-                    if neighbor.g == 0 or dist_from_previous < neighbor.g:
-                        neighbor.g = dist_from_previous
+                        neighbor.g = distance(neighbor.position, current.position)
                         neighbor.f = neighbor.g + neighbor.h
                         neighbor.previous = current
-                    self.open_list.remove(neighbor)
+                    else:
+                        dist_from_previous = current.g + distance(neighbor.position, current.position)
+                        if dist_from_previous < neighbor.g:
+                            neighbor.g = dist_from_previous
+                            neighbor.f = neighbor.g + neighbor.h
+                            neighbor.previous = current
+                            self.open_list.remove(neighbor)
                     heapq.heappush(self.open_list, neighbor)
-            self.closed_list.append(heapq.heappop(self.open_list))
+        return []
