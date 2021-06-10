@@ -1,4 +1,5 @@
 import os
+import time
 import entities
 import algorithms
 
@@ -7,7 +8,8 @@ from concurrent import futures
 AVAILABLE_COACHES = {
     'LARC2020Coach': entities.coach.LarcCoach,
     'Iron2021Coach': entities.coach.IronCoach,
-    'Astar': entities.coach.AstarCoach
+    'Astar': entities.coach.AstarCoach,
+    'devAlex': entities.coach.AlexCoach
 }
 
 class Match(object):
@@ -47,18 +49,23 @@ class Match(object):
         for entity in self.robots:
             entity.update(frame)
 
-        
+
     def decide(self):
         commands = []
+        commands_futures = []
         '''
         https://docs.python.org/3/library/concurrent.futures.html
         '''
-
+        t_init = time.time()
         self.coach.decide()
 
         with futures.ThreadPoolExecutor(max_workers=self.n_robots) as executor:
-            commands = [
-                executor.submit(robot.decide).result() for robot in self.robots
+            commands_futures = [
+                executor.submit(robot.decide) for robot in self.robots
             ]
-        
+
+        for future in futures.as_completed(commands_futures):
+            commands.append(future.result())
+      
+        print(time.time() - t_init)
         return commands

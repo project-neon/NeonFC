@@ -3,6 +3,35 @@ import numpy as np
 
 from scipy.signal import savgol_filter
 
+def dist_point_line(x1, y1, x2, y2, x3, y3):
+    """
+    veririca a distancia entre um ponto de uma linha
+    x1,y1: definicao do primeiro ponto que definira a linha
+    x2,y2: definicao do segundo ponto que definira a linha
+    x3,y3: definicao do terceiro ponto que sera usado para medir a distancia
+    """
+    px = x2-x1
+    py = y2-y1
+
+    norm = px*px + py*py
+
+    u =  ((x3 - x1) * px + (y3 - y1) * py) / float(norm)
+
+    if u > 1:
+        u = 1
+    elif u < 0:
+        u = 0
+
+    x = x1 + u * px
+    y = y1 + u * py
+
+    dx = x - x3
+    dy = y - y3
+
+    dist = (dx*dx + dy*dy)**.5
+
+    return dist
+
 def _fix_angle(theta_1, theta_2):
     rate_theta = (theta_2 - theta_1)
   
