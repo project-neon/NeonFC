@@ -8,24 +8,19 @@ class Field():
 
     def get_field(self):
         fieldSize = self.field.get('fieldSize', 0)
-        w = fieldSize.get('w')
-        h = fieldSize.get('h')
-        return (w, h)
+        return fieldSize
     
     def get_small_area(self):
+        #depois essa função deve retornar [x1, y1, w, h]
         small_area = self.field.get('sAreaSize', 0)
-        w = self.field['sAreaSize'].get('w', 0)
-        h = small_area.get('h', 0)
-        return (w, h)
+        return small_area
 
     def get_quad_ref(self, quad):
         quadrants = self.field.get('quadRef')
         quaDimen = quadrants.get(f'q{quad}')
-        x, y = quaDimen
-        return (x, y)
+        return quaDimen
 
     def get_fk_pos(self, side):
         freekicks = self.field.get("freeKick")
         fk_pos = freekicks.get(side)
-        x, y = fk_pos
-        return (x, y)
+        return fk_pos

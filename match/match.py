@@ -17,6 +17,7 @@ class Match(object):
         self.n_robots = num_robots
         self.coach_name = coach_name
         self.team_color = os.environ.get('TEAM_COLOR', team_color)
+        self.category = category
 
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 

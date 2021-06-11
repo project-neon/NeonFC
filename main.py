@@ -22,7 +22,7 @@ class Game():
         self.comm = comm.FiraComm()
         self.referee = comm.RefereeComm()
         self.data_sender = api.DataSender()
-        self.field = Field(**self.config.get('match'))
+        self.field = Field(self.match.category)
 
         if os.environ.get('USE_DATA_SENDER'):
             self.use_data_sender = bool(int(os.environ.get('USE_DATA_SENDER')))
