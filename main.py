@@ -4,7 +4,7 @@ import comm
 import vision
 import match
 import argparse
-from fields.fields import Field
+from fields import field
 from commons.utils import get_config
 
 parser = argparse.ArgumentParser(description='NeonFC')
@@ -22,7 +22,7 @@ class Game():
         self.comm = comm.FiraComm()
         self.referee = comm.RefereeComm()
         self.data_sender = api.DataSender()
-        self.field = Field(self.match.category)
+        self.field = field.Field(self.match.category)
 
         if os.environ.get('USE_DATA_SENDER'):
             self.use_data_sender = bool(int(os.environ.get('USE_DATA_SENDER')))
