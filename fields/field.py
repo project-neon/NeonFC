@@ -6,7 +6,7 @@ class Field():
         self.source = json.loads(open('fields.json', 'r').read())
         self.field = self.source.get(self.game_mode)
 
-    def get_field(self):
+    def get_dimensions(self):
         #get field dimensions
         field_size = self.field.get('field_size', 0)
         return field_size
@@ -17,13 +17,13 @@ class Field():
         small_area = areas.get(team)
         return small_area
 
-    def get_quad_ref(self, quad):
+    def get_quadrant_position(self, quad):
         #return quadrant positions (x, y)
         quadrants = self.field.get('quad_ref')
         quad_dimen = quadrants.get(f'q{quad}')
         return quad_dimen
 
-    def get_fk_pos(self, side):
-        free_kicks = self.field.get("freeKick")
+    def get_free_kick_position(self, side):
+        free_kicks = self.field.get("free_kick")
         fk_pos = free_kicks.get(side)
         return fk_pos

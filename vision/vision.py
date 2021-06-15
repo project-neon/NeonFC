@@ -91,8 +91,6 @@ class FiraVision(threading.Thread):
 
 def assign_empty_values(raw_frame, color, field_size):
     frame = raw_frame.get('frame')
-    # 2 m comprimento = x
-    # 1.8 m largura = y
     w, h = field_size
     if frame.get('ball'):
         if color == 'yellow':
