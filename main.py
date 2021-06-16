@@ -4,7 +4,7 @@ import comm
 import vision
 import match
 import argparse
-
+import fields as pitch
 from commons.utils import get_config
 
 parser = argparse.ArgumentParser(description='NeonFC')
@@ -22,6 +22,7 @@ class Game():
         self.comm = comm.FiraComm()
         self.referee = comm.RefereeComm()
         self.data_sender = api.DataSender()
+        self.field = pitch.Field(self.match.category)
 
         if os.environ.get('USE_DATA_SENDER'):
             self.use_data_sender = bool(int(os.environ.get('USE_DATA_SENDER')))
@@ -47,7 +48,8 @@ class Game():
     def update(self):
         frame = vision.assign_empty_values(
             self.vision.frame, 
-            color=self.match.team_color
+            color=self.match.team_color,
+            field_size=self.field.get_dimensions()
         )
         self.match.update(frame)
         commands = self.match.decide()

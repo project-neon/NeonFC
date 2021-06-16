@@ -11,12 +11,13 @@ AVAILABLE_COACHES = {
 }
 
 class Match(object):
-    def __init__(self, game, team_color, num_robots=3, coach_name=None):
+    def __init__(self, game, team_color, num_robots=3, coach_name=None, category="3v3"):
         super().__init__()
         self.game = game
         self.n_robots = num_robots
         self.coach_name = coach_name
         self.team_color = os.environ.get('TEAM_COLOR', team_color)
+        self.category = category
 
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
