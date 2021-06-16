@@ -19,7 +19,7 @@ class Field():
 
     def get_quadrant_position(self, quad):
         #return quadrant positions (x, y)
-        quadrants = self.field.get('quad_ref')
+        quadrants = self.field.get('quadrant_positions')
         quad_dimen = quadrants.get(f'q{quad}')
         return quad_dimen
 
