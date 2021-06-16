@@ -1,8 +1,6 @@
 import numpy
 import heapq
 
-from algorithims.a_star.fieldGraph import Node, FieldGraph
-
 
 def distance(pos1, pos2):
     # Considering pos = [x, y] or pos = (x, y)
@@ -14,9 +12,30 @@ def distance(pos1, pos2):
     return d
 
 
+class Node:
+    def __init__(self, position):
+        self.previous = None
+        self.position = position
+        self.g = 0 # distance so far
+        self.h = 0 # heuristic/distance to target
+        self.f = 0 # g plus h
+        self.neighbours = []
+
+    def set_position(self, position = []):
+        self.position = position
+
+    def __lt__(self, other):
+        if (self.f == other.f):
+            return self.h < other.h
+        return self.f < other.f
+
+    def __gt__(self, other):
+        return self.f > other.f
+
+
 class AStar():
-    def __init__(self, start_position, target_position):
-        self.start = FieldGraph(start_position).create_graph()
+    def __init__(self, initial_node, target_position):
+        self.start = initial_node
         self.target_position = target_position
         self.open_list = []
         self.closed_list = []
