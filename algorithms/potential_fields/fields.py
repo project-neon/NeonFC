@@ -7,9 +7,12 @@ import commons
 
 MIN_WEIGHT_ACTIVE = 0.0
 
-def call_or_return(func, match_context):
+def call_or_return(func, match_context, robot_id=-1):
     if callable(func):
-        return func(match_context)
+        if func.__code__.co_argcount == 1:
+            return func(match_context)
+        else:
+            return func(match_context, robot_id)
     return func
 
 def apply_decay(decay_fn, value):
@@ -214,12 +217,12 @@ class TangentialField(PotentialField):
 
         self.field_limits = kwargs.get('field_limits', None)
     
-    def compute(self, input):
-        target_go_to = call_or_return(self.target, self.match)
-        radius_max = call_or_return(self.radius_max, self.match)
-        multiplier = call_or_return(self.multiplier, self.match)
+    def compute(self, input, robot_id=-1):
+        target_go_to = call_or_return(self.target, self.match, robot_id)
+        radius_max = call_or_return(self.radius_max, self.match, robot_id)
+        multiplier = call_or_return(self.multiplier, self.match, robot_id)
 
-        cwo = 1 if call_or_return(self.clockwise, self.match) else -1 # clockwise ou counterclockwise
+        cwo = 1 if call_or_return(self.clockwise, self.match, robot_id) else -1 # clockwise ou counterclockwise
 
         to_target = np.subtract(target_go_to, input)
         to_taget_scalar = np.linalg.norm(to_target)

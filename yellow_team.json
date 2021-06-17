@@ -14,6 +14,7 @@
     "match" : {
         "num_robots": 3,
         "team_color": "yellow",
-        "coach_name": "LARC2020Coach"
+        "coach_name": "LARC2020Coach",
+        "category": "3v3"
     }
 }

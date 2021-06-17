@@ -13,7 +13,7 @@ class DwaScratch(Strategy):
         super().__init__(match)
 
     def start(self, robot=None):
-        self.dwa = algorithms.DynamicWindowApproach(robot, self.game)
+        self.dwa = algorithms.dwa.DynamicWindowApproach(robot, self.game)
         self.controller = self.dwa
         if (robot):
             self.robot = robot

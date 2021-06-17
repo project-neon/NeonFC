@@ -89,12 +89,9 @@ class FiraVision(threading.Thread):
         return sock
 
 
-def assign_empty_values(raw_frame, color):
+def assign_empty_values(raw_frame, color, field_size):
     frame = raw_frame.get('frame')
-    # 2 m comprimento = x
-    # 1.8 m largura = y
-    w = 0.750 * 2
-    h = 0.650 * 2
+    w, h = field_size
     if frame.get('ball'):
         if color == 'yellow':
             frame['ball']['x'] = -frame['ball'].get('x', 0)
