@@ -32,11 +32,19 @@ class Node:
     def __gt__(self, other):
         return self.f > other.f
 
+    def __eq__(self, o):
+        if not hasattr(o, "position"):
+            return False
+        return o.position == self.position
+
+    def __hash__(self):
+        return hash(str(self.position))
+
 
 class AStar():
-    def __init__(self, initial_node, target_position):
+    def __init__(self, initial_node, target):
         self.start = initial_node
-        self.target_position = target_position
+        self.target = target
         self.open_list = []
         self.closed_list = []
     
@@ -55,14 +63,14 @@ class AStar():
             # in case of a tie, lowest h is prioritized
             # current is the node with the smallest f value and is the first in the open_list
             current = self.open_list[0]
-            if current.position == self.target_position:
+            if current == self.target:
                 path_to_target = self.create_path(current)
                 return path_to_target
             self.closed_list.append(heapq.heappop(self.open_list))
             for neighbor in current.neighbours:
                 if neighbor not in self.closed_list:
                     if neighbor not in self.open_list:
-                        neighbor.h = distance(neighbor.position, self.target_position)
+                        neighbor.h = distance(neighbor.position, self.target.position)
                         neighbor.g = distance(neighbor.position, current.position)
                         neighbor.f = neighbor.g + neighbor.h
                         neighbor.previous = current

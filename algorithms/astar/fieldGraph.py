@@ -1,4 +1,4 @@
-from algorithims.a_star.astar import Node
+from algorithms.astar.astar import Node
 
 class FieldGraph():
     def __init__(self):
