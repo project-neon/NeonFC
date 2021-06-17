@@ -100,17 +100,11 @@ class DefensivePlay(Strategy):
         ball = self.match.ball
         robot = self.robot
 
-        field_limits = self.match.game.field.get_dimensions()
-        mid_field = field_limits[1]/2
-
-        robot_speed = ( (robot.vx)**2 + (robot.vy)**2 )**.5
-
         dist_to_ball = ( (ball.x - robot.x)**2 +  (ball.y - robot.y)**2 )**.5
 
         if dist_to_ball >= 0.3:
             self.tangential = None
-            
-            return self.voronoi_astar( max(.35, min(robot_speed * 1.5, .70)) )
+            return self.voronoi_astar(.75)
         else:
             if self.tangential:
                 return self.tangential.compute([self.robot.x, self.robot.y])
@@ -118,18 +112,17 @@ class DefensivePlay(Strategy):
                 self.tangential = TangentialField(
                     self.match,
                     target=lambda m: (
-                        m.ball.x + (math.cos(math.pi/3) if m.ball.y < mid_field else math.cos(5*math.pi/3)) * 0.4 * dist_to_ball,
-                        m.ball.y + (math.sin(math.pi/3) if m.ball.y < mid_field else math.sin(5*math.pi/3)) * 0.4 * dist_to_ball
+                        m.ball.x + (math.cos(math.pi/3) if m.ball.y < 0.65 else math.cos(5*math.pi/3)) * 0.4 * dist_to_ball,
+                        m.ball.y + (math.sin(math.pi/3) if m.ball.y < 0.65 else math.sin(5*math.pi/3)) * 0.4 * dist_to_ball
                     ),                                                                                                                                                                                                                                                                                                                                          
                     radius = dist_to_ball * 0.2,
                     radius_max = dist_to_ball * 10,
-                    clockwise = lambda m: (m.ball.y < mid_field),
+                    clockwise = lambda m: (m.ball.y < 0.65),
                     decay=lambda x: 1,
-                    field_limits = field_limits,
+                    field_limits = [0.75* 2 , 0.65*2],
                     multiplier = 0.75
                 )
 
                 return self.tangential.compute([self.robot.x, self.robot.y])
         
         
-

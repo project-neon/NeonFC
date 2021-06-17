@@ -9,7 +9,7 @@ AVAILABLE_COACHES = {
     'LARC2020Coach': entities.coach.LarcCoach,
     'Iron2021Coach': entities.coach.IronCoach,
     'Astar': entities.coach.AstarCoach,
-    'devAlex': entities.coach.AlexCoach
+    'devtest_alex': entities.coach.AlexCoach
 }
 
 class Match(object):
@@ -57,7 +57,6 @@ class Match(object):
         '''
         https://docs.python.org/3/library/concurrent.futures.html
         '''
-        t_init = time.time()
         self.coach.decide()
 
         with futures.ThreadPoolExecutor(max_workers=self.n_robots) as executor:
@@ -67,6 +66,5 @@ class Match(object):
 
         for future in futures.as_completed(commands_futures):
             commands.append(future.result())
-      
-        print(time.time() - t_init)
+
         return commands
