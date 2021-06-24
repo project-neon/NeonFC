@@ -5,6 +5,8 @@ import vision
 import match
 import argparse
 import fields as pitch
+import pyVSSSReferee
+from pyVSSSReferee.RefereeComm import RefereeComm
 from commons.utils import get_config
 
 parser = argparse.ArgumentParser(description='NeonFC')
@@ -20,9 +22,9 @@ class Game():
         )
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
-        self.referee = comm.RefereeComm()
         self.data_sender = api.DataSender()
         self.field = pitch.Field(self.match.category)
+        self.referee = RefereeComm(config_file = "config.json")
 
         if os.environ.get('USE_DATA_SENDER'):
             self.use_data_sender = bool(int(os.environ.get('USE_DATA_SENDER')))
@@ -39,7 +41,7 @@ class Game():
     def start(self):
         self.vision.assign_vision(self)
         self.match.start()
-
+        
         self.vision.start()
         self.comm.start()
         self.referee.start()
@@ -53,20 +55,61 @@ class Game():
         )
         self.match.update(frame)
         commands = self.match.decide()
-
-        if self.referee.can_play or (not self.use_referee):
+    
+        if self.referee.can_play() or (not self.use_referee):
             self.comm.send(commands)
         else:
-            commands = [
-                {
-                    'robot_id': r['robot_id'],
-                    'color': r['color'],
-                    'wheel_left': 0,
-                    'wheel_right': 0
-                } for r in commands
-            ]
-            self.comm.send(commands)
-        
+            if self.referee.get_foul() == "KICKOFF":
+                self.referee.send_replacement([{"robot_id": 0, "x": -0.2, "y": 0, "orientation":0},
+                                    {"robot_id": 1, "x": -0.4, "y": 0, "orientation":0},
+                                    {"robot_id": 2, "x": -0.6, "y": 0, "orientation":0}
+                                    ], "BLUE")
+            elif self.referee.get_foul() == "FREE_BALL":
+                self.referee.send_replacement([{"robot_id": 0, "x": 0, "y": 0, "orientation":0},
+                                    {"robot_id": 1, "x": -0.5, "y": -0.5, "orientation":0},
+                                    {"robot_id": 2, "x": 0.3, "y": 0.3, "orientation":0}
+                                    ], "BLUE")
+            elif self.referee.get_foul() == "GOAL_KICK" and self.referee.get_color() == 'BLUE':
+                self.referee.send_replacement([{"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+                                    {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+                                    {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+                                    ], "BLUE")    
+            elif self.referee.get_foul() == "GOAL_KICK" and self.referee.get_color() == 'YELLOW':
+                self.referee.send_replacement([{"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+                                    {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+                                    {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+                                    ], "BLUE")                   
+            elif self.referee.get_foul() == "PENALTY_KICK" and self.referee.get_color() == "YELLOW":
+                self.referee.send_replacement([{"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+                                    {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+                                    {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+                                    ], "BLUE")                   
+            elif self.referee.get_foul() == "PENALTY_KICK" and self.referee.get_color() == "BLUE":
+                self.referee.send_replacement([{"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+                                    {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+                                    {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+                                    ], "BLUE")                   
+            elif self.referee.get_foul() == "FREE_KICK" and self.referee.get_color() == "YELLOW":
+                self.referee.send_replacement([{"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+                                    {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+                                    {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+                                    ], "BLUE")                   
+            elif self.referee.get_foul() == "FREE_KICK" and self.referee.get_color() == "BLUE":
+                self.referee.send_replacement([{"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+                                    {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+                                    {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+                                    ], "BLUE")
+            else:
+                commands = [
+                    {
+                        'robot_id': r['robot_id'],
+                        'color': r['color'],
+                        'wheel_left': 0,
+                        'wheel_right': 0
+                    } for r in commands
+                ]
+                self.comm.send(commands)
+            
         if self.use_data_sender:
             api.DataSender().send_data()
 
