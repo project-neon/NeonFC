@@ -34,9 +34,7 @@ class Coach(object):
 
     def get_positions(self, foul, team_color):
         foul = self.positions.get(foul)
-        replacements = foul.get(team_color, 0)
-        if replacements == 0:
-            replacements = foul.get("POSITIONS")
+        replacements = foul.get(team_color, foul.get("POSITIONS"))
         return replacements
 
     def elect_attacker(self, robot):

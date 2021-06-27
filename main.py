@@ -23,7 +23,7 @@ class Game():
         self.comm = comm.FiraComm()
         self.data_sender = api.DataSender()
         self.field = pitch.Field(self.match.category)
-        self.referee = RefereeComm(config_file = "config.json")
+        self.referee = RefereeComm(config_file)
 
         if os.environ.get('USE_DATA_SENDER'):
             self.use_data_sender = bool(int(os.environ.get('USE_DATA_SENDER')))
@@ -45,7 +45,6 @@ class Game():
         self.comm.start()
         self.referee.start()
         self.data_sender.start()
-        print(self.match.team_color)
 
     def update(self):
         frame = vision.assign_empty_values(
