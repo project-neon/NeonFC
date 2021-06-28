@@ -30,7 +30,6 @@ class DeepPlay(Strategy):
 
         self.actions = [None for _ in range(11)]
 
-        self.state_shape = (len(self.get_observation()[0]),)
         self.action_shape = len(self.actions)
         self.learning_rate = 0.001
 
@@ -234,6 +233,7 @@ class DeepPlay(Strategy):
 
     def start(self, robot=None):
         super().start(robot=robot)
+        self.state_shape = (len(self.get_observation()[0]),)
         if not self.target_model or not self.model:
             self.generate_possible_actions()
             self.target_model = self.create_model()
@@ -317,10 +317,11 @@ class DeepPlay(Strategy):
 
     def get_observation(self):
         ball = self.match.ball
-        robot = self.robot
-        dist_to_ball = ( (ball.x - robot.x)**2 +  (ball.y - robot.y)**2 )**.5
-        min_angle_ball_to_goal = -math.atan2((ball.y - 0.55), (ball.x - 0.75*2))
-        angle_robot_to_ball = -math.atan2((robot.y - ball.y), (robot.x - ball.x ))
+        robot = self.robot if self.robot else None
+
+        dist_to_ball = ( (ball.x - robot.x)**2 +  (ball.y - robot.y)**2 )**.5 if robot else 0
+        min_angle_ball_to_goal = -math.atan2((ball.y - 0.55), (ball.x - 0.75*2)) if robot else 0
+        angle_robot_to_ball = -math.atan2((robot.y - ball.y), (robot.x - ball.x )) if robot else 0
         
         min_angle_to_goal = abs(min_angle_ball_to_goal - angle_robot_to_ball)
 
