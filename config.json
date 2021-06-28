@@ -14,8 +14,8 @@
         "num_robots": 3,
         "team_color": "blue",
         "coach_name": "devtest_alex",
-        "category": "5v5"
+        "category": "3v3"
     },
-    "referee": false,
+    "referee": true,
     "data_sender": false
 }

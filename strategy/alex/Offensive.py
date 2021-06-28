@@ -5,10 +5,10 @@ from scipy.spatial import Voronoi
 
 from algorithms.astar.astar import AStar, Node
 from algorithms.astar.fieldGraph import FieldGraph
-from algorithms.potential_fields.fields import TangentialField
+from algorithms.potential_fields.fields import TangentialField, PotentialField
 from strategy.BaseStrategy import Strategy
 
-class DefensivePlay(Strategy):
+class OffensivePlay(Strategy):
     def __init__(self, match):
         self.match = match
         self.game = self.match.game
@@ -102,25 +102,54 @@ class DefensivePlay(Strategy):
 
         dist_to_ball = ( (ball.x - robot.x)**2 +  (ball.y - robot.y)**2 )**.5
 
-        if dist_to_ball >= 0.3:
+        field_limits = self.match.game.field.get_dimensions()
+        mid_field = [ax/2 for ax in field_limits]
+        robot_speed = ( (robot.vx)**2 + (robot.vy)**2 )**.5
+
+        tangential_radius = 0.25
+
+        def choose_target(m, r_id):
+            above_line = lambda A, B, X, Y: 1 if ((B[0] - A[0]) * (Y - A[1]) - (B[1] - A[1]) * (X - A[0])) > 0 else -1
+            fl = field_limits
+            
+            def f(m):
+                _sign = 1 #above_line([m.ball.x, m.ball.y], [fl[0], fl[1]/2], m.robots[r_id].x, m.robots[r_id].y)
+                return (
+                    m.ball.x + _sign * math.cos(math.atan2((mid_field[1] - m.ball.y), (mid_field[0]*2 - m.ball.x)) + math.pi/2) * 0.4 * dist_to_ball,
+                    m.ball.y + _sign * math.sin(math.atan2((mid_field[1] - m.ball.y), (mid_field[0]*2 - m.ball.x)) + math.pi/2) * 0.4 * dist_to_ball
+                )
+
+            return f
+        
+        def choose_ccw(m, r_id):
+            above_line = lambda A, B, X, Y: 1 if ((B[0] - A[0]) * (Y - A[1]) - (B[1] - A[1]) * (X - A[0])) > 0 else -1
+            fl = field_limits
+
+            def f(m):
+                _sign = above_line([m.ball.x, m.ball.y], [fl[0], fl[1]/2], m.robots[r_id].x, m.robots[r_id].y)
+                return -_sign
+            
+            return f
+
+        if dist_to_ball >= tangential_radius:
             self.tangential = None
-            return self.voronoi_astar(.75)
+            return self.voronoi_astar( max(.2, min(robot_speed * 2.3, .7)) )
         else:
             if self.tangential:
                 return self.tangential.compute([self.robot.x, self.robot.y])
             else:
-                self.tangential = TangentialField(
-                    self.match,
-                    target=lambda m: (
-                        m.ball.x + (math.cos(math.pi/3) if m.ball.y < 0.65 else math.cos(5*math.pi/3)) * 0.4 * dist_to_ball,
-                        m.ball.y + (math.sin(math.pi/3) if m.ball.y < 0.65 else math.sin(5*math.pi/3)) * 0.4 * dist_to_ball
-                    ),                                                                                                                                                                                                                                                                                                                                          
-                    radius = dist_to_ball * 0.2,
-                    radius_max = dist_to_ball * 10,
-                    clockwise = lambda m: (m.ball.y < 0.65),
-                    decay=lambda x: 1,
-                    field_limits = [0.75* 2 , 0.65*2],
-                    multiplier = 0.75
+                self.tangential = PotentialField(self.match)
+
+                self.tangential.add_field(
+                    TangentialField(
+                        self.match,
+                        target=choose_target(self.match, self.robot.robot_id),                                                                                                                                                                                                                                                                                                                                          
+                        radius = dist_to_ball * 0.2,
+                        radius_max = dist_to_ball * 10,
+                        clockwise = 1,
+                        decay=lambda _: 1,
+                        multiplier = 0.75
+                    )
                 )
 
                 return self.tangential.compute([self.robot.x, self.robot.y])

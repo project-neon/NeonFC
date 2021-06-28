@@ -47,8 +47,14 @@ class DefensivePlay(Strategy):
 
         vor = Voronoi(obstacles)
 
+        field = self.match.game.field.get_dimensions()
         objective = self.match.ball
-        target_node = Node([objective.x, objective.y])
+        target_node = Node(
+            [
+                field[0]/3,
+                field[1]/2 + (objective.y - field[1]/2)/2
+            ]
+        )
 
         nodes = [
             Node([a[0], a[1]]) for a in vor.vertices
@@ -95,22 +101,22 @@ class DefensivePlay(Strategy):
             speed * (path[1][1] - path[0][1])/dist
         ]
 
-
     def decide(self):
         ball = self.match.ball
         robot = self.robot
 
         field_limits = self.match.game.field.get_dimensions()
-        mid_field = field_limits[1]/2
+        mid_field = [ax/2 for ax in field_limits]
 
         robot_speed = ( (robot.vx)**2 + (robot.vy)**2 )**.5
-
         dist_to_ball = ( (ball.x - robot.x)**2 +  (ball.y - robot.y)**2 )**.5
 
-        if dist_to_ball >= 0.3:
+        tangential_radius = 0.3
+
+        if dist_to_ball >= tangential_radius:
             self.tangential = None
             
-            return self.voronoi_astar( max(.35, min(robot_speed * 1.5, .70)) )
+            return self.voronoi_astar( max(.2, min(robot_speed * 1.8, .65)) )
         else:
             if self.tangential:
                 return self.tangential.compute([self.robot.x, self.robot.y])
@@ -118,12 +124,12 @@ class DefensivePlay(Strategy):
                 self.tangential = TangentialField(
                     self.match,
                     target=lambda m: (
-                        m.ball.x + (math.cos(math.pi/3) if m.ball.y < mid_field else math.cos(5*math.pi/3)) * 0.4 * dist_to_ball,
-                        m.ball.y + (math.sin(math.pi/3) if m.ball.y < mid_field else math.sin(5*math.pi/3)) * 0.4 * dist_to_ball
+                        m.ball.x - (math.cos(math.pi/3) if m.ball.y < mid_field[0] else math.cos(5*math.pi/3)) * 0.4 * dist_to_ball,
+                        m.ball.y - (math.sin(math.pi/3) if m.ball.y < mid_field[0] else math.sin(5*math.pi/3)) * 0.4 * dist_to_ball
                     ),                                                                                                                                                                                                                                                                                                                                          
                     radius = dist_to_ball * 0.2,
                     radius_max = dist_to_ball * 10,
-                    clockwise = lambda m: (m.ball.y < mid_field),
+                    clockwise = lambda m: (m.ball.y > mid_field[0]),
                     decay=lambda x: 1,
                     field_limits = field_limits,
                     multiplier = 0.75

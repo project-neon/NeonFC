@@ -47,7 +47,7 @@ class Robot(object):
         }
 
         self.vx, self.vy, self.vtheta = 0, 0, 0
-        self.x, self.y = 0, 0
+        self.x, self.y, self.theta = 0, 0, 0
 
     def start(self):
         self.strategy.start(self)
