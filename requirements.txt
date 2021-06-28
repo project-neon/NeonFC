@@ -5,3 +5,6 @@ scipy
 # live plot view stuff
 pyqtgraph
 PyQt5
+
+# deep learning stuff
+keras
