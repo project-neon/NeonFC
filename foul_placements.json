@@ -1,0 +1,52 @@
+{
+    "KICKOFF": {
+        "POSITIONS": [
+            {"robot_id": 0, "x": -0.2, "y": 0, "orientation":0},
+            {"robot_id": 1, "x": -0.4, "y": 0, "orientation":0},
+            {"robot_id": 2, "x": -0.6, "y": 0, "orientation":0}
+        ]
+    },
+    "FREE_BALL": {
+        "POSITIONS": [
+            {"robot_id": 0, "x": 0, "y": 0, "orientation":0},
+            {"robot_id": 1, "x": -0.5, "y": -0.5, "orientation":0},
+            {"robot_id": 2, "x": 0.3, "y": 0.3, "orientation":0}
+        ]
+    },
+    "GOAL_KICK": {
+        "YELLOW":[
+            {"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+            {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+            {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+        ],
+        "BLUE": [
+            {"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+            {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+            {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+        ]
+    },
+    "PENALTY_KICK": {
+        "YELLOW": [
+            {"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+            {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+            {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+        ],
+        "BLUE": [
+            {"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+            {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+            {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+        ]
+    },
+    "FREE_KICK": {
+        "YELLOW": [
+            {"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+            {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+            {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+        ],
+        "BLUE": [
+            {"robot_id": 0, "x": -0.5, "y": 0, "orientation":0},
+            {"robot_id": 1, "x": -0.3, "y": 0, "orientation":0},
+            {"robot_id": 2, "x": -0.1, "y": 0, "orientation":0}
+        ]
+    }
+}
