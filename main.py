@@ -69,10 +69,11 @@ class Game():
             self.comm.send(commands)
             
             if self.referee.get_foul() != "STOP" and self.referee.get_foul() != None:
-                self.referee.send_replacement(
-                    self.match.coach.get_positions( self.referee.get_foul(), self.referee.get_color() ),
-                    self.match.team_color.upper()
-                )
+                if self.match.coach.get_positions( self.referee.get_foul(), self.referee.get_color() ):
+                    self.referee.send_replacement(
+                        self.match.coach.get_positions( self.referee.get_foul(), self.referee.get_color() ),
+                        self.match.team_color.upper()
+                    )
             
         if self.use_data_sender:
             api.DataSender().send_data()
