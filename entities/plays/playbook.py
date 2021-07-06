@@ -200,3 +200,43 @@ class StuckRobots(Trigger):
             return True
         
         return False
+
+class OnFreeBall(Trigger):
+    def __init__(self, foul):
+        super().__init__()
+        self.foul = foul
+
+    def evaluate(self, coach, actual_play):
+        return self.foul == "FREE_BALL"
+
+class OnKickOff(Trigger):
+    def __init__(self, foul):
+        super().__init__()
+        self.foul = foul
+
+    def evaluate(self, coach, actual_play):
+        return self.foul == "KICK_OFF"
+
+class OnFreeKick(Trigger):
+    def __init__(self, foul):
+        super().__init__()
+        self.foul = foul
+
+    def evaluate(self, coach, actual_play):
+        return self.foul == "FREE_KICK"
+
+class OnPenaltyKick(Trigger):
+    def __init__(self, foul):
+        super().__init__()
+        self.foul = foul
+
+    def evaluate(self, coach, actual_play):
+        return self.foul == "PENALTY_KICK"
+
+class OnGoalKick(Trigger):
+    def __init__(self, foul):
+        super().__init__()
+        self.foul = foul
+
+    def evaluate(self, coach, actual_play):
+        return self.foul == "GOAL_KICK"
