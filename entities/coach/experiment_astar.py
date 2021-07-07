@@ -1,10 +1,9 @@
-import algorithms
+from entities.coach.coach import BaseCoach
 import strategy
 
-class Coach(object):
+class Coach(BaseCoach):
     def __init__(self, match):
-        self.match = match
-
+        super().__init__(match, "Experiment-astar")
         self.test_strategy = strategy.tests.AstarAttacker(self.match)
 
         self.idle_strategy = [

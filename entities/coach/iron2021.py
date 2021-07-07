@@ -1,14 +1,9 @@
-import algorithms
-import strategy
+from entities.coach.coach import BaseCoach
 from entities import plays
-import math
-import time
 
-from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
-
-class Coach(object):
+class Coach(BaseCoach):
     def __init__(self, match):
-        self.match = match
+        super().__init__(match, "IRON-2021")
 
         self.playbook = plays.Playbook(self)
 
