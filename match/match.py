@@ -16,6 +16,7 @@ class Match(object):
 
     
     def start(self):
+        print("Starting match module starting ...")
         self.ball = entities.Ball(self.game)
 
         self.opposites = [
@@ -27,6 +28,7 @@ class Match(object):
         ]
 
         self.coach = entities.coach.COACHES[self.coach_name](self)
+        print(f"Match started! coach is [{self.coach.NAME}]")
         self.coach.decide()
 
         for robot in self.robots:
