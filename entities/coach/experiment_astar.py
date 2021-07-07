@@ -2,8 +2,9 @@ from entities.coach.coach import BaseCoach
 import strategy
 
 class Coach(BaseCoach):
+    NAME = "EXPERIMENTAL_COACH_ASTAR"
     def __init__(self, match):
-        super().__init__(match, "Experiment-astar")
+        super().__init__(match)
         self.test_strategy = strategy.tests.AstarAttacker(self.match)
 
         self.idle_strategy = [

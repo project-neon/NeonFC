@@ -2,8 +2,9 @@ from entities.coach.coach import BaseCoach
 from entities import plays
 
 class Coach(BaseCoach):
+    NAME = "IRON_2021"
     def __init__(self, match):
-        super().__init__(match, "IRON-2021")
+        super().__init__(match)
 
         self.playbook = plays.Playbook(self)
 

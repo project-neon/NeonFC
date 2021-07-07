@@ -4,8 +4,9 @@ import math
 import json
 
 class Coach(BaseCoach):
+    NAME = "LARC_2020"
     def __init__(self, match):
-        super().__init__(match, "LARC-2020")
+        super().__init__(match)
 
         self.constraints = [
             #estratégia - função eleitora - prioridade
