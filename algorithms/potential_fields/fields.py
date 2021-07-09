@@ -9,10 +9,7 @@ MIN_WEIGHT_ACTIVE = 0.0
 
 def call_or_return(func, match_context, robot_id=-1):
     if callable(func):
-        if func.__code__.co_argcount == 1:
-            return func(match_context)
-        else:
-            return func(match_context, robot_id)
+        return func(match_context)
     return func
 
 def apply_decay(decay_fn, value):
@@ -22,43 +19,6 @@ def apply_decay(decay_fn, value):
     out = decay_fn(abs(value))
 
     return out if value >= 0 else -out
-
-class PotentialDataExporter(object):
-    def __init__(self, name):
-        self.file = open(
-            '{}|potential_field.log'.format(name),
-            'w'
-        )
-
-    def export(self, behaviour, robot, ball):
-        X = []
-        Y = []
-        U = []
-        V = []
-
-        for x in range(-10, 150 + 10, 2):
-            x = x/100.0
-            for y in range(-10, 130 + 10, 2):
-                y = y/100.0
-                res = behaviour.compute([x, y])
-                X.append(x)
-                Y.append(y)
-                U.append(res[0])
-                V.append(res[1])
-
-        plot_file = {
-            "x": X,
-            "y": Y,
-            "u": U,
-            "v": V,
-            "robot_x": robot.x,
-            "robot_y": robot.y,
-            "ball_x": ball.x,
-            "ball_y": ball.y,
-            "behaviour": behaviour.name
-        }
-
-        self.file.write(json.dumps(plot_file) + "||")
 
 class PotentialField(object):
     def __init__(self, match, **kwargs):
