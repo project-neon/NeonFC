@@ -220,27 +220,39 @@ class OnKickOff(Trigger):
         return self.foul == "KICK_OFF"
 
 class OnFreeKick(Trigger):
-    def __init__(self, referee):
+    def __init__(self, referee, team_color):
         super().__init__()
         self.referee = referee
+        self.team_color = team_color
+
+    def get_foul_side(self):
+        return self.team_color == self.referee.get_color()
 
     def evaluate(self, coach, actual_play):
         foul = self.referee.get_foul()
         return self.foul == "FREE_KICK"
 
 class OnPenaltyKick(Trigger):
-    def __init__(self, referee):
+    def __init__(self, referee, team_color):
         super().__init__()
         self.referee = referee
+        self.team_color = team_color
+
+    def get_foul_side(self):
+        return self.team_color == self.referee.get_color()
 
     def evaluate(self, coach, actual_play):
         foul = self.referee.get_foul()
         return self.foul == "PENALTY_KICK"
 
 class OnGoalKick(Trigger):
-    def __init__(self, referee):
+    def __init__(self, referee, team_color):
         super().__init__()
         self.referee = referee
+        self.team_color = team_color
+
+    def get_foul_side(self):
+        return self.team_color == self.referee.get_color()
 
     def evaluate(self, coach, actual_play):
         foul = self.referee.get_foul()
