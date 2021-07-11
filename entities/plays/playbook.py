@@ -200,3 +200,51 @@ class StuckRobots(Trigger):
             return True
         
         return False
+
+class OnFreeBall(Trigger):
+    def __init__(self, referee):
+        super().__init__()
+        self.referee = referee
+
+    def evaluate(self, coach, actual_play):
+        foul = self.referee.get_foul()
+        return foul == "FREE_BALL"
+
+class OnKickOff(Trigger):
+    def __init__(self, referee):
+        super().__init__()
+        self.referee = referee
+
+    def evaluate(self, coach, actual_play):
+        foul = self.referee.get_foul()
+        return foul == "KICK_OFF"
+
+class OnFreeKick(Trigger):
+    def __init__(self, referee, team_color):
+        super().__init__()
+        self.referee = referee
+        self.team_color = team_color
+
+    def evaluate(self, coach, actual_play):
+        foul = self.referee.get_foul()
+        return foul == "FREE_KICK" and self.team_color.upper() == self.referee.get_color()
+
+class OnPenaltyKick(Trigger):
+    def __init__(self, referee, team_color):
+        super().__init__()
+        self.referee = referee
+        self.team_color = team_color
+
+    def evaluate(self, coach, actual_play):
+        foul = self.referee.get_foul()
+        return foul == "PENALTY_KICK" and self.team_color.upper() == self.referee.get_color()
+
+class OnGoalKick(Trigger):
+    def __init__(self, referee, team_color):
+        super().__init__()
+        self.referee = referee
+        self.team_color = team_color
+
+    def evaluate(self, coach, actual_play):
+        foul = self.referee.get_foul()
+        return foul == "GOAL_KICK" and self.team_color.upper() == self.referee.get_color()
