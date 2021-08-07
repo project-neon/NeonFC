@@ -8,6 +8,7 @@ from strategy.tests.Idle import Idle
 from strategy.tests.pfScratch import Scratch
 from strategy.tests.dwaScratch import DwaScratch
 from strategy.tests.ControlSystemTroubleshoot import ControlSystemTroubleshoot
+from strategy.tests.mktAttacker import mktAttacker
 
 from strategy.tests.astarAttacker import AstarAttacker
 from strategy.tests.dijkSeeker import DijkstraSeeker
