@@ -13,7 +13,11 @@
     "match" : {
         "num_robots": 3,
         "team_color": "blue",
+<<<<<<< HEAD
         "coach_name": "devtest_alex",
+=======
+        "coach_name": "LARC_2020",
+>>>>>>> master
         "category": "3v3"
     },
     "referee": true,

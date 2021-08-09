@@ -1,10 +1,10 @@
 import os
 import time
 import entities
-import algorithms
 
 from concurrent import futures
 
+<<<<<<< HEAD
 AVAILABLE_COACHES = {
     'LARC2020Coach': entities.coach.LarcCoach,
     'Iron2021Coach': entities.coach.IronCoach,
@@ -12,6 +12,8 @@ AVAILABLE_COACHES = {
     'devtest_alex': entities.coach.AlexCoach
 }
 
+=======
+>>>>>>> master
 class Match(object):
     def __init__(self, game, team_color, num_robots=3, coach_name=None, category="3v3"):
         super().__init__()
@@ -25,6 +27,7 @@ class Match(object):
 
     
     def start(self):
+        print("Starting match module starting ...")
         self.ball = entities.Ball(self.game)
 
         self.opposites = [
@@ -35,7 +38,8 @@ class Match(object):
             entities.Robot(self.game, i, self.team_color) for i in range(self.n_robots)
         ]
 
-        self.coach = AVAILABLE_COACHES[self.coach_name](self)
+        self.coach = entities.coach.COACHES[self.coach_name](self)
+        print(f"Match started! coach is [{self.coach.NAME}]")
         self.coach.decide()
 
         for robot in self.robots:

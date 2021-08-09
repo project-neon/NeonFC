@@ -1,7 +1,7 @@
-import algorithms
+from entities.coach.coach import BaseCoach
 import strategy
 
-class Coach(object):
+class Coach(BaseCoach):
     def __init__(self, match):
         self.match = match
 

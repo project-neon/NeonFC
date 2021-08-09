@@ -1,5 +1,5 @@
 {
-    "referee": false,
+    "referee": true,
     "data_sender": true,
     "network" : {
         "multicast_ip": "224.0.0.1",
