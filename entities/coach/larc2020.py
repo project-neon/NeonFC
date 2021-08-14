@@ -1,17 +1,20 @@
-import algorithms
+from entities.coach.coach import BaseCoach
 import strategy
 import math
-from commons.math import angular_speed, speed, rotate_via_numpy, unit_vector
+import json
 
-class Coach(object):
+class Coach(BaseCoach):
+    NAME = "LARC_2020"
     def __init__(self, match):
-        self.match = match
+        super().__init__(match)
+
         self.constraints = [
             #estratégia - função eleitora - prioridade
             (strategy.larc2020.GoalKeeper(self.match), self.elect_goalkeeper, 0),
             (strategy.larc2020.Attacker(self.match), self.elect_attacker, 0),
             (strategy.larc2020.MidFielder(self.match), self.elect_midfielder, 0)
         ]
+        self.positions = json.loads(open('foul_placements.json', 'r').read())
     
     def decide (self):
         robots = [r.robot_id for r in self.match.robots]
@@ -29,7 +32,12 @@ class Coach(object):
                 self.match.robots[elected].strategy = strategy
                 self.match.robots[elected].start()
             robots.remove(elected)
-    
+
+    def get_positions(self, foul, team_color):
+        foul = self.positions.get(foul)
+        replacements = foul.get(team_color, foul.get("POSITIONS"))
+        return replacements
+
     def elect_attacker(self, robot):
         dist_to_ball = math.sqrt(
             (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2

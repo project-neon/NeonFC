@@ -1,0 +1,52 @@
+{
+    "KICKOFF": {
+        "POSITIONS": [
+            {"robot_id": 0, "x": 0.55, "y": 0.65, "orientation": 0},
+            {"robot_id": 1, "x": 0.35, "y": 0.65, "orientation": 0},
+            {"robot_id": 2, "x": 0.15, "y": 0.65, "orientation": 0}
+        ]
+    },
+    "FREE_BALL": {
+        "POSITIONS": [
+            {"robot_id": 0, "x": 0.75, "y": 0.65, "orientation": 0},
+            {"robot_id": 1, "x": 0.25, "y": 0.15, "orientation": 0},
+            {"robot_id": 2, "x": 1.05, "y": 0.95, "orientation": 0}
+        ]
+    },
+    "GOAL_KICK": {
+        "YELLOW":[
+            {"robot_id": 0, "x": 0.25, "y": 0.65, "orientation": 0},
+            {"robot_id": 1, "x": 0.45, "y": 0.65, "orientation": 0},
+            {"robot_id": 2, "x": 0.65, "y": 0.65, "orientation": 0}
+        ],
+        "BLUE": [
+            {"robot_id": 0, "x": 0.25, "y": 0.65, "orientation": 0},
+            {"robot_id": 1, "x": 0.45, "y": 0.65, "orientation": 0},
+            {"robot_id": 2, "x": 0.65, "y": 0.65, "orientation": 0}
+        ]
+    },
+    "PENALTY_KICK": {
+        "YELLOW": [
+            {"robot_id": 0, "x": 0.25, "y": 0.65, "orientation": 0},
+            {"robot_id": 1, "x": 0.45, "y": 0.65, "orientation": 0},
+            {"robot_id": 2, "x": 0.65, "y": 0.65, "orientation": 0}
+        ],
+        "BLUE": [
+            {"robot_id": 0, "x": 0.25, "y": 0.65, "orientation": 0},
+            {"robot_id": 1, "x": 0.45, "y": 0.65, "orientation": 0},
+            {"robot_id": 2, "x": 0.65, "y": 0.65, "orientation": 0}
+        ]
+    },
+    "FREE_KICK": {
+        "YELLOW": [
+            {"robot_id": 0, "x": 0.25, "y": 0.65, "orientation": 0},
+            {"robot_id": 1, "x": 0.45, "y": 0.65, "orientation": 0},
+            {"robot_id": 2, "x": 0.65, "y": 0.65, "orientation": 0}
+        ],
+        "BLUE": [
+            {"robot_id": 0, "x": 0.25, "y": 0.65, "orientation": 0},
+            {"robot_id": 1, "x": 0.45, "y": 0.65, "orientation": 0},
+            {"robot_id": 2, "x": 0.65, "y": 0.65, "orientation": 0}
+        ]
+    }
+}

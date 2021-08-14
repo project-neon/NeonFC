@@ -5,6 +5,7 @@ import vision
 import match
 import argparse
 import fields as pitch
+from pyVSSSReferee.RefereeComm import RefereeComm
 from commons.utils import get_config
 
 parser = argparse.ArgumentParser(description='NeonFC')
@@ -20,9 +21,9 @@ class Game():
         )
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
-        self.referee = comm.RefereeComm()
         self.data_sender = api.DataSender()
         self.field = pitch.Field(self.match.category)
+        self.referee = RefereeComm(config_file)
 
         if os.environ.get('USE_DATA_SENDER'):
             self.use_data_sender = bool(int(os.environ.get('USE_DATA_SENDER')))
@@ -38,11 +39,11 @@ class Game():
 
     def start(self):
         self.vision.assign_vision(self)
+        self.referee.start()
         self.match.start()
-
+        
         self.vision.start()
         self.comm.start()
-        self.referee.start()
         self.data_sender.start()
 
     def update(self):
@@ -54,7 +55,7 @@ class Game():
         self.match.update(frame)
         commands = self.match.decide()
 
-        if self.referee.can_play or (not self.use_referee):
+        if self.referee.can_play() or (not self.use_referee):
             self.comm.send(commands)
         else:
             commands = [
@@ -66,7 +67,14 @@ class Game():
                 } for r in commands
             ]
             self.comm.send(commands)
-        
+            
+            if self.referee.get_foul() != "STOP" and self.referee.get_foul() != None:
+                if self.match.coach.get_positions( self.referee.get_foul(), self.referee.get_color() ):
+                    self.referee.send_replacement(
+                        self.match.coach.get_positions( self.referee.get_foul(), self.referee.get_color() ),
+                        self.match.team_color.upper()
+                    )
+            
         if self.use_data_sender:
             api.DataSender().send_data()
 
