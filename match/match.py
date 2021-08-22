@@ -4,16 +4,6 @@ import entities
 
 from concurrent import futures
 
-<<<<<<< HEAD
-AVAILABLE_COACHES = {
-    'LARC2020Coach': entities.coach.LarcCoach,
-    'Iron2021Coach': entities.coach.IronCoach,
-    'Astar': entities.coach.AstarCoach,
-    'devtest_alex': entities.coach.AlexCoach
-}
-
-=======
->>>>>>> master
 class Match(object):
     def __init__(self, game, team_color, num_robots=3, coach_name=None, category="3v3"):
         super().__init__()

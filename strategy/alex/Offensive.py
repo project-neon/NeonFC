@@ -1,11 +1,13 @@
 import math
-import random
 
 from scipy.spatial import Voronoi
+
+from controller import TwoSidesLQR
 
 from algorithms.astar.astar import AStar, Node
 from algorithms.astar.fieldGraph import FieldGraph
 from algorithms.potential_fields.fields import TangentialField, PotentialField
+
 from strategy.BaseStrategy import Strategy
 
 class OffensivePlay(Strategy):
@@ -14,8 +16,13 @@ class OffensivePlay(Strategy):
         self.game = self.match.game
 
         self.graph = FieldGraph()
+        self.ctrl_params = {"l": 0.115}
 
-        super().__init__(match, 'DefensiveVoronoi')
+        super().__init__(
+            match, 'DefensiveVoronoi',
+            controller=TwoSidesLQR,
+            controller_kwargs=self.ctrl_params
+        )
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -38,12 +45,44 @@ class OffensivePlay(Strategy):
             [self.match.game.field.get_dimensions()[0], 0],
             [0, 0],
             [0, self.match.game.field.get_dimensions()[1]],
-            [self.match.game.field.get_dimensions()[0], self.match.game.field.get_dimensions()[1]]
+            [self.match.game.field.get_dimensions()[0], self.match.game.field.get_dimensions()[1]],
+
+            [0, self.match.game.field.get_dimensions()[1]/2],
+            [self.match.game.field.get_dimensions()[0], self.match.game.field.get_dimensions()[1]/2],
+
+            [0, self.match.game.field.get_dimensions()[1]/4],
+            [self.match.game.field.get_dimensions()[0], self.match.game.field.get_dimensions()[1]/4],
+
+            [0, 3 * self.match.game.field.get_dimensions()[1]/4],
+            [self.match.game.field.get_dimensions()[0], 3 * self.match.game.field.get_dimensions()[1]/4],
         ]
-        obstacles = corners + [ [r.x, r.y] for r in self.match.opposites] + [
+        mergeble_obstacles = [ [r.x, r.y] for r in self.match.opposites] + [
             [r.x, r.y] for r in self.match.robots 
             if r.robot_id != self.robot.robot_id
-        ] + [ [self.match.ball.x, self.match.ball.y], self.robot_node.position]
+        ]
+
+        dist = lambda x, y: math.sqrt( (x[0] - y[0])**2 + (x[1] - y[1])**2 )
+        to_merge = []
+        to_remove = []
+        for i1, m1 in enumerate(mergeble_obstacles):
+            for i2, m2 in enumerate(mergeble_obstacles):
+                if m1 == m2: continue
+                if dist(m1, m2) <= 2 * self.robot.dimensions["L"] * math.sqrt(2):
+                    to_merge.append([m1, m2])
+                    to_remove.append(i1)
+                    to_remove.append(i2)
+        
+        to_remove = list(set(to_remove))
+        for index in sorted(to_remove, reverse=True):
+            del mergeble_obstacles[index]
+
+        for o1, o2 in to_merge:
+            mergeble_obstacles.append([ (o1[0] + o2[0])/2 , (o1[1] + o2[1])/2 ])
+
+        unmergeble_obsctacles = [ [self.match.ball.x, self.match.ball.y], self.robot_node.position]
+
+
+        obstacles = corners + mergeble_obstacles + unmergeble_obsctacles
 
         vor = Voronoi(obstacles)
 
@@ -106,14 +145,15 @@ class OffensivePlay(Strategy):
         mid_field = [ax/2 for ax in field_limits]
         robot_speed = ( (robot.vx)**2 + (robot.vy)**2 )**.5
 
-        tangential_radius = 0.25
+        aim_param = 0.3 * max(0, mid_field[0] - robot.x)
+
+        mid_field[0] += aim_param
+
+        tangential_radius = 0.3
 
         def choose_target(m, r_id):
-            above_line = lambda A, B, X, Y: 1 if ((B[0] - A[0]) * (Y - A[1]) - (B[1] - A[1]) * (X - A[0])) > 0 else -1
-            fl = field_limits
-            
             def f(m):
-                _sign = 1 #above_line([m.ball.x, m.ball.y], [fl[0], fl[1]/2], m.robots[r_id].x, m.robots[r_id].y)
+                _sign = 1 if choose_ccw(m, r_id) else -1
                 return (
                     m.ball.x + _sign * math.cos(math.atan2((mid_field[1] - m.ball.y), (mid_field[0]*2 - m.ball.x)) + math.pi/2) * 0.4 * dist_to_ball,
                     m.ball.y + _sign * math.sin(math.atan2((mid_field[1] - m.ball.y), (mid_field[0]*2 - m.ball.x)) + math.pi/2) * 0.4 * dist_to_ball
@@ -122,18 +162,17 @@ class OffensivePlay(Strategy):
             return f
         
         def choose_ccw(m, r_id):
-            above_line = lambda A, B, X, Y: 1 if ((B[0] - A[0]) * (Y - A[1]) - (B[1] - A[1]) * (X - A[0])) > 0 else -1
+            above_line = lambda A, B, X, Y: ((B[0] - A[0]) * (Y - A[1]) - (B[1] - A[1]) * (X - A[0]))
             fl = field_limits
-
-            def f(m):
-                _sign = above_line([m.ball.x, m.ball.y], [fl[0], fl[1]/2], m.robots[r_id].x, m.robots[r_id].y)
-                return -_sign
+            _sign = above_line([m.ball.x, m.ball.y], [fl[0], fl[1]/2], m.robots[r_id].x, m.robots[r_id].y)
+            if abs(_sign) <= 0.05:
+                return True
+            return _sign > 0
             
-            return f
 
         if dist_to_ball >= tangential_radius:
             self.tangential = None
-            return self.voronoi_astar( max(.2, min(robot_speed * 2.3, .7)) )
+            return self.voronoi_astar( max(.2, min(robot_speed * 2.5, .5)) )
         else:
             if self.tangential:
                 return self.tangential.compute([self.robot.x, self.robot.y])
@@ -146,9 +185,9 @@ class OffensivePlay(Strategy):
                         target=choose_target(self.match, self.robot.robot_id),                                                                                                                                                                                                                                                                                                                                          
                         radius = dist_to_ball * 0.2,
                         radius_max = dist_to_ball * 10,
-                        clockwise = 1,
+                        clockwise = lambda m, r_id=self.robot.robot_id: choose_ccw(m, r_id),
                         decay=lambda _: 1,
-                        multiplier = 0.75
+                        multiplier = 0.6
                     )
                 )
 

@@ -2,11 +2,7 @@ import math
 import logging
 import numpy as np
 from collections import deque
-from scipy.ndimage.interpolation import rotate
-import controller
-import algorithms
-import strategy
-from commons.math import angular_speed, rotate_via_numpy, unit_vector
+from commons.math import angular_speed, rotate_via_numpy
 from commons.math import speed as avg_speed
 
 class Robot(object):
