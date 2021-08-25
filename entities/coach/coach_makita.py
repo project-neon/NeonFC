@@ -12,6 +12,13 @@ class Coach(BaseCoach):
         self.goalkeeper_strategy = strategy.tests.mktGoalKeeper(self.match)
 
     def decide(self):
+        self.match.robots[0].strategy = self.goalkeeper_strategy
+        self.match.robots[0].start()
+        self.match.robots[1].strategy = self.attacker_strategy
+        self.match.robots[1].start()
+        self.match.robots[2].strategy = self.midfielder_strategy
+        self.match.robots[2].start()
+        '''
         robots = [r.robot_id for r in self.match.robots]
         strategies = {
             self.goalkeeper_strategy, self.attacker_strategy, self.midfielder_strategy
@@ -23,4 +30,4 @@ class Coach(BaseCoach):
                 continue
         
             self.match.robots[robot].strategy = strategy
-            self.match.robots[robot].start()
+            self.match.robots[robot].start()'''
