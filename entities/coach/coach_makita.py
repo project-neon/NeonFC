@@ -14,7 +14,7 @@ class Coach(BaseCoach):
     def decide(self):
         robots = [r.robot_id for r in self.match.robots]
         strategies = {
-            self.attacker_strategy, self.midfielder_strategy, self.goalkeeper_strategy
+            self.goalkeeper_strategy, self.attacker_strategy, self.midfielder_strategy
         }
 
         for robot, strategy in zip(robots, strategies):
@@ -24,5 +24,3 @@ class Coach(BaseCoach):
         
             self.match.robots[robot].strategy = strategy
             self.match.robots[robot].start()
-
-    

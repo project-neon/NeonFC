@@ -1,5 +1,6 @@
 from strategy.BaseStrategy import Strategy
 from algorithms.potential_fields.fields import LineField, PotentialField, PointField
+from strategy.DebugTools import DebugPotentialFieldStrategy
 import math
 
 class mktAttacker(Strategy):
@@ -15,25 +16,23 @@ class mktAttacker(Strategy):
 
         self.aim = PotentialField(self.match, name="AimBehaviour")
 
-        self.carry = PotentialField(self.match, name="CarryBehaviour")
-
-        self.seek.add_field(
-            PointField(
-                self.match,
-                target = lambda m : (m.ball.x, m.ball.y),
-                radius = .14,
-                decay = lambda x : x**2,
-                multiplier = .5
+        def on_angle20(m, f=self.match.game.field):
+            field = f.get_dimensions()
+            angle_ball_goal = math.atan2((field[1]/2 - m.ball.y), (field[0] - m.ball.x))
+            ball_to_goal = (
+                m.ball.x - math.cos(angle_ball_goal) * 0.2,
+                m.ball.y - math.sin(angle_ball_goal) * 0.2
             )
-        )
+
+            return ball_to_goal
 
         self.seek.add_field(
             PointField(
                 self.match,
-                target = lambda m : (max(m.ball.x - .10, .10), m.ball.y),
+                target = on_angle20,
                 radius = .05,
                 decay = lambda x : x**4,
-                multiplier = .5
+                multiplier = .75
             )
         )
 
@@ -41,10 +40,10 @@ class mktAttacker(Strategy):
             PointField(
                 self.match,
                 target = lambda m : (m.ball.x, m.ball.y),
-                radius = .075,
-                radius_max = .075,
+                radius = .12,
+                radius_max = .12,
                 decay = lambda x : 1,
-                multiplier = -.5
+                multiplier = -.75
             )
         )
 
@@ -58,10 +57,10 @@ class mktAttacker(Strategy):
                         r.x, 
                         r.y
                     ),
-                    radius = .15,
-                    radius_max = .15,
+                    radius = .2,
+                    radius_max = .2,
                     decay = lambda x : 1,
-                    multiplier = -.5
+                    multiplier = -.75
                 )
             )
 
@@ -81,7 +80,7 @@ class mktAttacker(Strategy):
                 target = on_angle35,
                 radius = .015,
                 decay = lambda x: x,
-                multiplier =    .05
+                multiplier = .65
             )
         )
 
@@ -104,7 +103,7 @@ class mktAttacker(Strategy):
         ball = self.match.ball
         field = self.match.game.field.get_dimensions()
         
-        angle_ball_goal = math.atan2((field[1]/2 - ball.y), (field[0]/2 - ball.x))
+        angle_ball_goal = math.atan2((field[1]/2 - ball.y), (field[0] + 0.2 - ball.x))
         ball_to_goal = (
             ball.x - math.cos(angle_ball_goal) * 0.2,
             ball.y - math.sin(angle_ball_goal) * 0.2
