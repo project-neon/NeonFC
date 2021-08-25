@@ -9,7 +9,7 @@ class Coach(BaseCoach):
 
         self.attacker_strategy = strategy.tests.mktAttacker(self.match)
         self.midfielder_strategy = strategy.tests.Idle(self.match)
-        self.goalkeeper_strategy = strategy.tests.Idle(self.match)
+        self.goalkeeper_strategy = strategy.tests.mktGoalKeeper(self.match)
 
     def decide(self):
         robots = [r.robot_id for r in self.match.robots]

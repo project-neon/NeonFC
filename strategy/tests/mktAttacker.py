@@ -124,6 +124,6 @@ class mktAttacker(Strategy):
             if robot.x >= self.match.ball.x:
                 self.behaviour = self.seek
 
-        print(self.behaviour.name)
+        #print(self.behaviour.name)
 
         return self.behaviour.compute([self.robot.x, self.robot.y])

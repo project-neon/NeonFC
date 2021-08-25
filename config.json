@@ -16,6 +16,6 @@
         "coach_name": "TEST_MAKITA",
         "category": "3v3"
     },
-    "referee": true,
+    "referee": false,
     "data_sender": false
 }
