@@ -4,10 +4,11 @@ from strategy.BaseStrategy import Strategy
 from strategy.tests import astarVoronoi
 from commons.math import unit_vector, distance
 import numpy as np
+from strategy import DebugTools
 
 SPEED_FACTOR = 1.3
-POSSESSION_DIST = 8.27 # Distancia minima considerada pra posse de bola em cm
-BALL_RADIUS = 2.135 # Raio da bola em cm
+POSSESSION_DIST = 12 * 10**-2 # Distancia minima considerada pra posse de bola em cm
+BALL_RADIUS = 2.135 * 10**-2 # Raio da bola em cm
 
 # def line_circle_intersect(robot, ball):
 
@@ -27,32 +28,35 @@ def dist_to_ball(r, m):
 # Se posse esta com um inimigo nao precisa iterar mais
 # Se robo estiver com um robo nosso iterar pra ver se tem tbm um oponente com a bola
 
-# Método para definir a posse da bola => 0 - posse do atacante, 1 - nosso time, 2 - outro time, 3 - posse de ninguem
+# Método para definir a posse da bola => 
+# 0 - posse do atacante, 1 - nosso time, 2 - outro time, 3 - posse de ninguem
 def get_ball_possession(self, robots, m):
     for r in robots:
         if r.get_name() == self.robot.get_name():
             if(dist_to_ball(r, m) <= POSSESSION_DIST):
                 return 0
         elif r.team_color == self.robot.team_color:
-            return 1
+            if(dist_to_ball(r, m) <= POSSESSION_DIST):
+                return 1
         else:
             if(dist_to_ball(r, m) <= POSSESSION_DIST):
                 return 2
-            else:
-                return 3
+    return 3
 
 # goal_aim() -> function to determine if attacker is aiming the ball to the goal
 # def goal_aim():
 	#return True
 
-#class newAttacker(DebugTools):
+#class newAttacker(DebugTools.DebugPotentialFieldStrategy):
 class newAttacker(Strategy):
     def __init__(self, match):
         super().__init__(match, 'newAttacker1') #revisar nome no futura
         
         self.match = match
 
-        self.astar = algorithms.AStar()
+        #self.astar = algorithms.astar.AStar()
+
+        self.obey_rules_speed = 0.5
 
         self.path = None
 
@@ -357,7 +361,7 @@ class newAttacker(Strategy):
                 radius = 0.2, # 20cm - radius of the center of the field
                 decay = lambda x: x**2,
                 field_limits = [0.75*2 , 0.65*2],
-                multiplier = 1.5
+                multiplier = 0.5
             )
         )
         
@@ -415,6 +419,7 @@ class newAttacker(Strategy):
         
         all_robots = self.match.robots + self.match.opposites
         possession = get_ball_possession(self, all_robots, self.match)
+        print(possession)
         
         # goal_aim() -> function to determine if attacker is aiming the ball to the goal
         
@@ -432,5 +437,5 @@ class newAttacker(Strategy):
         
         behaviour = self.defend
 
-        return super().decide(behaviour)
-        #return behaviour.compute([self.robot.x, self.robot.y])
+        #return super().decide(behaviour)
+        return behaviour.compute([self.robot.x, self.robot.y])
