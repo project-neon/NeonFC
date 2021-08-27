@@ -13,7 +13,7 @@
     "match" : {
         "num_robots": 3,
         "team_color": "blue",
-        "coach_name": "TEST_MAKITA",
+        "coach_name": "TEST_NEWGK",
         "category": "3v3"
     },
     "referee": false,

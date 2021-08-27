@@ -3,13 +3,13 @@ from entities.coach.coach import BaseCoach
 import strategy
 
 class Coach(BaseCoach):
-    NAME = "TEST_MAKITA"
+    NAME = "TEST_NEWGK"
     def __init__(self, match):
         super().__init__(match)
 
-        self.attacker_strategy = strategy.tests.mktAttacker(self.match)
+        self.attacker_strategy = strategy.tests.Idle(self.match)
         self.midfielder_strategy = strategy.tests.Idle(self.match)
-        self.goalkeeper_strategy = strategy.tests.mktGoalKeeper(self.match)
+        self.goalkeeper_strategy = strategy.tests.newGoalKeeper(self.match)
 
     def decide(self):
         self.match.robots[0].strategy = self.goalkeeper_strategy

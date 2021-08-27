@@ -5,10 +5,10 @@ import controller
 from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 
-def get_ball_angle(m):
+def get_ball_info(m):
     return (m.ball.vx, m.ball.vy, m.ball.x, m.ball.y)
 
-class mktGoalKeeper(Strategy):
+class newGoalKeeper(Strategy):
     def __init__(self, match, plot_field=True):
         super().__init__(match, "MktGoalKeeper", controller=controller.TwoSidesLQR)
 
@@ -125,7 +125,7 @@ class mktGoalKeeper(Strategy):
 
         behaviour = None
 
-        print(get_ball_angle(self.match))
+        print(get_ball_info(self.match))
 
         if self.match.ball.x < 0.750 and self.match.ball.vx < 0:
             behaviour = self.path
