@@ -4,13 +4,14 @@ from strategy.BaseStrategy import Strategy
 from strategy.tests import astarVoronoi
 from commons.math import unit_vector, distance
 import numpy as np
-import json
 
 SPEED_FACTOR = 1.3
 POSSESSION_DIST = 8.27 # Distancia minima considerada pra posse de bola em cm
 BALL_RADIUS = 2.135 # Raio da bola em cm
 
-# def angle_to_ball(r, m):
+# def line_circle_intersect(robot, ball):
+
+# def angle_to_ball(r, m): !ATTENTION!
 
 # def robot_orientation_line(self, robots):
     #for r in robots:
@@ -21,10 +22,14 @@ BALL_RADIUS = 2.135 # Raio da bola em cm
 def dist_to_ball(r, m):
     return math.dist((r.x, r.y), (m.ball.x, m.ball.y))
 
+#ATTENTION!
+# Quando mais de um robo estiver em posse qual o criterio de desempate
+# Se posse esta com um inimigo nao precisa iterar mais
+# Se robo estiver com um robo nosso iterar pra ver se tem tbm um oponente com a bola
+
 # Método para definir a posse da bola => 0 - posse do atacante, 1 - nosso time, 2 - outro time, 3 - posse de ninguem
 def get_ball_possession(self, robots, m):
     for r in robots:
-        r_color = r.get_name().split("_")
         if r.get_name() == self.robot.get_name():
             if(dist_to_ball(r, m) <= POSSESSION_DIST):
                 return 0
@@ -40,19 +45,14 @@ def get_ball_possession(self, robots, m):
 # def goal_aim():
 	#return True
 
-from strategy import DebugTools
-
-class newAttacker(DebugTools.DebugPotentialFieldStrategy):
-
-#class newAttacker(Strategy):
+#class newAttacker(DebugTools):
+class newAttacker(Strategy):
     def __init__(self, match):
-        super().__init__(match, 'newAttacker1')
+        super().__init__(match, 'newAttacker1') #revisar nome no futura
         
         self.match = match
 
-        self.obey_rules_speed = 0.5
-
-        #self.astar = algorithms.astar.AStar()
+        self.astar = algorithms.AStar()
 
         self.path = None
 
@@ -66,7 +66,6 @@ class newAttacker(DebugTools.DebugPotentialFieldStrategy):
 
     def start(self, robot=None):
         super().start(robot=robot)
-
         self.base_rules = algorithms.fields.PotentialField(
             self.match,
             name="{}|BaseRules".format(self.__class__)
@@ -141,6 +140,8 @@ class newAttacker(DebugTools.DebugPotentialFieldStrategy):
         """
         Potential Fields
         """
+
+	#ATTENTION parametrizar tudo do field
 
         # Potential Fields for the base rules of the game
         self.base_rules.add_field(
@@ -295,7 +296,7 @@ class newAttacker(DebugTools.DebugPotentialFieldStrategy):
         self.base_rules.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = (1.5, 0.65),
+                target = (1.5, 0.65), #parametrizar
                 theta = math.pi/2,
                 line_size = 0.35,
                 line_dist = 0.15,
@@ -311,7 +312,7 @@ class newAttacker(DebugTools.DebugPotentialFieldStrategy):
         self.base_rules.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = (0, 0.65),
+                target = (0, 0.65), #parametrizar
                 theta = math.pi*(3/2),
                 line_size = 0.35,
                 line_dist = 0.15,
@@ -368,7 +369,6 @@ class newAttacker(DebugTools.DebugPotentialFieldStrategy):
 
 
     def decide(self):
-        
         """
         No decide iremos programar as regras que irão decidir qual 
         comportamento sera execuetado nesse momento. crie o conjunto de regras
@@ -382,25 +382,30 @@ class newAttacker(DebugTools.DebugPotentialFieldStrategy):
 
         avoid_obstacles usa pontos de repulsão nos robos.
 
+        Ana
         seek, caso a bola não esteja em posse de nenhum time, procurar a bola.
          seek usa astar
          caso nao haja robo a menos de alguns cm de distancia da bola.
         
+        Maria
         tackle, caso a bola esteja com o adversario, pegar a bola.
          usar so campo potencial de ponto de atracao na bola
          caso robo adversario esta perto da bola e robos aliados nao, dentro de alguns cm.
 
+	Mat
         defend, caso a bola esteja com outro robo aliado, ficar de guarda.
          so campos potencias
          tem como saber o behavior atual de outro robo (meio campista por ex)?
          ou caso o robo aliado esteja a uma certa distancia da bola sem adversario mais perto.
         
         se o atacante tiver a bola usamos astar:
-
+	
+	Ana
         kick, caso o atacante esteja pronto para chutar ao gol.
          so campo potencial
          se o path só tem pos atual do robo e a proxima pos é a do gol.
 
+	Mat
         carry, caso o atacante esteja com a bola, levar até o gol.
          astar
          usar path pra saber proximo ponto para o qual o robo leva a bola.
