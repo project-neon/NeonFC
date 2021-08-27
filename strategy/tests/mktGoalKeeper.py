@@ -5,10 +5,8 @@ import controller
 from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 
-'''
-esquerda: theta = 0
-direita: theta = math.pi
-'''
+def get_ball_angle(m):
+    return (m.ball.vx, m.ball.vy, m.ball.x, m.ball.y)
 
 class mktGoalKeeper(Strategy):
     def __init__(self, match, plot_field=True):
@@ -17,11 +15,11 @@ class mktGoalKeeper(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        print(robot.robot_id)
-
         self.restrict = algorithms.fields.PotentialField(self.match, name="RestrictBehaviour")
 
         self.project = algorithms.fields.PotentialField(self.match, name="ProjectBehaviour")
+
+        self.path = algorithms.fields.PotentialField(self.match, name="PathBehaviour")
 
         x, y, w, h = self.match.game.field.get_small_area("defensive")
 
@@ -97,15 +95,43 @@ class mktGoalKeeper(Strategy):
             )
         )
 
+        self.path.add_field(self.restrict)
+        
+        def get_def_spot(m):
+            x = w/2
+            if m.ball.vy==0 or m.ball.vx==0:
+                return (w/2, 1.3/2)
+            y = (m.ball.vy/m.ball.vx)*(x-m.ball.x)+m.ball.y
+            if y > (1.3/2)+0.2:
+                y = (1.3/2)+0.2
+            elif y < (1.3/2)-0.2:
+                y = (1.3/2)-0.2
+            return (x, y)
+
+        self.path.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target = get_def_spot,
+                theta = 0,
+                line_size = w/2,
+                line_dist = 0.1,
+                line_dist_max = 0.7,
+                multiplier = 0.7,
+                decay = lambda x : x
+            )
+        )
+
     def decide(self):
 
         behaviour = None
 
-        if self.match.ball.x <= 0.750:
-            behaviour = self.project
+        print(get_ball_angle(self.match))
+
+        if self.match.ball.x < 0.750 and self.match.ball.vx < 0:
+            behaviour = self.path
         else:
             behaviour = self.restrict
 
-        #return super().decide(self.project)
+        #return super().decide(self.path)
 
         return behaviour.compute([self.robot.x, self.robot.y])
