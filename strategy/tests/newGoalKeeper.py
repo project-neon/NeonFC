@@ -21,6 +21,8 @@ class newGoalKeeper(Strategy):
 
         self.path = algorithms.fields.PotentialField(self.match, name="PathBehaviour")
 
+        self.kalm = algorithms.fields.PotentialField(self.match, name="KalmBehaviour")
+
         x, y, w, h = self.match.game.field.get_small_area("defensive")
 
         self.restrict.add_field(
@@ -121,14 +123,30 @@ class newGoalKeeper(Strategy):
             )
         )
 
+        # permanece no centro da área
+        self.kalm.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target = lambda m: (0.07, 0.65),
+                theta = 0,
+                line_size = w/2,
+                line_dist = 0.1,
+                line_dist_max = 0.7,
+                decay = lambda x: x,
+                multiplier = 0.7,
+            )
+        )
+
     def decide(self):
 
         behaviour = None
 
-        print(get_ball_info(self.match))
-
         if self.match.ball.x < 0.750 and self.match.ball.vx < 0:
             behaviour = self.path
+
+        elif self.match.ball.x >= 0.750:
+            behaviour = self.kalm
+
         else:
             behaviour = self.restrict
 
