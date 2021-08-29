@@ -364,6 +364,32 @@ class newAttacker(Strategy):
                 multiplier = 0.5
             )
         )
+
+        #Potential field for the tackle behaviour
+        self.tackle.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = lambda m: (m.ball.x, m.ball.y),
+                radius = 0.2, # 30cm
+                decay = lambda x: x**2,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 0.5 # 50 cm/s
+            )
+        )
+
+        self.tackle.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target = (0.4, 0.65),
+                theta = math.pi/2,
+                line_size = 0.2,
+                line_dist = 0.2,
+                line_dist_max = 0.5,
+                decay = lambda x: x,
+                multiplier = 0.5,
+                line_dist_single_side = True
+            )
+        )
         
 
     def reset(self, robot=None):
@@ -419,7 +445,7 @@ class newAttacker(Strategy):
         
         all_robots = self.match.robots + self.match.opposites
         possession = get_ball_possession(self, all_robots, self.match)
-        print(possession)
+        #print(possession)
         
         # goal_aim() -> function to determine if attacker is aiming the ball to the goal
         
@@ -435,7 +461,7 @@ class newAttacker(Strategy):
         # 	behaviour == self.kick
 
         
-        behaviour = self.defend
+        behaviour = self.tackle
 
         #return super().decide(behaviour)
         return behaviour.compute([self.robot.x, self.robot.y])
