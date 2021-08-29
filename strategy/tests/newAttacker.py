@@ -9,6 +9,19 @@ from strategy import DebugTools
 SPEED_FACTOR = 1.3
 POSSESSION_DIST = 12 * 10**-2 # Distancia minima considerada pra posse de bola em cm
 BALL_RADIUS = 2.135 * 10**-2 # Raio da bola em cm
+OPPOSITE_GOAL_X = 1.5 # Coordenada x do goal adversário
+
+def goal_aim(robot):
+    if robot.theta >= math.pi/2 and robot.theta <= math.pi*(3/2):
+        return False
+    else:
+        robot_line_m = math.tan(robot.theta)
+        robot_line_n = robot.y - robot.x * robot_line_m # n=y-xm
+        aimed_at_y = OPPOSITE_GOAL_X * robot_line_m + robot_line_n
+        if aimed_at_y >= 0.49 and aimed_at_y <= 0.81:
+            self.goal_aim_y = aimed_at_y
+            return True
+        return False
 
 # def line_circle_intersect(robot, ball):
 
@@ -59,6 +72,8 @@ class newAttacker(Strategy):
         self.obey_rules_speed = 0.5
 
         self.path = None
+
+        self.goal_aim_y = 0.65 # point of the line of the goal that the robot is aiming at in kick behaviour
 
     def reset(self, robot=None):
         super().reset()
@@ -365,6 +380,18 @@ class newAttacker(Strategy):
             )
         )
 
+        # Potential field for the kick behavior
+        self.kick.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = self.goal_aim_y, # point of the line of the goal that the robot is aimed at
+                radius = 0.4, # goal width
+                decay = lambda x: x**2,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 0.5
+            )
+        )
+
         #Potential field for the tackle behaviour
         self.tackle.add_field(
             algorithms.fields.PointField(
@@ -403,15 +430,11 @@ class newAttacker(Strategy):
         No decide iremos programar as regras que irão decidir qual 
         comportamento sera execuetado nesse momento. crie o conjunto de regras
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
-
         Verificar qual comportamento será usado.
-
         Caso o behavior use astar, usar astarVoronoi para criar o grafo, passar para o astar
         e pegar o caminho que o robô seguirá (self.path), entao usar path para pegar as
         coordenadas alvo do robo.
-
         avoid_obstacles usa pontos de repulsão nos robos.
-
         Ana
         seek, caso a bola não esteja em posse de nenhum time, procurar a bola.
          seek usa astar
@@ -421,7 +444,6 @@ class newAttacker(Strategy):
         tackle, caso a bola esteja com o adversario, pegar a bola.
          usar so campo potencial de ponto de atracao na bola
          caso robo adversario esta perto da bola e robos aliados nao, dentro de alguns cm.
-
 	Mat
         defend, caso a bola esteja com outro robo aliado, ficar de guarda.
          so campos potencias
@@ -432,9 +454,8 @@ class newAttacker(Strategy):
 	
 	Ana
         kick, caso o atacante esteja pronto para chutar ao gol.
-         so campo potencial
-         se o path só tem pos atual do robo e a proxima pos é a do gol.
-
+         so campo potencial ate o ponto do gol no qual o atacante esta mirando (entre y>=0.49 e y<=0.81)
+         ou se o path so tem pos atual do robo e a proxima pos é a do gol.
 	Mat
         carry, caso o atacante esteja com a bola, levar até o gol.
          astar
@@ -445,12 +466,16 @@ class newAttacker(Strategy):
         
         all_robots = self.match.robots + self.match.opposites
         possession = get_ball_possession(self, all_robots, self.match)
-        #print(possession)
+        print(possession)
         
         # goal_aim() -> function to determine if attacker is aiming the ball to the goal
         
         # if possession == 3:
-        # 	behaviour = self.seek
+        #   for r in all_robots:
+        #       if (r.get_name() != self.robot.get_name()) and (r.team_color != self.robot.team_color):
+        #           if(dist_to_ball(r, m) <= 24 * 10**-2):
+        # 	            behaviour = self.tackle
+        # 	 behaviour = self.seek
         # elif possession == 2:
         # 	behaviour = self.tackle
         # elif possession == 1:
@@ -460,7 +485,6 @@ class newAttacker(Strategy):
         # else:
         # 	behaviour == self.kick
 
-        
         behaviour = self.tackle
 
         #return super().decide(behaviour)
