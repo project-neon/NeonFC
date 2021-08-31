@@ -16,12 +16,15 @@ class Coach(BaseCoach):
 
         one_to_one_play.add_transition(stuck_trigger, unstuck_play)
         unstuck_play.add_transition(wait_for_trigger, one_to_one_play)
-
+        
         self.playbook.add_play(one_to_one_play)
         self.playbook.add_play(unstuck_play)
 
         self.playbook.set_play(one_to_one_play)
     
+    def get_positions(self, foul, team_color):
+        return None
+
     def decide (self):
         self.playbook.update()
 

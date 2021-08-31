@@ -39,11 +39,11 @@ class Game():
 
     def start(self):
         self.vision.assign_vision(self)
+        self.referee.start()
         self.match.start()
         
         self.vision.start()
         self.comm.start()
-        self.referee.start()
         self.data_sender.start()
 
     def update(self):
