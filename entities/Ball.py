@@ -33,6 +33,9 @@ class Ball(object):
     def get_name(self):
         return 'BALL'
 
+    def get_speed(self):
+        return (self.vx**2 + self.vy**2)**.5
+
     def update(self, frame):
         self.current_data = frame.get('ball')
         self._update_speeds()

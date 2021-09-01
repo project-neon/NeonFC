@@ -38,8 +38,6 @@ class DefensivePlay(Strategy):
             )
         )
 
-
-
         
     
     def reset(self, robot=None):

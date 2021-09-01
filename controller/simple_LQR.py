@@ -2,7 +2,6 @@ import math
 
 
 from commons.math import angle_between
-import numpy as np
 
 import numpy as np
 import numpy.linalg as la

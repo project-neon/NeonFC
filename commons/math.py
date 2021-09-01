@@ -54,7 +54,8 @@ def angular_speed(_list, _fps):
             list(_list)[1:]
         )
     ]
-
+    if not speed_fbf:
+        return 0
     return _fps * (sum(speed_fbf)/len(speed_fbf))
 
 
@@ -72,7 +73,8 @@ def speed(_list, _fps):
         # limitar 0.1 m/f aqui é dizer que é impossivel
         # o robo fazer 6 m/s (0.1 [m][f⁻¹] * 60 [f][s⁻¹] = 6[m][s⁻¹])
     ]
-
+    if not speed_fbf:
+        return 0
     return _fps * (sum(speed_fbf)/len(speed_fbf))
 
 

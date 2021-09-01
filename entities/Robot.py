@@ -65,6 +65,9 @@ class Robot(object):
         self._update_speeds()
         self.update_stuckness()
 
+    def get_speed(self):
+        return (self.vx**2 + self.vy**2)**.5
+
     def _update_speeds(self):
         self._frames['x'].append(self.current_data['x'])
         self._frames['y'].append(self.current_data['y'])
