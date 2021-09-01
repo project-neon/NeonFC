@@ -23,6 +23,8 @@ class newGoalKeeper(Strategy):
 
         self.kalm = algorithms.fields.PotentialField(self.match, name="KalmBehaviour")
 
+        self.redeploy = algorithms.fields.PotentialField(self.match, name="RedeployBehaviour")
+
         #small area x, y, width and height
         sa_x, sa_y, sa_w, sa_h = self.match.game.field.get_small_area("defensive")
 
@@ -187,24 +189,53 @@ class newGoalKeeper(Strategy):
                 multiplier = 0.7,
             )
         )
+        
+        self.redeploy.add_field(
+            algorithms.fields.TangentialField(
+                self.match,
+                target = (sa_w/2+0.015, field_h/2),
+                radius = sa_w/2-0.07,
+                radius_max = field_w,
+                clockwise = True,
+                decay = lambda x: 1,
+                field_limits = [field_w, field_h],
+                multiplier = 0.7
+            )
+        )
 
     def decide(self):
 
         behaviour = None
 
+        theta = self.robot.theta
+
         #print(get_ball_info(self.match))
+        if  self.robot.x < 0.1 and self.robot.x > 0.02 and self.robot.y > 0.3 and self.robot.y < 1:
 
-        if self.match.ball.x < 0.750 and self.match.ball.vx < 0:
-            behaviour = self.path
+            if (theta >= -1.62 and theta <= -1.42) or (theta >= 1.42 and theta <= 1.62):
 
-        elif self.match.ball.x < 0.750 and self.match.ball.vx >= 0:
-            behaviour = self.project
+                if self.match.ball.x < 0.750: #and self.match.ball.vx < 0:
+                    behaviour = self.path
 
-        elif self.match.ball.x >= 0.750:
-            behaviour = self.kalm
+                elif self.match.ball.x < 0.750 and self.match.ball.vx > 0:
+                    behaviour = self.project
+
+                elif self.match.ball.x >= 0.750:
+                    behaviour = self.kalm
+
+                else:
+                    behaviour = self.restrict
+
+            else:
+
+                if self.match.ball.x > 0.750:
+                    behaviour = self.redeploy
+
+                else:
+                    behaviour = self.path
 
         else:
-            behaviour = self.restrict
+            behaviour = self.redeploy
 
         #return super().decide(self.path)
 
