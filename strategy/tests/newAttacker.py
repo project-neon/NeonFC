@@ -1,9 +1,13 @@
 import math
+from random import betavariate
+
+from scipy.spatial.qhull import Voronoi
 import algorithms
-from strategy.BaseStrategy import Strategy
-from strategy.tests import astarVoronoi
-from commons.math import unit_vector, distance
 import numpy as np
+from fields.field import Field as fd
+from strategy.BaseStrategy import Strategy
+#from strategy.tests import astarVoronoi
+from commons.math import unit_vector, distance
 from strategy import DebugTools
 
 SPEED_FACTOR = 1.3
@@ -11,7 +15,7 @@ POSSESSION_DIST = 12 * 10**-2 # Distancia minima considerada pra posse de bola e
 BALL_RADIUS = 2.135 * 10**-2 # Raio da bola em cm
 OPPOSITE_GOAL_X = 1.5 # Coordenada x do goal adversário
 
-def goal_aim(robot):
+def goal_aim(self, robot):
     if robot.theta >= math.pi/2 and robot.theta <= math.pi*(3/2):
         return False
     else:
@@ -59,6 +63,105 @@ def get_ball_possession(self, robots, m):
 # goal_aim() -> function to determine if attacker is aiming the ball to the goal
 # def goal_aim():
 	#return True
+
+from algorithms.astar import AStar, Node, FieldGraph
+from strategy.BaseStrategy import Strategy
+from scipy.spatial import Voronoi
+
+class Scratch(Strategy):
+    def __init__(self, match, objective):
+        super().__init__(match, "AstarVoronoi")
+
+        self.graph = FieldGraph()
+        self.min_range = 0.56
+        self.robot_node = None
+
+        self.objective = objective
+
+
+    def start(self, robot=None):
+        super().start(robot=robot)
+
+
+    def reset(self, robot=None):
+        super().reset()
+        if robot:
+            self.start(robot)
+
+
+    def decide(self):
+        self.graph = FieldGraph()
+
+        self.robot_node = Node([self.robot.x, self.robot.y])
+        self.graph.set_start(self.robot_node)
+
+        self.robot_node.position = [self.robot.x, self.robot.y]
+
+        corners = [
+            [self.match.game.field.get_dimensions()[0], 0],
+            [0, 0],
+            [0, self.match.game.field.get_dimensions()[1]],
+            [self.match.game.field.get_dimensions()[0], self.match.game.field.get_dimensions()[1]]
+        ]
+        obstacles = corners + [ [r.x, r.y] for r in self.match.opposites] + [
+            [r.x, r.y] for r in self.match.robots 
+            if r.robot_id != self.robot.robot_id
+        ] + [ [self.match.ball.x, self.match.ball.y], self.robot_node.position]
+
+        vor = Voronoi(obstacles)
+
+        objective = self.objective
+        target_node = Node([objective.x, objective.y])
+
+        nodes = [
+            Node([a[0], a[1]]) for a in vor.vertices
+        ] + [
+            target_node, self.robot_node
+        ]
+
+        objective_index = len(obstacles) - 2
+        robot_index = len(obstacles) - 1
+        
+        self.graph.set_nodes(nodes)
+
+        polygon_objective_edges = []
+        polygon_robot_edges = []
+
+        for edge, ridge_vertice in zip(vor.ridge_vertices, vor.ridge_points):
+            if edge[0] == -1: continue
+            self.graph.add_edge([nodes[edge[0]], nodes[edge[1]]])
+
+            if objective_index in ridge_vertice:
+                polygon_objective_edges.append(nodes[edge[0]])
+                polygon_objective_edges.append(nodes[edge[1]])
+
+            if robot_index in ridge_vertice:
+                polygon_robot_edges.append(nodes[edge[0]])
+                polygon_robot_edges.append(nodes[edge[1]])
+            
+            if objective_index in ridge_vertice and robot_index in ridge_vertice:
+                self.graph.add_edge([self.robot_node, target_node])
+
+        for edge_to_ball in set(polygon_objective_edges):
+            self.graph.add_edge([edge_to_ball, target_node])
+
+        for edge_to_ball in set(polygon_robot_edges):
+            self.graph.add_edge([edge_to_ball, self.robot_node])
+
+
+        path = AStar(self.robot_node, target_node).calculate()
+
+        dist = ( (path[0][0] - path[1][0])**2 + (path[1][1] - path[1][1])**2 )**.5
+
+        return [
+            0.5 * (path[1][0] - path[0][0])/dist,
+            0.5 * (path[1][1] - path[0][1])/dist
+        ]
+
+"""
+------///-------///-------------///----------///-----
+
+"""
 
 #class newAttacker(DebugTools.DebugPotentialFieldStrategy):
 class newAttacker(Strategy):
@@ -162,16 +265,19 @@ class newAttacker(Strategy):
 
 	#ATTENTION parametrizar tudo do field
 
+        # Line size -> em relação ao campo
+        # Line dist -> verificar se parametrização é em relaçao ao robo ou à alguma das paredes
+
         # Potential Fields for the base rules of the game
         self.base_rules.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = (0, 0.650),
+                target = (0, 0.650), # parametrizado em relaçao ao field
                 theta = math.pi/2,
-                line_size = 0.25,
-                line_size_max = 0.25,
-                line_dist = 0.25,
-                line_dist_max = 0.25,
+                line_size = 0.25, # parametrizado em relaçao ao field
+                line_size_max = 0.25, # parametrizado em relaçao ao field
+                line_dist = 0.25, # parametrizado em relaçao a area do gol
+                line_dist_max = 0.25, # parametrizado em relaçao a area do gol
                 line_dist_single_side = True,
                 decay = lambda x: (-x**2) + 1,
                 multiplier = self.obey_rules_speed
@@ -417,6 +523,18 @@ class newAttacker(Strategy):
                 line_dist_single_side = True
             )
         )
+
+        # Seek behaviour 
+        self.seek.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = lambda m: (m.ball.x, m.ball.y),
+                radius = 0.2, # 30cm
+                decay = lambda x: x**2,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 0.5 # 50 cm/s
+            )
+        )
         
 
     def reset(self, robot=None):
@@ -480,12 +598,34 @@ class newAttacker(Strategy):
         # 	behaviour = self.tackle
         # elif possession == 1:
         # 	behaviour == self.defend
-        # elif goal_aim() == False:
-        # 	behaviour == self.carry
+        # if goal_aim() == False:
+        #  	behaviour = self.carry
+        #     voronoi = new Scratch(self.match, [OPPOSITE_GOAL_X, fd.get_dimensions[1]/2])
+        #     vf = behaviour.compute([self.robot.x, self.robot.y])
+        #     vf = (vf[0] + Scratch[1][0], vf[1] + self.voronoi[1][1])
+        #     return vf
         # else:
-        # 	behaviour == self.kick
+        #     behaviour == self.kick
 
-        behaviour = self.tackle
+        if possession == 3:
+            behaviour = self.seek
+            print("seek")
+        elif possession == 1:
+            behaviour = self.defend
+            print("defend")
+        elif possession == 0:
+            if goal_aim(self, self.robot) == False:
+                behaviour = self.carry
+                print("carry")
+                carryGraph = Scratch(self.match, [OPPOSITE_GOAL_X, fd.get_dimensions[1]/2]).decide()
+                print("CARRYGRAPH: ",carryGraph)
+                vf = behaviour.compute([self.robot.x, self.robot.y])
+                vf = (vf[0] + carryGraph[1][0], vf[1] + carryGraph[1][1])
+                return vf
+            else:
+                print("kick")
+                behaviour == self.kick
+        
 
         #return super().decide(behaviour)
         return behaviour.compute([self.robot.x, self.robot.y])
