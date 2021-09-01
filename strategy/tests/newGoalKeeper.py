@@ -1,6 +1,7 @@
 import math
 import algorithms
 import controller
+import numpy as np
 from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 
@@ -97,6 +98,22 @@ class newGoalKeeper(Strategy):
                 cover_func = lambda x : ((robot_ext_y-g_lwr)/robot_ext_x)*x + g_lwr
                 return cover_func
 
+        def bezier_intersec(m, dir):
+            t = 0
+            if dir == "rise":
+                y_med = (g_hgr+m.ball.y)/2
+            elif dir == "drop":
+                y_med = (g_lwr+m.ball.y)/2
+            while t <= 1:
+                y = (m.ball.vy/m.ball.vx)*(sa_w-m.ball.x) + m.ball.y
+                b_x = ((1-t)**2)*m.ball.x + 2*(1-t)*t*sa_w
+                b_y = ((1-t)**2)*m.ball.y + 2*(1-t)*t*y + (t**2)*y_med
+                if 0.05 > round(b_x, 3) and round(b_x, 3) < 0.1:
+                    return b_y
+                t += 0.01
+            print(f"False: {m.ball.vy/m.ball.vx}")
+            return self.robot.y
+
 
         def get_def_spot(m):
             x = sa_w/2
@@ -111,21 +128,23 @@ class newGoalKeeper(Strategy):
 
             #trava o goleiro na lateral do gol caso a bola esteja no escanteio ou 
             #acima da linha do gol e indo para o escanteio
-            if m.ball.y > g_cvr_sup or (m.ball.y > g_hgr and y > g_hgr):
+            if (m.ball.y > g_cvr_sup and m.ball.y > g_hgr) or (m.ball.y > g_hgr and y > g_hgr):
                 y = g_hgr
                 return (x, y)
 
-            elif m.ball.y < g_cvr_inf or (m.ball.y < g_lwr and y < g_lwr):
+            elif (m.ball.y < g_cvr_inf and m.ball.y < g_lwr) or (m.ball.y < g_lwr and y < g_lwr):
                 y = g_lwr
                 return (x, y)
 
             #segue a cordenada y se a bola está no meio do campo indo para a lateral
             if y > g_hgr and g_lwr < m.ball.y < g_hgr:
-                y =  m.ball.y
+                y =  max(bezier_intersec(m, "rise"), self.robot.y, m.ball.y)
+                if y > g_hgr: y = g_hgr
                 return (x, y)
                 
             elif y < g_lwr and g_hgr > m.ball.y > g_lwr:
-                y = m.ball.y
+                y = min(bezier_intersec(m, "drop"), self.robot.y, m.ball.y)
+                if y < g_lwr: y = g_lwr
                 return (x, y)
 
             mid_field_h = field_h/2
@@ -175,10 +194,10 @@ class newGoalKeeper(Strategy):
 
         #print(get_ball_info(self.match))
 
-        if self.match.ball.x < 0.750: #and self.match.ball.vx < 0:
+        if self.match.ball.x < 0.750 and self.match.ball.vx < 0:
             behaviour = self.path
 
-        elif self.match.ball.x < 0.750 and self.match.ball.vx > 0:
+        elif self.match.ball.x < 0.750 and self.match.ball.vx >= 0:
             behaviour = self.project
 
         elif self.match.ball.x >= 0.750:
@@ -190,3 +209,22 @@ class newGoalKeeper(Strategy):
         #return super().decide(self.path)
 
         return behaviour.compute([self.robot.x, self.robot.y])
+    
+    def spin(self):
+        if (self.match.ball.y - self.robot.y) > 0:
+            return 120, -120
+        return -120, 120
+
+    def spinning_time(self):
+        dist_to_ball = np.linalg.norm(
+            np.array([self.robot.x, self.robot.y]) - 
+            np.array([self.match.ball.x, self.match.ball.y])
+        )
+        if dist_to_ball <= 0.1:
+            return True
+        return False
+
+    def update(self):
+        if self.spinning_time():
+            return self.spin()
+        return self.controller.update()
