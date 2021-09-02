@@ -198,7 +198,6 @@ class newGoalKeeper(Strategy):
                 radius_max = field_w,
                 clockwise = True,
                 decay = lambda x: 1,
-                field_limits = [field_w, field_h],
                 multiplier = 0.7
             )
         )
