@@ -4,6 +4,7 @@ import numpy as np
 import numpy.linalg as la
 
 from scipy.spatial import Voronoi
+from commons.math import distance_to_line
 
 from controller import TwoSidesLQR
 
@@ -14,16 +15,9 @@ from algorithms.potential_fields.fields import PointField, LineField, Tangential
 from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 
-def distance_to_line(x, y, l1x, l1y, l2x, l2y):
-    x_diff = l2x - l1x
-    y_diff = l2y - l1y
-    num = abs(y_diff*x - x_diff*y + l2x*l1y - l2y*l1x)
-    den = math.sqrt(y_diff**2 + x_diff**2)
-    return num / den
-
 # class OffensivePlay(DebugPotentialFieldStrategy):
 class OffensivePlay(Strategy):
-    def __init__(self, match):
+    def __init__(self, match, name="Attacker"):
         self.match = match
         self.game = self.match.game
 
@@ -49,6 +43,22 @@ class OffensivePlay(Strategy):
 
         self.push = PotentialField(self.match, name="push")
 
+        self.wait = PotentialField(self.match, name="wait")
+
+
+        self.wait.add_field(
+            PointField(
+                self.match,
+                target = lambda m, : (
+                    m.game.field.get_small_area("defensive")[3] * 1.3, 
+                    m.game.field.get_dimensions()[1]
+                ),
+                radius = 0.1,
+                decay = lambda x: x,
+                multiplier = 0.8
+            )
+        )
+
 
         self.point.add_field(
             PointField(
@@ -56,7 +66,7 @@ class OffensivePlay(Strategy):
                 target = lambda m, r=self : r.voronoi_astar(m),
                 radius = 0.1,
                 decay = lambda x: x,
-                multiplier = 0.8
+                multiplier = 0.65
             )
         )
 
@@ -66,8 +76,7 @@ class OffensivePlay(Strategy):
                 target = lambda m: (m.ball.x, m.ball.y),
                 radius = 0.05, # 30cm
                 decay = lambda x: 1,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = lambda m: max(0.80, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.25) # 50 cm/s
+                multiplier = lambda m: max(0.80, m.ball.get_speed() + 0.25) # 50 cm/s
             )
         )
 
@@ -107,6 +116,7 @@ class OffensivePlay(Strategy):
         )
 
         self.point.add_field(self.dribble)
+        self.wait.add_field(self.dribble)
 
         for robot in self.match.robots + self.match.opposites:
             if robot.get_name() == self.robot.get_name():
@@ -118,10 +128,10 @@ class OffensivePlay(Strategy):
                             r.x,
                             r.y
                         ),
-                        radius = .2,
-                        radius_max = .2,
-                        decay = lambda x: -x +1,
-                        multiplier = -.75
+                        radius = .15,
+                        radius_max = .15,
+                        decay = lambda x: (-x +1) ** .5,
+                        multiplier = -.80
                     )
                 )
     
@@ -226,10 +236,6 @@ class OffensivePlay(Strategy):
 
         dist = ((path[0][0] - path[1][0])**2 + (path[1][1] - path[1][1])**2 )**.5
 
-        # return [
-        #     speed * (path[1][0] - path[0][0])/dist,
-        #     speed * (path[1][1] - path[0][1])/dist
-        # ]
         return  path[1]
     
     def get_range_of_aim(self):
@@ -254,16 +260,10 @@ class OffensivePlay(Strategy):
             robot_to_goal_or = math.degrees(robot_to_goal_or)
             if robot_to_goal_or < 0:
                 robot_to_goal_or += 90
-
-            print(f"#### {goal}: {ball_to_goal_or} {robot_to_goal_or}")
             
             range_.append((robot_to_goal_or - ball_to_goal_or))
 
-        print(f"RANGE {range_}")
         return range_
-
-
-        
 
 
     def has_possession(self, ball_ahead=True):
@@ -286,9 +286,6 @@ class OffensivePlay(Strategy):
             + (self.robot.y - self.match.ball.y)**2
         )**.5
 
-        # print(f"dist from aim {distance_from_aim}")
-        # print(f"dist to ball {dist_robot_ball}")
-
         if (
             distance_from_aim < 0.075
             and ranges[0] > 0 and ranges[1] < 0
@@ -296,6 +293,27 @@ class OffensivePlay(Strategy):
         ):
             return True
         return False
+
+
+    def is_inside_minor_area(self):
+        x1, y1, width, height = self.match.game.field.get_small_area("defensive")
+
+        inside = (
+            x1 < self.robot.x < width
+            and y1 < self.robot.y < height
+        )
+        
+        return inside
+
+    def ball_inside_minor_area(self):
+        x1, y1, width, height = self.match.game.field.get_small_area("defensive")
+
+        inside = (
+            x1 < self.match.ball.x < width
+            and y1 < self.match.ball.y < height
+        )
+        
+        return inside
 
     def decide(self):
         ball = self.match.ball
@@ -331,10 +349,10 @@ class OffensivePlay(Strategy):
                 return True
             return _sign > 0
             
-
         behaviour = None
-
-        if self.has_possession():
+        if self.ball_inside_minor_area():
+            behaviour = self.wait
+        elif self.has_possession():
             behaviour = self.push
         elif dist_to_ball >= tangential_radius:
             self.tangential = None
@@ -358,7 +376,7 @@ class OffensivePlay(Strategy):
                         radius = .35,
                         radius_max = .35,
                         decay = lambda x: (1 - x) ** 4,
-                        multiplier = -.5
+                        multiplier = -.65
                     )
                 )
 
@@ -371,7 +389,7 @@ class OffensivePlay(Strategy):
                         clockwise = lambda m, r_id=self.robot.robot_id: choose_ccw(m, r_id),
                         decay=lambda _: 1,
                         multiplier = lambda m, me=self.robot: min(
-                            max(0.75,  m.ball.get_speed() + .2 ), 0.85)
+                            max(0.6,  m.ball.get_speed() + .05 ), 0.7)
                     )
                 )
 

@@ -1,35 +1,9 @@
+from commons.math import distance_to_line
 import json
 import math
 
 import strategy
 from entities.coach.coach import BaseCoach
-
-
-# class Coach(BaseCoach):
-#     NAME = "DEV_ALEX"
-#     def __init__(self, match):
-#         self.match = match
-
-#         self.attacker = [
-#             strategy.alex.OffensivePlay(self.match) for _ in self.match.robots
-#         ]
-
-#         self.mock = [
-#             strategy.tests.Idle(self.match) for _ in self.match.robots
-#         ]
-    
-#     def decide (self):
-#         robots = [r.robot_id for r in self.match.robots]
-
-#         for robot_id in robots:
-#             if robot_id == 0:
-#                 if self.match.robots[robot_id].strategy is None:
-#                     self.match.robots[robot_id].strategy = self.attacker[robot_id]
-#                     self.match.robots[robot_id].start()
-#             else:
-#                 if self.match.robots[robot_id].strategy is None:
-#                     self.match.robots[robot_id].strategy = self.mock[robot_id]
-#                     self.match.robots[robot_id].start()
 
 class Coach(BaseCoach):
     NAME = "DEV_ALEX"
@@ -75,3 +49,59 @@ class Coach(BaseCoach):
 
     def elect_midfielder(self, robot):
         return 1
+
+    def get_range_of_aim(self, robot):
+        goal_ = self.match.game.field.get_dimensions()
+        goal_left = [goal_[0], goal_[1]/2 + 0.15]
+        goal_right = [goal_[0], goal_[1]/2 - 0.15]
+        ball_pos = [self.match.ball.x, self.match.ball.y]
+
+        range_ = []
+
+        for goal in [goal_left, goal_right]:
+            ball_to_goal_or = math.atan2(ball_pos[0] - goal[0], ball_pos[1] - goal[1])
+
+            robot_to_goal_or = math.atan2(
+                robot.x - goal[0], robot.y - goal[1]
+            )
+
+            ball_to_goal_or = math.degrees(ball_to_goal_or)
+            if ball_to_goal_or < 0:
+                ball_to_goal_or += 90
+
+            robot_to_goal_or = math.degrees(robot_to_goal_or)
+            if robot_to_goal_or < 0:
+                robot_to_goal_or += 90
+            
+            range_.append((robot_to_goal_or - ball_to_goal_or))
+
+        return range_
+    
+    def best_angle(self, robot):
+        
+        goal = self.match.game.field.get_dimensions()
+        goal = [goal[0], goal[1]/2]
+
+        ranges = self.get_range_of_aim(robot)
+
+        distance_from_aim = distance_to_line(
+            self.match.ball.x, self.match.ball.y,
+            math.sin(robot.theta), math.cos(robot.theta),
+            robot.x, robot.y
+        )
+
+        dist_robot_ball = (
+            (robot.x - self.match.ball.x)**2
+            + (robot.y - self.match.ball.y)**2
+        )**.5
+
+        match_rank = 0
+
+        if self.match.ball.x < robot.x:
+            match_rank += 100
+
+        if not (ranges[0] > 0 and ranges[1] < 0):
+            match_rank += 100
+        
+        print(robot.get_name(),  match_rank + dist_robot_ball * 10 + distance_from_aim * 5)
+        return match_rank + dist_robot_ball * 10 + distance_from_aim * 100
