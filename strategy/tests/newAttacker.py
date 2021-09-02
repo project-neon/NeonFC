@@ -1,95 +1,81 @@
 import math
-from random import betavariate
-
-from scipy.spatial.qhull import Voronoi
+#from random import betavariate
+#from scipy.spatial.qhull import Voronoi
 import algorithms
 import numpy as np
 from fields.field import Field as fd
 from strategy.BaseStrategy import Strategy
-#from strategy.tests import astarVoronoi
 from commons.math import unit_vector, distance
 from strategy import DebugTools
+from algorithms.astar import AStar, Node
+from algorithms.astar.fieldGraph import FieldGraph
+from scipy.spatial import Voronoi
 
 SPEED_FACTOR = 1.3
 POSSESSION_DIST = 12 * 10**-2 # Distancia minima considerada pra posse de bola em cm
 BALL_RADIUS = 2.135 * 10**-2 # Raio da bola em cm
 OPPOSITE_GOAL_X = 1.5 # Coordenada x do goal adversário
 
-def goal_aim(self, robot):
-    if robot.theta >= math.pi/2 and robot.theta <= math.pi*(3/2):
-        return False
-    else:
-        robot_line_m = math.tan(robot.theta)
-        robot_line_n = robot.y - robot.x * robot_line_m # n=y-xm
-        aimed_at_y = OPPOSITE_GOAL_X * robot_line_m + robot_line_n
-        if aimed_at_y >= 0.49 and aimed_at_y <= 0.81:
-            self.goal_aim_y = aimed_at_y
-            return True
-        return False
-
-# def line_circle_intersect(robot, ball):
-
-# def angle_to_ball(r, m): !ATTENTION!
-
 # def robot_orientation_line(self, robots):
     #for r in robots:
         #if r.get_name() == self.robot.get_name():
             #robotPointAhead = [r.x]
 
-# Método para calcular distância euclidiana até a bola
-def dist_to_ball(r, m):
-    return math.dist((r.x, r.y), (m.ball.x, m.ball.y))
 
-#ATTENTION!
-# Quando mais de um robo estiver em posse qual o criterio de desempate
-# Se posse esta com um inimigo nao precisa iterar mais
-# Se robo estiver com um robo nosso iterar pra ver se tem tbm um oponente com a bola
 
-# Método para definir a posse da bola => 
-# 0 - posse do atacante, 1 - nosso time, 2 - outro time, 3 - posse de ninguem
-def get_ball_possession(self, robots, m):
-    for r in robots:
-        if r.get_name() == self.robot.get_name():
-            if(dist_to_ball(r, m) <= POSSESSION_DIST):
-                return 0
-        elif r.team_color == self.robot.team_color:
-            if(dist_to_ball(r, m) <= POSSESSION_DIST):
-                return 1
+#class newAttacker(DebugTools.DebugPotentialFieldStrategy):
+class newAttacker(Strategy):
+    def __init__(self, match):
+        super().__init__(match, 'newAttacker1') #revisar nome no futura
+        
+        self.match = match
+
+        #self.astar = algorithms.astar.AStar()
+
+        self.obey_rules_speed = 0.5
+
+        self.path = None
+
+        self.goal_aim_y = 0.65 # point of the line of the goal that the robot is aiming at in kick behaviour
+
+    # Method for goal alignment verification
+    def goal_aim(self, robot):
+        if robot.theta >= math.pi/2 and robot.theta <= math.pi*(3/2):
+            return False
         else:
-            if(dist_to_ball(r, m) <= POSSESSION_DIST):
-                return 2
-    return 3
+            robot_line_m = math.tan(robot.theta)
+            robot_line_n = robot.y - robot.x * robot_line_m # n=y-xm
+            aimed_at_y = OPPOSITE_GOAL_X * robot_line_m + robot_line_n
+            if aimed_at_y >= 0.49 and aimed_at_y <= 0.81:
+                self.goal_aim_y = aimed_at_y
+                return True
+            return False
+    
+    # Método para calcular distância euclidiana até a bola
+    def dist_to_ball(self, r, m):
+        return math.dist((r.x, r.y), (m.ball.x, m.ball.y))
 
-# goal_aim() -> function to determine if attacker is aiming the ball to the goal
-# def goal_aim():
-	#return True
+    #ATTENTION!
+    # Quando mais de um robo estiver em posse qual o criterio de desempate
+    # Se posse esta com um inimigo nao precisa iterar mais
+    # Se robo estiver com um robo nosso iterar pra ver se tem tbm um oponente com a bola
 
-from algorithms.astar import AStar, Node, FieldGraph
-from strategy.BaseStrategy import Strategy
-from scipy.spatial import Voronoi
+    # Método para definir a posse da bola => 
+    # 0 - posse do atacante, 1 - nosso time, 2 - outro time, 3 - posse de ninguem
+    def get_ball_possession(self, robots, m):
+        for r in robots:
+            if r.get_name() == self.robot.get_name():
+                if(self.dist_to_ball(r, m) <= POSSESSION_DIST):
+                    return 0
+            elif r.team_color == self.robot.team_color:
+                if(self.dist_to_ball(r, m) <= POSSESSION_DIST):
+                    return 1
+            else:
+                if(self.dist_to_ball(r, m) <= POSSESSION_DIST):
+                    return 2
+        return 3
 
-class Scratch(Strategy):
-    def __init__(self, match, objective):
-        super().__init__(match, "AstarVoronoi")
-
-        self.graph = FieldGraph()
-        self.min_range = 0.56
-        self.robot_node = None
-
-        self.objective = objective
-
-
-    def start(self, robot=None):
-        super().start(robot=robot)
-
-
-    def reset(self, robot=None):
-        super().reset()
-        if robot:
-            self.start(robot)
-
-
-    def decide(self):
+    def generate_graph(self, objective):
         self.graph = FieldGraph()
 
         self.robot_node = Node([self.robot.x, self.robot.y])
@@ -106,12 +92,11 @@ class Scratch(Strategy):
         obstacles = corners + [ [r.x, r.y] for r in self.match.opposites] + [
             [r.x, r.y] for r in self.match.robots 
             if r.robot_id != self.robot.robot_id
-        ] + [ [self.match.ball.x, self.match.ball.y], self.robot_node.position]
+        ] + [ [objective[0], objective[1]], self.robot_node.position]
 
         vor = Voronoi(obstacles)
 
-        objective = self.objective
-        target_node = Node([objective.x, objective.y])
+        target_node = Node([objective[0], objective[1]])
 
         nodes = [
             Node([a[0], a[1]]) for a in vor.vertices
@@ -142,41 +127,16 @@ class Scratch(Strategy):
             if objective_index in ridge_vertice and robot_index in ridge_vertice:
                 self.graph.add_edge([self.robot_node, target_node])
 
-        for edge_to_ball in set(polygon_objective_edges):
-            self.graph.add_edge([edge_to_ball, target_node])
+        for edge_to_objective in set(polygon_objective_edges):
+            self.graph.add_edge([edge_to_objective, target_node])
 
-        for edge_to_ball in set(polygon_robot_edges):
-            self.graph.add_edge([edge_to_ball, self.robot_node])
+        for edge_to_objective in set(polygon_robot_edges):
+            self.graph.add_edge([edge_to_objective, self.robot_node])
 
 
         path = AStar(self.robot_node, target_node).calculate()
 
-        dist = ( (path[0][0] - path[1][0])**2 + (path[1][1] - path[1][1])**2 )**.5
-
-        return [
-            0.5 * (path[1][0] - path[0][0])/dist,
-            0.5 * (path[1][1] - path[0][1])/dist
-        ]
-
-"""
-------///-------///-------------///----------///-----
-
-"""
-
-#class newAttacker(DebugTools.DebugPotentialFieldStrategy):
-class newAttacker(Strategy):
-    def __init__(self, match):
-        super().__init__(match, 'newAttacker1') #revisar nome no futura
-        
-        self.match = match
-
-        #self.astar = algorithms.astar.AStar()
-
-        self.obey_rules_speed = 0.5
-
-        self.path = None
-
-        self.goal_aim_y = 0.65 # point of the line of the goal that the robot is aiming at in kick behaviour
+        return path[1]
 
     def reset(self, robot=None):
         super().reset()
@@ -510,6 +470,7 @@ class newAttacker(Strategy):
             )
         )
 
+        #Potential field for the tackle behaviour
         self.tackle.add_field(
             algorithms.fields.LineField(
                 self.match,
@@ -524,7 +485,7 @@ class newAttacker(Strategy):
             )
         )
 
-        # Seek behaviour 
+        # Seek behaviour FOR TESTING PURPOSES *** DELETE AFTER
         self.seek.add_field(
             algorithms.fields.PointField(
                 self.match,
@@ -536,6 +497,17 @@ class newAttacker(Strategy):
             )
         )
         
+        # Carry behaviour
+        self.carry.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = lambda m, r=self: r.generate_graph([m.game.field.get_dimensions()[0], m.game.field.get_dimensions()[1]/2]),
+                radius = 0.2, # 30cm
+                decay = lambda x: 1,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 0.5 # 50 cm/s
+            )
+        )
 
     def reset(self, robot=None):
         super().reset()
@@ -583,7 +555,7 @@ class newAttacker(Strategy):
         # 0 - posse do atacante, 1 - nosso time, 2 - outro time, 3 - posse de ninguem
         
         all_robots = self.match.robots + self.match.opposites
-        possession = get_ball_possession(self, all_robots, self.match)
+        possession = self.get_ball_possession(all_robots, self.match)
         print(possession)
         
         # goal_aim() -> function to determine if attacker is aiming the ball to the goal
@@ -607,25 +579,18 @@ class newAttacker(Strategy):
         # else:
         #     behaviour == self.kick
 
-        if possession == 3:
-            behaviour = self.seek
-            print("seek")
+        # 0 - posse do atacante, 1 - nosso time, 2 - outro time, 3 - posse de ninguem
+        if possession == 0 and math.dist((self.robot.x, self.robot.y), (1.500, 0.650)) <= 0.3 and self.goal_aim(self.robot) == True:
+            behaviour = self.kick
+        elif possession == 0:
+            behaviour = self.carry
         elif possession == 1:
             behaviour = self.defend
-            print("defend")
-        elif possession == 0:
-            if goal_aim(self, self.robot) == False:
-                behaviour = self.carry
-                print("carry")
-                carryGraph = Scratch(self.match, [OPPOSITE_GOAL_X, fd.get_dimensions[1]/2]).decide()
-                print("CARRYGRAPH: ",carryGraph)
-                vf = behaviour.compute([self.robot.x, self.robot.y])
-                vf = (vf[0] + carryGraph[1][0], vf[1] + carryGraph[1][1])
-                return vf
-            else:
-                print("kick")
-                behaviour == self.kick
+        elif possession == 2:
+            behaviour = self.tackle
+        else:
+            behaviour = self.seek
         
-
+        print(behaviour.name)
         #return super().decide(behaviour)
         return behaviour.compute([self.robot.x, self.robot.y])
