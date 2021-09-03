@@ -193,8 +193,8 @@ class newGoalKeeper(Strategy):
         self.redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (sa_w/2+0.015, field_h/2),
-                radius = sa_w/2-0.07,
+                target = (sa_w/2+0.02, field_h/2),
+                radius = 0.00001,
                 radius_max = field_w,
                 clockwise = True,
                 decay = lambda x: 1,
@@ -209,7 +209,7 @@ class newGoalKeeper(Strategy):
         theta = self.robot.theta
 
         #print(get_ball_info(self.match))
-        if  self.robot.x < 0.1 and self.robot.x > 0.02 and self.robot.y > 0.3 and self.robot.y < 1:
+        if  self.robot.x < 0.11 and self.robot.x > 0.02 and self.robot.y > 0.3 and self.robot.y < 1:
 
             if (theta >= -1.62 and theta <= -1.42) or (theta >= 1.42 and theta <= 1.62):
 
@@ -227,7 +227,7 @@ class newGoalKeeper(Strategy):
 
             else:
 
-                if self.match.ball.x > 0.750:
+                if self.match.ball.x >= 0.750:
                     behaviour = self.redeploy
 
                 else:
@@ -250,7 +250,7 @@ class newGoalKeeper(Strategy):
             np.array([self.robot.x, self.robot.y]) - 
             np.array([self.match.ball.x, self.match.ball.y])
         )
-        if dist_to_ball <= 0.1:
+        if dist_to_ball <= 0.12:
             return True
         return False
 
