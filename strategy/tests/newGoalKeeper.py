@@ -120,8 +120,16 @@ class newGoalKeeper(Strategy):
         def get_def_spot(m):
             x = sa_w/2
 
-            if m.ball.vy==0 or m.ball.vx==0:
-                return (x, field_h/2)
+            if m.ball.vx == 0:
+                if m.ball.y > g_hgr:
+                    y = g_hgr
+                    return (x, y)
+                elif m.ball.y < g_lwr:
+                    y = g_lwr
+                    return (x, y)
+                else:
+                    y = m.ball.y
+                    return (x, y)
 
             y = (m.ball.vy/m.ball.vx)*(x-m.ball.x) + m.ball.y
 
