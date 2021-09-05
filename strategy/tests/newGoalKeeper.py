@@ -26,17 +26,17 @@ class newGoalKeeper(Strategy):
         self.redeploy = algorithms.fields.PotentialField(self.match, name="RedeployBehaviour")
 
         #small area x, y, width and height
-        sa_x, sa_y, sa_w, sa_h = self.match.game.field.get_small_area("defensive")
+        self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
 
-        field_w, field_h = self.match.game.field.get_dimensions()
+        self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
-        g_hgr = (field_h/2)+0.2
-        g_lwr = (field_h/2)-0.2
+        g_hgr = (self.field_h/2)+0.2
+        g_lwr = (self.field_h/2)-0.2
 
         self.restrict.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = (sa_w, sa_y+sa_h/2),
+                target = (self.sa_w, self.sa_y+self.sa_h/2),
                 theta = math.pi/2,
                 line_size = 1.3/2,
                 line_dist = 0.15,
@@ -51,9 +51,9 @@ class newGoalKeeper(Strategy):
         self.restrict.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = (0, sa_y+sa_h/2),
+                target = (0, self.sa_y+self.sa_h/2),
                 theta = 3*math.pi/2,
-                line_size = sa_h/2,
+                line_size = self.sa_h/2,
                 line_dist = 0.075,
                 line_dist_max = 0.1,
                 line_dist_single_side = True,
@@ -67,18 +67,18 @@ class newGoalKeeper(Strategy):
 
         def follow_ball(m):
             if m.ball.y > g_hgr:
-                return (sa_w/2, g_hgr)
+                return (self.sa_w/2, g_hgr)
             elif m.ball.y < g_lwr:
-                return (sa_w/2, g_lwr)
+                return (self.sa_w/2, g_lwr)
             else:
-                return (sa_w/2, m.ball.y)
+                return (self.sa_w/2, m.ball.y)
 
         self.project.add_field(
             algorithms.fields.LineField(
                 self.match,
                 target = follow_ball,
                 theta = 0,
-                line_size = sa_w/2,
+                line_size = self.sa_w/2,
                 line_dist = 0.1,
                 line_dist_max = 0.7,
                 multiplier = 0.7,
@@ -91,12 +91,12 @@ class newGoalKeeper(Strategy):
         def get_cover_area(robot, side):
             robot_w = robot_h = 0.075
             if side == "inf":
-                robot_ext_x, robot_ext_y = (sa_w/2+robot_w/2, g_lwr+robot_h/2)
+                robot_ext_x, robot_ext_y = (self.sa_w/2+robot_w/2, g_lwr+robot_h/2)
                 cover_func = lambda x : ((robot_ext_y-g_hgr)/robot_ext_x)*x + g_hgr
                 return cover_func
 
             elif side == "sup":
-                robot_ext_x, robot_ext_y = (sa_w/2+robot_w/2, g_hgr-robot_h/2)
+                robot_ext_x, robot_ext_y = (self.sa_w/2+robot_w/2, g_hgr-robot_h/2)
                 cover_func = lambda x : ((robot_ext_y-g_lwr)/robot_ext_x)*x + g_lwr
                 return cover_func
 
@@ -107,8 +107,8 @@ class newGoalKeeper(Strategy):
             elif dir == "drop":
                 y_med = (g_lwr+m.ball.y)/2
             while t <= 1:
-                y = (m.ball.vy/m.ball.vx)*(sa_w-m.ball.x) + m.ball.y
-                b_x = ((1-t)**2)*m.ball.x + 2*(1-t)*t*sa_w
+                y = (m.ball.vy/m.ball.vx)*(self.sa_w-m.ball.x) + m.ball.y
+                b_x = ((1-t)**2)*m.ball.x + 2*(1-t)*t*self.sa_w
                 b_y = ((1-t)**2)*m.ball.y + 2*(1-t)*t*y + (t**2)*y_med
                 if 0.05 > round(b_x, 3) and round(b_x, 3) < 0.1:
                     return b_y
@@ -118,7 +118,7 @@ class newGoalKeeper(Strategy):
 
 
         def get_def_spot(m):
-            x = sa_w/2
+            x = self.sa_w/2
 
             if m.ball.vx == 0:
                 if m.ball.y > g_hgr:
@@ -157,7 +157,7 @@ class newGoalKeeper(Strategy):
                 if y < g_lwr: y = g_lwr
                 return (x, y)
 
-            mid_field_h = field_h/2
+            mid_field_h = self.field_h/2
 
             #caso a bola esteja entre o escanteio e o meio do campo indo para uma dos escanteios,
             #o robo defende a trajetoria entre a bola e o gol
@@ -176,7 +176,7 @@ class newGoalKeeper(Strategy):
                 self.match,
                 target = get_def_spot,
                 theta = 0,
-                line_size = sa_w/2,
+                line_size = self.sa_w/2,
                 line_dist = 0.1,
                 line_dist_max = 0.7,
                 multiplier = 0.7,
@@ -188,11 +188,11 @@ class newGoalKeeper(Strategy):
         self.kalm.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = lambda m: (0.075, field_h/2),
+                target = lambda m: (self.sa_w/2, self.field_h/2),
                 theta = 0,
-                line_size = sa_w/2,
+                line_size = self.sa_w/2,
                 line_dist = 0.1,
-                line_dist_max = 0.7,
+                line_dist_max = self.sa_h,
                 decay = lambda x: x,
                 multiplier = 0.7,
             )
@@ -201,9 +201,9 @@ class newGoalKeeper(Strategy):
         self.redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (sa_w/2+0.02, field_h/2),
+                target = (self.sa_w/2, self.field_h/2),
                 radius = 0.00001,
-                radius_max = field_w,
+                radius_max = self.field_w,
                 clockwise = True,
                 decay = lambda x: 1,
                 multiplier = 0.7
@@ -217,17 +217,18 @@ class newGoalKeeper(Strategy):
         theta = self.robot.theta
 
         #print(get_ball_info(self.match))
-        if  self.robot.x < 0.11 and self.robot.x > 0.02 and self.robot.y > 0.3 and self.robot.y < 1:
+        if  (self.robot.x < self.sa_w-0.04 and self.robot.x > 0.02 and self.robot.y > self.sa_y 
+             and self.robot.y < self.sa_y + self.sa_h):
 
-            if (theta >= -1.62 and theta <= -1.42) or (theta >= 1.42 and theta <= 1.62):
+            if (theta >= -1.65 and theta <= -1.485) or (theta >= 1.485 and theta <= 1.65):
 
-                if self.match.ball.x < 0.750 and self.match.ball.vx > 0:
+                if self.match.ball.x < self.field_w/2 and self.match.ball.vx > 0:
                     behaviour = self.project
                     
-                elif self.match.ball.x < 0.750: #and self.match.ball.vx < 0:
+                elif self.match.ball.x < self.field_w/2: #and self.match.ball.vx < 0:
                     behaviour = self.path
 
-                elif self.match.ball.x >= 0.750:
+                elif self.match.ball.x >= self.field_w/2:
                     behaviour = self.kalm
 
                 else:
@@ -235,7 +236,7 @@ class newGoalKeeper(Strategy):
 
             else:
 
-                if self.match.ball.x >= 0.750:
+                if self.match.ball.x >= self.field_w/2:
                     behaviour = self.redeploy
 
                 else:
