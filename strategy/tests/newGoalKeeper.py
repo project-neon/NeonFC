@@ -201,7 +201,7 @@ class newGoalKeeper(Strategy):
         self.redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (self.sa_w/2, self.field_h/2),
+                target = (self.sa_w/2 + 0.02, self.field_h/2),
                 radius = 0.00001,
                 radius_max = self.field_w,
                 clockwise = True,
