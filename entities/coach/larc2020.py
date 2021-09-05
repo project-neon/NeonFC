@@ -36,7 +36,8 @@ class Coach(BaseCoach):
     def get_positions(self, foul, team_color):
         foul = self.positions.get(foul)
         replacements = foul.get(team_color, foul.get("POSITIONS"))
-        return replacements
+        # FIXME default positions are broken
+        return None
 
     def elect_attacker(self, robot):
         dist_to_ball = math.sqrt(
