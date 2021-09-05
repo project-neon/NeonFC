@@ -221,11 +221,11 @@ class newGoalKeeper(Strategy):
 
             if (theta >= -1.62 and theta <= -1.42) or (theta >= 1.42 and theta <= 1.62):
 
-                if self.match.ball.x < 0.750: #and self.match.ball.vx < 0:
-                    behaviour = self.path
-
-                elif self.match.ball.x < 0.750 and self.match.ball.vx > 0:
+                if self.match.ball.x < 0.750 and self.match.ball.vx > 0:
                     behaviour = self.project
+                    
+                elif self.match.ball.x < 0.750: #and self.match.ball.vx < 0:
+                    behaviour = self.path
 
                 elif self.match.ball.x >= 0.750:
                     behaviour = self.kalm
