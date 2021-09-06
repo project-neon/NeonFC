@@ -228,7 +228,8 @@ class newAttacker(Strategy):
         # Line size -> em relação ao campo
         # Line dist -> verificar se parametrização é em relaçao ao robo ou à alguma das paredes
 
-        # Potential Fields for the base rules of the game
+        # Potential Fields for the base rules of the 
+        # right goal area (our team)
         self.base_rules.add_field(
             algorithms.fields.LineField(
                 self.match,
@@ -258,6 +259,7 @@ class newAttacker(Strategy):
             )
         )
 
+        # Left goal area (opposite team)
         self.base_rules.add_field(
             algorithms.fields.LineField(
                 self.match,
@@ -486,16 +488,16 @@ class newAttacker(Strategy):
         )
 
         # Seek behaviour FOR TESTING PURPOSES *** DELETE AFTER
-        self.seek.add_field(
-            algorithms.fields.PointField(
-                self.match,
-                target = lambda m: (m.ball.x, m.ball.y),
-                radius = 0.2, # 30cm
-                decay = lambda x: x**2,
-                field_limits = [0.75*2 , 0.65*2],
-                multiplier = 0.5 # 50 cm/s
-            )
-        )
+        # self.seek.add_field(
+        #     algorithms.fields.PointField(
+        #         self.match,
+        #         target = lambda m: (m.ball.x, m.ball.y),
+        #         radius = 0.2, # 30cm
+        #         decay = lambda x: x**2,
+        #         field_limits = [0.75*2 , 0.65*2],
+        #         multiplier = 0.5 # 50 cm/s
+        #     )
+        # )
         
         # Carry behaviour
         self.carry.add_field(
@@ -504,6 +506,18 @@ class newAttacker(Strategy):
                 target = lambda m, r=self: r.generate_graph([m.game.field.get_dimensions()[0], m.game.field.get_dimensions()[1]/2]),
                 radius = 0.2, # 30cm
                 decay = lambda x: 1,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 0.5 # 50 cm/s
+            )
+        )
+
+        # Seek behaviour
+        self.seek.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = lambda m, r=self: r.generate_graph([m.ball.x, m.ball.y]),
+                radius = 0.2, # 30cm
+                decay = lambda x: x**2,
                 field_limits = [0.75*2 , 0.65*2],
                 multiplier = 0.5 # 50 cm/s
             )
