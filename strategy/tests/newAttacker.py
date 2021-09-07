@@ -546,7 +546,7 @@ class newAttacker(Strategy):
                 clockwise = False,
                 decay = lambda x: 1,
                 field_limits = [0.75*2 , 0.65*2],
-                multiplier = 1 # 100 cm/s
+                multiplier = 0.8 # 100 cm/s
             )
         )
 
@@ -560,12 +560,12 @@ class newAttacker(Strategy):
                 clockwise = True,
                 decay = lambda x: 1,
                 field_limits = [0.75*2 , 0.65*2],
-                multiplier = 1 # 100 cm/s
+                multiplier = 0.8 # 100 cm/s
             )
         )
 
-        # self.seek_anti_clockwise.add_field(self.seek)
-        # self.seek_clockwise.add_field(self.seek)
+        self.seek_anti_clockwise.add_field(self.seek)
+        self.seek_clockwise.add_field(self.seek)
 
         # Carry behaviour
         self.carry.add_field(
@@ -659,7 +659,7 @@ class newAttacker(Strategy):
         #     vf = (vf[0] + Scratch[1][0], vf[1] + self.voronoi[1][1])
         #     return vf
         # else:
-        #     behaviour == self.kick
+        #     behaviour = self.kick
 
         # 0 - posse do atacante, 1 - nosso time, 2 - outro time, 3 - posse de ninguem
         if possession == 0 and math.dist((self.robot.x, self.robot.y), (1.500, 0.650)) <= 0.4 and self.goal_aim(self.robot) == True:
@@ -678,7 +678,7 @@ class newAttacker(Strategy):
                 if (self.dist_to_ball(r, self.match) <= 24 * 10**-2):
                     if (r.get_name() != self.robot.get_name()) and (r.team_color != self.robot.team_color):
                         break
-        	        behaviour = self.tackle
+        	        # behaviour = self.tackle
                 else:
                     if self.robot.x > self.match.ball.x-0.23 and self.dist_to_ball(self.robot, self.match) <= 0.2:
                         if self.robot.y < self.match.ball.y:
