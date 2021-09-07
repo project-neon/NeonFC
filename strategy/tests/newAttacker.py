@@ -3,6 +3,7 @@ import math
 #from scipy.spatial.qhull import Voronoi
 import algorithms
 import numpy as np
+import controller
 from fields.field import Field as fd
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector, distance
@@ -10,23 +11,31 @@ from strategy import DebugTools
 from algorithms.astar import AStar, Node
 from algorithms.astar.fieldGraph import FieldGraph
 from scipy.spatial import Voronoi
+from controller import TwoSidesLQR
 
 SPEED_FACTOR = 1.3
 POSSESSION_DIST = 12 * 10**-2 # Distancia minima considerada pra posse de bola em cm
 BALL_RADIUS = 2.135 * 10**-2 # Raio da bola em cm
 OPPOSITE_GOAL_X = 1.5 # Coordenada x do goal adversário
 
-# def robot_orientation_line(self, robots):
-    #for r in robots:
-        #if r.get_name() == self.robot.get_name():
-            #robotPointAhead = [r.x]
+# Orientantion lane of the robot to support ball possession verification
+def robot_orientation_line(self, robots):
+    for r in robots:
+        m = math.tan(r.theta) # slope of the line
+        xi, yi = r.x, r.y
+        
+
+        if r.get_name() == self.robot.get_name():
+            robotPointAhead = [r.x]
 
 
 
 #class newAttacker(DebugTools.DebugPotentialFieldStrategy):
 class newAttacker(Strategy):
     def __init__(self, match):
-        super().__init__(match, 'newAttacker1') #revisar nome no futura
+        super().__init__(
+            match, 'newAttacker1',
+            controller=TwoSidesLQR) #revisar nome no futuro
         
         self.match = match
 
@@ -37,6 +46,13 @@ class newAttacker(Strategy):
         self.path = None
 
         self.goal_aim_y = 0.65 # point of the line of the goal that the robot is aiming at in kick behaviour
+
+    # Method to verify if robot has the control of the ball
+    def ball_control(self, robot):
+        if (robot.y < self.match.ball.y-0.015) or (robot.y > self.match.ball.y+0.015):
+            return True
+        else:
+            return False
 
     # Method for goal alignment verification
     def goal_aim(self, robot):
@@ -65,8 +81,9 @@ class newAttacker(Strategy):
     def get_ball_possession(self, robots, m):
         for r in robots:
             if r.get_name() == self.robot.get_name():
-                if(self.dist_to_ball(r, m) <= POSSESSION_DIST):
-                    return 0
+                if r.x < m.ball.x: # Ball ahead of robot
+                    if(self.dist_to_ball(r, m) <= POSSESSION_DIST-0.05):
+                        return 0
             elif r.team_color == self.robot.team_color:
                 if(self.dist_to_ball(r, m) <= POSSESSION_DIST):
                     return 1
@@ -163,6 +180,16 @@ class newAttacker(Strategy):
             name="{}|SeekBehavior".format(self.__class__)
         )
 
+        self.seek_anti_clockwise = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|AntiClockwiseSeekBehavior".format(self.__class__)
+        )
+
+        self.seek_clockwise = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|ClockwiseSeekBehavior".format(self.__class__)
+        )
+
         self.tackle = algorithms.fields.PotentialField(
             self.match,
             name="{}|TackleBehavior".format(self.__class__)
@@ -181,6 +208,11 @@ class newAttacker(Strategy):
         self.carry = algorithms.fields.PotentialField(
             self.match,
             name="{}|CarryBehavior".format(self.__class__)
+        )
+
+        self.carry2 = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|Carry2Behavior".format(self.__class__)
         )
         
 
@@ -391,7 +423,7 @@ class newAttacker(Strategy):
                 line_dist_max = 0.15,
                 line_dist_single_side = True,
                 decay = lambda x: x**2,
-                multiplier = 0.5
+                multiplier = self.obey_rules_speed
             )
         )
 
@@ -407,11 +439,11 @@ class newAttacker(Strategy):
                 line_dist_max = 0.15,
                 line_dist_single_side = True,
                 decay = lambda x: x**2,
-                multiplier = 0.5
+                multiplier = self.obey_rules_speed
             )
         )
 
-        # Robot avoids opposite team robots
+        # Robot avoids other robots
         for robot in self.match.robots + self.match.opposites:
             if robot.get_name() == self.robot.get_name():
                 continue
@@ -430,10 +462,15 @@ class newAttacker(Strategy):
             )
 
         self.seek.add_field(self.base_rules)
+        self.seek_anti_clockwise.add_field(self.base_rules)
+
+        self.seek_clockwise.add_field(self.base_rules)
+
         self.tackle.add_field(self.base_rules)
         self.defend.add_field(self.base_rules)
         self.defend.add_field(self.avoid_obstacles)
         self.carry.add_field(self.base_rules)
+        self.carry2.add_field(self.base_rules)
         self.kick.add_field(self.base_rules)
 
         # Potential field for the defend behavior
@@ -486,31 +523,7 @@ class newAttacker(Strategy):
                 line_dist_single_side = True
             )
         )
-
-        # Seek behaviour FOR TESTING PURPOSES *** DELETE AFTER
-        # self.seek.add_field(
-        #     algorithms.fields.PointField(
-        #         self.match,
-        #         target = lambda m: (m.ball.x, m.ball.y),
-        #         radius = 0.2, # 30cm
-        #         decay = lambda x: x**2,
-        #         field_limits = [0.75*2 , 0.65*2],
-        #         multiplier = 0.5 # 50 cm/s
-        #     )
-        # )
         
-        # Carry behaviour
-        self.carry.add_field(
-            algorithms.fields.PointField(
-                self.match,
-                target = lambda m, r=self: r.generate_graph([m.game.field.get_dimensions()[0], m.game.field.get_dimensions()[1]/2]),
-                radius = 0.2, # 30cm
-                decay = lambda x: 1,
-                field_limits = [0.75*2 , 0.65*2],
-                multiplier = 0.5 # 50 cm/s
-            )
-        )
-
         # Seek behaviour
         self.seek.add_field(
             algorithms.fields.PointField(
@@ -519,7 +532,62 @@ class newAttacker(Strategy):
                 radius = 0.2, # 30cm
                 decay = lambda x: x**2,
                 field_limits = [0.75*2 , 0.65*2],
-                multiplier = 0.5 # 50 cm/s
+                multiplier = 0.8 # 80 cm/s
+            )
+        )
+
+        # Anti clockwise Seek behaviour
+        self.seek_clockwise.add_field(
+            algorithms.fields.TangentialField(
+                self.match,
+                target = lambda m: (m.ball.x-0.02, m.ball.y-0.1),
+                radius = 0.1, # 6cm
+                radius_max = 0.22, # 8cm
+                clockwise = False,
+                decay = lambda x: 1,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 1 # 100 cm/s
+            )
+        )
+
+        # Clockwise Seek behaviour
+        self.seek_anti_clockwise.add_field(
+            algorithms.fields.TangentialField(
+                self.match,
+                target = lambda m: (m.ball.x-0.02, m.ball.y+0.1),
+                radius = 0.1, # 6cm
+                radius_max = 0.22, # 8cm
+                clockwise = True,
+                decay = lambda x: 1,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 1 # 100 cm/s
+            )
+        )
+
+        # self.seek_anti_clockwise.add_field(self.seek)
+        # self.seek_clockwise.add_field(self.seek)
+
+        # Carry behaviour
+        self.carry.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = lambda m, r=self: r.generate_graph([m.game.field.get_dimensions()[0], m.game.field.get_dimensions()[1]/2]),
+                radius = 0.2, # 20cm
+                decay = lambda x: 1,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 0.7 # 70 cm/s
+            )
+        )
+
+        # Carry behaviour 2
+        self.carry2.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = lambda m, r=self: r.generate_graph([m.ball.x, m.ball.y]),
+                radius = 0.2, # 20cm
+                decay = lambda x: 1,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 0.7 # 70 cm/s
             )
         )
 
@@ -594,16 +662,31 @@ class newAttacker(Strategy):
         #     behaviour == self.kick
 
         # 0 - posse do atacante, 1 - nosso time, 2 - outro time, 3 - posse de ninguem
-        if possession == 0 and math.dist((self.robot.x, self.robot.y), (1.500, 0.650)) <= 0.3 and self.goal_aim(self.robot) == True:
+        if possession == 0 and math.dist((self.robot.x, self.robot.y), (1.500, 0.650)) <= 0.4 and self.goal_aim(self.robot) == True:
             behaviour = self.kick
-        elif possession == 0:
-            behaviour = self.carry
+        elif possession == 0: # and self.match.ball.x > self.robot.x:
+            if(self.ball_control == True):
+                behaviour = self.carry2
+            else:
+                behaviour = self.carry
         elif possession == 1:
             behaviour = self.defend
         elif possession == 2:
             behaviour = self.tackle
         else:
-            behaviour = self.seek
+            for r in all_robots:
+                if (self.dist_to_ball(r, self.match) <= 24 * 10**-2):
+                    if (r.get_name() != self.robot.get_name()) and (r.team_color != self.robot.team_color):
+                        break
+        	        behaviour = self.tackle
+                else:
+                    if self.robot.x > self.match.ball.x-0.23 and self.dist_to_ball(self.robot, self.match) <= 0.2:
+                        if self.robot.y < self.match.ball.y:
+                            behaviour = self.seek_clockwise
+                        else:
+                            behaviour = self.seek_anti_clockwise
+                    else:
+                        behaviour = self.seek
         
         print(behaviour.name)
         #return super().decide(behaviour)
