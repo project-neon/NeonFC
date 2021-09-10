@@ -5,9 +5,6 @@ import numpy as np
 from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 
-def get_ball_info(m):
-    return (m.ball.vx, m.ball.vy, m.ball.x, m.ball.y)
-
 class newGoalKeeper(Strategy):
     def __init__(self, match, plot_field=True):
         super().__init__(match, "MktGoalKeeper", controller=controller.TwoSidesLQR)
@@ -29,8 +26,11 @@ class newGoalKeeper(Strategy):
         self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
 
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
-
+        
+        #trave superior do gol
         g_hgr = (self.field_h/2)+0.2
+
+        #trave inferior do gol
         g_lwr = (self.field_h/2)-0.2
 
         self.restrict.add_field(
@@ -88,6 +88,7 @@ class newGoalKeeper(Strategy):
 
         self.path.add_field(self.restrict)
         
+        #cria a area de cobertura do goleiro quando esta nos cantos do gol
         def get_cover_area(robot, side):
             robot_w = robot_h = 0.075
             if side == "inf":
@@ -100,6 +101,8 @@ class newGoalKeeper(Strategy):
                 cover_func = lambda x : ((robot_ext_y-g_lwr)/robot_ext_x)*x + g_lwr
                 return cover_func
 
+        #retorna a intersecção entre a linha do goleiro e uma curva de bezier,
+        # que representa uma possível trajetória da bola
         def bezier_intersec(m, dir):
             t = 0
             if dir == "rise":
@@ -116,7 +119,7 @@ class newGoalKeeper(Strategy):
             print(f"False: {m.ball.vy/m.ball.vx}")
             return self.robot.y
 
-
+        #retorna a posição em que o campo deve ser criado, para que a bola seja defendida
         def get_def_spot(m):
             x = self.sa_w/2
 
@@ -146,7 +149,7 @@ class newGoalKeeper(Strategy):
                 y = g_lwr
                 return (x, y)
 
-            #segue a cordenada y se a bola está no meio do campo indo para a lateral
+            #bloqueia uma possivel trajetoria da bola se ela esta no meio do campo indo para a lateral
             if y > g_hgr and g_lwr < m.ball.y < g_hgr:
                 y =  max(bezier_intersec(m, "rise"), self.robot.y, m.ball.y)
                 if y > g_hgr: y = g_hgr
@@ -216,7 +219,6 @@ class newGoalKeeper(Strategy):
 
         theta = self.robot.theta
 
-        #print(get_ball_info(self.match))
         if  (self.robot.x < self.sa_w-0.04 and self.robot.x > 0.02 and self.robot.y > self.sa_y 
              and self.robot.y < self.sa_y + self.sa_h):
 
@@ -225,7 +227,7 @@ class newGoalKeeper(Strategy):
                 if self.match.ball.x < self.field_w/2 and self.match.ball.vx > 0:
                     behaviour = self.project
                     
-                elif self.match.ball.x < self.field_w/2: #and self.match.ball.vx < 0:
+                elif self.match.ball.x < self.field_w/2:
                     behaviour = self.path
 
                 elif self.match.ball.x >= self.field_w/2:
@@ -244,8 +246,6 @@ class newGoalKeeper(Strategy):
 
         else:
             behaviour = self.redeploy
-
-        #return super().decide(self.path)
 
         return behaviour.compute([self.robot.x, self.robot.y])
     
