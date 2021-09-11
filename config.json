@@ -16,6 +16,6 @@
         "coach_name": "LARC_2020",
         "category": "3v3"
     },
-    "referee": false,
+    "referee": true,
     "data_sender": false
 }
