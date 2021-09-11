@@ -6,6 +6,4 @@ scipy
 pyqtgraph
 PyQt5
 
-# deep learning stuff
-tensorflow
-keras
+pyVsssReferee
