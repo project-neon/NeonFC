@@ -2,11 +2,7 @@ import math
 import logging
 import numpy as np
 from collections import deque
-from scipy.ndimage.interpolation import rotate
-import controller
-import algorithms
-import strategy
-from commons.math import angular_speed, rotate_via_numpy, unit_vector
+from commons.math import angular_speed, rotate_via_numpy
 from commons.math import speed as avg_speed
 
 class Robot(object):
@@ -47,7 +43,7 @@ class Robot(object):
         }
 
         self.vx, self.vy, self.vtheta = 0, 0, 0
-        self.x, self.y = 0, 0
+        self.x, self.y, self.theta = 0, 0, 0
 
     def start(self):
         self.strategy.start(self)
@@ -68,6 +64,9 @@ class Robot(object):
 
         self._update_speeds()
         self.update_stuckness()
+
+    def get_speed(self):
+        return (self.vx**2 + self.vy**2)**.5
 
     def _update_speeds(self):
         self._frames['x'].append(self.current_data['x'])

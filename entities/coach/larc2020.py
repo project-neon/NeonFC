@@ -15,7 +15,6 @@ class Coach(BaseCoach):
             #(strategy.larc2020.Attacker(self.match), self.elect_attacker, 0),
             (strategy.larc2020.MidFielder(self.match), self.elect_midfielder, 0)
         ]
-        self.positions = json.loads(open('foul_placements.json', 'r').read())
     
     def decide (self):
         robots = [r.robot_id for r in self.match.robots]
@@ -33,12 +32,6 @@ class Coach(BaseCoach):
                 self.match.robots[elected].strategy = strategy
                 self.match.robots[elected].start()
             robots.remove(elected)
-
-    def get_positions(self, foul, team_color):
-        foul = self.positions.get(foul)
-        replacements = foul.get(team_color, foul.get("POSITIONS"))
-        # FIXME default positions are broken
-        return None
 
     def elect_attacker(self, robot):
         dist_to_ball = math.sqrt(
