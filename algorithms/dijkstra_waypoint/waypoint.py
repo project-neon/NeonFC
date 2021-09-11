@@ -1,27 +1,6 @@
 from algorithms.dijkstra_waypoint import dijkstra
 
-def dist_point_line(x1, y1, x2, y2, x3, y3):
-    px = x2-x1
-    py = y2-y1
-
-    norm = px*px + py*py
-
-    u =  ((x3 - x1) * px + (y3 - y1) * py) / float(norm)
-
-    if u > 1:
-        u = 1
-    elif u < 0:
-        u = 0
-
-    x = x1 + u * px
-    y = y1 + u * py
-
-    dx = x - x3
-    dy = y - y3
-
-    dist = (dx*dx + dy*dy)**.5
-
-    return dist
+from commons.math import dist_point_line
 
 class WaypointSystem():
     def __init__(self,
@@ -59,7 +38,7 @@ class WaypointSystem():
 
         for vtx1 in self.graph.vert_dict.values():
             for vtx2 in self.graph.vert_dict.values():
-                if vtx1.get_id() == vtx2.get_id():
+                if (vtx1.get_id() == vtx2.get_id()) or (vtx1.x == vtx2.x and vtx1.y == vtx2.y):
                     continue
                 if any(
                         [

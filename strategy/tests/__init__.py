@@ -14,3 +14,4 @@ from strategy.tests.astarAttacker import AstarAttacker
 from strategy.tests.dijkSeeker import DijkstraSeeker
 from strategy.tests.asScratch import Scratch as astarVoronoi
 from strategy.tests.guideAttacker import My_Attacker
+from strategy.tests.newAttacker import newAttacker

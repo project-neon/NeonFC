@@ -3,6 +3,35 @@ import numpy as np
 
 from scipy.signal import savgol_filter
 
+def dist_point_line(x1, y1, x2, y2, x3, y3):
+    """
+    veririca a distancia entre um ponto de uma linha
+    x1,y1: definicao do primeiro ponto que definira a linha
+    x2,y2: definicao do segundo ponto que definira a linha
+    x3,y3: definicao do terceiro ponto que sera usado para medir a distancia
+    """
+    px = x2-x1
+    py = y2-y1
+
+    norm = px*px + py*py
+
+    u =  ((x3 - x1) * px + (y3 - y1) * py) / float(norm)
+
+    if u > 1:
+        u = 1
+    elif u < 0:
+        u = 0
+
+    x = x1 + u * px
+    y = y1 + u * py
+
+    dx = x - x3
+    dy = y - y3
+
+    dist = (dx*dx + dy*dy)**.5
+
+    return dist
+
 def _fix_angle(theta_1, theta_2):
     rate_theta = (theta_2 - theta_1)
   
@@ -25,7 +54,8 @@ def angular_speed(_list, _fps):
             list(_list)[1:]
         )
     ]
-
+    if not speed_fbf:
+        return 0
     return _fps * (sum(speed_fbf)/len(speed_fbf))
 
 
@@ -43,7 +73,8 @@ def speed(_list, _fps):
         # limitar 0.1 m/f aqui é dizer que é impossivel
         # o robo fazer 6 m/s (0.1 [m][f⁻¹] * 60 [f][s⁻¹] = 6[m][s⁻¹])
     ]
-
+    if not speed_fbf:
+        return 0
     return _fps * (sum(speed_fbf)/len(speed_fbf))
 
 
@@ -86,3 +117,10 @@ def distance(A, B, P):
     if arccos(dot((P - B) / norm(P - B), (A - B) / norm(A - B))) > pi / 2:
         return norm(P - B)
     return norm(cross(A-B, A-P))/norm(B-A)
+
+def distance_to_line(x, y, l1x, l1y, l2x, l2y):
+    x_diff = l2x - l1x
+    y_diff = l2y - l1y
+    num = abs(y_diff*x - x_diff*y + l2x*l1y - l2y*l1x)
+    den = math.sqrt(y_diff**2 + x_diff**2)
+    return num / den
