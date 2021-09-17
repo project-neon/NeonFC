@@ -22,6 +22,8 @@ class newGoalKeeper(Strategy):
 
         self.redeploy = algorithms.fields.PotentialField(self.match, name="RedeployBehaviour")
 
+        self.panik = algorithms.fields.PotentialField(self.match, name="AlertBehaviour")
+        
         #small area x, y, width and height
         self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
 
@@ -63,7 +65,7 @@ class newGoalKeeper(Strategy):
             )
         )
 
-        self.project.add_field(self.restrict)
+        #self.project.add_field(self.restrict)
 
         def follow_ball(m):
             if m.ball.y > g_hgr:
@@ -86,7 +88,7 @@ class newGoalKeeper(Strategy):
             )
         )
 
-        self.path.add_field(self.restrict)
+        #self.path.add_field(self.restrict)
         
         #cria a area de cobertura do goleiro quando esta nos cantos do gol
         def get_cover_area(robot, side):
@@ -213,36 +215,47 @@ class newGoalKeeper(Strategy):
             )
         )
 
+        self.panik.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = lambda m : (self.sa_w/2, max(0.35, min(m.ball.y, 0.70 + 0.35)) ),
+                radius = 0.1, # 30cm
+                decay = lambda x: x**2,
+                field_limits = [0.75* 2 , 0.65*2],
+                multiplier = 0.7
+            )
+        )
+
+        #self.alert.add_field(self.restrict)
+
     def decide(self):
+
+        self.theta = self.robot.theta
 
         behaviour = None
 
-        theta = self.robot.theta
+        if (self.robot.x <= self.sa_w - 0.0375  and self.robot.x > 0 and self.robot.y >= self.sa_y 
+            and self.robot.y <= self.sa_y + self.sa_h):
 
-        if  (self.robot.x < self.sa_w-0.04 and self.robot.x > 0.02 and self.robot.y > self.sa_y 
-             and self.robot.y < self.sa_y + self.sa_h):
+            if (self.theta >= -1.67 and self.theta <= -1.47) or (self.theta >= 1.47 and self.theta <= 1.67):
 
-            if (theta >= -1.65 and theta <= -1.485) or (theta >= 1.485 and theta <= 1.65):
+                if self.match.ball.x < self.field_w/2:
 
-                if self.match.ball.x < self.field_w/2 and self.match.ball.vx > 0:
-                    behaviour = self.project
+                    if self.match.ball.vx > 0:
+                        behaviour = self.project
                     
-                elif self.match.ball.x < self.field_w/2:
-                    behaviour = self.path
-
-                elif self.match.ball.x >= self.field_w/2:
-                    behaviour = self.kalm
+                    else:
+                        behaviour = self.path
 
                 else:
-                    behaviour = self.restrict
+                    behaviour = self.kalm
 
             else:
-
                 if self.match.ball.x >= self.field_w/2:
                     behaviour = self.redeploy
 
                 else:
-                    behaviour = self.path
+                    behaviour = self.panik
 
         else:
             behaviour = self.redeploy
@@ -255,11 +268,11 @@ class newGoalKeeper(Strategy):
         return -120, 120
 
     def spinning_time(self):
-        dist_to_ball = np.linalg.norm(
+        self.dist_to_ball = np.linalg.norm(
             np.array([self.robot.x, self.robot.y]) - 
             np.array([self.match.ball.x, self.match.ball.y])
         )
-        if dist_to_ball <= 0.12:
+        if (self.dist_to_ball <= 0.12):
             return True
         return False
 
