@@ -16,11 +16,11 @@ class Coach(BaseCoach):
         self.playbook.add_play(main_play)
         self.playbook.set_play(main_play)
     
-    def get_positions(self, foul, team_color, foul_color):
-        team = self.positions.get(team_color)
-        foul = team.get(foul)
-        replacements = foul.get(foul_color, foul.get("POSITIONS"))
-        return replacements
+    # def get_positions(self, foul, team_color, foul_color):
+    #     team = self.positions.get(team_color)
+    #     foul = team.get(foul)
+    #     replacements = foul.get(foul_color, foul.get("POSITIONS"))
+    #     return replacements
 
     def decide (self):
         self.playbook.update()
