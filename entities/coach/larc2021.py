@@ -1,10 +1,13 @@
 from entities.coach.coach import BaseCoach
 from entities import plays
+import json
 
 class Coach(BaseCoach):
     NAME = "LARC_2021"
     def __init__(self, match):
         super().__init__(match)
+
+        self.positions = json.loads(open('foul_placements.json', 'r').read())
 
         self.playbook = plays.Playbook(self)
 
