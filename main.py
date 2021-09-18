@@ -61,9 +61,9 @@ class Game():
             self.comm.send(commands)
             
             if self.referee.get_foul() != "STOP" and self.referee.get_foul() != None:
-                if self.match.coach.get_positions( self.referee.get_foul(), self.match.team_color.upper(), self.referee.get_color() ):
+                if self.match.coach.get_positions( self.referee.get_foul(), self.match.team_color.upper(), self.referee.get_color(), self.referee.get_quadrant() ):
                     self.referee.send_replacement(
-                        self.match.coach.get_positions( self.referee.get_foul(), self.match.team_color.upper(), self.referee.get_color() ),
+                        self.match.coach.get_positions( self.referee.get_foul(), self.match.team_color.upper(), self.referee.get_color(), self.referee.get_quadrant() ),
                         self.match.team_color.upper()
                     )
 
