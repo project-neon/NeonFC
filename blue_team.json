@@ -1,6 +1,5 @@
 {
     "referee": true,
-    "data_sender": true,
     "network" : {
         "multicast_ip": "224.0.0.1",
         "referee_ip": "224.5.23.2",
@@ -15,6 +14,7 @@
     "match" : {
         "num_robots": 3,
         "team_color": "blue",
-        "coach_name": "LARC2020Coach"
+        "coach_name": "LARC_2020",
+        "category": "3v3"
     }
 }

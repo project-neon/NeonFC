@@ -6,8 +6,8 @@ from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 
 class newGoalKeeper(Strategy):
-    def __init__(self, match, plot_field=True):
-        super().__init__(match, "MktGoalKeeper", controller=controller.TwoSidesLQR)
+    def __init__(self, match, name="MktGoalKeeper"):
+        super().__init__(match, name, controller=controller.TwoSidesLQR)
 
     def start(self, robot=None):
         super().start(robot=robot)
