@@ -64,9 +64,9 @@ class OffensivePlay(Strategy):
             PointField(
                 self.match,
                 target = lambda m, r=self : r.voronoi_astar(m),
-                radius = 0.1,
+                radius = .075,
                 decay = lambda x: x,
-                multiplier = 0.65
+                multiplier = 0.8
             )
         )
 
@@ -76,7 +76,7 @@ class OffensivePlay(Strategy):
                 target = lambda m: (m.ball.x, m.ball.y),
                 radius = 0.05, # 30cm
                 decay = lambda x: 1,
-                multiplier = lambda m: max(0.80, m.ball.get_speed() + 0.25) # 50 cm/s
+                multiplier = lambda m: max(0.80, m.ball.get_speed() + 0.75) # 50 cm/s
             )
         )
 
@@ -111,7 +111,7 @@ class OffensivePlay(Strategy):
                 line_dist = .2,
                 line_dist_max = .2,
                 decay = lambda x: x,
-                multiplier = .5
+                multiplier = .65
             )
         )
 
@@ -128,10 +128,10 @@ class OffensivePlay(Strategy):
                             r.x,
                             r.y
                         ),
-                        radius = .15,
-                        radius_max = .15,
+                        radius = .12,
+                        radius_max = .12,
                         decay = lambda x: (-x +1) ** .5,
-                        multiplier = -.80
+                        multiplier = -.70
                     )
                 )
     
@@ -373,10 +373,10 @@ class OffensivePlay(Strategy):
                             m.ball.x,
                             m.ball.y
                         ),
-                        radius = .35,
-                        radius_max = .35,
+                        radius = .10,
+                        radius_max = .10,
                         decay = lambda x: (1 - x) ** 4,
-                        multiplier = -.65
+                        multiplier = -.75
                     )
                 )
 

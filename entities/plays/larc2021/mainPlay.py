@@ -10,7 +10,7 @@ class MainPlay(Play):
         self.match = self.coach.match
         self.constraints = [
             (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
-            (strategy.larc2020.Attacker(self.match), self._elect_attacker),
+            (strategy.alex.OffensivePlay(self.match), self._elect_attacker),
             (strategy.larc2020.MidFielder(self.match), self._elect_midfielder)
         ]
 
