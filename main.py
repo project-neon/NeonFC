@@ -21,14 +21,8 @@ class Game():
         )
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
-        self.data_sender = api.DataSender()
         self.field = pitch.Field(self.match.category)
         self.referee = RefereeComm(config_file)
-
-        if os.environ.get('USE_DATA_SENDER'):
-            self.use_data_sender = bool(int(os.environ.get('USE_DATA_SENDER')))
-        else:
-            self.use_data_sender = self.config.get('data_sender', False)
         
         if os.environ.get('USE_REFEREE'):
             self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
@@ -44,7 +38,6 @@ class Game():
         
         self.vision.start()
         self.comm.start()
-        self.data_sender.start()
 
     def update(self):
         frame = vision.assign_empty_values(
@@ -74,8 +67,5 @@ class Game():
                         self.match.coach.get_positions( self.referee.get_foul(), self.match.team_color.upper(), self.referee.get_color() ),
                         self.match.team_color.upper()
                     )
-            
-        if self.use_data_sender:
-            api.DataSender().send_data()
 
 g = Game(config_file=args.config_file)
