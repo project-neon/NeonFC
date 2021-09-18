@@ -35,7 +35,8 @@ class Coach(BaseCoach):
             self.match.robots[robot].strategy = strategy
             self.match.robots[robot].start()'''
 
-    def get_positions(self, foul, team_color):
-        foul = self.positions.get(foul)
-        replacements = foul.get(team_color, foul.get("POSITIONS"))
+    def get_positions(self, foul, team_color, foul_color):
+        team = self.positions.get(team_color)
+        foul = team.get(foul)
+        replacements = foul.get(foul_color, foul.get("POSITIONS"))
         return replacements
