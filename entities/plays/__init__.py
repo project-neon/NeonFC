@@ -11,3 +11,5 @@ from entities.plays.playbook import OnFreeKick
 from entities.plays.playbook import OnKickOff
 from entities.plays.playbook import OnGoalKick
 from entities.plays.playbook import OnPenaltyKick
+
+from entities.plays import larc2021

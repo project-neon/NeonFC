@@ -1,17 +1,16 @@
 from entities.coach.coach import BaseCoach
 import strategy
 import math
-import json
 
 class Coach(BaseCoach):
-    NAME = "LARC_2020"
+    NAME = "TEST_NEWATK"
     def __init__(self, match):
         super().__init__(match)
 
         self.constraints = [
             #estratégia - função eleitora - prioridade
-            (strategy.larc2020.GoalKeeper(self.match), self.elect_goalkeeper, 0),
-            (strategy.larc2020.Attacker(self.match), self.elect_attacker, 0),
+            (strategy.tests.newGoalKeeper(self.match), self.elect_goalkeeper, 0),
+            (strategy.tests.newAttacker(self.match), self.elect_attacker, 0),
             (strategy.larc2020.MidFielder(self.match), self.elect_midfielder, 0)
         ]
     
