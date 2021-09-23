@@ -10,5 +10,5 @@ class BaseCoach(ABC):
     def decide (self):
         raise NotImplementedError("Coach needs decide implementation!")
 
-    def get_positions(self, foul, team_color, foul_color):
+    def get_positions(self, foul, team_color, foul_color, quadrant):
         return None
