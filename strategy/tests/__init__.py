@@ -8,7 +8,12 @@ from strategy.tests.Idle import Idle
 from strategy.tests.pfScratch import Scratch
 from strategy.tests.dwaScratch import DwaScratch
 from strategy.tests.ControlSystemTroubleshoot import ControlSystemTroubleshoot
+
 from strategy.tests.newGoalKeeper import newGoalKeeper
+from strategy.tests.newMidFielder import newMidFielder
+from strategy.tests.right_defenser import RightDefenser
+from strategy.tests.left_defenser import LeftDefenser
+
 
 from strategy.tests.astarAttacker import AstarAttacker
 from strategy.tests.dijkSeeker import DijkstraSeeker

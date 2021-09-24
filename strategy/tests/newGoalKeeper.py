@@ -262,7 +262,7 @@ class newGoalKeeper(Strategy):
 
         return behaviour.compute([self.robot.x, self.robot.y])
     
-    def spin(self):
+    """   def spin(self):
         if (self.match.ball.y - self.robot.y) > 0:
             return 120, -120
         return -120, 120
@@ -279,4 +279,4 @@ class newGoalKeeper(Strategy):
     def update(self):
         if self.spinning_time():
             return self.spin()
-        return self.controller.update()
+        return self.controller.update()"""

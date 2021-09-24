@@ -13,9 +13,9 @@
     "match" : {
         "num_robots": 3,
         "team_color": "blue",
-        "coach_name": "LARC_2021",
-        "category": "3v3"
+        "coach_name": "TEST_NEWGK",
+        "category": "5v5"
     },
-    "referee": true,
+    "referee": false,
     "data_sender": false
 }
