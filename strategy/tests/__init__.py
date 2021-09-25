@@ -13,6 +13,7 @@ from strategy.tests.newGoalKeeper import newGoalKeeper
 from strategy.tests.newMidFielder import newMidFielder
 from strategy.tests.right_defenser import RightDefenser
 from strategy.tests.left_defenser import LeftDefenser
+from strategy.tests.Defender import Defender
 
 
 from strategy.tests.astarAttacker import AstarAttacker
