@@ -8,6 +8,7 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 class Defender(Strategy):
     def __init__(self, match, side, plot_field=False):
         super().__init__(match, side+"Defender", controller=controller.TwoSidesLQR)
+        self.name = side+"Defender"
     
     def start(self, robot=None):
         super().start(robot=robot)
@@ -28,9 +29,11 @@ class Defender(Strategy):
         self.x = self.sa_w + 0.075
         
         #trave superior do gol
+        g_hgr = (self.field_h/2)+0.2
         sa_hgr = self.field_h/2 + self.sa_h/2
     
         #trave inferior do gol
+        g_lwr = (self.field_h/2)-0.2
         sa_lwr = self.field_h/2 - self.sa_h/2
 
         def side_verifier(y):
@@ -47,23 +50,37 @@ class Defender(Strategy):
             x = self.x
 
             if m.ball.vx == 0:
-                if m.ball.y > sa_hgr:
-                    y = side_verifier(sa_hgr)
+                if m.ball.y > g_hgr:
+                    y = side_verifier(g_hgr)
                     return (x, y)
-                elif m.ball.y < sa_lwr:
-                    y = side_verifier(sa_lwr)
+                elif m.ball.y < g_lwr:
+                    y = side_verifier(g_lwr)
                     return (x, y)
                 else:
                     y = side_verifier(m.ball.y)
                     return (x, y)
 
             if m.ball.y > sa_hgr:
-                y = side_verifier(sa_hgr)
+                y = side_verifier(g_hgr)
                 return (x, y)
             elif m.ball.y < sa_lwr:
-                y = side_verifier(sa_lwr)
+                y = side_verifier(g_lwr)
                 return (x, y)
             else:
+                if m.ball.x > 0.35:
+                    gk_y = self.match.robots[0].y
+
+                    if self.name == "RightDefender":
+                        gk_inf = gk_y-0.075/2
+                        m_inf = (gk_inf+g_lwr)/2
+                        y = ( (m.ball.y-m_inf)/m.ball.x)*x + m_inf
+                        return (x, y)
+                    elif self.name == "LeftDefender":
+                        gk_sup = gk_y+0.075/2
+                        m_sup = (gk_sup+g_hgr)/2
+                        y = ( (m.ball.y-m_sup)/m.ball.x)*x + m_sup
+                        return (x, y)
+
                 y = ( (m.ball.y-(self.field_h/2) )/m.ball.x)*x + self.field_h/2
                 y = side_verifier(y)
                 return (x, y)
@@ -127,13 +144,8 @@ class Defender(Strategy):
         if (self.robot.x >= self.sa_w + 0.0375) and (self.robot.x < self.field_w/2 - 0.0375):
     
             if (self.theta >= -1.67 and self.theta <= -1.47) or (self.theta >= 1.47 and self.theta <= 1.67):
-    
-                if self.match.ball.x < self.field_w/2 + 0.3:
-                    
-                    behaviour = self.path
-    
-                else:
-                    behaviour = self.kalm
+
+                behaviour = self.path
     
             else:
                 #if self.match.ball.x >= self.field_w/2 + 0.25:
