@@ -121,6 +121,6 @@ def distance(A, B, P):
 def distance_to_line(x, y, l1x, l1y, l2x, l2y):
     x_diff = l2x - l1x
     y_diff = l2y - l1y
-    num = abs(y_diff*x - x_diff*y + l2x*l1y - l2y*l1x)
+    num = y_diff*x - x_diff*y + l2x*l1y - l2y*l1x
     den = math.sqrt(y_diff**2 + x_diff**2)
     return num / den
