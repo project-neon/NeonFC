@@ -8,8 +8,8 @@ class Coach(BaseCoach):
     def __init__(self, match):
         super().__init__(match)
 
-        self.attacker_strategy = strategy.tests.LeftDefenser(self.match)
-        self.midfielder_strategy = strategy.tests.RightDefenser(self.match)
+        self.attacker_strategy = strategy.tests.Defender(self.match, "Left")
+        self.midfielder_strategy = strategy.tests.Defender(self.match, "Right")
         self.goalkeeper_strategy = strategy.tests.newGoalKeeper(self.match)
 
         self.positions = json.loads(open('foul_placements.json', 'r').read())

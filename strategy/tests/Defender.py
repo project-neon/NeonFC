@@ -19,23 +19,19 @@ class Defender(Strategy):
         self.redeploy = algorithms.fields.PotentialField(self.match, name="RedeployBehaviour")
     
         self.alert = algorithms.fields.PotentialField(self.match, name="AlertBehaviour")
-
-        self.up = algorithms.fields.PotentialField(self.match, name="UpBehaviour")
-
-        self.down = algorithms.fields.PotentialField(self.match, name="DownBehaviour")
         
         #small area x, y, width and height
         self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
     
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
-        self.x = self.sa_w + 0.05
+        self.x = self.sa_w + 0.075
         
         #trave superior do gol
-        g_hgr = (self.field_h/2)+0.2
+        sa_hgr = self.field_h/2 + self.sa_h/2
     
         #trave inferior do gol
-        g_lwr = (self.field_h/2)-0.2
+        sa_lwr = self.field_h/2 - self.sa_h/2
 
         def side_verifier(y):
             d = 0.05
@@ -50,48 +46,32 @@ class Defender(Strategy):
         def get_def_spot(m):
             x = self.x
 
-            if m.ball.y > g_hgr:
-                u = self.field_h/2 + self.sa_h/2
-                y = side_verifier(u)
+            if m.ball.vx == 0:
+                if m.ball.y > sa_hgr:
+                    y = side_verifier(sa_hgr)
+                    return (x, y)
+                elif m.ball.y < sa_lwr:
+                    y = side_verifier(sa_lwr)
+                    return (x, y)
+                else:
+                    y = side_verifier(m.ball.y)
+                    return (x, y)
+
+            if m.ball.y > sa_hgr:
+                y = side_verifier(sa_hgr)
                 return (x, y)
-            elif m.ball.y < g_lwr:
-                d = self.field_h/2 - self.sa_h/2
-                y = side_verifier(d)
+            elif m.ball.y < sa_lwr:
+                y = side_verifier(sa_lwr)
                 return (x, y)
             else:
-                y = side_verifier(m.ball.y)
+                y = ( (m.ball.y-(self.field_h/2) )/m.ball.x)*x + self.field_h/2
+                y = side_verifier(y)
                 return (x, y)
     
         self.path.add_field(
             algorithms.fields.LineField(
                 self.match,
                 target = get_def_spot,
-                theta = 0,
-                line_size = self.field_h - self.sa_w,
-                line_dist = 0.1,
-                line_dist_max = self.field_h,
-                multiplier = 0.7,
-                decay = lambda x : x
-            )
-        )
-
-        self.up.add_field(
-            algorithms.fields.LineField(
-                self.match,
-                target = (self.x, self.sa_h + self.sa_y - 0.1),
-                theta = 0,
-                line_size = self.field_h - self.sa_w,
-                line_dist = 0.1,
-                line_dist_max = self.field_h,
-                multiplier = 0.7,
-                decay = lambda x : x
-            )
-        )
-
-        self.down.add_field(
-            algorithms.fields.LineField(
-                self.match,
-                target = (self.x, self.sa_y),
                 theta = 0,
                 line_size = self.field_h - self.sa_w,
                 line_dist = 0.1,
