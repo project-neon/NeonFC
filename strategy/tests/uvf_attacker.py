@@ -9,8 +9,7 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 class Attacker(Strategy):
     def __init__(self, match):
         super().__init__(match,
-        name="UVF_Attacker",
-        controller_kwargs={"l": 0.45}
+        name="UVF_Attacker"
         )
 
 
