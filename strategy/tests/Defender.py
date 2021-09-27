@@ -19,9 +19,9 @@ class Defender(Strategy):
     
         self.kalm = algorithms.fields.PotentialField(self.match, name="KalmBehaviour")
     
-        self.redeploy = algorithms.fields.PotentialField(self.match, name="RedeployBehaviour")
+        self.right_redeploy = algorithms.fields.PotentialField(self.match, name="RightRedeployBehaviour")
     
-        self.alert = algorithms.fields.PotentialField(self.match, name="AlertBehaviour")
+        self.left_redeploy = algorithms.fields.PotentialField(self.match, name="LeftRedeployBehaviour")    
         
         #small area x, y, width and height
         self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
@@ -135,7 +135,7 @@ class Defender(Strategy):
         self.kalm.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = lambda m: (self.x, self.field_h/2 - 0.09),
+                target = lambda m: (self.x, side_verifier(self.field_h/2)),
                 theta = 0,
                 line_size = self.field_h - self.sa_w,
                 line_dist = 0.1,
@@ -145,71 +145,69 @@ class Defender(Strategy):
             )
         )
         
-        self.redeploy.add_field(
+        self.left_redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (self.x, self.field_h/2),
-                radius = 0.00001,
+                target = (0, self.sa_h+self.sa_y - 0.07),
+                radius = 0,
+                radius_max = self.field_w,
+                clockwise = False,
+                decay = lambda x: 1,
+                multiplier = 0.7
+            )
+        )
+
+        self.right_redeploy.add_field(
+            algorithms.fields.TangentialField(
+                self.match,
+                target = (0, self.sa_y + 0.07),
+                radius = 0,
                 radius_max = self.field_w,
                 clockwise = True,
                 decay = lambda x: 1,
                 multiplier = 0.7
             )
         )
-    
-        self.alert.add_field(
-            algorithms.fields.PointField(
-                self.match,
-                target = get_def_spot,
-                radius = 0.1, # 30cm
-                decay = lambda x: x**2,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.7
-            )
-        )
+
     
     def decide(self):
     
         self.theta = self.robot.theta
     
         behaviour = None
+        self.behaviour = None
     
-        if (self.robot.x >= self.sa_w + 0.0375) and (self.robot.x < self.field_w/2 - 0.0375):
-    
-            if (self.theta >= -1.67 and self.theta <= -1.47) or (self.theta >= 1.47 and self.theta <= 1.67):
+        if (self.robot.x >= self.sa_w) and (self.robot.x < self.sa_w + 0.1):
                 
-                if self.match.ball.x > 0.225:
+                if self.match.ball.x > 0.225 and self.match.ball.x < self.field_w/2 + 0.3:
                     behaviour = self.path
-                else:
+                elif self.match.ball.x <= 0.225:
                     behaviour = self.project
-    
-            else:
-                #if self.match.ball.x >= self.field_w/2 + 0.25:
-                    #behaviour = self.redeploy
-    
-                #else:
-                    behaviour = self.alert
+                else:
+                    behaviour = self.kalm
     
         else:
-            behaviour = self.redeploy
+            if self.name == "LeftDefender":
+                behaviour = self.left_redeploy
+            else:
+                behaviour = self.right_redeploy
     
         return behaviour.compute([self.robot.x, self.robot.y])
 
-    """def spin(self):
-        if (self.match.ball.y - self.robot.y) > 0:
-            return 120, -120
-        return -120, 120
-
+    def spin(self):
+        w = ((self.theta**2)**0.5 - 1.5708) * 30
+        return -w, w
+    
     def spinning_time(self):
-        self.dist_to_ball = np.linalg.norm(
-            np.array([self.robot.x, self.robot.y]) - 
-            np.array([self.match.ball.x, self.match.ball.y])
-        )
-        if (self.dist_to_ball <= 0.12 and self.match.ball.vx < 0):
-            return True
-        return False
+        if (self.robot.x > self.sa_w and self.robot.x < self.sa_w + 0.0375):
+            if ((self.theta >= -1.6 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.6)):
+                return False
+            else:
+                return True
+        else:
+            return False
 
     def update(self):
         if self.spinning_time():
             return self.spin()
-        return self.controller.update()"""
+        return self.controller.update()
