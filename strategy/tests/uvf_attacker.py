@@ -1,26 +1,28 @@
 import math
-import random
 import algorithms
 from commons import math as nfc_math
 from strategy.BaseStrategy import Strategy
+from controller import TwoSidesLQR
 from strategy.DebugTools import DebugPotentialFieldStrategy
+
 
 # class Attacker(DebugPotentialFieldStrategy):
 class Attacker(Strategy):
     def __init__(self, match):
+        self.ctrl_params = {"l": 0.08}
         super().__init__(match,
-        name="UVF_Attacker"
+            name="UVF_Attacker",
+            controller=TwoSidesLQR,
+            controller_kwargs=self.ctrl_params
         )
-
-
 
     def start(self, robot=None):
         super().start(robot=robot)
 
-        uvf_radius = 0.05 # 5 cm
-        uvf_radius_2 = 0.1 # 10 cm
+        uvf_radius = 0.08 # 6.5 cm
+        uvf_radius_2 = 0.08 # 6.5 cm
 
-        tangential_speed = 0.5 # 50 cm/s
+        tangential_speed = .8 # 65 cm/s
 
         """
         MTG-UVF: move to goal univector field
@@ -30,93 +32,92 @@ class Attacker(Strategy):
         multiplier: media ponderada em relacao ao raio
         """
 
-        self.field = algorithms.fields.PotentialField(
+        self.seek = algorithms.fields.PotentialField(
             self.match,
-            name="{}|FieldBehaviour".format(self.__class__)
+            name="{}|SeekBehaviour".format(self.__class__)
         )
 
         def shifted_target_left(m, radius_2=uvf_radius_2):
-            field_w, field_h = m.game.field.get_dimensions()
+            field_h, field_w = m.game.field.get_dimensions()
+            aim_point_y = field_w/2 if abs(m.ball.y - field_w/2) > 0.12 else m.ball.y
+            aim_point_x = field_h
 
             pos_x = (
                 m.ball.x -
-                math.cos(math.atan2((field_w/2-m.ball.y), (field_h - m.ball.x))+ math.pi/2)*radius_2
+                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2)*radius_2
             )
 
             pos_y = (
                 m.ball.y -
-                math.sin(math.atan2((field_w/2-m.ball.y), (field_h - m.ball.x))+ math.pi/2)*radius_2
+                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2)*radius_2
             )
 
             return [pos_x, pos_y]
 
         def shifted_target_right(m, radius=uvf_radius_2):
-            field_w, field_h = m.game.field.get_dimensions()
+            field_h, field_w = m.game.field.get_dimensions()
+            aim_point_y = field_w/2 if abs(m.ball.y - field_w/2) > 0.12 else m.ball.y
+            aim_point_x = field_h
 
             pos_x = (
                 m.ball.x +
-                math.cos(math.atan2((field_w/2-m.ball.y), (field_h - m.ball.x))+ math.pi/2) * radius
+                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2) * radius
             )
 
             pos_y = (
                 m.ball.y +
-                math.sin(math.atan2((field_w/2-m.ball.y), (field_h - m.ball.x))+ math.pi/2) * radius
+                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2) * radius
             )
 
             return [pos_x, pos_y]
-
         
         def uvf_mean_contributtion_left(m, radius=uvf_radius_2, robot=self.robot, speed=tangential_speed):
             pos =  [robot.x, robot.y]
-            field_w, field_h = m.game.field.get_dimensions()
+            field_h, field_w = m.game.field.get_dimensions()
+            aim_point_y = field_w/2 if abs(m.ball.y - field_w/2) > 0.12 else m.ball.y
+            aim_point_x = field_h
             target = [
                 m.ball.x,
                 m.ball.y
             ]
 
-            dist_target_robot = ( (pos[0] - target[0])**2 + (pos[1] - target[1])**2)**.5
-
             target2 = [
                 m.ball.x +
-                math.cos(math.atan2((field_w/2-m.ball.y), (field_h - m.ball.x))) * 0.025,
+                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))) * 0.025,
                 m.ball.y +
-                math.sin(math.atan2((field_w/2-m.ball.y), (field_h- m.ball.x))) * 0.025
+                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x- m.ball.x))) * 0.025
             ]
 
             dist = nfc_math.distance_to_line(pos[0], pos[1], target[0], target[1], target2[0], target2[1])
-            if radius < dist_target_robot:
-                dist = max(0, min(dist, radius))/ (radius * 2)
-                return speed * (dist + 0.5)
-            dist = max(0, min(dist, radius))/ (radius)
-            return speed * dist
+            if abs(dist) > radius and dist < 0:
+                return 0
+            dist = 0.5 * max(0, min(dist, radius))/ (radius)
+            return speed * (dist + 0.5)
 
         def uvf_mean_contributtion_right(m, radius=uvf_radius_2, robot=self.robot, speed=tangential_speed):
             pos =  [robot.x, robot.y]
-            field_w, field_h = m.game.field.get_dimensions()
+            field_h, field_w = m.game.field.get_dimensions()
+            aim_point_y = field_w/2 if abs(m.ball.y - field_w/2) > 0.12 else m.ball.y
+            aim_point_x = field_h
             target = [
                 m.ball.x,
                 m.ball.y
             ]
 
-            dist_target_robot = ( (pos[0] - target[0])**2 + (pos[1] - target[1])**2)**.5
-
             target2 = [
                 m.ball.x +
-                math.cos(math.atan2((field_w/2-m.ball.y), (field_h - m.ball.x))) * 0.025,
+                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))) * 0.025,
                 m.ball.y +
-                math.sin(math.atan2((field_w/2-m.ball.y), (field_h- m.ball.x))) * 0.025
+                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x- m.ball.x))) * 0.025
             ]
 
             dist = -nfc_math.distance_to_line(pos[0], pos[1], target[0], target[1], target2[0], target2[1])
-            if radius < dist_target_robot:
-                dist = max(0, min(dist, radius))/ (radius * 2)
-                return speed * (dist + 0.5)
-            dist = max(0, min(dist, radius))/ (radius)
-            return speed * dist
-                
+            if abs(dist) > radius and dist < 0:
+                return 0
+            dist = 0.5 * max(0, min(dist, radius))/ (radius )
+            return speed * (dist + 0.5)
 
-
-        self.field.add_field(
+        self.seek.add_field(
             algorithms.fields.TangentialField(
                 self.match,
                 target=shifted_target_left,                                                                                                                                                                                                                                                                                                                                          
@@ -128,7 +129,7 @@ class Attacker(Strategy):
             )
         )
 
-        self.field.add_field(
+        self.seek.add_field(
             algorithms.fields.TangentialField(
                 self.match,
                 target=shifted_target_right,                                                                                                                                                                                                                                                                                                                                          
@@ -140,7 +141,6 @@ class Attacker(Strategy):
             )
         )
 
-
     def reset(self, robot=None):
         super().reset()
         if robot:
@@ -148,8 +148,6 @@ class Attacker(Strategy):
 
 
     def decide(self):
-        behaviour = self.field
-
-        # return super().decide(behaviour)
+        behaviour = self.seek
         return behaviour.compute([self.robot.x, self.robot.y])
 

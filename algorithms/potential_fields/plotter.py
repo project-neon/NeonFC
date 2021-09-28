@@ -17,6 +17,8 @@ class PotentialDataExporter(object):
             x = x/100.0
             for y in range(-10, 130 + 10, 2):
                 y = y/100.0
+                robot.x = x 
+                robot.y = y
                 res = behaviour.compute([x, y])
                 X.append(x)
                 Y.append(y)
