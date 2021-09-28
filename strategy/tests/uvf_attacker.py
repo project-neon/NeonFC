@@ -19,10 +19,10 @@ class Attacker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        uvf_radius = 0.08 # 6.5 cm
-        uvf_radius_2 = 0.08 # 6.5 cm
+        uvf_radius = 0.08 # 8 cm
+        uvf_radius_2 = 0.08 # 8 cm
 
-        tangential_speed = .8 # 65 cm/s
+        tangential_speed = .8 # 80 cm/s
 
         """
         MTG-UVF: move to goal univector field
@@ -35,6 +35,11 @@ class Attacker(Strategy):
         self.seek = algorithms.fields.PotentialField(
             self.match,
             name="{}|SeekBehaviour".format(self.__class__)
+        )
+
+        self.wait = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|WaitBehaviour".format(self.__class__)
         )
 
         def shifted_target_left(m, radius_2=uvf_radius_2):
@@ -141,6 +146,18 @@ class Attacker(Strategy):
             )
         )
 
+        field = self.match.game.field.get_dimensions()
+        self.wait.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = (field[0]/3, field[1]/2),
+                radius = 0.1,
+                decay = lambda x: x,
+                multiplier = 0.60
+            )
+        )
+
+
     def reset(self, robot=None):
         super().reset()
         if robot:
@@ -148,6 +165,19 @@ class Attacker(Strategy):
 
 
     def decide(self):
-        behaviour = self.seek
+        small_area = self.match.game.field.get_small_area("defensive")
+        goal_area = [
+            0             - self.robot.dimensions["L"]/2, 
+            small_area[1] - self.robot.dimensions["L"]/2, 
+            small_area[2] + self.robot.dimensions["L"]/2, 
+            small_area[3] + self.robot.dimensions["L"]/2
+        ]
+        ball = [self.match.ball.x, self.match.ball.y]
+
+        if nfc_math.point_in_rect(ball, goal_area):
+            behaviour = self.wait
+        else:
+            behaviour = self.seek
+
         return behaviour.compute([self.robot.x, self.robot.y])
 

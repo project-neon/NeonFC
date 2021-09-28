@@ -12,8 +12,8 @@ class Coach(BaseCoach):
 
         self.constraints = [
             #estratégia - função eleitora - prioridade
-            (strategy.larc2020.GoalKeeper(self.match), self.elect_goalkeeper, 0),
-            (strategy.tests.UVFAttacker(self.match), self.elect_attacker), 0),
+            (strategy.tests.newGoalKeeper(self.match), self.elect_goalkeeper, 0),
+            (strategy.tests.UVFAttacker(self.match), self.elect_attacker, 0),
             (strategy.larc2020.MidFielder(self.match), self.elect_midfielder, 0)
         ]
     
