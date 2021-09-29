@@ -31,11 +31,6 @@ class newGoalKeeper(Strategy):
         #trave inferior do gol
         g_lwr = (self.field_h/2)-0.2
 
-        self.dist_to_ball = np.linalg.norm(
-            np.array([self.robot.x, self.robot.y]) - 
-            np.array([self.match.ball.x, self.match.ball.y])
-        )
-
         def follow_ball(m):
             if m.ball.y > g_hgr:
                 return (self.sa_w/2, g_hgr)
@@ -56,8 +51,6 @@ class newGoalKeeper(Strategy):
                 decay = lambda x : x
             )
         )
-
-        #self.path.add_field(self.restrict)
         
         #cria a area de cobertura do goleiro quando esta nos cantos do gol
         def get_cover_area(robot, side):
@@ -175,7 +168,7 @@ class newGoalKeeper(Strategy):
         self.redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (-1, self.field_h/2),
+                target = (self.sa_w/2, self.field_h/2),
                 radius = 0.00001,
                 radius_max = self.field_w,
                 clockwise = True,
@@ -189,7 +182,7 @@ class newGoalKeeper(Strategy):
         self.theta = self.robot.theta
 
         behaviour = None
-        if (self.robot.x <= self.sa_w - 0.0375  and self.robot.x > 0 and self.robot.y >= self.sa_y 
+        if (self.robot.x <= self.sa_w - 0.0375  and self.robot.x > 0.0375 and self.robot.y >= self.sa_y 
             and self.robot.y <= self.sa_y + self.sa_h):
 
             if self.match.ball.x < self.field_w/2:
@@ -209,20 +202,26 @@ class newGoalKeeper(Strategy):
         return behaviour.compute([self.robot.x, self.robot.y])
 
     def spin(self):
-        if self.dist_to_ball <= 0.12:
+        dist_to_ball = math.sqrt(
+            (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
+        )
+        if dist_to_ball <= 0.12:
             if (self.match.ball.y - self.robot.y) > 0:
                 return 120, -120
             else:
                 return -120, 120
         else:
-            w = ((self.theta**2)**0.5 - 1.5708) * 30
+            w = ((self.theta**2)**0.5 - 1.5708) * 20
             return -w, w
 
     def spinning_time(self):
-        if self.dist_to_ball > 0.12:
-            if (self.robot.x <= self.sa_w - 0.04  and self.robot.x > 0 and self.robot.y >= self.sa_y 
+        dist_to_ball = math.sqrt(
+            (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
+        )
+        if dist_to_ball > 0.12:
+            if (self.robot.x <= self.sa_w-0.0375  and self.robot.x > 0.0375  and self.robot.y >= self.sa_y 
                 and self.robot.y <= self.sa_y + self.sa_h):
-                if ((self.theta >= -1.6 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.6)):
+                if (self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61):
                     return False
                 else:
                     return True

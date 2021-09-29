@@ -31,12 +31,12 @@ class Defender(Strategy):
         self.x = self.sa_w + 0.075
         
         #trave superior do gol
-        g_hgr = (self.field_h/2)+0.2
+        g_hgr = (self.field_h/2)+0.2-0.0375
         sa_hgr = self.field_h/2 + self.sa_h/2
         ga_hgr = self.field_h/2 + 0.4
     
         #trave inferior do gol
-        g_lwr = (self.field_h/2)-0.2
+        g_lwr = (self.field_h/2)-0.2+0.0375
         sa_lwr = self.field_h/2 - self.sa_h/2
         ga_lwr = self.field_h/2 - 0.4
 
@@ -79,7 +79,7 @@ class Defender(Strategy):
         #retorna a posição em que o campo deve ser criado, para que a bola seja defendida
         def get_def_spot(m):
             x = self.x
-
+            
             if m.ball.vx == 0:
                 if m.ball.y > g_hgr:
                     y = side_verifier(g_hgr)
@@ -117,7 +117,7 @@ class Defender(Strategy):
                 y = ( (m.ball.y-(self.field_h/2) )/m.ball.x)*x + self.field_h/2
                 y = get_mid_value(side_verifier(y), side_verifier(g_lwr), side_verifier(g_hgr))
                 return (x, y)
-    
+            
         self.path.add_field(
             algorithms.fields.LineField(
                 self.match,
@@ -131,7 +131,7 @@ class Defender(Strategy):
             )
         )
     
-        # permanece no centro da área
+        #permanece no centro da área
         self.kalm.add_field(
             algorithms.fields.LineField(
                 self.match,
@@ -148,7 +148,7 @@ class Defender(Strategy):
         self.left_redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (0, self.sa_h+self.sa_y - 0.07),
+                target = (self.sa_w+0.0375, self.sa_h+self.sa_y - 0.07),
                 radius = 0,
                 radius_max = self.field_w,
                 clockwise = False,
@@ -160,7 +160,7 @@ class Defender(Strategy):
         self.right_redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (0, self.sa_y + 0.07),
+                target = (self.sa_w+0.0375, self.sa_y + 0.07),
                 radius = 0,
                 radius_max = self.field_w,
                 clockwise = True,
@@ -177,7 +177,7 @@ class Defender(Strategy):
         behaviour = None
         self.behaviour = None
     
-        if (self.robot.x >= self.sa_w) and (self.robot.x < self.sa_w + 0.1):
+        if (self.robot.x >= self.sa_w+0.01) and (self.robot.x < self.sa_w + 0.045):
                 
                 if self.match.ball.x > 0.225 and self.match.ball.x < self.field_w/2 + 0.3:
                     behaviour = self.path
@@ -195,11 +195,11 @@ class Defender(Strategy):
         return behaviour.compute([self.robot.x, self.robot.y])
 
     def spin(self):
-        w = ((self.theta**2)**0.5 - 1.5708) * 30
+        w = ((self.theta**2)**0.5 - 1.5708) * 20
         return -w, w
     
     def spinning_time(self):
-        if (self.robot.x > self.sa_w and self.robot.x < self.sa_w + 0.0375):
+        if (self.robot.x > self.sa_w+0.01 and self.robot.x < self.sa_w + 0.05):
             if ((self.theta >= -1.6 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.6)):
                 return False
             else:
