@@ -6,13 +6,11 @@ from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 
 class newGoalKeeper(Strategy):
-    def __init__(self, match, name="MktGoalKeeper"):
+    def __init__(self, match, name="Higuita"):
         super().__init__(match, name, controller=controller.TwoSidesLQR)
 
     def start(self, robot=None):
         super().start(robot=robot)
-
-        self.restrict = algorithms.fields.PotentialField(self.match, name="RestrictBehaviour")
 
         self.project = algorithms.fields.PotentialField(self.match, name="ProjectBehaviour")
 
@@ -21,8 +19,6 @@ class newGoalKeeper(Strategy):
         self.kalm = algorithms.fields.PotentialField(self.match, name="KalmBehaviour")
 
         self.redeploy = algorithms.fields.PotentialField(self.match, name="RedeployBehaviour")
-
-        self.panik = algorithms.fields.PotentialField(self.match, name="AlertBehaviour")
         
         #small area x, y, width and height
         self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
@@ -34,38 +30,6 @@ class newGoalKeeper(Strategy):
 
         #trave inferior do gol
         g_lwr = (self.field_h/2)-0.2
-
-        self.restrict.add_field(
-            algorithms.fields.LineField(
-                self.match,
-                target = (self.sa_w, self.sa_y+self.sa_h/2),
-                theta = math.pi/2,
-                line_size = 1.3/2,
-                line_dist = 0.15,
-                line_dist_max = 0.3,
-                line_dist_single_side = True,
-                inverse = True,
-                multiplier = 0.75,
-                decay = lambda x : 1
-            )
-        )
-
-        self.restrict.add_field(
-            algorithms.fields.LineField(
-                self.match,
-                target = (0, self.sa_y+self.sa_h/2),
-                theta = 3*math.pi/2,
-                line_size = self.sa_h/2,
-                line_dist = 0.075,
-                line_dist_max = 0.1,
-                line_dist_single_side = True,
-                inverse = True,
-                multiplier = 0.75,
-                decay = lambda x : 1
-            )
-        )
-
-        #self.project.add_field(self.restrict)
 
         def follow_ball(m):
             if m.ball.y > g_hgr:
@@ -87,8 +51,6 @@ class newGoalKeeper(Strategy):
                 decay = lambda x : x
             )
         )
-
-        #self.path.add_field(self.restrict)
         
         #cria a area de cobertura do goleiro quando esta nos cantos do gol
         def get_cover_area(robot, side):
@@ -202,11 +164,11 @@ class newGoalKeeper(Strategy):
                 multiplier = 0.7,
             )
         )
-        
+
         self.redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (self.sa_w/2 + 0.02, self.field_h/2),
+                target = (self.sa_w/2, self.field_h/2),
                 radius = 0.00001,
                 radius_max = self.field_w,
                 clockwise = True,
@@ -215,66 +177,58 @@ class newGoalKeeper(Strategy):
             )
         )
 
-        self.panik.add_field(
-            algorithms.fields.PointField(
-                self.match,
-                target = lambda m : (self.sa_w/2, max(0.35, min(m.ball.y, 0.70 + 0.35)) ),
-                radius = 0.1, # 30cm
-                decay = lambda x: x**2,
-                field_limits = [0.75* 2 , 0.65*2],
-                multiplier = 0.7
-            )
-        )
-
-        #self.alert.add_field(self.restrict)
-
     def decide(self):
 
         self.theta = self.robot.theta
 
         behaviour = None
-
-        if (self.robot.x <= self.sa_w - 0.0375  and self.robot.x > 0 and self.robot.y >= self.sa_y 
+        if (self.robot.x <= self.sa_w - 0.0375  and self.robot.x > 0.0375 and self.robot.y >= self.sa_y 
             and self.robot.y <= self.sa_y + self.sa_h):
 
-            if (self.theta >= -1.67 and self.theta <= -1.47) or (self.theta >= 1.47 and self.theta <= 1.67):
+            if self.match.ball.x < self.field_w/2:
 
-                if self.match.ball.x < self.field_w/2:
-
-                    if self.match.ball.vx > 0:
-                        behaviour = self.project
-                    
-                    else:
-                        behaviour = self.path
-
+                if self.match.ball.vx > 0:
+                    behaviour = self.project
+                
                 else:
-                    behaviour = self.kalm
+                    behaviour = self.path
 
             else:
-                if self.match.ball.x >= self.field_w/2:
-                    behaviour = self.redeploy
-
-                else:
-                    behaviour = self.panik
-
+                behaviour = self.kalm
+        
         else:
             behaviour = self.redeploy
 
         return behaviour.compute([self.robot.x, self.robot.y])
-    
+
     def spin(self):
-        if (self.match.ball.y - self.robot.y) > 0:
-            return 120, -120
-        return -120, 120
+        dist_to_ball = math.sqrt(
+            (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
+        )
+        if dist_to_ball <= 0.12:
+            if (self.match.ball.y - self.robot.y) > 0:
+                return 120, -120
+            else:
+                return -120, 120
+        else:
+            w = ((self.theta**2)**0.5 - 1.5708) * 20
+            return -w, w
 
     def spinning_time(self):
-        self.dist_to_ball = np.linalg.norm(
-            np.array([self.robot.x, self.robot.y]) - 
-            np.array([self.match.ball.x, self.match.ball.y])
+        dist_to_ball = math.sqrt(
+            (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
-        if (self.dist_to_ball <= 0.12):
+        if dist_to_ball > 0.12:
+            if (self.robot.x <= self.sa_w-0.0375  and self.robot.x > 0.0375  and self.robot.y >= self.sa_y 
+                and self.robot.y <= self.sa_y + self.sa_h):
+                if (self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61):
+                    return False
+                else:
+                    return True
+            else: 
+                return False
+        else:
             return True
-        return False
 
     def update(self):
         if self.spinning_time():

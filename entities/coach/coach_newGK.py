@@ -8,8 +8,8 @@ class Coach(BaseCoach):
     def __init__(self, match):
         super().__init__(match)
 
-        self.attacker_strategy = strategy.iron2021.Attacker(self.match)
-        self.midfielder_strategy = strategy.iron2021.MidFielder(self.match)
+        self.attacker_strategy = strategy.tests.Defender(self.match, "Left")
+        self.midfielder_strategy = strategy.tests.Defender(self.match, "Right")
         self.goalkeeper_strategy = strategy.tests.newGoalKeeper(self.match)
 
         self.positions = json.loads(open('foul_placements.json', 'r').read())
@@ -35,8 +35,13 @@ class Coach(BaseCoach):
             self.match.robots[robot].strategy = strategy
             self.match.robots[robot].start()'''
 
-    def get_positions(self, foul, team_color, foul_color):
+    def get_positions(self, foul, team_color, foul_color, quadrant):
+        quad = quadrant
+        foul_type = foul
         team = self.positions.get(team_color)
         foul = team.get(foul)
-        replacements = foul.get(foul_color, foul.get("POSITIONS"))
+        if foul_type != "FREE_BALL":
+            replacements = foul.get(foul_color, foul.get("POSITIONS"))
+        else:
+            replacements = foul.get(f"{quad}")
         return replacements
