@@ -19,8 +19,8 @@ class Attacker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        uvf_radius = 0.08 # 8 cm
-        uvf_radius_2 = 0.08 # 8 cm
+        uvf_radius = 0.065 # 8 cm
+        uvf_radius_2 = 0.065 # 8 cm
 
         tangential_speed = .8 # 80 cm/s
 
