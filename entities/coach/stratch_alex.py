@@ -12,8 +12,8 @@ class Coach(BaseCoach):
 
         self.constraints = [
             #estratégia - função eleitora - prioridade
-            (strategy.larc2020.GoalKeeper(self.match), self.elect_goalkeeper, 0),
-            (strategy.alex.OffensivePlay(self.match), self.elect_attacker, 0),
+            (strategy.tests.newGoalKeeper(self.match), self.elect_goalkeeper, 0),
+            (strategy.tests.UVFAttacker(self.match), self.elect_attacker, 0),
             (strategy.larc2020.MidFielder(self.match), self.elect_midfielder, 0)
         ]
     
@@ -104,4 +104,4 @@ class Coach(BaseCoach):
             match_rank += 100
         
         print(robot.get_name(),  match_rank + dist_robot_ball * 10 + distance_from_aim * 5)
-        return match_rank + dist_robot_ball * 10 + distance_from_aim * 100
+        return match_rank * 100 + dist_robot_ball * 10 + distance_from_aim * 100

@@ -121,6 +121,15 @@ def distance(A, B, P):
 def distance_to_line(x, y, l1x, l1y, l2x, l2y):
     x_diff = l2x - l1x
     y_diff = l2y - l1y
-    num = abs(y_diff*x - x_diff*y + l2x*l1y - l2y*l1x)
+    num = y_diff*x - x_diff*y + l2x*l1y - l2y*l1x
     den = math.sqrt(y_diff**2 + x_diff**2)
     return num / den
+
+def point_in_rect(point, rect):
+    x1, y1, w, h = rect
+    x2, y2 = x1+w, y1+h
+    x, y = point
+    if (x1 < x and x < x2):
+        if (y1 < y and y < y2):
+            return True
+    return False
