@@ -11,7 +11,6 @@
         "referee_port": 10003
     },
     "match" : {
-        "num_robots": 3,
         "team_color": "blue",
         "coach_name": "LARC_2021",
         "category": "3v3"
