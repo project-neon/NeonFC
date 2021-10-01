@@ -211,8 +211,11 @@ class newGoalKeeper(Strategy):
             else:
                 return -120, 120
         else:
-            w = ((self.theta**2)**0.5 - 1.5708) * 20
-            return -w, w
+            if self.match.team_color.upper() == "BLUE":
+                w = ((self.theta**2)**0.5 - 1.5708) * 20
+            else:
+                w = ((((self.theta**2)**0.5 - 4.71239)**2)**0.5) * 13
+        return -w, w
 
     def spinning_time(self):
         dist_to_ball = math.sqrt(
@@ -221,10 +224,17 @@ class newGoalKeeper(Strategy):
         if dist_to_ball > 0.12:
             if (self.robot.x <= self.sa_w-0.0375  and self.robot.x > 0.0375  and self.robot.y >= self.sa_y 
                 and self.robot.y <= self.sa_y + self.sa_h):
-                if (self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61):
-                    return False
+                if self.match.team_color.upper() == "BLUE":
+                    if ((self.theta >= -1.6 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.6)):
+                        return False
+                    else:
+                        return True
                 else:
-                    return True
+                    theta = self.theta*180/math.pi
+                    if (theta >= 87 and theta <= 93) or (theta >= 267 and theta <= 273):
+                        return False
+                    else:
+                        return True
             else: 
                 return False
         else:
