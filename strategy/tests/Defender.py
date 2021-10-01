@@ -198,13 +198,13 @@ class Defender(Strategy):
         if self.match.team_color.upper() == "BLUE":
             w = ((self.theta**2)**0.5 - 1.5708) * 20
         else:
-            w = ((((self.theta**2)**0.5 - 4.71239)**2)**0.5) * 13
+            w = ((((self.theta**2)**0.5 - 4.71239)**2)**0.5) * 15
         return -w, w
     
     def spinning_time(self):
         if (self.robot.x > self.sa_w+0.01 and self.robot.x < self.sa_w + 0.04):
             if self.match.team_color.upper() == "BLUE":
-                if ((self.theta >= -1.6 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.6)):
+                if ((self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61)):
                     return False
                 else:
                     return True
