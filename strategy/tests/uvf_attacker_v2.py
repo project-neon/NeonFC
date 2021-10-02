@@ -16,12 +16,6 @@ class Attacker(Strategy):
             controller_kwargs=self.ctrl_params
         )
 
-        atk_pos_log = [(self.robot.x, self.robot.y)] # Position log of the attacker
-
-        adv0_pos_log = [(self.match.opposites[0].x, self.match.opposites[0].y)] # Position log of the opposite robot of index 0
-        adv1_pos_log = [(self.match.opposites[1].x, self.match.opposites[1].y)] # Position log of the opposite robot of index 1
-        adv2_pos_log = [(self.match.opposites[2].x, self.match.opposites[2].y)] # Position log of the opposite robot of index 2
-
     def start(self, robot=None):
         super().start(robot=robot)
 
@@ -30,7 +24,7 @@ class Attacker(Strategy):
 
         tangential_speed = .8 # 80 cm/s
 
-        t = 1/60 # fps
+        avoiance_K = 0
 
         """
         MTG-UVF: move to goal univector field
@@ -154,6 +148,38 @@ class Attacker(Strategy):
             )
         )
 
+        def proj_obstacle(m, o, r, K):
+            o_p = [o.x, o.y]
+            o_s = [o.vx, o.vy]
+            r_s = [r.vx, r.vy]
+
+            p_s = [
+                (o_s[0] - r_s[0]) * K,
+                (o_s[1] - r_s[1]) * K
+            ]
+
+            return [
+                o_p[0]  + p_s[0],
+                o_p[1]  + p_s[1]
+            ]
+
+        for robot in self.match.robots + self.match.opposites:
+            if robot.get_name() == self.robot.get_name():
+                continue
+   
+            self.seek.add_field(
+                    algorithms.fields.PointField(
+                        self.match,
+                        target = lambda m, o=robot, r=self.robot, k=avoiance_K: (
+                            proj_obstacle(m, o, r, k)
+                        ),
+                        radius = .08,
+                        radius_max = .08,
+                        decay = lambda x: 1,
+                        multiplier = lambda m, r=self.robot: -.9 if ((r.x - m.ball.x)**2 +  (r.y - m.ball.y)**2)**.5 > 0.15 else 0
+                    )
+                )
+
         field = self.match.game.field.get_dimensions()
         self.wait.add_field(
             algorithms.fields.PointField(
@@ -190,12 +216,6 @@ class Attacker(Strategy):
         else:
             behaviour = self.seek
 
-        
-        atk_pos_log = [(self.robot.x, self.robot.y)] # Position log of the attacker
-
-        adv0_pos_log = [(self.match.opposites[0].x, self.match.opposites[0].y)] # Position log of the opposite robot of index 0
-        adv1_pos_log = [(self.match.opposites[1].x, self.match.opposites[1].y)] # Position log of the opposite robot of index 1
-        adv2_pos_log = [(self.match.opposites[2].x, self.match.opposites[2].y)] # Position log of the opposite robot of index 2
-
+        #return super().decide(behaviour, self.match.opposites[2])
         return behaviour.compute([self.robot.x, self.robot.y])
 
