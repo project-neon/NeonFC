@@ -44,6 +44,11 @@ class Attacker(Strategy):
             name="{}|WaitBehaviour".format(self.__class__)
         )
 
+        self.avoidArea = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|AvoidAreaBehaviour".format(self.__class__)
+        )
+
         def shifted_target_left(m, radius_2=uvf_radius_2):
             field_h, field_w = m.game.field.get_dimensions()
             aim_point_y = field_w/2 if abs(m.ball.y - field_w/2) > 0.12 else m.ball.y
@@ -148,6 +153,24 @@ class Attacker(Strategy):
             )
         )
 
+        # Avoid defensive area
+        self.avoidArea.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target= [self.match.game.field.get_dimensions()[0] - self.match.game.field.get_dimensions()[0], 
+                self.match.game.field.get_dimensions()[1]/2],                                                                                                                                                                                                                                                                                                                                          
+                theta = math.pi/2,
+                line_size = (self.match.game.field.get_small_area("defensive")[3]/2) + 0.08,
+                line_dist = 0.23,
+                line_dist_max = 0.23,
+                decay = lambda x: 1,
+                multiplier = -2
+            )
+        )
+
+        self.wait.add_field(self.avoidArea)
+        self.seek.add_field(self.avoidArea)
+
         def proj_obstacle(m, o, r, K):
             o_p = [o.x, o.y]
             o_s = [o.vx, o.vy]
@@ -200,7 +223,7 @@ class Attacker(Strategy):
 
     def decide(self):
 
-        #v_robot = 
+         
 
         small_area = self.match.game.field.get_small_area("defensive")
         goal_area = [
