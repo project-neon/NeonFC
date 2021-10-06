@@ -9,7 +9,7 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 # class Attacker(DebugPotentialFieldStrategy):
 class Attacker(Strategy):
     def __init__(self, match):
-        self.ctrl_params = {"l": 0.08}
+        self.ctrl_params = {"l": 0.0975}
         super().__init__(match,
             name="UVF_Attacker",
             controller=TwoSidesLQR,
@@ -19,10 +19,11 @@ class Attacker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        uvf_radius = 0.065 # 8 cm
-        uvf_radius_2 = 0.065 # 8 cm
+        uvf_radius = 0.075 # 7.5 cm
+        uvf_radius_2 = 0.075 # 7.5 cm
 
-        tangential_speed = .8 # 80 cm/s
+        tangential_speed = .9 # 9 cm/s
+        avoiance_K = 0
 
         """
         MTG-UVF: move to goal univector field
@@ -40,6 +41,11 @@ class Attacker(Strategy):
         self.wait = algorithms.fields.PotentialField(
             self.match,
             name="{}|WaitBehaviour".format(self.__class__)
+        )
+
+        self.avoid_area = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|AvoidAreaBehaviour".format(self.__class__)
         )
 
         def shifted_target_left(m, radius_2=uvf_radius_2):
@@ -154,6 +160,56 @@ class Attacker(Strategy):
                 radius = 0.1,
                 decay = lambda x: x,
                 multiplier = 0.60
+            )
+        )
+
+        # Avoid defensive area
+        self.avoid_area.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target= [self.match.game.field.get_dimensions()[0] - self.match.game.field.get_dimensions()[0], 
+                self.match.game.field.get_dimensions()[1]/2],                                                                                                                                                                                                                                                                                                                                          
+                theta = math.pi/2,
+                line_size = (self.match.game.field.get_small_area("defensive")[3]/2) + 0.08,
+                line_dist = 0.23,
+                line_dist_max = 0.23,
+                decay = lambda x: 1,
+                multiplier = -2
+            )
+        )
+
+        self.wait.add_field(self.avoid_area)
+        self.seek.add_field(self.avoid_area)
+
+        def proj_obstacle(m, o, r, K):
+            o_p = [o.x, o.y]
+            o_s = [o.vx, o.vy]
+            r_s = [r.vx, r.vy]
+
+            p_s = [
+                (o_s[0] - r_s[0]) * K,
+                (o_s[1] - r_s[1]) * K
+            ]
+
+            return [
+                o_p[0]  + p_s[0],
+                o_p[1]  + p_s[1]
+            ]
+
+        for robot in self.match.robots + self.match.opposites:
+            if robot.get_name() == self.robot.get_name():
+                continue
+
+        self.seek.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = lambda m, o=robot, r=self.robot, k=avoiance_K: (
+                    proj_obstacle(m, o, r, k)
+                ),
+                radius = .08,
+                radius_max = .08,
+                decay = lambda x: 1,
+                multiplier = lambda m, r=self.robot: -.2 if ((r.x - m.ball.x)**2 +  (r.y - m.ball.y)**2)**.5 > 0.15 else 0
             )
         )
 
