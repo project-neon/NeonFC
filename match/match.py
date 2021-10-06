@@ -4,11 +4,15 @@ import entities
 
 from concurrent import futures
 
+CATEGORIES = {
+    '3v3': 3, '5v5': 5
+}
+
 class Match(object):
-    def __init__(self, game, team_color, num_robots=3, coach_name=None, category="3v3"):
+    def __init__(self, game, team_color, coach_name=None, category="3v3"):
         super().__init__()
         self.game = game
-        self.n_robots = num_robots
+        self.n_robots = CATEGORIES.get(category)
         self.coach_name = coach_name
         self.team_color = os.environ.get('TEAM_COLOR', team_color)
         self.category = category

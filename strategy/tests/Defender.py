@@ -195,15 +195,25 @@ class Defender(Strategy):
         return behaviour.compute([self.robot.x, self.robot.y])
 
     def spin(self):
-        w = ((self.theta**2)**0.5 - 1.5708) * 20
+        if self.match.team_color.upper() == "BLUE":
+            w = ((self.theta**2)**0.5 - 1.5708) * 20
+        else:
+            w = ((((self.theta**2)**0.5 - 4.71239)**2)**0.5) * 15
         return -w, w
     
     def spinning_time(self):
-        if (self.robot.x > self.sa_w+0.01 and self.robot.x < self.sa_w + 0.05):
-            if ((self.theta >= -1.6 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.6)):
-                return False
+        if (self.robot.x > self.sa_w+0.01 and self.robot.x < self.sa_w + 0.04):
+            if self.match.team_color.upper() == "BLUE":
+                if ((self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61)):
+                    return False
+                else:
+                    return True
             else:
-                return True
+                theta = self.theta*180/math.pi
+                if ((theta >= 87 and theta <= 93) or (theta >= 267 and theta <= 273)):
+                    return False
+                else:
+                    return True
         else:
             return False
 

@@ -10,8 +10,10 @@ class MainPlay(Play):
         self.match = self.coach.match
         self.constraints = [
             (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
-            (strategy.alex.OffensivePlay(self.match), self._elect_attacker),
-            (strategy.tests.Defender(self.match, ""), self._elect_midfielder)
+            (strategy.tests.UVFAttacker(self.match), self._elect_attacker),
+            (strategy.larc2020.MidFielder(self.match), self._elect_midfielder),
+            # (strategy.tests.Defender(self.match, "Left"), self._elect_midfielder),
+            # (strategy.tests.Defender(self.match, "Right"), self._elect_midfielder),
         ]
 
     def _can_play(self):
@@ -24,12 +26,12 @@ class MainPlay(Play):
         constraints = self.constraints
 
         # verify if the game is running
-        # if is running don't change goalkeeper
+        # if is running don't change goalkeeper or attacker
         if self._can_play():
             constraints = self.constraints[1:]
             robots = [
                 r_id for r_id in robots 
-                if self.match.robots[r_id].strategy.name != "Goalkeeper"
+                if self.match.robots[r_id].strategy.name not in ("Goalkeeper", "LeftDefender", "RightDefender")
             ]
 
         for strategy, fit_fuction in constraints:
