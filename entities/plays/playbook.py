@@ -24,12 +24,12 @@ class Playbook(object):
     def _transition_if_have(self):
         for transition, next_play in self.plays[self.actual_play].transitions:
             if transition.evaluate(self.coach, self.plays[self.actual_play]):
-                # print(
-                #     ':::: {} transition for {}'.format(
-                #         self.plays[self.actual_play].get_name(),
-                #         next_play.get_name(),
-                #         )
-                #     )
+                print(
+                    ':::: {} transition for {}'.format(
+                        self.plays[self.actual_play].get_name(),
+                        next_play.get_name(),
+                        )
+                    )
                 self.set_play(next_play)
 
     def update(self):
@@ -54,6 +54,9 @@ class Play(object):
     
     def get_running_time(self):
         return time.time() - self.start_running_time
+
+    def get_positions(self, foul, team_color, foul_color, quadrant):
+        return None
 
     def get_name(self):
         return self.__class__
@@ -237,6 +240,7 @@ class OnPenaltyKick(Trigger):
 
     def evaluate(self, coach, actual_play):
         foul = self.referee.get_foul()
+        # print(foul, self.referee.get_color())
         return foul == "PENALTY_KICK" and self.team_color.upper() == self.referee.get_color()
 
 class OnGoalKick(Trigger):

@@ -2,6 +2,7 @@ from entities.coach.coach import BaseCoach
 from entities import plays
 import json
 
+
 class Coach(BaseCoach):
     NAME = "LARC_2021"
     def __init__(self, match):
@@ -12,15 +13,29 @@ class Coach(BaseCoach):
         self.playbook = plays.Playbook(self)
 
         main_play = plays.larc2021.MainPlay(self)
+        penalty_play = plays.larc2021.PenaltyPlay(self)
+
+        penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.team_color)
+        seven_seconds_trigger = plays.WaitForTrigger(7)
         
         self.playbook.add_play(main_play)
+        self.playbook.add_play(penalty_play)
+
+        main_play.add_transition(penalty_trigger, penalty_play)
+        penalty_play.add_transition(seven_seconds_trigger, main_play)
+
         self.playbook.set_play(main_play)
     
     def get_positions(self, foul, team_color, foul_color, quadrant):
+        play_positioning = self.playbook.get_actual_play().get_positions(foul, team_color, foul_color, quadrant)
+        if play_positioning:
+            return play_positioning
         quad = quadrant
         foul_type = foul
+
         team = self.positions.get(team_color)
         foul = team.get(foul)
+
         if foul_type != "FREE_BALL":
             replacements = foul.get(foul_color, foul.get("POSITIONS"))
         else:
