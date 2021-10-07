@@ -11,6 +11,7 @@ from strategy.tests.ControlSystemTroubleshoot import ControlSystemTroubleshoot
 
 from strategy.tests.newGoalKeeper import newGoalKeeper
 from strategy.tests.Defender import Defender
+from strategy.tests.newMidFielder import newMidFielder
 
 
 from strategy.tests.astarAttacker import AstarAttacker

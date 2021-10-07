@@ -43,7 +43,7 @@
         },
         "PENALTY_KICK": {
             "YELLOW": [
-                {"robot_id": 0, "x": -0.675, "y": 0, "orientation": 90},
+                {"robot_id": 0, "x": -0.71, "y": 0, "orientation": 90},
                 {"robot_id": 1, "x": 0.1125, "y": -0.4, "orientation": 0},
                 {"robot_id": 2, "x": 0.1125, "y": 0.25, "orientation": 0}
             ],
@@ -115,7 +115,7 @@
                 {"robot_id": 2, "x": 0.113, "y": 0.4, "orientation": 0}
             ],
             "BLUE": [
-                {"robot_id": 0, "x": 0.675, "y": 0, "orientation": 90},
+                {"robot_id": 0, "x": 0.71, "y": 0, "orientation": 90},
                 {"robot_id": 1, "x": -0.1125, "y": -0.4, "orientation": 0},
                 {"robot_id": 2, "x": -0.1125, "y": 0.25, "orientation": 0}
             ]
