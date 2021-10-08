@@ -13,6 +13,8 @@ class newMidFielder(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
+        self.intercept = algorithms.fields.PotentialField(self.match, name="InterceptBehaviour")
+
         self.push = algorithms.fields.PotentialField(self.match, name="PushBehaviour")
 
         self.sobra = algorithms.fields.PotentialField(self.match, name="SobraBehaviour")
@@ -38,6 +40,25 @@ class newMidFielder(Strategy):
         #trave inferior do gol
         g_lwr = (self.field_h/2)-0.2+0.0375
 
+        def intercept(m):
+           if m.ball.y > self.field_h/2:
+               x = (m.ball.x + m.ball.vx * (1/60)) - 0.1
+               y = (m.ball.y + m.ball.vy * (1/60))- 0.3
+           else:
+               x = (m.ball.y + m.ball.vy * (1/60)) - 0.1
+               y = (m.ball.y + m.ball.vy * (1/60)) + 0.3
+ 
+           if x < self.sa_w*2:
+               x = self.sa_w + 0.01
+               if m.ball.y > self.field_h/2:
+                   y = self.g_hgr - 0.0375
+               elif m.ball.y < self.field_h/2:
+                   y = self.g_lwr + 0.0375
+               else:
+                   y = m.ball.y
+ 
+           return x,y
+
         def future_point(m):
             if m.ball.vy != 0:
                 self.future_y = self.field_h/2
@@ -48,7 +69,7 @@ class newMidFielder(Strategy):
                 return (self.robot.x, self.robot.y)
 
         def sobra(m):
-            x = m.ball.x-0.4
+            x = m.ball.x-0.45
             if m.ball.x < self.robot.x and m.ball.vx > 0:
                 if m.ball.y > self.field_h/2:
                     y = m.ball.y - 0.3
@@ -153,6 +174,17 @@ class newMidFielder(Strategy):
                 decay = lambda x : x**6
             )
         )
+
+        self.intercept.add_field(
+           algorithms.fields.PointField(
+               self.match,
+               target = intercept,
+               radius = 0.1,
+               decay = lambda x: x,
+               multiplier = 0.7
+           )
+       )
+
         
         self.left_redeploy.add_field(
             algorithms.fields.TangentialField(
@@ -185,12 +217,15 @@ class newMidFielder(Strategy):
         self.behaviour = 'prende'
 
         if ball.vx < 0 and ball.x < self.field_w - self.sa_w - 0.3:
-            if (self.robot.x >= self.sa_w+0.02) and (self.robot.x < self.field_w/2):
+            if ((self.robot.x >= self.sa_w+0.02) and (self.robot.x < self.field_w/2)
+                and (ball.y < self.sa_y + self.sa_h) and (ball.y > self.sa_y)):
                     
                     if self.match.ball.x > self.robot.x:
                         behaviour = self.path
                     else:
                         behaviour = self.project
+            elif ball.y >= self.sa_y + self.sa_h and ball.y <= self.sa_y:
+                behaviour = self.intercept
         
             else:
                 if ball.y > self.field_h/2:

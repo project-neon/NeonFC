@@ -20,19 +20,38 @@ class PenaltyPlay(Play):
         dist_to_ball = 0.225
         shoot_side = random.choice([-1, 1])
 
-        replacements = [
-            {"robot_id": 0, "x": -0.675, "y": 0, "orientation": 90},
-            {"robot_id": 2, "x": -0.113, "y": 0.4, "orientation": 0}
-        ]
+        # Estava bugado quando o penalti era pro amarelo, corrigi pois estava testando em jogo 
+        # e acabava atrapalhando. -gtorres
+        if foul_color == "BLUE":
+            replacements = [
+                {"robot_id": 0, "x": -0.675, "y": 0, "orientation": 90},
+                {"robot_id": 2, "x": -0.113, "y": 0.4, "orientation": 0}
+            ]
+        else:
+            replacements = [
+                {"robot_id": 0, "x": 0.675, "y": 0, "orientation": 90},
+                {"robot_id": 2, "x": 0.113, "y": 0.4, "orientation": 0}
+            ]
+
         if foul == "PENALTY_KICK" and foul_color == team_color:
-            replacements.append(
-                {
-                    "robot_id": 1, 
-                    "x": 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
-                    "y": 0 - shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
-                    "orientation": + shoot_side * angle_of_interest
-                }
-            )
+            if foul_color == "BLUE":
+                replacements.append(
+                    {
+                        "robot_id": 1, 
+                        "x": 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                        "y": 0 - shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
+                        "orientation": + shoot_side * angle_of_interest
+                    }
+                )
+            else:
+                replacements.append(
+                    {
+                        "robot_id": 1, 
+                        "x": -0.375 + math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                        "y": 0 - shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
+                        "orientation": + shoot_side * angle_of_interest * (-1)
+                    }
+                )
             return replacements
 
         return None
