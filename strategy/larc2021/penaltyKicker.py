@@ -1,12 +1,14 @@
-import math
 import algorithms
-import controller
+from controller.simple_LQR import TwoSidesLQR
 from strategy.BaseStrategy import Strategy
-from commons.math import unit_vector, distance
 
 class Shooter(Strategy):
-    def __init__(self, match, name="shooter", ctr_kwargs={'l': 0.185}):
-        super().__init__(match, name, controller_kwargs=ctr_kwargs)
+    def __init__(self, match, name="shooter", ctr_kwargs={'l': 0.0975}):
+        super().__init__(
+            match, 
+            name, 
+            controller=TwoSidesLQR,
+            controller_kwargs=ctr_kwargs)
 
     def reset(self, robot=None):
         super().reset()

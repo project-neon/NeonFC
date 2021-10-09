@@ -8,10 +8,10 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 
 # class Attacker(DebugPotentialFieldStrategy):
 class Attacker(Strategy):
-    def __init__(self, match):
+    def __init__(self, match, name='UFV-Attacker'):
         self.ctrl_params = {"l": 0.0975}
         super().__init__(match,
-            name="UVF_Attacker",
+            name=name,
             controller=TwoSidesLQR,
             controller_kwargs=self.ctrl_params
         )

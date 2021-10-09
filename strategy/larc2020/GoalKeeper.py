@@ -1,10 +1,7 @@
 import math
 import algorithms
-import controller
 from strategy.BaseStrategy import Strategy
-from commons.math import unit_vector
 
-import json
 import numpy as np
 
 def line_intersection(line1, line2):
@@ -43,7 +40,7 @@ def proj_goaline(pos_ball, speed_ball):
     return res
 
 class GoalKeeper(Strategy):
-    def __init__(self, match, plot_field=False, ctr_kwargs={'l': 0.185}):
+    def __init__(self, match, ctr_kwargs={'l': 0.185}):
         super().__init__(
             match, "goalkeeper", controller_kwargs=ctr_kwargs)
 
@@ -74,25 +71,6 @@ class GoalKeeper(Strategy):
         self.obey_rules_speed = 0.5
         self.push_speed = 0.8
 
-        self.plot_field = plot_field
-        self.exporter = None
-
-    
-    # def spin(self):
-    #     if (self.match.ball.y - self.robot.y) > 0:
-    #         return 120, -120
-    #     return -120, 120
-
-    # def spinning_time(self):
-    #     if math.sqrt((self.match.ball.x - self.robot.x)**2 + (self.match.ball.y - self.robot.y)**2) <= 0.080:
-    #         return True
-    #     return False
-
-    # def update(self):
-    #     if self.spinning_time():
-    #         return self.spin()
-    #     return self.controller.update()
-
     def start(self, robot=None):
         super().start(robot=robot)
 
@@ -115,9 +93,6 @@ class GoalKeeper(Strategy):
             self.match, 
             name="{}|PushBehaviour".format(self.__class__)
         )
-
-        if self.plot_field:
-            self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
 
         def follow_ball(m):
             return (m.ball.x, m.ball.y)
@@ -354,9 +329,6 @@ class GoalKeeper(Strategy):
             behaviour = self.push
         else:
             behaviour = self.alert
-        
-        if self.exporter:
-            self.exporter.export(behaviour, self.robot, self.match.ball)
 
         return behaviour.compute([self.robot.x, self.robot.y])
 
