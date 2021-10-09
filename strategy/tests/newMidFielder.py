@@ -98,15 +98,22 @@ class newMidFielder(Strategy):
             return x,y
 
         def follow_ball(m):
-            if m.ball.y > g_hgr:
-                y = g_hgr
-                return (self.x, y)
-            elif m.ball.y < g_lwr:
-                y = g_lwr
-                return (self.x, y)
+            if m.ball.x > self.robot.x:
+                if m.ball.y > g_hgr:
+                    y = g_hgr
+                    return (self.x, y)
+                elif m.ball.y < g_lwr:
+                    y = g_lwr
+                    return (self.x, y)
+                else:
+                    y = m.ball.y
+                    return (self.x, y)
             else:
-                y = m.ball.y
-                return (self.x, y)
+                if m.ball.y > self.field_h/2 and m.ball.x < self.robot.x:
+                    return self.x, m.ball.y - 0.3
+    
+                elif m.ball.y <= self.field_h/2 and m.ball.x < self.robot.x:
+                    return self.x, m.ball.y + 0.3
 
         self.project.add_field(
             algorithms.fields.LineField(
@@ -132,10 +139,10 @@ class newMidFielder(Strategy):
                 t = (x - m.ball.x)/m.ball.vx
                 y = m.ball.y + m.ball.vy * t
     
-                if m.ball.vx > 0 and m.ball.y > self.field_h/2:
+                if m.ball.vx > 0 and m.ball.y > self.field_h/2 and m.ball.x < self.robot.x:
                     return x, m.ball.y - 0.3
     
-                elif m.ball.vx > 0 and m.ball.y <= self.field_h/2:
+                elif m.ball.vx > 0 and m.ball.y <= self.field_h/2 and m.ball.x < self.robot.x:
                     return x, m.ball.y + 0.3
                 
                 else:
@@ -214,7 +221,7 @@ class newMidFielder(Strategy):
         ball = self.match.ball
         self.theta = self.robot.theta
         behaviour = None
-        self.behaviour = 'prende'
+        self.maneuver = "yep"
 
         if ball.vx < 0 and ball.x < self.field_w - self.sa_w - 0.3:
             if ((self.robot.x >= self.sa_w+0.02) and (self.robot.x < self.field_w/2)
@@ -224,19 +231,17 @@ class newMidFielder(Strategy):
                         behaviour = self.path
                     else:
                         behaviour = self.project
-            elif ball.y >= self.sa_y + self.sa_h and ball.y <= self.sa_y:
-                behaviour = self.intercept
-        
+
             else:
                 if ball.y > self.field_h/2:
                     behaviour = self.left_redeploy
                 else:
                     behaviour = self.right_redeploy
         elif (ball.x >= self.field_w - self.sa_w - 0.3 and ball.y > 0.35 and ball.y < 0.85):
-            self.behaviour = 'solta'
+            self.maneuver = "nope"
             behaviour = self.push
         else:
-            self.behaviour = 'solta'
+            self.maneuver = "nope"
             behaviour = self.sobra
 
     
@@ -250,7 +255,7 @@ class newMidFielder(Strategy):
         return -w, w
     
     def spinning_time(self):
-        if self.behaviour == 'prende':
+        if self.maneuver == "yep":
             if (self.robot.x > self.sa_w+0.01 and self.robot.x < self.sa_w + 0.3):
                 if self.match.team_color.upper() == "BLUE":
                     if ((self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61)):
