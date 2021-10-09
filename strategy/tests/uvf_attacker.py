@@ -288,52 +288,6 @@ class Attacker(Strategy):
         self.wait.add_field(self.avoid_area)
         self.seek.add_field(self.avoid_area)
 
-        def proj_obstacle(m, o, r, K):
-            o_p = [o.x, o.y]
-            o_s = [o.vx, o.vy]
-            r_s = [r.vx, r.vy]
-
-            p_s = [
-                (o_s[0] - r_s[0]) * K,
-                (o_s[1] - r_s[1]) * K
-            ]
-
-            return [
-                o_p[0]  + p_s[0],
-                o_p[1]  + p_s[1]
-            ]
-
-        
-
-        # for robot in self.match.robots + self.match.opposites:
-        #     if robot.get_name() == self.robot.get_name():
-        #         continue
-        #     self.seek.add_field(
-        #         algorithms.fields.PointField(
-        #             self.match,
-        #             target = lambda m, o=robot, r=self.robot, k=avoiance_K: (
-        #                 proj_obstacle(m, o, r, k)
-        #             ),
-        #             radius = .2,
-        #             radius_max = .2,
-        #             decay = lambda x: x**4,
-        #             multiplier = lambda m, r=self.robot: -2 if ((r.x - m.ball.x)**2 +  (r.y - m.ball.y)**2)**.5 > 0.15 else 0
-        #         )
-        #     )
-        #     self.seek.add_field(
-        #         algorithms.fields.TangentialField(
-        #             self.match,
-        #             target = lambda m, o=robot, r=self.robot, k=avoiance_K: (
-        #                 proj_obstacle(m, o, r, k)
-        #             ),
-        #             radius = .21,
-        #             radius_max = .16,
-        #             decay = lambda x: x,
-        #             clockwise = True,
-        #             multiplier = lambda m, r=self.robot: 1.5 if ((r.x - m.ball.x)**2 +  (r.y - m.ball.y)**2)**.5 > 0.15 else 0
-        #         )
-        #     )
-
         self.astar.add_field(
             algorithms.fields.PointField(
                 self.match,
