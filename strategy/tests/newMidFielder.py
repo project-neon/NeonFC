@@ -7,13 +7,12 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 
 
 class newMidFielder(Strategy):
-    def __init__(self, match, plot_field=False):
-        super().__init__(match, "NeonDesarmaRindokkkkkkkkk", controller=controller.TwoSidesLQR)
+    def __init__(self, match, side, plot_field=False):
+        super().__init__(match, side+"Defender", controller=controller.TwoSidesLQR)
+        self.name = side+"Defender"
     
     def start(self, robot=None):
         super().start(robot=robot)
-
-        self.intercept = algorithms.fields.PotentialField(self.match, name="InterceptBehaviour")
 
         self.push = algorithms.fields.PotentialField(self.match, name="PushBehaviour")
 
@@ -36,28 +35,20 @@ class newMidFielder(Strategy):
         
         #trave superior do gol
         g_hgr = (self.field_h/2)+0.2-0.0375
+        ga_hgr = self.field_h/2 + 0.4
     
         #trave inferior do gol
         g_lwr = (self.field_h/2)-0.2+0.0375
+        ga_lwr = self.field_h/2 - 0.4
 
-        def intercept(m):
-           if m.ball.y > self.field_h/2:
-               x = (m.ball.x + m.ball.vx * (1/60)) - 0.1
-               y = (m.ball.y + m.ball.vy * (1/60))- 0.3
-           else:
-               x = (m.ball.y + m.ball.vy * (1/60)) - 0.1
-               y = (m.ball.y + m.ball.vy * (1/60)) + 0.3
- 
-           if x < self.sa_w*2:
-               x = self.sa_w + 0.01
-               if m.ball.y > self.field_h/2:
-                   y = self.g_hgr - 0.0375
-               elif m.ball.y < self.field_h/2:
-                   y = self.g_lwr + 0.0375
-               else:
-                   y = m.ball.y
- 
-           return x,y
+        def side_verifier(y):
+            d = 0.05
+
+            if self.name == "LeftDefender":
+                y += d
+            elif self.name == "RightDefender":
+                y -= d
+            return y
 
         def future_point(m):
             if m.ball.vy != 0:
@@ -86,34 +77,18 @@ class newMidFielder(Strategy):
                 elif y < 0.04:
                     y = 0.04
 
-            if x < self.sa_w*2: 
-                x = self.sa_w + 0.01
-                if m.ball.y > self.sa_y + self.sa_h:
-                    y = g_hgr
-                elif m.ball.y < self.sa_y:
-                    y = g_lwr
-                else:
-                    y = m.ball.y
-
             return x,y
 
         def follow_ball(m):
-            if m.ball.x > self.robot.x:
-                if m.ball.y > g_hgr:
-                    y = g_hgr
-                    return (self.x, y)
-                elif m.ball.y < g_lwr:
-                    y = g_lwr
-                    return (self.x, y)
-                else:
-                    y = m.ball.y
-                    return (self.x, y)
+            if m.ball.y > g_hgr:
+                y = side_verifier(g_hgr)
+                return (self.x, y)
+            elif m.ball.y < g_lwr:
+                y = side_verifier(g_lwr)
+                return (self.x, y)
             else:
-                if m.ball.y > self.field_h/2 and m.ball.x < self.robot.x:
-                    return self.x, m.ball.y - 0.3
-    
-                elif m.ball.y <= self.field_h/2 and m.ball.x < self.robot.x:
-                    return self.x, m.ball.y + 0.3
+                y = side_verifier(m.ball.y)
+                return (self.x, y)
 
         self.project.add_field(
             algorithms.fields.LineField(
@@ -129,24 +104,50 @@ class newMidFielder(Strategy):
         )
         
         #retorna a posição em que o campo deve ser criado, para que a bola seja defendida
+        def get_mid_value(a, b, c):
+            return max(min(a,b), min(max(a,b),c))
+
+        #retorna a posição em que o campo deve ser criado, para que a bola seja defendida
         def get_def_spot(m):
             x = self.x
-    
-            if m.ball.vx == 0:
-                return x, m.ball.y
             
-            else:
-                t = (x - m.ball.x)/m.ball.vx
-                y = m.ball.y + m.ball.vy * t
-    
-                if m.ball.vx > 0 and m.ball.y > self.field_h/2 and m.ball.x < self.robot.x:
-                    return x, m.ball.y - 0.3
-    
-                elif m.ball.vx > 0 and m.ball.y <= self.field_h/2 and m.ball.x < self.robot.x:
-                    return x, m.ball.y + 0.3
-                
+            if m.ball.vx == 0:
+                if m.ball.y > g_hgr:
+                    y = side_verifier(g_hgr)
+                    return (x, y)
+                elif m.ball.y < g_lwr:
+                    y = side_verifier(g_lwr)
+                    return (x, y)
                 else:
-                    return x, y
+                    y = side_verifier(m.ball.y)
+                    return (x, y)
+
+            if m.ball.y > ga_hgr:
+                y = side_verifier(g_hgr)
+                return (x, y)
+            elif m.ball.y < ga_lwr:
+                y = side_verifier(g_lwr)
+                return (x, y)
+            else:
+                if m.ball.x > 0.4:
+                    gk_y = self.match.robots[0].y
+
+                    if self.name == "RightDefender":
+                        gk_inf = gk_y-0.075/2
+                        m_inf = (gk_inf+g_lwr)/2
+                        y = ( (m.ball.y-m_inf)/m.ball.x)*x + m_inf
+                        y = get_mid_value(y, side_verifier(g_lwr), side_verifier(g_hgr))
+                        return (x, y)
+                    elif self.name == "LeftDefender":
+                        gk_sup = gk_y+0.075/2
+                        m_sup = (gk_sup+g_hgr)/2
+                        y = ( (m.ball.y-m_sup)/m.ball.x)*x + m_sup
+                        y = get_mid_value(y, side_verifier(g_lwr), side_verifier(g_hgr))
+                        return (x, y)
+
+                y = ( (m.ball.y-(self.field_h/2) )/m.ball.x)*x + self.field_h/2
+                y = get_mid_value(side_verifier(y), side_verifier(g_lwr), side_verifier(g_hgr))
+                return (x, y)
 
             
         self.path.add_field(
@@ -181,22 +182,11 @@ class newMidFielder(Strategy):
                 decay = lambda x : x**6
             )
         )
-
-        self.intercept.add_field(
-           algorithms.fields.PointField(
-               self.match,
-               target = intercept,
-               radius = 0.1,
-               decay = lambda x: x,
-               multiplier = 0.7
-           )
-       )
-
         
         self.left_redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (self.x, self.sa_h+self.sa_y - 0.07),
+                target = (self.sa_w+0.0375, self.sa_h+self.sa_y - 0.2),
                 radius = 0,
                 radius_max = self.field_w,
                 clockwise = False,
@@ -208,7 +198,7 @@ class newMidFielder(Strategy):
         self.right_redeploy.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target = (self.x, self.sa_y + 0.07),
+                target = (self.sa_w+0.0375, self.sa_y + 0.2),
                 radius = 0,
                 radius_max = self.field_w,
                 clockwise = True,
@@ -223,20 +213,20 @@ class newMidFielder(Strategy):
         behaviour = None
         self.maneuver = "yep"
 
-        if ball.vx < 0 and ball.x < self.field_w - self.sa_w - 0.3:
-            if ((self.robot.x >= self.sa_w+0.02) and (self.robot.x < self.field_w/2)
-                and (ball.y < self.sa_y + self.sa_h) and (ball.y > self.sa_y)):
+        if ball.x < self.field_w/2: #- self.sa_w - 0.3:
+            if (self.robot.x >= self.sa_w+0.01) and (self.robot.x < self.sa_w+0.045):
                     
-                    if self.match.ball.x > self.robot.x:
-                        behaviour = self.path
-                    else:
-                        behaviour = self.project
+                if self.match.ball.x > 0.225:
+                    behaviour = self.path
+                else:
+                    behaviour = self.project
 
             else:
                 if ball.y > self.field_h/2:
-                    behaviour = self.left_redeploy
-                else:
                     behaviour = self.right_redeploy
+                else:
+                    behaviour = self.left_redeploy
+
         elif (ball.x >= self.field_w - self.sa_w - 0.3 and ball.y > 0.35 and ball.y < 0.85):
             self.maneuver = "nope"
             behaviour = self.push
@@ -256,7 +246,7 @@ class newMidFielder(Strategy):
     
     def spinning_time(self):
         if self.maneuver == "yep":
-            if (self.robot.x > self.sa_w+0.01 and self.robot.x < self.sa_w + 0.3):
+            if (self.robot.x > self.sa_w+0.01 and self.robot.x < self.sa_w + 0.04):
                 if self.match.team_color.upper() == "BLUE":
                     if ((self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61)):
                         return False

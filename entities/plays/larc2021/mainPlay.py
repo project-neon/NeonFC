@@ -11,7 +11,7 @@ class MainPlay(Play):
         self.constraints = [
             (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
             (strategy.tests.UVFAttacker(self.match), self._elect_attacker),
-            (strategy.tests.newMidFielder(self.match), self._elect_midfielder),
+            (strategy.tests.newMidFielder(self.match, "NeonDesarmaRindokkkkkkk"), self._elect_midfielder),
             # (strategy.tests.Defender(self.match, "Left"), self._elect_midfielder),
             # (strategy.tests.Defender(self.match, "Right"), self._elect_midfielder),
         ]
@@ -51,12 +51,7 @@ class MainPlay(Play):
             robots.remove(elected)
 
     def _elect_attacker(self, robot):
-
         is_behind = 2 if robot.x > self.match.ball.x else 1
-
-        x_ball = self.match.ball.x + self.match.ball.vx * (1/60)
-        y_ball = self.match.ball.y + self.match.ball.vy * (1/60)
-
         dist_to_ball = math.sqrt(
             (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
         )
