@@ -8,7 +8,7 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 
 # class Attacker(DebugPotentialFieldStrategy):
 class Attacker(Strategy):
-    def __init__(self, match):
+    def __init__(self, match, name="UFV_Attacker"):
         self.ctrl_params = {"l": 0.07}
         super().__init__(match,
             name=name,
