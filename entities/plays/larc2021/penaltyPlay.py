@@ -9,9 +9,9 @@ class PenaltyPlay(MainPlay):
     def __init__(self, coach):
         super().__init__(coach)
         self.constraints = [
-            (strategy.larc2021.Shooter(self.match), self._elect_attacker),
             (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
-            (strategy.larc2020.MidFielder(self.match), self._elect_midfielder)
+            (strategy.larc2021.Shooter(self.match), self._elect_attacker),
+            (strategy.tests.newMidFielder(self.match, ""), self._elect_midfielder)
         ]
         
 

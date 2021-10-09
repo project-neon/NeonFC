@@ -13,7 +13,7 @@ class MainPlay(Play):
         self.constraints = [
             (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
             (strategy.tests.UVFAttacker(self.match), self._elect_attacker),
-            (strategy.larc2020.MidFielder(self.match), self._elect_midfielder)
+            (strategy.tests.newMidFielder(self.match, ""), self._elect_midfielder)
         ]
 
     def _can_play(self):
@@ -39,7 +39,7 @@ class MainPlay(Play):
 
         # verify if the game is running
         # if is running don't change goalkeeper or attacker
-        if self._can_play() and (not self._reset):
+        if self._can_play():
             constraints, robots = self.freeze_positions(
                 constraints, robots
             )

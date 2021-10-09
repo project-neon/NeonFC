@@ -9,9 +9,9 @@ class GoalKickPlay(MainPlay):
     def __init__(self, coach):
         super().__init__(coach)
         self.constraints = [
-            (strategy.larc2021.Shooter(self.match), self._elect_goalkeeper),
+            (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
             (strategy.tests.UVFAttacker(self.match), self._elect_attacker),
-            (strategy.larc2020.MidFielder(self.match), self._elect_midfielder)
+            (strategy.tests.newMidFielder(self.match, ""), self._elect_midfielder)
         ]
 
     def freeze_positions(self, constraints, robots):
