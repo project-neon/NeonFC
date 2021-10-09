@@ -8,6 +8,7 @@ from entities.plays.playbook import Play
 class PenaltyPlay(Play):
     def __init__(self, coach):
         super().__init__(coach)
+        self.coach = coach
         self.match = self.coach.match
         self.constraints = [
             (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
@@ -20,19 +21,32 @@ class PenaltyPlay(Play):
         dist_to_ball = 0.225
         shoot_side = random.choice([-1, 1])
 
-        replacements = [
-            {"robot_id": 0, "x": -0.675, "y": 0, "orientation": 90},
-            {"robot_id": 2, "x": -0.113, "y": 0.4, "orientation": 0}
-        ]
+        replacements = self.coach._get_positions(foul, team_color, foul_color, quadrant)
+
         if foul == "PENALTY_KICK" and foul_color == team_color:
-            replacements.append(
-                {
-                    "robot_id": 1, 
-                    "x": 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
-                    "y": 0 - shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
-                    "orientation": + shoot_side * angle_of_interest
-                }
-            )
+            kicker_pos = list(filter(lambda r: r["robot_id"] == 1, replacements))
+            if len(kicker_pos):
+                replacements.remove(kicker_pos[0])
+            field_size = self.match.game.field.get_dimensions()
+            if team_color  == "BLUE":
+                replacements.append(
+                    {
+                        "robot_id": 1, 
+                        "x": 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                        "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
+                        "orientation": + shoot_side * angle_of_interest
+                    }
+                )
+            else:
+                replacements.append(
+                    {
+                        "robot_id": 1, 
+                        "x": - field_size[0]/2 + 0.375 + math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                        "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
+                        "orientation": + shoot_side * angle_of_interest
+                    }
+                )
+                
             return replacements
 
         return None

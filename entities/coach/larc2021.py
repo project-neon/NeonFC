@@ -25,14 +25,10 @@ class Coach(BaseCoach):
         penalty_play.add_transition(seven_seconds_trigger, main_play)
 
         self.playbook.set_play(main_play)
-    
-    def get_positions(self, foul, team_color, foul_color, quadrant):
-        play_positioning = self.playbook.get_actual_play().get_positions(foul, team_color, foul_color, quadrant)
-        if play_positioning:
-            return play_positioning
+
+    def _get_positions(self, foul, team_color, foul_color, quadrant):
         quad = quadrant
         foul_type = foul
-
         team = self.positions.get(team_color)
         foul = team.get(foul)
 
@@ -41,6 +37,14 @@ class Coach(BaseCoach):
         else:
             replacements = foul.get(f"{quad}")
         return replacements
+
+    
+    def get_positions(self, foul, team_color, foul_color, quadrant):
+        play_positioning = self.playbook.get_actual_play().get_positions(foul, team_color, foul_color, quadrant)
+        if play_positioning:
+            return play_positioning
+        
+        return self._get_positions(foul, team_color, foul_color, quadrant)
  
 
     def decide (self):
