@@ -8,8 +8,8 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 
 # class Attacker(DebugPotentialFieldStrategy):
 class Attacker(Strategy):
-    def __init__(self, match, name='UFV-Attacker'):
-        self.ctrl_params = {"l": 0.0975}
+    def __init__(self, match):
+        self.ctrl_params = {"l": 0.07}
         super().__init__(match,
             name=name,
             controller=TwoSidesLQR,
@@ -22,7 +22,7 @@ class Attacker(Strategy):
         uvf_radius = 0.075 # 7.5 cm
         uvf_radius_2 = 0.075 # 7.5 cm
 
-        tangential_speed = .9 # 9 cm/s
+        tangential_speed = .8 # 8 cm/s
         avoiance_K = 0
 
         """
