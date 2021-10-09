@@ -11,7 +11,7 @@ class Attacker(Strategy):
     def __init__(self, match):
         self.ctrl_params = {"l": 0.07}
         super().__init__(match,
-            name="UVF_Attacker",
+            name=name,
             controller=TwoSidesLQR,
             controller_kwargs=self.ctrl_params
         )
