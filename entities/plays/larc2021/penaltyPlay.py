@@ -9,8 +9,8 @@ class PenaltyPlay(MainPlay):
     def __init__(self, coach):
         super().__init__(coach)
         self.constraints = [
-            (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
             (strategy.larc2021.Shooter(self.match), self._elect_attacker),
+            (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
             (strategy.larc2020.MidFielder(self.match), self._elect_midfielder)
         ]
         
@@ -33,7 +33,7 @@ class PenaltyPlay(MainPlay):
                         "robot_id": 1, 
                         "x": 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
                         "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
-                        "orientation": + shoot_side * angle_of_interest
+                        "orientation": - shoot_side * angle_of_interest
                     }
                 )
             else:
