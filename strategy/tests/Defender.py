@@ -13,6 +13,8 @@ class Defender(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
+        self.sobra = algorithms.fields.PotentialField(self.match, name="SobraBehaviour")
+
         self.project = algorithms.fields.PotentialField(self.match, name="ProjectBehaviour")
 
         self.path = algorithms.fields.PotentialField(self.match, name="PathBehaviour")
@@ -117,6 +119,26 @@ class Defender(Strategy):
                 y = ( (m.ball.y-(self.field_h/2) )/m.ball.x)*x + self.field_h/2
                 y = get_mid_value(side_verifier(y), side_verifier(g_lwr), side_verifier(g_hgr))
                 return (x, y)
+
+        def sobra(m):
+            x = m.ball.x-0.8
+            if m.ball.x < self.robot.x and m.ball.vx > 0:
+                if m.ball.y > self.field_h/2:
+                    y = m.ball.y - 0.3
+                else:
+                    y = m.ball.y + 0.3
+            else:
+                if m.ball.y > self.field_h/2:
+                    y = self.field_h/2 + 0.55
+                else:
+                    y = self.field_h/2 - 0.55
+                
+                if self.field_h - y < 0.04:
+                    y = self.field_h - 0.04
+                elif y < 0.04:
+                    y = 0.04
+
+            return x,y
             
         self.path.add_field(
             algorithms.fields.LineField(
@@ -169,28 +191,45 @@ class Defender(Strategy):
             )
         )
 
+        self.sobra.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = sobra,
+                radius = 0.1,
+                multiplier = 0.7,
+                decay = lambda x : x**6
+            )
+        )
+
     
     def decide(self):
     
         self.theta = self.robot.theta
-    
+        self.maneuver = "yep"
         behaviour = None
         self.behaviour = None
-    
-        if (self.robot.x >= self.sa_w+0.01) and (self.robot.x < self.sa_w + 0.045):
-                
-                if self.match.ball.x > 0.225 and self.match.ball.x < self.field_w/2 + 0.3:
-                    behaviour = self.path
-                elif self.match.ball.x <= 0.225:
-                    behaviour = self.project
+
+        if self.match.ball.x < self.field_w/2 + 0.2:
+            if (self.robot.x >= self.sa_w+0.01) and (self.robot.x < self.sa_w + 0.045):
+                    
+                    if self.match.ball.x > 0.225 and self.match.ball.x < self.field_w/2 + 0.3:
+                        behaviour = self.path
+                    elif self.match.ball.x <= 0.225:
+                        behaviour = self.project
+                    else:
+                        behaviour = self.kalm
+        
+            else:
+                if self.name == "LeftDefender":
+                    behaviour = self.left_redeploy
                 else:
-                    behaviour = self.kalm
-    
+                    behaviour = self.right_redeploy
         else:
             if self.name == "LeftDefender":
-                behaviour = self.left_redeploy
+                self.maneuver = "nope"
+                behaviour = self.sobra
             else:
-                behaviour = self.right_redeploy
+                behaviour = self.kalm
     
         return behaviour.compute([self.robot.x, self.robot.y])
 
@@ -202,18 +241,21 @@ class Defender(Strategy):
         return -w, w
     
     def spinning_time(self):
-        if (self.robot.x > self.sa_w+0.01 and self.robot.x < self.sa_w + 0.04):
-            if self.match.team_color.upper() == "BLUE":
-                if ((self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61)):
-                    return False
+        if self.maneuver == "yep":
+            if (self.robot.x > self.sa_w+0.01 and self.robot.x < self.sa_w + 0.04):
+                if self.match.team_color.upper() == "BLUE":
+                    if ((self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61)):
+                        return False
+                    else:
+                        return True
                 else:
-                    return True
+                    theta = self.theta*180/math.pi
+                    if ((theta >= 87 and theta <= 93) or (theta >= 267 and theta <= 273)):
+                        return False
+                    else:
+                        return True
             else:
-                theta = self.theta*180/math.pi
-                if ((theta >= 87 and theta <= 93) or (theta >= 267 and theta <= 273)):
-                    return False
-                else:
-                    return True
+                return False
         else:
             return False
 
