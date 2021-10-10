@@ -13,8 +13,8 @@ class Coach(BaseCoach):
         self.playbook = plays.Playbook(self)
 
         main_play = plays.larc2021.MainPlay(self)
-        # penalty_play = plays.larc2021.PenaltyPlay(self)
-        # goalkick_play = plays.larc2021.GoalKickPlay(self)
+        penalty_play = plays.larc2021.PenaltyPlay(self)
+        goalkick_play = plays.larc2021.GoalKickPlay(self)
 
         penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.team_color)
         seven_seconds_trigger = plays.WaitForTrigger(7)
@@ -22,14 +22,14 @@ class Coach(BaseCoach):
         goalkick_trigger = plays.OnGoalKick(self.match.game.referee, self.match.team_color)
         
         self.playbook.add_play(main_play)
-        # self.playbook.add_play(penalty_play)
-        # self.playbook.add_play(goalkick_play)
+        self.playbook.add_play(penalty_play)
+        self.playbook.add_play(goalkick_play)
 
-        # main_play.add_transition(penalty_trigger, penalty_play)
-        # penalty_play.add_transition(seven_seconds_trigger, main_play)
+        main_play.add_transition(penalty_trigger, penalty_play)
+        penalty_play.add_transition(seven_seconds_trigger, main_play)
 
-        # main_play.add_transition(goalkick_trigger, goalkick_play)
-        # goalkick_play.add_transition(seven_seconds_trigger, main_play)
+        main_play.add_transition(goalkick_trigger, goalkick_play)
+        goalkick_play.add_transition(seven_seconds_trigger, main_play)
 
         self.playbook.set_play(main_play)
 
