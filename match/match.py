@@ -13,9 +13,9 @@ class Match(object):
         super().__init__()
         self.game = game
         self.n_robots = CATEGORIES.get(category)
-        self.coach_name = coach_name
+        self.coach_name = os.environ.get('COACH_NAME', coach_name) 
         self.team_color = os.environ.get('TEAM_COLOR', team_color)
-        self.category = category
+        self.category = os.environ.get('CATEGORY', category)
 
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
