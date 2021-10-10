@@ -19,38 +19,6 @@ class GoalKickPlay(MainPlay):
     def freeze_positions(self, constraints, robots):
         return constraints, robots
 
-    def get_positions(self, foul, team_color, foul_color, quadrant):
-        angle_of_interest = 115
-        dist_to_ball = 0.225
-
-        replacements = self.coach._get_positions(foul, team_color, foul_color, quadrant)
-
-        if foul == "GOAL_KICK" and foul_color == team_color:
-            kicker_pos = list(filter(lambda r: r["robot_id"] == 0, replacements))
-            if len(kicker_pos):
-                replacements.remove(kicker_pos[0])
-            field_size = self.match.game.field.get_dimensions()
-            if team_color  == "BLUE":
-                replacements.append(
-                    {
-                        "robot_id": 0, 
-                        "x": -field_size[0]/2 + 0.05,
-                        "y": -0.05,
-                        "orientation": 45
-                    }
-                )
-            else:
-                replacements.append(
-                    {
-                        "robot_id": 0, 
-                        "x": field_size[0]/2 - 0.1,
-                        "y": 0,
-                        "orientation": 0
-                    }
-                )
-                
-            return replacements
-
     def _can_play(self):
         return self.match.game.referee.can_play()
 

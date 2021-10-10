@@ -17,7 +17,8 @@ class Coach(BaseCoach):
         goalkick_play = plays.larc2021_5v5.GoalKickPlay(self)
 
         penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.team_color)
-        seven_seconds_trigger = plays.WaitForTrigger(12)
+        seven_seconds_trigger = plays.WaitForTrigger(10)
+        _15_seconds_trigger = plays.WaitForTrigger(10)
 
         goalkick_trigger = plays.OnGoalKick(self.match.game.referee, self.match.team_color)
         
@@ -29,7 +30,7 @@ class Coach(BaseCoach):
         penalty_play.add_transition(seven_seconds_trigger, main_play)
 
         main_play.add_transition(goalkick_trigger, goalkick_play)
-        goalkick_play.add_transition(seven_seconds_trigger, main_play)
+        goalkick_play.add_transition(_15_seconds_trigger, main_play)
 
         self.playbook.set_play(main_play)
 
@@ -37,7 +38,10 @@ class Coach(BaseCoach):
         quad = quadrant
         foul_type = foul
         team = self.positions.get(team_color)
+        print(foul)
         foul = team.get(foul)
+        if not foul:
+            return None
 
         if foul_type != "FREE_BALL":
             replacements = foul.get(foul_color, foul.get("POSITIONS"))

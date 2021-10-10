@@ -115,6 +115,9 @@ class Attacker(Strategy):
 
         path = AStar(self.robot_node, target_node).calculate()
 
+        if len(path) < 2:
+            return [0, 0]
+
         dist = ((path[0][0] - path[1][0])**2 + (path[1][1] - path[1][1])**2 )**.5
 
         return  path[1]
