@@ -1,0 +1,60 @@
+{
+    "BLUE": {
+        "KICKOFF": {
+            "POSITIONS": [
+                {"robot_id": 0, "x": -1.05, "y": 0, "orientation": 90},
+                {"robot_id": 1, "x": -0.9, "y": 0.2, "orientation": 0},
+                {"robot_id": 2, "x": -0.9, "y": -0.2, "orientation": 0},
+                {"robot_id": 3, "x": -0.35, "y": -0.3, "orientation": 0},
+                {"robot_id": 4, "x": -0.3, "y": 0, "orientation": 0}
+            ]
+        },
+        "GOAL_KICK": {
+            "BLUE": [
+                {"robot_id": 0, "x": -1, "y": -2.65, "orientation": 0},
+                {"robot_id": 1, "x": -0.4, "y": -0.4, "orientation": 0},
+                {"robot_id": 2, "x": 0.4, "y": 0.2, "orientation": 0},
+                {"robot_id": 3, "x": 0.2, "y": -0.4, "orientation": 0},
+                {"robot_id": 4, "x": 0.45, "y": 0.45, "orientation": 0}
+            ]
+        },
+        "PENALTY_KICK": {
+            "BLUE": [
+                {"robot_id": 0, "x": -1, "y": -1.15, "orientation": 90},
+                {"robot_id": 1, "x": -0.3, "y": -0.55, "orientation": 0},
+                {"robot_id": 2, "x": -0.3, "y": 0.45, "orientation": 0},
+                {"robot_id": 3, "x": -0.3, "y": -0.05, "orientation": 0},
+                {"robot_id": 4, "x": 0.6, "y": 1.73, "orientation": 0}
+            ]
+        }
+    },
+    "YELLOW": {
+        "KICKOFF": {
+            "POSITIONS": [
+                {"robot_id": 0, "x": 1.05, "y": 0, "orientation": 90},
+                {"robot_id": 1, "x": 0.9, "y": -0.2, "orientation": 0},
+                {"robot_id": 2, "x": 0.9, "y": 0.2, "orientation": 0},
+                {"robot_id": 3, "x": 0.35, "y": 0.3, "orientation": 0},
+                {"robot_id": 4, "x": 0.3, "y": 0, "orientation": 0}
+            ]
+        },
+        "GOAL_KICK": {
+            "YELLOW": [
+                {"robot_id": 0, "x": 1, "y": 2.65, "orientation": 0},
+                {"robot_id": 1, "x": 0.4, "y": 0.4, "orientation": 0},
+                {"robot_id": 2, "x": -0.4, "y": -0.2, "orientation": 0},
+                {"robot_id": 3, "x": -0.2, "y": 0.4, "orientation": 0},
+                {"robot_id": 4, "x": -0.45, "y": -0.45, "orientation": 0}
+            ]
+        },
+        "PENALTY_KICK": {
+            "YELLOW": [
+                {"robot_id": 0, "x": 1, "y": 1.15, "orientation": 90},
+                {"robot_id": 1, "x": 0.3, "y": 0.55, "orientation": 0},
+                {"robot_id": 2, "x": 0.3, "y": -0.45, "orientation": 0},
+                {"robot_id": 3, "x": 0.3, "y": 0.05, "orientation": 0},
+                {"robot_id": 4, "x": -0.6, "y": -1.73, "orientation": 0}
+            ]
+        }
+    }
+ }

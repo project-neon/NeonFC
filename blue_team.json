@@ -13,7 +13,7 @@
     },
     "match" : {
         "team_color": "blue",
-        "coach_name": "LARC_2021",
-        "category": "3v3"
+        "coach_name": "LARC_2021_5V5",
+        "category": "5v5"
     }
 }
