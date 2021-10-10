@@ -125,8 +125,7 @@ class Attacker(Strategy):
         uvf_radius = 0.075 # 7.5 cm
         uvf_radius_2 = 0.075 # 7.5 cm
 
-        tangential_speed = .8 # 8 cm/s
-        avoiance_K = 0
+        tangential_speed = lambda m: max(.8, (m.ball.vx**2 + m.ball.vy**2)**.5 + .3 ) # 8 cm/s
 
         """
         MTG-UVF: move to goal univector field
@@ -158,7 +157,11 @@ class Attacker(Strategy):
 
         def shifted_target_left(m, radius_2=uvf_radius_2):
             field_h, field_w = m.game.field.get_dimensions()
-            aim_point_y = field_w/2 if abs(m.ball.y - field_w/2) > 0.12 else m.ball.y
+            aim_point_y = field_w/2
+            if m.ball.y > field_w - 0.075:
+                aim_point_y = field_w - 0.05
+            if m.ball.y < 0.075:
+                aim_point_y = 0.05
             aim_point_x = field_h
 
             pos_x = (
@@ -175,7 +178,11 @@ class Attacker(Strategy):
 
         def shifted_target_right(m, radius=uvf_radius_2):
             field_h, field_w = m.game.field.get_dimensions()
-            aim_point_y = field_w/2 if abs(m.ball.y - field_w/2) > 0.12 else m.ball.y
+            aim_point_y = field_w/2
+            if m.ball.y > field_w - 0.075:
+                aim_point_y = field_w - 0.05
+            if m.ball.y < 0.075:
+                aim_point_y = 0.05
             aim_point_x = field_h
 
             pos_x = (
@@ -193,7 +200,11 @@ class Attacker(Strategy):
         def uvf_mean_contributtion_left(m, radius=uvf_radius_2, robot=self.robot, speed=tangential_speed):
             pos =  [robot.x, robot.y]
             field_h, field_w = m.game.field.get_dimensions()
-            aim_point_y = field_w/2 if abs(m.ball.y - field_w/2) > 0.12 else m.ball.y
+            aim_point_y = field_w/2
+            if m.ball.y > field_w - 0.075:
+                aim_point_y = field_w - 0.05
+            if m.ball.y < 0.075:
+                aim_point_y = 0.05
             aim_point_x = field_h
             target = [
                 m.ball.x,
@@ -211,12 +222,16 @@ class Attacker(Strategy):
             if abs(dist) > radius and dist < 0:
                 return 0
             dist = 0.5 * max(0, min(dist, radius))/ (radius)
-            return speed * (dist + 0.5)
+            return speed(m) * (dist + 0.5)
 
         def uvf_mean_contributtion_right(m, radius=uvf_radius_2, robot=self.robot, speed=tangential_speed):
             pos =  [robot.x, robot.y]
             field_h, field_w = m.game.field.get_dimensions()
-            aim_point_y = field_w/2 if abs(m.ball.y - field_w/2) > 0.12 else m.ball.y
+            aim_point_y = field_w/2
+            if m.ball.y > field_w - 0.075:
+                aim_point_y = field_w - 0.05
+            if m.ball.y < 0.075:
+                aim_point_y = 0.05
             aim_point_x = field_h
             target = [
                 m.ball.x,
@@ -234,7 +249,7 @@ class Attacker(Strategy):
             if abs(dist) > radius and dist < 0:
                 return 0
             dist = 0.5 * max(0, min(dist, radius))/ (radius )
-            return speed * (dist + 0.5)
+            return speed(m) * (dist + 0.5)
 
         self.seek.add_field(
             algorithms.fields.TangentialField(
@@ -295,7 +310,7 @@ class Attacker(Strategy):
                 target = lambda m, r=self : r.voronoi_astar(m),
                 radius = .075,
                 decay = lambda x: x,
-                multiplier = 0.8
+                multiplier = tangential_speed
             )
         )
 

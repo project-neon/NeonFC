@@ -2,6 +2,7 @@ from entities.coach.coach import BaseCoach
 
 from entities.coach.larc2020 import Coach as LarcCoach20
 from entities.coach.larc2021 import Coach as LarcCoach21
+from entities.coach.larc2021_5v5 import Coach as LarcCoach21_5v5
 
 from entities.coach.iron2021 import Coach as IronCoach
 from entities.coach.experiment_astar import Coach as AstarCoach
@@ -15,6 +16,7 @@ _coach_list = [
     # Tournament coaches
     LarcCoach20,
     LarcCoach21,
+    LarcCoach21_5v5,
     IronCoach,
     AstarCoach,
     NGKCoach,
