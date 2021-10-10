@@ -9,7 +9,7 @@ class GoalKickPlay(MainPlay):
     def __init__(self, coach):
         super().__init__(coach)
         self.constraints = [
-            (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
+            (strategy.larc2021.Shooter(self.match, "ShooterGoalkeeper"), self._elect_goalkeeper),
             (strategy.tests.UVFAttacker(self.match), self._elect_attacker),
             (strategy.tests.newMidFielder(self.match, ""), self._elect_midfielder)
         ]

@@ -39,10 +39,12 @@ class MainPlay(Play):
 
         # verify if the game is running
         # if is running don't change goalkeeper or attacker
-        if self._can_play():
+        if self._can_play() and (not self._reset):
             constraints, robots = self.freeze_positions(
                 constraints, robots
             )
+
+        if self._reset == True:
             self._reset = False
 
         for strategy, fit_fuction in constraints:
