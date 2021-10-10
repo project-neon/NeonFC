@@ -24,6 +24,8 @@ class newGoalKeeper(Strategy):
         self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
 
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
+
+        self.category = self.match.category
         
         #trave superior do gol
         g_hgr = (self.field_h/2)+0.2
@@ -238,7 +240,10 @@ class newGoalKeeper(Strategy):
             else: 
                 return False
         else:
-            return True
+            if self.category == "5v5":
+                return False
+            else:
+                return True
 
     def update(self):
         if self.spinning_time():
