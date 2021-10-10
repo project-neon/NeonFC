@@ -182,7 +182,7 @@ class newMidFielder(Strategy):
                 x_c = x_c2
                 y_c = y_c2
             
-            if round(m.ball.vx, 2) == 0:
+            if m.ball.vx == 0:
                 tht = m.ball.vy
             else:
                 tht = m.ball.vy/m.ball.vx
