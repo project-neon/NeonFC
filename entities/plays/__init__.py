@@ -13,3 +13,4 @@ from entities.plays.playbook import OnGoalKick
 from entities.plays.playbook import OnPenaltyKick
 
 from entities.plays import larc2021
+from entities.plays import larc2021_5v5
