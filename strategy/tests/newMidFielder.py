@@ -182,12 +182,19 @@ class newMidFielder(Strategy):
                 x_c = x_c2
                 y_c = y_c2
             
-            tht = m.ball.vy/m.ball.vx
+            if round(m.ball.vx, 2) == 0:
+                tht = m.ball.vy
+            else:
+                tht = m.ball.vy/m.ball.vx
+            
             a = 1 + (tht**2)
             b = 2*( tht*(m.ball.y - y_c - (tht*m.ball.x) ) - x_c)
             c = (x_c**2) - (circ_r**2) + (m.ball.y - y_c - (tht*m.ball.x) )**2
-
-            x_t = (b*(-1) - math.sqrt(b**2 - 4*a*c) )/(2*a)
+            
+            try:
+                x_t = (b*(-1) - math.sqrt(b**2 - 4*a*c) )/(2*a)
+            except ValueError:
+                x_t = self.field_w/2 + 0.2
 
             if x_t >= self.atk_x-0.1:
                 x_t -= 0.2
