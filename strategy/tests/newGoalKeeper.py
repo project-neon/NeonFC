@@ -47,7 +47,7 @@ class newGoalKeeper(Strategy):
                 line_size = self.sa_w/2,
                 line_dist = 0.1,
                 line_dist_max = 0.7,
-                multiplier = 1,
+                multiplier = 1.3,
                 decay = lambda x : x
             )
         )
@@ -146,7 +146,7 @@ class newGoalKeeper(Strategy):
                 line_size = self.sa_w/2,
                 line_dist = 0.1,
                 line_dist_max = 0.7,
-                multiplier = 1,
+                multiplier = 1.3,
                 decay = lambda x : x
             )
         )
