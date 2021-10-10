@@ -7,9 +7,11 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 
 
 class newMidFielder(Strategy):
-    def __init__(self, match, side, plot_field=False):
+    def __init__(self, match, side, has_defensive_behaviour=True):
         super().__init__(match, side+"Defender", controller=controller.TwoSidesLQR)
         self.name = side+"Defender"
+
+        self.has_defensive_behaviour = has_defensive_behaviour
     
     def start(self, robot=None):
         super().start(robot=robot)
@@ -213,7 +215,7 @@ class newMidFielder(Strategy):
         behaviour = None
         self.maneuver = "yep"
 
-        if ball.x < self.field_w/2: #- self.sa_w - 0.3:
+        if ball.x < self.field_w/2 and self.has_defensive_behaviour: #- self.sa_w - 0.3:
             if (self.robot.x >= self.sa_w+0.01) and (self.robot.x < self.sa_w+0.045):
                     
                 if self.match.ball.x > 0.225:
