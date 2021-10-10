@@ -12,10 +12,11 @@ class Match(object):
     def __init__(self, game, team_color, coach_name=None, category="3v3"):
         super().__init__()
         self.game = game
-        self.n_robots = CATEGORIES.get(category)
+        
         self.coach_name = os.environ.get('COACH_NAME', coach_name) 
         self.team_color = os.environ.get('TEAM_COLOR', team_color)
         self.category = os.environ.get('CATEGORY', category)
+        self.n_robots = CATEGORIES.get(self.category)
 
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
