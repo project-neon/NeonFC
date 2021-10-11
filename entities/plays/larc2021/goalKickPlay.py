@@ -32,9 +32,9 @@ class GoalKickPlay(MainPlay):
                 replacements.append(
                     {
                         "robot_id": 0, 
-                        "x": -field_size[0]/2 + 0.05,
+                        "x": -field_size[0]/2 + 0.1,
                         "y": 0.2,
-                        "orientation": 45
+                        "orientation": 60
                     }
                 )
             else:

@@ -16,20 +16,30 @@ class Coach(BaseCoach):
         penalty_play = plays.larc2021.PenaltyPlay(self)
         goalkick_play = plays.larc2021.GoalKickPlay(self)
 
+        defend_penalty_play = plays.larc2021.DefendPenaltyPlay(self)
+
         penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.team_color)
-        seven_seconds_trigger = plays.WaitForTrigger(7)
+        penalty_seconds_trigger = plays.WaitForTrigger(12)
+        goalkick_seconds_trigger = plays.WaitForTrigger(9)
+        defendpenalty_seconds_trigger = plays.WaitForTrigger(9)
 
         goalkick_trigger = plays.OnGoalKick(self.match.game.referee, self.match.team_color)
+
+        defend_penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.opposite_team_color)
         
         self.playbook.add_play(main_play)
         self.playbook.add_play(penalty_play)
         self.playbook.add_play(goalkick_play)
+        self.playbook.add_play(defend_penalty_play)
 
         main_play.add_transition(penalty_trigger, penalty_play)
-        penalty_play.add_transition(seven_seconds_trigger, main_play)
+        penalty_play.add_transition(penalty_seconds_trigger, main_play)
 
         main_play.add_transition(goalkick_trigger, goalkick_play)
-        goalkick_play.add_transition(seven_seconds_trigger, main_play)
+        goalkick_play.add_transition(goalkick_seconds_trigger, main_play)
+
+        main_play.add_transition(defend_penalty_trigger, defend_penalty_play)
+        defend_penalty_play.add_transition(defendpenalty_seconds_trigger, main_play)
 
         self.playbook.set_play(main_play)
 
