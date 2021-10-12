@@ -19,9 +19,9 @@ class Coach(BaseCoach):
         defend_penalty_play = plays.larc2021.DefendPenaltyPlay(self)
 
         penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.team_color)
-        penalty_seconds_trigger = plays.WaitForTrigger(12)
-        goalkick_seconds_trigger = plays.WaitForTrigger(9)
-        defendpenalty_seconds_trigger = plays.WaitForTrigger(9)
+        penalty_seconds_trigger = plays.WaitForTrigger(15)
+        goalkick_seconds_trigger = plays.WaitForTrigger(13)
+        defendpenalty_seconds_trigger = plays.WaitForTrigger(13)
 
         goalkick_trigger = plays.OnGoalKick(self.match.game.referee, self.match.team_color)
 
