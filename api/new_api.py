@@ -39,8 +39,8 @@ class Api(metaclass=SingletonMeta):
             msg = json.dumps(obj)
             self.obj_socket.sendto(msg.encode(), (self.servidor, self.porta))
             print(msg)
-            dados, origem = self.obj_socket.recvfrom(65535) 
-            print("Resposta do Servidor: ", dados.decode())
+            # dados, origem = self.obj_socket.recvfrom(65535) 
+            #print("Resposta do Servidor: ", dados.decode())
             self.saida = input("Digite <X> para sair: ").upper()
 
         self.obj_socket.close()
