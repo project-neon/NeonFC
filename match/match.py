@@ -67,21 +67,4 @@ class Match(object):
         for future in futures.as_completed(commands_futures):
             commands.append(future.result())
 
-        
-        #Send Data to API
-        data_dict = dict({
-            'COACH_NAME' :  self.coach_name,
-            'TEAM_COLOR' :  self.team_color,
-            'CATEGORY' :    self.category,
-            'TEAM_ROBOTS_POS' : [{f"{robot.robot_id}": (robot.x, robot.y)} for robot in self.robots],
-            'OPPOSITE_ROBOTS_POS' : [{f"{robot.robot_id}": (robot.x, robot.y)} for robot in self.opposites],
-            'BALL_POS' : (self.ball.x, self.ball.y),
-            'GAME_STATUS' : self.game.referee.get_foul()
-        })
-
-
-        api = Api()
-
-        api.recvData(data_dict)
-
         return commands

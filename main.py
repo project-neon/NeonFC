@@ -1,4 +1,5 @@
 import os
+from api.new_api import Api
 import comm
 import vision
 import match
@@ -22,6 +23,12 @@ class Game():
         self.comm = comm.FiraComm()
         self.field = pitch.Field(self.match.category)
         self.referee = RefereeComm(config_file)
+
+        self.use_api = self.config.get("api")
+        self.api_address = self.config.get("network").get("api_address")
+        self.api_port = self.config.get("network").get("api_port")
+
+        self.api = Api(self.api_address, self.api_port)
         
         if os.environ.get('USE_REFEREE'):
             self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
@@ -37,6 +44,9 @@ class Game():
         
         self.vision.start()
         self.comm.start()
+
+        self.api.start()
+        
 
     def update(self):
         frame = vision.assign_empty_values(
@@ -66,5 +76,8 @@ class Game():
                         self.match.coach.get_positions( self.referee.get_foul(), self.match.team_color.upper(), self.referee.get_color(), self.referee.get_quadrant() ),
                         self.match.team_color.upper()
                     )
+
+        if self.use_api:
+            self.api.send_data(self.match)
 
 g = Game(config_file=args.config_file)

@@ -26,21 +26,25 @@ class SingletonMeta(type):
 
 
 class Api(metaclass=SingletonMeta):
-    def __init__(self):
-        self.servidor = "127.0.0.1"
-        self.porta = 43210
+    def __init__(self, address, port):
+        self.address = address
+        self.port = port
 
+    def start(self):
         self.obj_socket = socket(AF_INET, SOCK_DGRAM)
-        self.obj_socket.connect((self.servidor, self.porta))
-        self.saida = ""
+        self.obj_socket.connect((self.address, self.port))
 
-    def recvData(self, obj):
-        while self.saida != "X":
-            msg = json.dumps(obj)
-            self.obj_socket.sendto(msg.encode(), (self.servidor, self.porta))
-            print(msg)
-            # dados, origem = self.obj_socket.recvfrom(65535) 
-            #print("Resposta do Servidor: ", dados.decode())
-            self.saida = input("Digite <X> para sair: ").upper()
-
-        self.obj_socket.close()
+    def send_data(self, obj):
+        data_dict = dict({
+            'COACH_NAME' :  obj.coach_name,
+            'TEAM_COLOR' :  obj.team_color,
+            'CATEGORY' :    obj.category,
+            'TEAM_ROBOTS_POS' : [{f"{robot.robot_id}": (robot.x, robot.y, robot.theta)} for robot in obj.robots],
+            'OPPOSITE_ROBOTS_POS' : [{f"{robot.robot_id}": (robot.x, robot.y, robot.theta)} for robot in obj.opposites],
+            'BALL_POS' : (obj.ball.x, obj.ball.y),
+            'GAME_STATUS' : obj.game.referee.get_foul()
+        })
+        msg = json.dumps(data_dict)
+        self.obj_socket.sendto(msg.encode(), (self.address, self.port))
+        # dados, origem = self.obj_socket.recvfrom(65535) 
+        #print("Resposta do Servidor: ", dados.decode())
