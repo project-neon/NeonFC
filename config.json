@@ -8,13 +8,16 @@
         "vision_port": 10002,
         "command_port": 20011,
         "replacer_port": 10004,
-        "referee_port": 10003
+        "referee_port": 10003,
+        "api_address": "127.0.0.1",
+        "api_port" : 43210
     },
     "match" : {
         "team_color": "blue",
         "coach_name": "LARC_2021",
         "category": "3v3"
     },
-    "referee": true,
-    "data_sender": false
+    "referee": false,
+    "data_sender": false,
+    "api": true
 }
