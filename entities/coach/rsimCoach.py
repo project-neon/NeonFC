@@ -3,7 +3,7 @@ from entities.coach.coach import BaseCoach
 import strategy
 
 class Coach(BaseCoach): # heranca da classe abstrata
-    NAME = "CoachTeste"
+    NAME = "RLCoach"
     def __init__(self, match):
         super().__init__(match) # chamada do metodo da classe mae
 

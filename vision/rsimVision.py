@@ -46,6 +46,8 @@ class RSimVision(threading.Thread):
 
         while True:
             self.game.update()
+            if self.done:
+                frame = self.env.reset()
             if self.next_state is not None:
                 self.frame = self.env.rsim.get_frame()
                 self.set_fps()
@@ -67,45 +69,45 @@ class RSimVision(threading.Thread):
         robot_commands = sorted(robot_commands, key=lambda k: k['robot_id'])
         action = [
             [
-                robot_commands[i]["wheel_left"],
-                robot_commands[i]["wheel_right"]
+                robot_commands[i]["wheel_left"]/100,
+                robot_commands[i]["wheel_right"]/100
             ] for i in range(0, 3)
         ]
 
         self.next_state, self.reward, self.done, _ = self.env.step(action)
+        self.env.render()
 
 
-def assign_empty_values(raw_frame, color, field_size):
-    frame = raw_frame.get('frame')
+def cleaning_data(raw_frame, color, field_size):
     w, h = field_size
-    if frame.get('ball'):
-        if color == 'yellow':
-            frame['ball']['x'] = -frame['ball'].get('x', 0)
-            frame['ball']['y'] = -frame['ball'].get('y', 0)
+    frame = {}
 
-        frame['ball']['x'] = frame['ball'].get('x', 0) + w/2
-        frame['ball']['y'] = frame['ball'].get('y', 0) + h/2
+    _fm = -1 if color == 'yellow' else 1 # field multiplier
+    _ap = math.pi if color == 'yellow' else 0 # angle part
+
+    frame['ball'] = {}
+    frame['ball']['x'] = _fm * raw_frame.ball.x + w/2
+    frame['ball']['y'] = _fm * raw_frame.ball.y + h/2
+
+    frame['robotsBlue'] = []
+    frame['robotsYellow'] = []
+
+    for _id, robot in raw_frame.robots_yellow.items():
+        robot_bundle = {}
+        robot_bundle['x'] = _fm * robot.x + w/2
+        robot_bundle['y'] = _fm * robot.y + h/2
+        robot_bundle['orientation'] = math.radians(robot.theta) + _ap
+        robot_bundle['robotId'] = _id
+
+        frame['robotsYellow'].append(robot_bundle)
     
-    for robot in frame.get("robotsYellow"):
-        if color == 'yellow':
-            robot['x'] = - robot.get('x', 0)
-            robot['y'] = - robot.get('y', 0)
-            robot['orientation'] = robot.get('orientation', 0) + math.pi
+    for _id, robot in raw_frame.robots_blue.items():
+        robot_bundle = {}
+        robot_bundle['x'] = _fm * robot.x + w/2
+        robot_bundle['y'] = _fm * robot.y + h/2
+        robot_bundle['orientation'] = math.radians(robot.theta) + _ap
+        robot_bundle['robotId'] = _id
 
-        robot['x'] = robot.get('x', 0) + w/2
-        robot['y'] = robot.get('y', 0) + h/2
-        robot['robotId'] = robot.get('robotId', 0)
-        robot['orientation'] = robot.get('orientation', 0)
-    
-    for robot in frame.get("robotsBlue"):
-        if color == 'yellow':
-            robot['x'] = - robot.get('x', 0)
-            robot['y'] = - robot.get('y', 0)
-            robot['orientation'] = robot.get('orientation', 0) + math.pi
-
-        robot['x'] = robot.get('x', 0) + w/2
-        robot['y'] = robot.get('y', 0) + h/2
-        robot['robotId'] = robot.get('robotId', 0)
-        robot['orientation'] = robot.get('orientation', 0)
+        frame['robotsBlue'].append(robot_bundle)
     
     return frame

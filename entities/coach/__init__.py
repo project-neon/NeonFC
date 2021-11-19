@@ -12,6 +12,8 @@ from entities.coach.coach_newATK import Coach as NATCoach
 from entities.coach.guideCoach import Coach as GuideCoach
 from entities.coach.stratch_alex import Coach as AlexCoach
 
+from entities.coach.rsimCoach import Coach as RLCoach
+
 _coach_list = [
     # Tournament coaches
     LarcCoach20,
@@ -22,7 +24,8 @@ _coach_list = [
     NGKCoach,
     NATCoach,
     GuideCoach,
-    AlexCoach
+    AlexCoach,
+    RLCoach
 ]
 
 COACHES = {c.NAME: c for c in _coach_list}

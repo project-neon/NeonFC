@@ -7,6 +7,9 @@ import fields as pitch
 from pyVSSSReferee.RefereeComm import RefereeComm
 from commons.utils import get_config
 
+import gym
+import rsoccer_gym
+
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config.json')
 
@@ -18,8 +21,13 @@ class Game():
         self.match = match.Match(self,
             **self.config.get('match')
         )
-        self.vision = vision.FiraVision()
-        self.comm = comm.FiraComm()
+
+        self.env = gym.make("VSSMA-v0")
+
+        # Vision works both as vision and comm since it handles all enviroment
+        self.vision = vision.RSimVision(self.env)
+        self.comm = self.vision
+
         self.field = pitch.Field(self.match.category)
         self.referee = RefereeComm(config_file)
         
@@ -36,10 +44,9 @@ class Game():
         self.match.start()
         
         self.vision.start()
-        self.comm.start()
 
     def update(self):
-        frame = vision.assign_empty_values(
+        frame = vision.cleaning_data(
             self.vision.frame, 
             color=self.match.team_color,
             field_size=self.field.get_dimensions()
