@@ -1,5 +1,7 @@
 # NeonFC - Neon Futebol Clube
 
+teste, apagar esse PR
+
 ### Software de estratégia
 
 Software desenvolvido para LARC 2020 para o VSSS online.
