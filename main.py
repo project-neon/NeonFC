@@ -79,5 +79,17 @@ class Game():
 
         if self.use_api:
             self.api.send_data(self.match)
+            #self.api.change_color(self.match)
+            #print(self.match.team_color)
+            '''if self.api.stop():
+                commands = [
+                    {
+                        'robot_id': r['robot_id'],
+                        'color': r['color'],
+                        'wheel_left': 0,
+                        'wheel_right': 0
+                    } for r in commands
+                ]
+                self.comm.send(commands)'''
 
 g = Game(config_file=args.config_file)
