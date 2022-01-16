@@ -13,7 +13,7 @@ class MainPlay(Play):
         self.constraints = [
             (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
             (strategy.tests.UVFAttacker(self.match), self._elect_attacker),
-            (strategy.tests.newMidFielder(self.match, ""), self._elect_midfielder)
+            (strategy.tests.MidFielderkkkkk(self.match), self._elect_midfielder)
         ]
 
     def _can_play(self):

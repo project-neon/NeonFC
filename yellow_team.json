@@ -1,6 +1,6 @@
 {
-    "referee": false,
-    "api": true,
+    "referee": true,
+    "api": false,
     "network" : {
         "multicast_ip": "224.0.0.1",
         "referee_ip": "224.5.23.2",
