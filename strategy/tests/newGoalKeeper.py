@@ -4,6 +4,7 @@ import controller
 import numpy as np
 from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
+from commons.math import point_in_rect
 
 class newGoalKeeper(Strategy):
     def __init__(self, match, name="Higuita"):
@@ -29,9 +30,13 @@ class newGoalKeeper(Strategy):
         
         #trave superior do gol
         g_hgr = (self.field_h/2)+0.2
+        ga_hgr = g_hgr + 0.15
 
         #trave inferior do gol
         g_lwr = (self.field_h/2)-0.2
+        ga_lwr = g_lwr - 0.15
+
+        self.robot_w = self.robot_h = 0.075
 
         def follow_ball(m):
             if m.ball.y > g_hgr:
@@ -56,14 +61,13 @@ class newGoalKeeper(Strategy):
         
         #cria a area de cobertura do goleiro quando esta nos cantos do gol
         def get_cover_area(robot, side):
-            robot_w = robot_h = 0.075
             if side == "inf":
-                robot_ext_x, robot_ext_y = (self.sa_w/2+robot_w/2, g_lwr+robot_h/2)
+                robot_ext_x, robot_ext_y = (self.sa_w/2+self.robot_w/2, g_lwr+self.robot_h/2)
                 cover_func = lambda x : ((robot_ext_y-g_hgr)/robot_ext_x)*x + g_hgr
                 return cover_func
 
             elif side == "sup":
-                robot_ext_x, robot_ext_y = (self.sa_w/2+robot_w/2, g_hgr-robot_h/2)
+                robot_ext_x, robot_ext_y = (self.sa_w/2+self.robot_w/2, g_hgr-self.robot_h/2)
                 cover_func = lambda x : ((robot_ext_y-g_lwr)/robot_ext_x)*x + g_lwr
                 return cover_func
 
@@ -72,12 +76,12 @@ class newGoalKeeper(Strategy):
         def bezier_intersec(m, dir):
             t = 0
             if dir == "rise":
-                y_med = (g_hgr+m.ball.y)/2
+                y_med = m.ball.y + (g_hgr-m.ball.y)/3
             elif dir == "drop":
-                y_med = (g_lwr+m.ball.y)/2
+                y_med = m.ball.y - (m.ball.y-g_lwr)/3
             while t <= 1:
-                y = (m.ball.vy/m.ball.vx)*(self.sa_w-m.ball.x) + m.ball.y
-                b_x = ((1-t)**2)*m.ball.x + 2*(1-t)*t*self.sa_w
+                y = (m.ball.vy/m.ball.vx)*((self.robot.x+self.robot_w/2)-m.ball.x) + m.ball.y
+                b_x = ((1-t)**2)*m.ball.x + 2*(1-t)*t*(self.robot.x+self.robot_w/2)
                 b_y = ((1-t)**2)*m.ball.y + 2*(1-t)*t*y + (t**2)*y_med
                 if 0.05 > round(b_x, 3) and round(b_x, 3) < 0.1:
                     return b_y
@@ -88,6 +92,14 @@ class newGoalKeeper(Strategy):
         #retorna a posição em que o campo deve ser criado, para que a bola seja defendida
         def get_def_spot(m):
             x = self.sa_w/2
+
+            if m.ball.x < (self.sa_w/2 + self.robot_w/2):
+                if self.robot.y < m.ball.y < g_hgr:
+                    y = g_hgr
+                    return (x, y)
+                elif self.robot.y > m.ball.y > g_lwr:
+                    y = g_lwr
+                    return (x, y)
 
             if m.ball.vx == 0:
                 if m.ball.y > g_hgr:
@@ -106,17 +118,17 @@ class newGoalKeeper(Strategy):
             g_cvr_inf = get_cover_area(self.robot, "inf")(m.ball.x)
 
             #trava o goleiro na lateral do gol caso a bola esteja no escanteio ou 
-            #acima da linha do gol e indo para o escanteio
-            if (m.ball.y > g_cvr_sup and m.ball.y > g_hgr) or (m.ball.y > g_hgr and y > g_hgr):
+            #acima/abaixo da linha do gol e indo para o escanteio
+            if (m.ball.y > g_cvr_sup and m.ball.y > ga_hgr) or (m.ball.y > ga_hgr):
                 y = g_hgr
                 return (x, y)
 
-            elif (m.ball.y < g_cvr_inf and m.ball.y < g_lwr) or (m.ball.y < g_lwr and y < g_lwr):
+            elif (m.ball.y < g_cvr_inf and m.ball.y < ga_lwr) or (m.ball.y < ga_lwr):
                 y = g_lwr
                 return (x, y)
 
             #bloqueia uma possivel trajetoria da bola se ela esta no meio do campo indo para a lateral
-            if y > g_hgr and g_lwr < m.ball.y < g_hgr:
+            '''if y > g_hgr and g_lwr < m.ball.y < g_hgr:
                 y =  max(bezier_intersec(m, "rise"), self.robot.y, m.ball.y)
                 if y > g_hgr: y = g_hgr
                 return (x, y)
@@ -124,19 +136,35 @@ class newGoalKeeper(Strategy):
             elif y < g_lwr and g_hgr > m.ball.y > g_lwr:
                 y = min(bezier_intersec(m, "drop"), self.robot.y, m.ball.y)
                 if y < g_lwr: y = g_lwr
+                return (x, y)'''
+            
+            if ga_lwr < m.ball.y < ga_hgr:
+                y = m.ball.y + m.ball.vy*(12/60)
+                
+                if y > g_hgr:
+                    y = g_hgr
+                elif y < g_lwr:
+                    y = g_lwr
+                
                 return (x, y)
 
             mid_field_h = self.field_h/2
 
             #caso a bola esteja entre o escanteio e o meio do campo indo para uma dos escanteios,
             #o robo defende a trajetoria entre a bola e o gol
-            if g_cvr_inf < m.ball.y < g_lwr and y > self.robot.y:
-                y = ((m.ball.y-mid_field_h+0.1)/m.ball.x)*x + mid_field_h - 0.1
-                return (x, y)
+            if g_cvr_inf < m.ball.y < ga_lwr and y > self.robot.y:
+                y = ((m.ball.y-mid_field_h+0.1)/m.ball.x)*(x+self.robot_w/2) + mid_field_h - 0.1
+                if y < g_lwr:
+                    return (x, g_lwr)
+                else:
+                    return (x, y)
 
-            elif g_cvr_sup > m.ball.y > g_hgr and y < self.robot.y:
-                y = ((m.ball.y-mid_field_h-0.1)/m.ball.x)*x + mid_field_h + 0.1
-                return (x, y)
+            elif g_cvr_sup > m.ball.y > ga_hgr and y < self.robot.y:
+                y = ((m.ball.y-mid_field_h-0.1)/m.ball.x)*(x+self.robot_w/2) + mid_field_h + 0.1
+                if y > g_hgr:
+                    return (x, g_hgr)
+                else:
+                    return (x, y)
 
             return (x, y)
 
@@ -153,11 +181,32 @@ class newGoalKeeper(Strategy):
             )
         )
 
+        def kalm():
+            is_mid = False
+            for r in self.match.robots:
+                if r.strategy.name == "MidFielderkkkkk":
+                    self.mid_x, self.mid_y = r.x, r.y
+                    is_mid = True
+    
+            x = self.sa_w/2
+            if is_mid:
+                if self.mid_x < self.sa_w and self.mid_y > self.sa_y and self.mid_y < self.sa_y + self.sa_h and self.match.ball.x > self.field_w/2:
+                    if self.mid_y > self.robot.y:
+                        y = self.mid_y - 0.35
+                    else:
+                        y = self.mid_y + 0.35
+                else:
+                    y = self.field_h/2
+            else:
+                y = self.field_h/2
+
+            return (x, y)
+
         # permanece no centro da área
         self.kalm.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = lambda m: (self.sa_w/2, self.field_h/2),
+                target = kalm,
                 theta = 0,
                 line_size = self.sa_w/2,
                 line_dist = 0.1,
@@ -184,16 +233,16 @@ class newGoalKeeper(Strategy):
         self.theta = self.robot.theta
 
         behaviour = None
-        if (self.robot.x <= self.sa_w - 0.0375  and self.robot.x > 0.0375 and self.robot.y >= self.sa_y 
+        if (self.robot.x <= self.sa_w - 0.04  and self.robot.x > 0.0375 and self.robot.y >= self.sa_y 
             and self.robot.y <= self.sa_y + self.sa_h):
 
             if self.match.ball.x < self.field_w/2:
 
-                if self.match.ball.vx > 0:
+                '''if self.match.ball.vx > 0:
                     behaviour = self.project
                 
-                else:
-                    behaviour = self.path
+                else:'''
+                behaviour = self.path
 
             else:
                 behaviour = self.kalm
@@ -207,11 +256,11 @@ class newGoalKeeper(Strategy):
         dist_to_ball = math.sqrt(
             (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
-        if dist_to_ball <= 0.12:
+        if dist_to_ball <= 0.08:
             if (self.match.ball.y - self.robot.y) > 0:
-                return 120, -120
+                return 300, -300
             else:
-                return -120, 120
+                return -300, 300
         else:
             if self.match.team_color.upper() == "BLUE":
                 w = ((self.theta**2)**0.5 - 1.5708) * 20
@@ -223,7 +272,14 @@ class newGoalKeeper(Strategy):
         dist_to_ball = math.sqrt(
             (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
-        if dist_to_ball > 0.12:
+
+        #trave superior do gol
+        g_hgr = (self.field_h/2)+0.2
+
+        #trave inferior do gol
+        g_lwr = (self.field_h/2)-0.2
+
+        if dist_to_ball > 0.08:
             if (self.robot.x <= self.sa_w-0.0375  and self.robot.x > 0.0375  and self.robot.y >= self.sa_y 
                 and self.robot.y <= self.sa_y + self.sa_h):
                 if self.match.team_color.upper() == "BLUE":
@@ -240,9 +296,26 @@ class newGoalKeeper(Strategy):
             else: 
                 return False
         else:
+
             if self.category == "5v5":
                 return False
             else:
+                if self.match.ball.x < self.sa_w:
+                    if self.robot.y < self.match.ball.y <= g_hgr + self.robot_w/4:
+                        return False
+                    elif self.robot.y > self.match.ball.y >= g_lwr - self.robot_w/4:
+                        return False
+
+                for r in self.match.opposites:
+                    if point_in_rect((r.x, r.y), (0.15, 0.25, 0.225, 0.7)) or 0 < r.x < self.field_w/4 and g_lwr < r.y < g_hgr:
+                        if self.match.ball.x < self.robot.x and (g_lwr > self.match.ball.y or self.match.ball.y > g_hgr):
+                            if self.match.ball.vx > 0:
+                                return False
+                            else:
+                                return True
+                        else:
+                            return False
+
                 return True
 
     def update(self):
