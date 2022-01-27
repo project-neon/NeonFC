@@ -30,9 +30,11 @@ class newGoalKeeper(Strategy):
         
         #trave superior do gol
         g_hgr = (self.field_h/2)+0.2
+        ga_hgr = g_hgr + 0.15
 
         #trave inferior do gol
         g_lwr = (self.field_h/2)-0.2
+        ga_lwr = g_lwr - 0.15
 
         self.robot_w = self.robot_h = 0.075
 
@@ -117,16 +119,16 @@ class newGoalKeeper(Strategy):
 
             #trava o goleiro na lateral do gol caso a bola esteja no escanteio ou 
             #acima/abaixo da linha do gol e indo para o escanteio
-            if (m.ball.y > g_cvr_sup and m.ball.y > g_hgr) or (m.ball.y > g_hgr and y > g_hgr):
+            if (m.ball.y > g_cvr_sup and m.ball.y > ga_hgr) or (m.ball.y > ga_hgr):
                 y = g_hgr
                 return (x, y)
 
-            elif (m.ball.y < g_cvr_inf and m.ball.y < g_lwr) or (m.ball.y < g_lwr and y < g_lwr):
+            elif (m.ball.y < g_cvr_inf and m.ball.y < ga_lwr) or (m.ball.y < ga_lwr):
                 y = g_lwr
                 return (x, y)
 
             #bloqueia uma possivel trajetoria da bola se ela esta no meio do campo indo para a lateral
-            if y > g_hgr and g_lwr < m.ball.y < g_hgr:
+            '''if y > g_hgr and g_lwr < m.ball.y < g_hgr:
                 y =  max(bezier_intersec(m, "rise"), self.robot.y, m.ball.y)
                 if y > g_hgr: y = g_hgr
                 return (x, y)
@@ -134,19 +136,35 @@ class newGoalKeeper(Strategy):
             elif y < g_lwr and g_hgr > m.ball.y > g_lwr:
                 y = min(bezier_intersec(m, "drop"), self.robot.y, m.ball.y)
                 if y < g_lwr: y = g_lwr
+                return (x, y)'''
+            
+            if ga_lwr < m.ball.y < ga_hgr:
+                y = m.ball.y + m.ball.vy*(12/60)
+                
+                if y > g_hgr:
+                    y = g_hgr
+                elif y < g_lwr:
+                    y = g_lwr
+                
                 return (x, y)
 
             mid_field_h = self.field_h/2
 
             #caso a bola esteja entre o escanteio e o meio do campo indo para uma dos escanteios,
             #o robo defende a trajetoria entre a bola e o gol
-            if g_cvr_inf < m.ball.y < g_lwr and y > self.robot.y:
+            if g_cvr_inf < m.ball.y < ga_lwr and y > self.robot.y:
                 y = ((m.ball.y-mid_field_h+0.1)/m.ball.x)*(x+self.robot_w/2) + mid_field_h - 0.1
-                return (x, y)
+                if y < g_lwr:
+                    return (x, g_lwr)
+                else:
+                    return (x, y)
 
-            elif g_cvr_sup > m.ball.y > g_hgr and y < self.robot.y:
+            elif g_cvr_sup > m.ball.y > ga_hgr and y < self.robot.y:
                 y = ((m.ball.y-mid_field_h-0.1)/m.ball.x)*(x+self.robot_w/2) + mid_field_h + 0.1
-                return (x, y)
+                if y > g_hgr:
+                    return (x, g_hgr)
+                else:
+                    return (x, y)
 
             return (x, y)
 
@@ -194,16 +212,16 @@ class newGoalKeeper(Strategy):
         self.theta = self.robot.theta
 
         behaviour = None
-        if (self.robot.x <= self.sa_w - 0.0375  and self.robot.x > 0.0375 and self.robot.y >= self.sa_y 
+        if (self.robot.x <= self.sa_w - 0.04  and self.robot.x > 0.0375 and self.robot.y >= self.sa_y 
             and self.robot.y <= self.sa_y + self.sa_h):
 
             if self.match.ball.x < self.field_w/2:
 
-                if self.match.ball.vx > 0:
+                '''if self.match.ball.vx > 0:
                     behaviour = self.project
                 
-                else:
-                    behaviour = self.path
+                else:'''
+                behaviour = self.path
 
             else:
                 behaviour = self.kalm
@@ -217,11 +235,11 @@ class newGoalKeeper(Strategy):
         dist_to_ball = math.sqrt(
             (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
-        if dist_to_ball <= 0.12:
+        if dist_to_ball <= 0.08:
             if (self.match.ball.y - self.robot.y) > 0:
-                return 120, -120
+                return 300, -300
             else:
-                return -120, 120
+                return -300, 300
         else:
             if self.match.team_color.upper() == "BLUE":
                 w = ((self.theta**2)**0.5 - 1.5708) * 20
