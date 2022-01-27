@@ -7,21 +7,12 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 from commons.math import point_in_rect
 
 
-class MidFielderkkkk(Strategy):
-    def __init__(self, match, name = 'MidFielderkkkk'):
-        self.ctrl_params = {"l": 0.07}
-        super().__init__(match,
-            name=name,
-            controller=controller.TwoSidesLQR,
-            controller_kwargs=self.ctrl_params
-        )
+class MidFielderkkkkk(Strategy):
+    def __init__(self, match, name = 'MidFielderkkkkk'):
+        super().__init__(match, name, controller=controller.TwoSidesLQR)
     
     def start(self, robot=None):
         super().start(robot=robot)
-
-        for r in self.match.robots:
-            if r.strategy.name in ["UFV-Attacker", "shooter", "AtacanteMeu"]:
-                self.atk_x, self.atk_y = r.x, r.y
 
         VEL = 1
 
@@ -65,59 +56,63 @@ class MidFielderkkkk(Strategy):
         def sobra(m):    
 
             for r in self.match.robots:
-                if r.strategy.name in ["UVF-Attacker", "shooter"]:
+                if r.strategy.name  == "Atacanteee" or r.strategy.name == "UFV-Attacker":
                     self.atk_x, self.atk_y = r.x, r.y
             
             if m.ball.x >= self.field_w/2 - 0.2:  
                 # top corner
-                if point_in_rect((m.ball.x, m.ball.y), (self.field_w-self.sa_w, self.field_h/2, self.sa_w, self.field_h/2)):
-                    x = self.field_w - self.sa_w - 0.2
-                    y = self.field_h/2 + 0.1
+                if point_in_rect((m.ball.x, m.ball.y), (self.field_w-self.sa_w, self.field_h/2 + 0.01, self.sa_w, self.field_h/2)):
+                    x = self.field_w - self.sa_w - 0.25
+                    y = self.field_h/2 - 0.1
 
                 # bottom corner
                 elif point_in_rect((m.ball.x, m.ball.y), (self.field_w-self.sa_w, 0, self.sa_w, self.field_h/2)):
-                    x = self.field_w - self.sa_w - 0.2
-                    y = self.field_h/2 - 0.1
+                    x = self.field_w - self.sa_w - 0.25
+                    y = self.field_h/2 + 0.1
 
                 else:
                     if m.ball.x < self.atk_x:
-                        ref_x = m.ball.x
+                        ref_x = m.ball.x - 0.35
                         ref_y = m.ball.y
-                    else:
-                        ref_x = self.atk_x
+                    elif self.atk_x >= self.field_w/2 - 0.2:
+                        ref_x = self.atk_x - 0.35
                         ref_y = self.atk_y
+                    else:
+                        ref_x = m.ball.x - 0.35
+                        ref_y = m.ball.y
                     # terço maior do campo
                     if m.ball.y > self.field_h * 2/3:
                         # se o atacante vem de baixo
                         if self.atk_y < self.field_h * 2/3:
-                            x = ref_x - 0.4
+                            x = ref_x
                             y = self.field_h * 5/6
                         # se o atacante vem de cima
                         else:
-                            x = ref_x - 0.4
-                            y = ref_y - 0.3
+                            x = ref_x
+                            y = ref_y - 0.4
 
                     # segundo terço do campo
-                    elif m.ball.y > self.field_h*1/3 and m.ball.y < self.field_h*2/3:
+                    elif m.ball.y >= self.field_h*1/3 and m.ball.y <= self.field_h*2/3:
                         # se o atacante vem de baixo ou de cima 
                         if self.atk_y < self.field_h * 1/3 or self.atk_y > self.field_h * 2/3:
-                            x = ref_x - 0.4
+                            x = ref_x
                             y = self.field_h/2
                         # se o atacante esta no meio
                         else :
-                            x = ref_x - 0.4
+                            x = ref_x
                             y = ref_y
                     # primeiro terço do campo
                     else:
                         # se o atacante vem de cima
-                        if self.atk_y > self.robot.y:
-                            x = ref_x - 0.4
+                        if self.atk_y > self.field_h * 1/3:
+                            x = ref_x
                             y = self.field_h * 1/6
                         # se o atacante vem de baixo
                         else:
-                            x = ref_x - 0.4
-                            y = ref_y + 0.3
-            # ????
+                            x = ref_x
+                            y = ref_y + 0.4
+
+            # defensive strategies
             elif m.ball.x < self.field_w/2 - 0.2 and not is_in_defensive_area(m):
                     # defense top corner or bottom corner
                     # if is_in_defensive_corner(m):
@@ -150,20 +145,33 @@ class MidFielderkkkk(Strategy):
         )
         
         def future_point(m):
-            if m.ball.vy != 0:
-                self.future_y = self.field_h/2
-                t = ((self.future_y - m.ball.y)**2)**0.5/m.ball.vy
-                self.future_x = m.ball.x + m.ball.vx * t   
-                return (self.future_x-0.04, self.future_y)
+            if m.ball.x > self.field_w - self.sa_w - 0.05:
+                if m.ball.vy < 0:
+                    y = m.ball.y - 0.08
+                    t = (m.ball.y - y)/(m.ball.vy * (-1))
+                    x = m.ball.x + m.ball.vx * t
+
+                elif m.ball.vy > 0:
+                    y = m.ball.y + 0.08
+                    t = (y - m.ball.y)/m.ball.vy
+                    x = m.ball.x + m.ball.vx * t
+
+                else:
+                    x = m.ball.x
+                    y = m.ball.y
+
             else:
-                return (self.robot.x, self.robot.y)
+                x = self.field_w - self.sa_w - 0.1
+                y = self.field_h/2
+
+            return x,y
 
         self.push.add_field(
             algorithms.fields.PointField(
                 self.match,
                 target = future_point,
                 radius = 0.1,
-                multiplier = VEL,
+                multiplier = lambda m: max(1, (m.ball.vx**2 + m.ball.vy**2)**0.5 + 0.3),
                 decay = lambda x : x
             )
         )
@@ -202,9 +210,13 @@ class MidFielderkkkk(Strategy):
             )
         )
 
-
     # melhorar posicionamento do atacante e meio campo
     def decide(self):
+
+        for r in self.match.robots:
+                if r.strategy.name  == "Atacanteee" or r.strategy.name == "UFV-Attacker":
+                    self.atk_x, self.atk_y = r.x, r.y
+
         ball = self.match.ball
         behaviour = None
         self.theta = self.robot.theta
@@ -225,48 +237,11 @@ class MidFielderkkkk(Strategy):
         if ball.vx < 0 and self.robot.x < ball.x and self.atk_x > ball.x and atk_dist > midf_dist:
             behaviour = self.attack
         
-        elif (ball.x >= self.field_w - self.sa_w - 0.3 and ball.y > self.field_h/2-0.2 and 
-              ball.y < self.field_h/2+0.2) and not is_atk_in_area():
+        elif (ball.x >= self.field_w - self.sa_w - 0.3 and ball.y > self.field_h/2-0.25 and 
+              ball.y < self.field_h/2+0.25) and not is_atk_in_area():
             behaviour = self.push
 
         else:
             behaviour = self.sobra
     
-        return behaviour.compute([self.robot.x, self.robot.y])
-
-    def spin(self):
-
-        if point_in_rect((self.robot.x, self.robot.y), (self.sa_w -0.07 - 0.0375, self.field_h -0.07 - 0.1875, 0.075, 0.075)):
-            w = ((self.theta**2)**0.5 - 0.785) * 20
-
-        elif point_in_rect((self.robot.x, self.robot.y), (self.sa_w - 0.07 - 0.0375, 0.1125 - 0.07, 0.075, 0.075)):
-            w = ((self.theta**2)**0.5 - 2.3558) * 20
-
-        else:
-            return False
-
-        return -w, w
-
-    def spinning_time(self):
-      
-        if point_in_rect((self.robot.x, self.robot.y), (self.sa_w - 0.07 -  0.0375, self.field_h - 0.07 - 0.1875, 0.075, 0.075)):
-            if (self.theta < -0.7504 and self.theta > -0.8203):
-                return False
-            else:
-                return True
-
-        elif point_in_rect((self.robot.x, self.robot.y), (self.sa_w - 0.07 -0.0375, 0.1125 - 0.07, 0.075, 0.075)):
-            if (self.theta < -2.321 and self.theta > -2.3911):
-                return False
-            else:
-                return True
-
-        else: 
-            return False
-    
-    def update(self):
-        if self.spinning_time():
-            return self.spin()
-        return self.controller.update()
-
-                     
+        return behaviour.compute([self.robot.x, self.robot.y])                  
