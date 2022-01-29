@@ -173,7 +173,7 @@ class GoalKeeperRCX(Strategy):
             )
         )
 
-        def kalm():
+        def kalm(m):
             is_mid = False
             for r in self.match.robots:
                 if r.strategy.name == self.midfielder:
@@ -263,6 +263,7 @@ class GoalKeeperRCX(Strategy):
         return -w, w
 
     def spinning_time(self):
+        ball = self.match.ball
         dist_to_ball = math.sqrt(
             (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
@@ -280,7 +281,12 @@ class GoalKeeperRCX(Strategy):
                     if ((self.theta >= -1.61 and self.theta <= -1.54) or (self.theta >= 1.54 and self.theta <= 1.61)):
                         return False
                     else:
-                        return True
+                        for r in self.match.opposites:
+                            if (point_in_rect((r.x, r.y), (self.sa_x, self.sa_y, self.sa_w, self.sa_h)) and
+                               point_in_rect((ball.x, ball.y ), (self.sa_x, self.sa_y, self.sa_w, self.sa_h))):
+                                return False
+                            else:
+                                return True
                 else:
                     theta = self.theta*180/math.pi
                     if (theta >= 87 and theta <= 93) or (theta >= 267 and theta <= 273):

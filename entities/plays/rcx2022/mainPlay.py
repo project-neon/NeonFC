@@ -12,8 +12,8 @@ class MainPlay(Play):
         self._reset = False
         self.constraints = [
             (strategy.tests.GoalKeeperRCX(self.match, "Goalkeeper", "MidFielderkkkkk"), self._elect_goalkeeper),
-            (strategy.tests.UVFAttacker(self.match), self._elect_attacker),
-            (strategy.tests.MidFielderSupporter(self.match), self._elect_midfielder)
+            (strategy.tests.Atacante(self.match), self._elect_attacker),
+            (strategy.tests.MidFielderSupporter(self.match, attacker="Atacanteee"), self._elect_midfielder)
         ]
 
     def _can_play(self):
