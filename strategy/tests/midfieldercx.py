@@ -6,9 +6,10 @@ from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 from commons.math import point_in_rect
 
-class MidFielderkkkkk(Strategy):
-    def __init__(self, match, name = 'MidFielderkkkkk'):
+class MidFielderSupporter(Strategy):
+    def __init__(self, match, name='MidFielderkkkkk', attacker='UFV-Attacker'):
         super().__init__(match, name, controller=controller.TwoSidesLQR)
+        self.attacker = attacker
     
     def start(self, robot=None):
         super().start(robot=robot)
@@ -53,7 +54,7 @@ class MidFielderkkkkk(Strategy):
         def sobra(m):    
             # tracks attacker position
             for r in self.match.robots:
-                if r.strategy.name == "UFV-Attacker":
+                if r.strategy.name == self.attacker:
                     self.atk_x, self.atk_y = r.x, r.y
             
             if m.ball.x >= self.field_w/2 - 0.2:  
@@ -190,7 +191,7 @@ class MidFielderkkkkk(Strategy):
     def decide(self):
 
         for r in self.match.robots:
-                if r.strategy.name == "UFV-Attacker":
+                if r.strategy.name == self.attacker:
                     self.atk_x, self.atk_y = r.x, r.y
 
         ball = self.match.ball
