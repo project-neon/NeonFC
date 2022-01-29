@@ -7,8 +7,10 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 from commons.math import point_in_rect
 
 class GoalKeeperRCX(Strategy):
-    def __init__(self, match, name="Buffon"):
+    def __init__(self, match, name="Buffon", midfielder="MidFielderkkkkk"):
         super().__init__(match, name, controller=controller.TwoSidesLQR)
+
+        self.midfielder = midfielder
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -29,11 +31,11 @@ class GoalKeeperRCX(Strategy):
         self.category = self.match.category
         
         #trave superior do gol
-        g_hgr = (self.field_h/2)+0.2
+        g_hgr = (self.field_h/2)+0.185
         ga_hgr = g_hgr + 0.15
 
         #trave inferior do gol
-        g_lwr = (self.field_h/2)-0.2
+        g_lwr = (self.field_h/2)-0.185
         ga_lwr = g_lwr - 0.15
 
         self.robot_w = self.robot_h = 0.075
@@ -128,16 +130,6 @@ class GoalKeeperRCX(Strategy):
                 return (x, y)
 
             #bloqueia uma possivel trajetoria da bola se ela esta no meio do campo indo para a lateral
-            '''if y > g_hgr and g_lwr < m.ball.y < g_hgr:
-                y =  max(bezier_intersec(m, "rise"), self.robot.y, m.ball.y)
-                if y > g_hgr: y = g_hgr
-                return (x, y)
-                
-            elif y < g_lwr and g_hgr > m.ball.y > g_lwr:
-                y = min(bezier_intersec(m, "drop"), self.robot.y, m.ball.y)
-                if y < g_lwr: y = g_lwr
-                return (x, y)'''
-            
             if ga_lwr < m.ball.y < ga_hgr:
                 y = m.ball.y + m.ball.vy*(12/60)
                 
@@ -184,7 +176,7 @@ class GoalKeeperRCX(Strategy):
         def kalm():
             is_mid = False
             for r in self.match.robots:
-                if r.strategy.name == "MidFielderkkkkk":
+                if r.strategy.name == self.midfielder:
                     self.mid_x, self.mid_y = r.x, r.y
                     is_mid = True
     
@@ -237,11 +229,6 @@ class GoalKeeperRCX(Strategy):
             and self.robot.y <= self.sa_y + self.sa_h):
 
             if self.match.ball.x < self.field_w/2:
-
-                '''if self.match.ball.vx > 0:
-                    behaviour = self.project
-                
-                else:'''
                 behaviour = self.path
 
             else:
@@ -257,10 +244,17 @@ class GoalKeeperRCX(Strategy):
             (self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2
         )
         if dist_to_ball <= 0.08:
-            if (self.match.ball.y - self.robot.y) > 0:
-                return 300, -300
+            if self.match.ball.x > self.robot.x:
+                if (self.match.ball.y - self.robot.y) > 0:
+                    return -300, 300
+                else:
+                    return 300, -300
             else:
-                return -300, 300
+                if (self.match.ball.y - self.robot.y) > 0:
+                    return 300, -300
+                else:
+                    return -300, 300
+
         else:
             if self.match.team_color.upper() == "BLUE":
                 w = ((self.theta**2)**0.5 - 1.5708) * 20
