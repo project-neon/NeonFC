@@ -15,8 +15,6 @@ class GoalKeeperRCX(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        self.project = algorithms.fields.PotentialField(self.match, name="ProjectBehaviour")
-
         self.path = algorithms.fields.PotentialField(self.match, name="PathBehaviour")
 
         self.kalm = algorithms.fields.PotentialField(self.match, name="KalmBehaviour")
@@ -39,27 +37,6 @@ class GoalKeeperRCX(Strategy):
         ga_lwr = g_lwr - 0.15
 
         self.robot_w = self.robot_h = 0.075
-
-        def follow_ball(m):
-            if m.ball.y > g_hgr:
-                return (self.sa_w/2, g_hgr)
-            elif m.ball.y < g_lwr:
-                return (self.sa_w/2, g_lwr)
-            else:
-                return (self.sa_w/2, m.ball.y)
-
-        self.project.add_field(
-            algorithms.fields.LineField(
-                self.match,
-                target = follow_ball,
-                theta = 0,
-                line_size = self.sa_w/2,
-                line_dist = 0.1,
-                line_dist_max = 0.7,
-                multiplier = 1.3,
-                decay = lambda x : x
-            )
-        )
         
         #cria a area de cobertura do goleiro quando esta nos cantos do gol
         def get_cover_area(robot, side):
@@ -72,24 +49,6 @@ class GoalKeeperRCX(Strategy):
                 robot_ext_x, robot_ext_y = (self.sa_w/2+self.robot_w/2, g_hgr-self.robot_h/2)
                 cover_func = lambda x : ((robot_ext_y-g_lwr)/robot_ext_x)*x + g_lwr
                 return cover_func
-
-        #retorna a intersecção entre a linha do goleiro e uma curva de bezier,
-        # que representa uma possível trajetória da bola
-        def bezier_intersec(m, dir):
-            t = 0
-            if dir == "rise":
-                y_med = m.ball.y + (g_hgr-m.ball.y)/3
-            elif dir == "drop":
-                y_med = m.ball.y - (m.ball.y-g_lwr)/3
-            while t <= 1:
-                y = (m.ball.vy/m.ball.vx)*((self.robot.x+self.robot_w/2)-m.ball.x) + m.ball.y
-                b_x = ((1-t)**2)*m.ball.x + 2*(1-t)*t*(self.robot.x+self.robot_w/2)
-                b_y = ((1-t)**2)*m.ball.y + 2*(1-t)*t*y + (t**2)*y_med
-                if 0.05 > round(b_x, 3) and round(b_x, 3) < 0.1:
-                    return b_y
-                t += 0.01
-            print(f"False: {m.ball.vy/m.ball.vx}")
-            return self.robot.y
 
         #retorna a posição em que o campo deve ser criado, para que a bola seja defendida
         def get_def_spot(m):
@@ -168,7 +127,7 @@ class GoalKeeperRCX(Strategy):
                 line_size = self.sa_w/2,
                 line_dist = 0.1,
                 line_dist_max = 0.7,
-                multiplier = 1.3,
+                multiplier = 1.5,
                 decay = lambda x : x
             )
         )
@@ -204,7 +163,7 @@ class GoalKeeperRCX(Strategy):
                 line_dist = 0.1,
                 line_dist_max = self.sa_h,
                 decay = lambda x: x,
-                multiplier = 0.7,
+                multiplier = 1.3,
             )
         )
 
@@ -216,7 +175,7 @@ class GoalKeeperRCX(Strategy):
                 radius_max = self.field_w,
                 clockwise = True,
                 decay = lambda x: 1,
-                multiplier = 0.7
+                multiplier = 1.3
             )
         )
 

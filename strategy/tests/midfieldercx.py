@@ -6,14 +6,15 @@ from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 from commons.math import point_in_rect
 
-class MidFielderkkkkk(Strategy):
-    def __init__(self, match, name = 'MidFielderkkkkk'):
+class MidFielderSupporter(Strategy):
+    def __init__(self, match, name='MidFielderkkkkk', attacker='UFV-Attacker'):
         super().__init__(match, name, controller=controller.TwoSidesLQR)
+        self.attacker = attacker
     
     def start(self, robot=None):
         super().start(robot=robot)
 
-        VEL = 1
+        vel = 1
 
         self.sobra = algorithms.fields.PotentialField(self.match, name="SobraBehaviour")
 
@@ -38,22 +39,11 @@ class MidFielderkkkkk(Strategy):
         # lower goalarea limit
         ga_lwr = self.field_h/2 - 0.4
 
-        def is_in_defensive_corner(m):
-            if point_in_rect((m.ball.x, m.ball.y), (0, self.field_h-0.3, self.sa_w, 0.3)) or point_in_rect((m.ball.x, m.ball.y), (0, 0, self.sa_w, 0.3)):
-                return True
-            else:
-                return False
-
-        def is_in_defensive_area(m):
-            if point_in_rect((m.ball.x, m.ball.y), (0, self.sa_w, self.sa_w, self.sa_h)):
-                return True
-            else:
-                return False
 
         def sobra(m):    
             # tracks attacker position
             for r in self.match.robots:
-                if r.strategy.name == "UFV-Attacker":
+                if r.strategy.name == self.attacker:
                     self.atk_x, self.atk_y = r.x, r.y
             
             if m.ball.x >= self.field_w/2 - 0.2:  
@@ -112,23 +102,14 @@ class MidFielderkkkkk(Strategy):
                             y = ref_y + 0.4
 
             # defensive strategies
-            elif m.ball.x < self.field_w/2 - 0.2 and not is_in_defensive_area(m):
+            else:
                 # defense top corner 
                 if m.ball.y < self.field_h/2:
-                    x = self.sa_w 
+                    x = self.sa_w/2 + 0.075 
                     y = self.field_h - 0.15
                 # defense bottom corner
                 else:
-                    x = self.sa_w
-                    y = self.sa_y/2
-
-            # ball in defensive goal area  
-            else:
-                if m.ball.y < self.field_h/2:
-                    x = self.field_w/4
-                    y = self.field_h - 0.10
-                else:
-                    x = self.field_w/4
+                    x = self.sa_w/2 + 0.075
                     y = self.sa_y/2
                     
             return (x, y)
@@ -138,7 +119,7 @@ class MidFielderkkkkk(Strategy):
                 self.match,
                 target = sobra,
                 radius = 0.1,
-                multiplier = VEL,
+                multiplier = vel,
                 decay = lambda x : x**6
             )
         )
@@ -146,16 +127,16 @@ class MidFielderkkkkk(Strategy):
         def future_point(m):
             # ball is on opponent's goal area
             if m.ball.x > self.field_w - self.sa_w - 0.05:
+                if m.ball.y > self.field_h/2:
+                    y = self.field_h/2 + 0.1
+                else:
+                    y = self.field_h/2 - 0.1
                 # if ball is going down
                 if m.ball.vy < 0:
-                    y = m.ball.y - 0.08
-                    t = (m.ball.y - y)/(m.ball.vy * (-1))
-                    x = m.ball.x + m.ball.vx * t
+                    x = (m.ball.vx/(m.ball.vy)*(-1))*(y-m.ball.y) + m.ball.x
                 # if ball is going up
                 elif m.ball.vy > 0:
-                    y = m.ball.y + 0.08
-                    t = (y - m.ball.y)/m.ball.vy
-                    x = m.ball.x + m.ball.vx * t
+                    x = (m.ball.vx/m.ball.vy)*(y-m.ball.y) + m.ball.x
                 # if ball's vy = 0
                 else:
                     x = m.ball.x
@@ -165,7 +146,7 @@ class MidFielderkkkkk(Strategy):
                 x = self.field_w - self.sa_w - 0.1
                 y = self.field_h/2
 
-            return x,y
+            return (x, y)
 
         self.push.add_field(
             algorithms.fields.PointField(
@@ -182,7 +163,7 @@ class MidFielderkkkkk(Strategy):
                 self.match,
                 target = lambda m: (m.ball.x, m.ball.y),
                 radius = 0.1,
-                multiplier = VEL,
+                multiplier = vel,
                 decay = lambda x : x
             )
         )
@@ -190,12 +171,11 @@ class MidFielderkkkkk(Strategy):
     def decide(self):
 
         for r in self.match.robots:
-                if r.strategy.name == "UFV-Attacker":
+                if r.strategy.name == self.attacker:
                     self.atk_x, self.atk_y = r.x, r.y
 
         ball = self.match.ball
         behaviour = None
-        self.theta = self.robot.theta
 
         def dist_to_ball(robot_y, robot_x):
             dist = ((robot_y - ball.y)**2 + (robot_x - ball.x)**2)**0.5
