@@ -51,7 +51,8 @@ class Game():
 
         self.api.start()
 
-        self.api_recv.start()
+        if self.use_api:
+            self.api_recv.start()
         
 
     def update(self):
@@ -96,7 +97,5 @@ class Game():
 
         if self.use_api:
             self.api.send_data(self.match)
-            #self.api.change_color(self.match)
-            #print(self.match.team_color)
 
 g = Game(config_file=args.config_file)
