@@ -32,7 +32,8 @@ class Api_recv(threading.Thread):
         while True:
             data, origem = self.obj_socket.recvfrom(self.buffer_size)
             decoded_data = json.loads(data.decode())
-            print(decoded_data)
+            # Feedback commands from socket (e.g. an interface)
+            #print(decoded_data)
 
             team_color = decoded_data.get('TEAM_COLOR')
             team_side = decoded_data.get('TEAM_SIDE')

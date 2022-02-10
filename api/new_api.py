@@ -1,7 +1,6 @@
 from socket import *
 
 import json
-#import socket
 import struct
 
 class SingletonMeta(type):
@@ -27,13 +26,16 @@ class SingletonMeta(type):
 
 class Api(metaclass=SingletonMeta):
     def __init__(self, address, port):
+        
         self.address = address
         self.port = port
 
+    # Initiate socket connection
     def start(self):
         self.obj_socket = socket(AF_INET, SOCK_DGRAM)
         self.obj_socket.connect((self.address, self.port))
 
+    # Sends dict game data to socket listener
     def send_data(self, obj):
         data_dict = dict({
             'COACH_NAME' :  obj.coach_name,
@@ -46,19 +48,3 @@ class Api(metaclass=SingletonMeta):
         })
         msg = json.dumps(data_dict)
         self.obj_socket.sendto(msg.encode(), (self.address, self.port))
-        # dados, origem = self.obj_socket.recvfrom(65535) 
-        #print("Resposta do Servidor: ", dados.decode())
-
-    def change_color(self, match):
-        color, origem = self.obj_socket.recvfrom(65535)
-        print(color.decode())
-        if color.decode() != match.team_color:
-            match.team_color = color.decode()
-
-    def stop(self):
-        dados, origem = self.obj_socket.recvfrom(65535)
-        print(dados.decode())
-        if dados.decode() == "stop":
-            return True
-        else:
-            return False
