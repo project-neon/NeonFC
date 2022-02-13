@@ -17,7 +17,7 @@
         "coach_name": "LARC_2021",
         "category": "3v3"
     },
-    "referee": false,
+    "referee": true,
     "data_sender": false,
-    "api": true
+    "api": false
 }
