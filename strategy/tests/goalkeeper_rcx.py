@@ -7,7 +7,7 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 from commons.math import point_in_rect
 
 class GoalKeeperRCX(Strategy):
-    def __init__(self, match, name="Buffon", midfielder="MidFielderkkkkk"):
+    def __init__(self, match, name="Buffon", midfielder="MidFielderSupporter"):
         super().__init__(match, name, controller=controller.TwoSidesLQR)
 
         self.midfielder = midfielder
