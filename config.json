@@ -10,9 +10,11 @@
         "replacer_port": 10004,
         "referee_port": 10003,
         "api_address": "127.0.0.1",
-        "api_port" : 43210
+        "api_port" : 43210,
+        "api_recv_port": 43211
     },
     "match" : {
+        "team_side": "left",
         "team_color": "blue",
         "coach_name": "RCX_2022",
         "category": "3v3"
