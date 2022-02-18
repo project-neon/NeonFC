@@ -10,8 +10,8 @@ class PenaltyPlay(MainPlay):
         super().__init__(coach)
         self.constraints = [
             (strategy.larc2021.Shooter(self.match), self._elect_attacker),
-            (strategy.tests.newGoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
-            (strategy.tests.MidFielderSupporter(self.match, "shooter"), self._elect_midfielder)
+            (strategy.tests.GoalKeeperRCX(self.match, "Goalkeeper", "MidFielderSupporter"), self._elect_goalkeeper),
+            (strategy.tests.MidFielderSupporter(self.match, attacker="shooter"), self._elect_midfielder)
         ]
 
     def freeze_positions(self, constraints, robots):

@@ -66,5 +66,3 @@ class Coach(BaseCoach):
 
     def decide (self):
         self.playbook.update()
-        # for r in self.match.robots:
-        #     print(r.get_name(), r.strategy.name)

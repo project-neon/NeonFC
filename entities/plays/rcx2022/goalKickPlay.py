@@ -11,7 +11,7 @@ class GoalKickPlay(MainPlay):
         self.constraints = [
             (strategy.larc2021.Shooter(self.match, "ShooterGoalkeeper"), self._elect_goalkeeper),
             (strategy.tests.UVFAttacker(self.match), self._elect_attacker),
-            (strategy.tests.MidFielderSupporter(self.match, "UFV-Attacker"), self._elect_midfielder)
+            (strategy.tests.MidFielderSupporter(self.match, attacker="UFV-Attacker"), self._elect_midfielder)
         ]
 
     def freeze_positions(self, constraints, robots):
