@@ -49,9 +49,8 @@ class Game():
         self.vision.start()
         self.comm.start()
 
-        self.api.start()
-
         if self.use_api:
+            self.api.start()
             self.api_recv.start()
         
 
