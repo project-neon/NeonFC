@@ -61,6 +61,7 @@ class FiraVision(threading.Thread):
         self.vision_sock.recv(1024)
     
     def _create_socket(self):
+        print(f"Creating socket with address: {self.host} and port: {self.vision_port}")
         sock = socket.socket(
             socket.AF_INET, 
             socket.SOCK_DGRAM, 
