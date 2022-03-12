@@ -15,7 +15,7 @@ class Match(object):
         self.game = game
         
         self.coach_name = os.environ.get('COACH_NAME', coach_name) 
-        self.team_side = team_side
+        self.team_side = os.environ.get('TEAM_SIDE', team_side) 
         self.team_color = os.environ.get('TEAM_COLOR', team_color)
         self.category = os.environ.get('CATEGORY', category)
         self.n_robots = CATEGORIES.get(self.category)
