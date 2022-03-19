@@ -15,6 +15,7 @@
         "api_port" : 43210
     },
     "match" : {
+        "team_side": "right",
         "team_color": "yellow",
         "coach_name": "LARC_2021",
         "category": "3v3"
