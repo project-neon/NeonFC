@@ -1,6 +1,6 @@
 {
-    "referee": false,
-    "api": true,
+    "referee": true,
+    "api": false,
     "network" : {
         "multicast_ip": "224.0.0.1",
         "referee_ip": "224.5.23.2",
@@ -15,6 +15,7 @@
         "api_port" : 43210
     },
     "match" : {
+        "team_side": "right",
         "team_color": "yellow",
         "coach_name": "LARC_2021",
         "category": "3v3"

@@ -1,5 +1,6 @@
 import os
 from api.new_api import Api
+from api.api_recv import Api_recv
 import comm
 import vision
 import match
@@ -27,8 +28,11 @@ class Game():
         self.use_api = self.config.get("api")
         self.api_address = self.config.get("network").get("api_address")
         self.api_port = self.config.get("network").get("api_port")
+        self.api_recv_port = self.config.get("network").get("api_recv_port")
 
         self.api = Api(self.api_address, self.api_port)
+
+        self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
         
         if os.environ.get('USE_REFEREE'):
             self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
@@ -45,17 +49,30 @@ class Game():
         self.vision.start()
         self.comm.start()
 
-        self.api.start()
+        if self.use_api:
+            self.api.start()
+            self.api_recv.start()
         
 
     def update(self):
         frame = vision.assign_empty_values(
             self.vision.frame, 
-            color=self.match.team_color,
-            field_size=self.field.get_dimensions()
+            field_size=self.field.get_dimensions(),
+            team_side=self.match.team_side
         )
         self.match.update(frame)
         commands = self.match.decide()
+
+        if self.use_api and self.match.game_status == 'stop':
+            commands = [
+                {
+                    'robot_id': r['robot_id'],
+                    'color': r['color'],
+                    'wheel_left': 0,
+                    'wheel_right': 0
+                } for r in commands
+            ]
+            self.comm.send(commands)
 
         if self.referee.can_play() or (not self.use_referee):
             self.comm.send(commands)

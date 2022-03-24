@@ -10,16 +10,19 @@ CATEGORIES = {
 }
 
 class Match(object):
-    def __init__(self, game, team_color, coach_name=None, category="3v3"):
+    def __init__(self, game, team_side, team_color, coach_name=None, category="3v3"):
         super().__init__()
         self.game = game
         
         self.coach_name = os.environ.get('COACH_NAME', coach_name) 
+        self.team_side = os.environ.get('TEAM_SIDE', team_side) 
         self.team_color = os.environ.get('TEAM_COLOR', team_color)
         self.category = os.environ.get('CATEGORY', category)
         self.n_robots = CATEGORIES.get(self.category)
 
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+
+        self.game_status = 'stop'
 
     
     def start(self):
@@ -40,6 +43,24 @@ class Match(object):
 
         for robot in self.robots:
             robot.start()
+
+    def restart(self, team_color):
+        self.team_color = team_color
+        self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+
+        self.opposites = [
+            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
+        ]
+
+        self.robots = [
+            entities.Robot(self.game, i, self.team_color) for i in range(self.n_robots)
+        ]
+
+        self.coach.decide()
+
+        for robot in self.robots:
+            robot.start()
+
 
     def update(self, frame):
         self.ball.update(frame)

@@ -61,6 +61,7 @@ class FiraVision(threading.Thread):
         self.vision_sock.recv(1024)
     
     def _create_socket(self):
+        print(f"Creating socket with address: {self.host} and port: {self.vision_port}")
         sock = socket.socket(
             socket.AF_INET, 
             socket.SOCK_DGRAM, 
@@ -89,11 +90,11 @@ class FiraVision(threading.Thread):
         return sock
 
 
-def assign_empty_values(raw_frame, color, field_size):
+def assign_empty_values(raw_frame, field_size, team_side):
     frame = raw_frame.get('frame')
     w, h = field_size
     if frame.get('ball'):
-        if color == 'yellow':
+        if team_side == 'right':
             frame['ball']['x'] = -frame['ball'].get('x', 0)
             frame['ball']['y'] = -frame['ball'].get('y', 0)
 
@@ -101,7 +102,7 @@ def assign_empty_values(raw_frame, color, field_size):
         frame['ball']['y'] = frame['ball'].get('y', 0) + h/2
     
     for robot in frame.get("robotsYellow"):
-        if color == 'yellow':
+        if team_side == 'right':
             robot['x'] = - robot.get('x', 0)
             robot['y'] = - robot.get('y', 0)
             robot['orientation'] = robot.get('orientation', 0) + math.pi
@@ -112,7 +113,7 @@ def assign_empty_values(raw_frame, color, field_size):
         robot['orientation'] = robot.get('orientation', 0)
     
     for robot in frame.get("robotsBlue"):
-        if color == 'yellow':
+        if team_side == 'right':
             robot['x'] = - robot.get('x', 0)
             robot['y'] = - robot.get('y', 0)
             robot['orientation'] = robot.get('orientation', 0) + math.pi
