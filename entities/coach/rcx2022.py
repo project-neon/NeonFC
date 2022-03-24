@@ -19,9 +19,9 @@ class Coach(BaseCoach):
         defend_penalty_play = plays.rcx2022.DefendPenaltyPlay(self)
 
         penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.team_color)
-        penalty_seconds_trigger = plays.WaitForTrigger(15)
-        goalkick_seconds_trigger = plays.WaitForTrigger(13)
-        defendpenalty_seconds_trigger = plays.WaitForTrigger(13)
+        penalty_seconds_trigger = plays.WaitForTrigger(10)
+        goalkick_seconds_trigger = plays.WaitForTrigger(10)
+        defendpenalty_seconds_trigger = plays.WaitForTrigger(9)
 
         goalkick_trigger = plays.OnGoalKick(self.match.game.referee, self.match.team_color)
 
