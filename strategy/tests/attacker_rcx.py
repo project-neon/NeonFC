@@ -14,7 +14,7 @@ from commons.math import point_in_rect
 #class Attacker(DebugPotentialFieldStrategy):
 class SpinnerAttacker(Strategy):
 
-    def __init__(self, match, name = "PiaoDoBau"):
+    def __init__(self, match, name = "SpinnerAttacker"):
         self.ctrl_params = {"l": 0.07}
         super().__init__(match,
             name=name,
