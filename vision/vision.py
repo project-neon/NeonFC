@@ -93,7 +93,35 @@ class FiraVision(threading.Thread):
 def assign_empty_values(raw_frame, field_size, team_side):
     frame = raw_frame.get('frame')
     w, h = field_size
-    print(frame)
+    if frame.get('ball'):
+        if team_side == 'right':
+            frame['ball']['x'] = -frame['ball'].get('x', 0)
+            frame['ball']['y'] = -frame['ball'].get('y', 0)
+
+        frame['ball']['x'] = frame['ball'].get('x', 0) + w/2
+        frame['ball']['y'] = frame['ball'].get('y', 0) + h/2
+    
+    for robot in frame.get("robotsYellow"):
+        if team_side == 'right':
+            robot['x'] = - robot.get('x', 0)
+            robot['y'] = - robot.get('y', 0)
+            robot['orientation'] = robot.get('orientation', 0) + math.pi
+
+        robot['x'] = robot.get('x', 0) + w/2
+        robot['y'] = robot.get('y', 0) + h/2
+        robot['robotId'] = robot.get('robotId', 0)
+        robot['orientation'] = robot.get('orientation', 0)
+    
+    for robot in frame.get("robotsBlue"):
+        if team_side == 'right':
+            robot['x'] = - robot.get('x', 0)
+            robot['y'] = - robot.get('y', 0)
+            robot['orientation'] = robot.get('orientation', 0) + math.pi
+
+        robot['x'] = robot.get('x', 0) + w/2
+        robot['y'] = robot.get('y', 0) + h/2
+        robot['robotId'] = robot.get('robotId', 0)
+        robot['orientation'] = robot.get('orientation', 0)
     
     return frame
 

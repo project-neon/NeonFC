@@ -8,6 +8,7 @@ import argparse
 import fields as pitch
 from commons.utils import get_config
 from pyVSSSReferee.RefereeComm import RefereeComm
+from vision.sslvision import assign_empty_values
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config.json')
@@ -53,15 +54,15 @@ class Game():
         
 
     def update(self):
-        frame = vision.assign_empty_values(
+        frame = assign_empty_values(
             self.vision.frame, 
             field_size=self.field.get_dimensions(),
             team_side=self.match.team_side
         )
-        # self.match.update(frame)
-        # commands = self.match.decide()
+        self.match.update(frame)
+        commands = self.match.decide()
 
-        # self.comm.send(commands)
+        self.comm.send(commands)
         pass
 
 
