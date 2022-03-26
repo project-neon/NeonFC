@@ -12,8 +12,8 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-import messages_robocup_ssl_detection_pb2 as messages__robocup__ssl__detection__pb2
-import messages_robocup_ssl_geometry_pb2 as messages__robocup__ssl__geometry__pb2
+import protocols.ssl_vision.messages_robocup_ssl_detection_pb2 as messages__robocup__ssl__detection__pb2
+import protocols.ssl_vision.messages_robocup_ssl_geometry_pb2 as messages__robocup__ssl__geometry__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
