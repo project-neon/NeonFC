@@ -15,6 +15,7 @@ from strategy.tests.newMidFielder import newMidFielder
 
 from strategy.tests.midfieldercx import MidFielderSupporter
 from strategy.tests.goalkeeper_rcx import GoalKeeperRCX
+from strategy.tests.attacker_rcx import SpinnerAttacker
 
 from strategy.tests.astarAttacker import AstarAttacker
 from strategy.tests.dijkSeeker import DijkstraSeeker
