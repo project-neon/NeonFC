@@ -9,6 +9,7 @@ from entities.coach.experiment_astar import Coach as AstarCoach
 from entities.coach.coach_newGK import Coach as NGKCoach
 from entities.coach.coach_newATK import Coach as NATCoach
 from entities.coach.rcx2022 import Coach as RCX_2022
+from entities.coach.cbfrs2022 import Coach as CBFRS_2022
 
 from entities.coach.guideCoach import Coach as GuideCoach
 from entities.coach.stratch_alex import Coach as AlexCoach
@@ -24,7 +25,8 @@ _coach_list = [
     NATCoach,
     GuideCoach,
     AlexCoach,
-    RCX_2022
+    RCX_2022,
+    CBFRS_2022
 ]
 
 COACHES = {c.NAME: c for c in _coach_list}
