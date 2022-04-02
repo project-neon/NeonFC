@@ -11,14 +11,14 @@ from pyVSSSReferee.RefereeComm import RefereeComm
 from vision.sslvision import assign_empty_values
 
 parser = argparse.ArgumentParser(description='NeonFC')
-parser.add_argument('--config_file', default='config.json')
+parser.add_argument('--config_file', default='config_real_life.json')
 
 args = parser.parse_args()
 
 class Game():
     def __init__(self, config_file=None):
         self.config = get_config(config_file)
-        self.match = match.Match(self,
+        self.match = match.MatchRealLife(self,
             **self.config.get('match')
         )
         self.vision = vision.SSLVision()
