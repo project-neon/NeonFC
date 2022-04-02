@@ -54,7 +54,7 @@ class Robot(object):
     def update(self, frame):
         team_color_key = 'robotsBlue' if self.team_color == 'blue' else 'robotsYellow'
 
-        robot_data = [i for i in frame[team_color_key] if i.get('robotId') == self.robot_id]
+        robot_data = [i for i in frame.get(team_color_key, []) if i.get('robotId') == self.robot_id]
 
         if len(robot_data) >= 1:
             self.current_data = robot_data[0]

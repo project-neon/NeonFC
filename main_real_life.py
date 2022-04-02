@@ -57,8 +57,11 @@ class Game():
         frame = assign_empty_values(
             self.vision.frame, 
             field_size=self.field.get_dimensions(),
-            team_side=self.match.team_side
+            team_side=self.match.team_side,
+            last_frame=self.vision.last_frame
         )
+        self.vision.last_frame = frame
+        
         self.match.update(frame)
         commands = self.match.decide()
 

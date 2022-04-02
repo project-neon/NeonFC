@@ -23,6 +23,7 @@ class SSLVision(threading.Thread):
         self.config = get_config()
 
         self.frame = {}
+        self.last_frame = {}
         
         self.vision_port = 10006
         self.host = '224.5.23.2'
@@ -92,7 +93,10 @@ class SSLVision(threading.Thread):
         return sock
 
 
-def assign_empty_values(raw_frame, field_size, team_side):
+def assign_empty_values(raw_frame, field_size, team_side, last_frame=None):
+    if raw_frame.get('detection') is None:
+        return last_frame
+
     frame = raw_frame.get('detection')
     w, h = field_size
 
@@ -131,7 +135,7 @@ def assign_empty_values(raw_frame, field_size, team_side):
         robot['y'] = robot.get('y', 0) + h/2
         robot['robotId'] = robot.get('robotId', 0)
         robot['orientation'] = robot.get('orientation', 0)
-    
+
     return frame
 
 if __name__ == "__main__":
