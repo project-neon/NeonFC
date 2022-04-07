@@ -50,10 +50,14 @@ class MainPlay(Play):
         for strategy, fit_fuction in constraints:
             elected, best_fit = -1, -99999
 
+            index = 0
             for robot_id in robots:
-                robot_fit = fit_fuction(self.match.robots[robot_id])
+                for i in range(len(self.match.robots)):
+                    if self.match.robots[i].robot_id == robot_id:
+                        index = i
+                robot_fit = fit_fuction(self.match.robots[index])
                 if (robot_fit > best_fit):
-                    best_fit, elected = robot_fit, robot_id
+                    best_fit, elected = robot_fit, index
             
             if self.match.robots[elected].strategy is None:
                 self.match.robots[elected].strategy = strategy
@@ -61,7 +65,7 @@ class MainPlay(Play):
                 self.match.robots[elected].strategy = strategy
                 self.match.robots[elected].start()
 
-            robots.remove(elected)
+            robots.remove(self.match.robots[elected].robot_id)
 
     def _elect_attacker(self, robot):
         is_behind = 2 if robot.x > self.match.ball.x else 1

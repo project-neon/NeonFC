@@ -1,0 +1,30 @@
+{
+    "network" : {
+        "multicast_ip": "224.5.23.2",
+        "referee_ip": "224.5.23.3",
+        "host_ip": "localhost",
+        "blue_port": 30011,
+        "yellow_port": 30012,
+        "vision_port": 10006,
+        "command_port": 20011,
+        "replacer_port": 10004,
+        "referee_port": 10003,
+        "api_address": "127.0.0.1",
+        "api_port" : 43210,
+        "api_recv_port": 43211
+    },
+    "match" : {
+        "team_side": "left",
+        "team_color": "blue",
+        "coach_name": "RCX_2022",
+        "category": "3v3",
+        "robot_ids": [
+            3,
+            9,
+            0
+        ]
+    },
+    "referee": true,
+    "data_sender": false,
+    "api": false
+}

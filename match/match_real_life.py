@@ -1,0 +1,92 @@
+import os
+import time
+import entities
+from api import Api
+
+from concurrent import futures
+
+CATEGORIES = {
+    '3v3': 3, '5v5': 5
+}
+
+class MatchRealLife(object):
+    def __init__(self, game, team_side, team_color, coach_name=None, category="3v3", robot_ids=[0,1,2]):
+        super().__init__()
+        self.game = game
+        
+        self.coach_name = os.environ.get('COACH_NAME', coach_name) 
+        self.team_side = os.environ.get('TEAM_SIDE', team_side) 
+        self.team_color = os.environ.get('TEAM_COLOR', team_color)
+        self.category = os.environ.get('CATEGORY', category)
+        self.n_robots = CATEGORIES.get(self.category)
+        self.robot_ids = os.environ.get('robot_ids', robot_ids)
+
+        self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+
+        self.game_status = 'stop'
+
+    
+    def start(self):
+        print("Starting match module starting ...")
+        self.ball = entities.Ball(self.game)
+
+        self.opposites = [
+            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
+        ]
+
+        self.robots = [
+            entities.Robot(self.game, i, self.team_color) for i in self.robot_ids
+        ]
+
+        self.coach = entities.coach.COACHES[self.coach_name](self)
+        print(f"Match started! coach is [{self.coach.NAME}]")
+        self.coach.decide()
+
+        for robot in self.robots:
+            robot.start()
+
+    def restart(self, team_color):
+        self.team_color = team_color
+        self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+
+        self.opposites = [
+            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
+        ]
+
+        self.robots = [
+            entities.Robot(self.game, i, self.team_color) for i in self.robot_ids
+        ]
+
+        self.coach.decide()
+
+        for robot in self.robots:
+            robot.start()
+
+
+    def update(self, frame):
+        self.ball.update(frame)
+
+        for entity in self.opposites:
+            entity.update(frame)
+        
+        for entity in self.robots:
+            entity.update(frame)
+
+
+    def decide(self):
+        commands = []
+        commands_futures = []
+        '''
+        https://docs.python.org/3/library/concurrent.futures.html
+        '''
+        self.coach.decide()
+
+        with futures.ThreadPoolExecutor(max_workers=self.n_robots) as executor:
+            commands_futures = [
+                executor.submit(robot.decide) for robot in self.robots
+            ]
+
+        for future in futures.as_completed(commands_futures):
+            commands.append(future.result())
+
+        return commands
