@@ -50,7 +50,7 @@
             "BLUE": [
                 {"robot_id": 0, "x": -0.695, "y": 0, "orientation": 90},
                 {"robot_id": 1, "x": 0.225, "y": 0, "orientation": 0},
-                {"robot_id": 2, "x": -0.113, "y": 0.4, "orientation": 0}
+                {"robot_id": 2, "x": -0.113, "y": 0.48, "orientation": 0}
             ]
         },
         "FREE_KICK": {

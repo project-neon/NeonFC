@@ -20,7 +20,7 @@ class PenaltyPlay(MainPlay):
 
     def get_positions(self, foul, team_color, foul_color, quadrant):
         angle_of_interest = 25
-        dist_to_ball = 0.225
+        dist_to_ball = 0.06
         shoot_side = random.choice([-1, 1])
 
         replacements = self.coach._get_positions(foul, team_color, foul_color, quadrant)
@@ -35,7 +35,7 @@ class PenaltyPlay(MainPlay):
                     {
                         "robot_id": 1, 
                         "x": 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
-                        "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
+                        "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball + shoot_side*0.015,
                         "orientation": - shoot_side * angle_of_interest
                     }
                 )
@@ -43,8 +43,8 @@ class PenaltyPlay(MainPlay):
                 replacements.append(
                     {
                         "robot_id": 1, 
-                        "x": - field_size[0]/2 + 0.375 + math.cos(math.radians(angle_of_interest)) * dist_to_ball,
-                        "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
+                        "x": - field_size[0]/2 + 0.375 + math.cos(math.radians(angle_of_interest)) * dist_to_ball + 0.05,
+                        "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball - shoot_side*0.015,
                         "orientation": + shoot_side * angle_of_interest
                     }
                 )
