@@ -8,3 +8,6 @@ PyQt5
 
 # Referee custom library
 pyVsssReferee
+
+# For real life execution
+pyserial
