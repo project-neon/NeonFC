@@ -130,10 +130,10 @@ class SpinnerAttacker(Strategy):
     
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
-        uvf_radius = 0.075 # 7.5 cm
+        uvf_radius = 0.072 # 7.5 cm
         uvf_radius_2 = 0.08 # 7.5 cm
 
-        tangential_speed = lambda m: max(.8, (m.ball.vx**2 + m.ball.vy**2)**.5 + .2 ) # 8 cm/s
+        tangential_speed = 0.9 # 8 cm/s
 
         """
         MTG-UVF: move to goal univector field
@@ -230,7 +230,7 @@ class SpinnerAttacker(Strategy):
             if abs(dist) > radius and dist < 0:
                 return 0
             dist = 0.5 * max(0, min(dist, radius))/ (radius)
-            return speed(m) * (dist + 0.5)
+            return speed * (dist + 0.5)
 
         def uvf_mean_contributtion_right(m, radius=uvf_radius_2, robot=self.robot, speed=tangential_speed):
             pos =  [robot.x, robot.y]
@@ -257,7 +257,7 @@ class SpinnerAttacker(Strategy):
             if abs(dist) > radius and dist < 0:
                 return 0
             dist = 0.5 * max(0, min(dist, radius))/ (radius )
-            return speed(m) * (dist + 0.5)
+            return speed * (dist + 0.5)
 
         self.seek.add_field(
             algorithms.fields.TangentialField(
