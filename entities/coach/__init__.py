@@ -13,6 +13,8 @@ from entities.coach.rcx2022 import Coach as RCX_2022
 from entities.coach.guideCoach import Coach as GuideCoach
 from entities.coach.stratch_alex import Coach as AlexCoach
 
+from entities.coach.rsm2022 import Coach as RSMCoach
+
 _coach_list = [
     # Tournament coaches
     LarcCoach20,
@@ -24,7 +26,9 @@ _coach_list = [
     NATCoach,
     GuideCoach,
     AlexCoach,
-    RCX_2022
+    RCX_2022,
+    RSMCoach
+    
 ]
 
 COACHES = {c.NAME: c for c in _coach_list}

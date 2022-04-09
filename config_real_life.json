@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "RCX_2022",
+        "coach_name": "RSM_2022",
         "category": "3v3",
         "robot_ids": [
             3,

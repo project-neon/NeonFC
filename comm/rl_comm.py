@@ -46,7 +46,9 @@ class RLComm(object):
         '''
         message = ""
         for rb in robot_commands:
-            message += f"{rb['robot_id']} {rb['wheel_right']} {rb['wheel_left']} "
+            message += f"{rb['robot_id']} {rb['wheel_right']} {rb['wheel_left']},"
+
+        message = message[:-1]
 
         self.comm.write(message.encode())
 
