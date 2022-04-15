@@ -41,8 +41,8 @@ class Robot_PID(object):
         self.game = self.robot.game
 
         self.desired = np.array([0, 0])
-        self.linear_pid = PID(2, 1.2, 0)
-        self.angular_pid = PID(12, 4, 0)
+        self.linear_pid = PID(500, 0, 0)
+        self.angular_pid = PID(0, 0, 0)
         self.power_left , self.power_right = 0, 0
 
         # self.pid_file = open("pid.log", "a")
@@ -61,12 +61,13 @@ class Robot_PID(object):
         acc_right = vl + va
 
         if self.game.vision._fps != 0:
-            self.power_left = self.power_left + acc_left * (1/self.game.vision._fps)
-            self.power_right = self.power_right + acc_right * (1/self.game.vision._fps)
+            # self.power_left = self.power_left + acc_left * (1/self.game.vision._fps)
+            # self.power_right = self.power_right + acc_right * (1/self.game.vision._fps)
+            self.power_left = acc_left * (1/self.game.vision._fps)
+            self.power_right = acc_right * (1/self.game.vision._fps)
 
-            self.power_left = min(500, max(self.power_left, -500))
-            self.power_right = min(500, max(self.power_right, -500))
-
+            self.power_left = min(255, max(self.power_left, -255))
+            self.power_right = min(255, max(self.power_right, -255))
             return self.power_left , self.power_right
         
         return 0, 0

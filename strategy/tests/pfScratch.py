@@ -1,5 +1,5 @@
-import math
 import algorithms
+import controller
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 
@@ -8,7 +8,8 @@ import numpy as np
 
 class Scratch(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match)
+        super().__init__(match, "asdgasad")
+        
 
         """
         Ambiente para rascunhar novas estrategias com
@@ -30,9 +31,6 @@ class Scratch(Strategy):
         comportamentos que evitem que ele cometa faltas ou fique travado na parede, atrapalhe o goleiro e principalmente
         que evite-o de fazer gol contra :P
         """
-        
-        self.plot_field = plot_field
-        self.exporter = None
 
         """
         Essa é uma definição basica de campo, você sempre irá usar o objeto 
@@ -40,10 +38,7 @@ class Scratch(Strategy):
         nesse caso convencionamos que sera 'NOME_CLASSE|NOME_COMPORTAMENTO', o nome da classe
         já é dado pelo cósigo e o nome do comportamento você decide, nesse caso é FieldBehaviour
         """
-        self.field = algorithms.fields.PotentialField(
-            self.match,
-            name="{}|FieldBehaviour".format(self.__class__)
-        )
+
         """
         Crie quantos você quiser, cada um irá representar um comportamento que você definiu no passo (1)
         """
@@ -52,10 +47,10 @@ class Scratch(Strategy):
 
     def start(self, robot=None):
         super().start(robot=robot)
-
-        if self.plot_field:
-            self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
-        
+        self.field = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|FieldBehaviour".format(self.__class__)
+        )
         """
         No Start você ira adicionar campos potenciais aos comportamentos criados no metodo __init__
         de uma olhada na documentação de como se cria cada campo e como eles se comportam. Aqui, por exemplo
@@ -65,11 +60,10 @@ class Scratch(Strategy):
         self.field.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = (0.75, 0.65),
-                radius = 0.05, # 30cm
-                decay = lambda x: 1,
-                field_limits = [0.75*2 , 0.65*2],
-                multiplier = 1.2 # 50 cm/s
+                target = lambda m: (m.ball.x, m.ball.y),
+                radius = 0.05, # 5cm
+                decay = lambda x: x,
+                multiplier = 0.5 # 50 cm/s
             )
         )
 
@@ -86,11 +80,8 @@ class Scratch(Strategy):
         comportamento sera execuetado nesse momento. crie o conjunto de regras
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
+        print(">>>>>>>>>>> ROBOT POS::", self.robot.x, self.robot.y, self.robot.robot_id)
+        print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.speed)
         behaviour = self.field
-
-        if self.exporter:
-            self.exporter.export(behaviour, self.robot, self.match.ball)
-            return (0, 0)
-
         return behaviour.compute([self.robot.x, self.robot.y])
 

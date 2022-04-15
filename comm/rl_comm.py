@@ -44,18 +44,19 @@ class RLComm(object):
             }
         ]
         '''
-        message = ""
+        message = "<"
+        robot_commands = sorted(robot_commands, key = lambda i: i['robot_id'])
         for rb in robot_commands:
-            message += f"{rb['robot_id']} {rb['wheel_right']} {rb['wheel_left']},"
+            message += f"{rb['robot_id']},{round(rb['wheel_right'], 2)},{round(rb['wheel_left'], 2)},"
 
-        message = message[:-1]
+        message = message[:-1] + '>'
 
         self.comm.write(message.encode())
 
-        battery = self.comm.readline().decode('ascii')
+        # battery = self.comm.readline().decode('ascii')
 
         print('mensagem', message)
-        print('bateria: ', battery)
+        # print('bateria: ', battery)
 
 
     def _get_robot_color(self, robot):
