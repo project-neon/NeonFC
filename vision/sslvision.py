@@ -16,6 +16,9 @@ from google.protobuf.json_format import MessageToJson
 
 from protocols.ssl_vision import messages_robocup_ssl_wrapper_pb2
 
+FIX_ROBOT_H = 0.012 + 0.09
+FIX_ROBOT_W = 0.006
+
 
 class SSLVision(threading.Thread):
     def __init__(self):
@@ -120,23 +123,23 @@ def assign_empty_values(raw_frame, field_size, team_side, last_frame=None):
     
     for robot in frame.get("robotsYellow", []):
         if team_side == 'right':
-            robot['x'] = - robot.get('x', 0)  / 1000
-            robot['y'] = - robot.get('y', 0)  / 1000
+            robot['x'] = - robot.get('x', 0)
+            robot['y'] = - robot.get('y', 0) 
             robot['orientation'] = robot.get('orientation', 0) + math.pi
 
-        robot['x'] = robot.get('x', 0)  / 1000 + w/2
-        robot['y'] = robot.get('y', 0)  / 1000 + h/2
+        robot['x'] = robot.get('x', 0)  / 1000 + w/2 + FIX_ROBOT_W
+        robot['y'] = robot.get('y', 0)  / 1000 + h/2 + FIX_ROBOT_H
         robot['robotId'] = robot.get('robotId', 0)
         robot['orientation'] = robot.get('orientation', 0)
     
     for robot in frame.get("robotsBlue", []):
         if team_side == 'right':
-            robot['x'] = - robot.get('x', 0)  / 1000
-            robot['y'] = - robot.get('y', 0)  / 1000
+            robot['x'] = - robot.get('x', 0)  
+            robot['y'] = - robot.get('y', 0) 
             robot['orientation'] = robot.get('orientation', 0) + math.pi
 
-        robot['x'] = robot.get('x', 0)  / 1000 + w/2
-        robot['y'] = robot.get('y', 0)  / 1000+ h/2
+        robot['x'] = robot.get('x', 0)  / 1000 + w/2 + FIX_ROBOT_W
+        robot['y'] = robot.get('y', 0)  / 1000+ h/2 + FIX_ROBOT_H
         robot['robotId'] = robot.get('robotId', 0)
         robot['orientation'] = robot.get('orientation', 0)
 

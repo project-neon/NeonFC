@@ -1,4 +1,5 @@
 import algorithms
+import math
 import controller
 from controller.PID import Robot_PID
 from controller.simple_LQR import TwoSidesLQR, SimpleLQR
@@ -59,13 +60,78 @@ class Scratch(Strategy):
         tem um campo que leva a bola, note que elementos dinamicos podem ser passados como uma função lambda
         referencia util para funções lambdas: https://realpython.com/python-lambda/.
         """
+        # self.field.add_field(
+        #     algorithms.fields.PointField(
+        #         self.match,
+        #         target = lambda m: (0.75, 0.65),
+        #         radius = 0.25, # 1cm
+        #         decay = lambda x: x**2,
+        #         multiplier = 0.5 # 50 cm/s
+        #     )
+        # )
+
+        # self.field.add_field(
+        #     algorithms.fields.LineField(
+        #         self.match,
+        #         target = (0.75, 0.65),
+        #         theta = math.pi/2,
+        #         line_size = 0.5,
+        #         line_dist = 0.25,
+        #         line_dist_max = 0.5,
+        #         decay = lambda x: x,
+        #         multiplier = 0.5
+        #     )
+        # )
+
+        """
+        Behaviour to make goalkeeper follow the ball vertically
+        """
+
+        def set_boundaries(m):
+            x = 0.26
+            y = m.ball.y
+            if m.ball.y > 0.96:
+                y = 0.96
+            elif m.ball.y < 0.58:
+                y = 0.58
+            return x, y
+            
+
         self.field.add_field(
-            algorithms.fields.PointField(
+            algorithms.fields.LineField(
                 self.match,
-                target = lambda m: (0.75, 0.65),
-                radius = 0.25, # 1cm
+                target = set_boundaries,
+                theta = 0,
+                line_size = 0.2,
+                line_dist = 0.25,
+                line_dist_max = 1.3,
                 decay = lambda x: x**2,
-                multiplier = 0.5 # 50 cm/s
+                multiplier = 0.4,
+            )
+        )
+
+        self.field.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target = (0.30, 0.75),
+                theta = math.pi/2,
+                line_size = 1.3,
+                line_dist = 0.4,
+                decay = lambda x: x,
+                multiplier = 0.5,
+            )
+        )
+
+        self.field.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target = (0, 0.75),
+                theta = math.pi/2,
+                line_size = 1.3,
+                line_dist = 0.4,
+                line_dist_max = 0.1,
+                decay = lambda x: 1,
+                multiplier = -1,
             )
         )
 
@@ -84,6 +150,7 @@ class Scratch(Strategy):
         """
         print(">>>>>>>>>>> ROBOT POS::", self.robot.x, self.robot.y, self.robot.robot_id)
         print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.vtheta)
+        print(">>>>>>>>>>> BALL POS <<<<<<<<::", self.match.ball.x, self.match.ball.y)
         behaviour = self.field
         return behaviour.compute([self.robot.x, self.robot.y])
 
