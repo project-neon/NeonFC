@@ -31,7 +31,7 @@ class Robot(object):
 
         self.dimensions = {
             'L': 0.075,
-            'R': 0.02
+            'R': 0.035
         }
 
         self.power_left, self.power_right = 0, 0

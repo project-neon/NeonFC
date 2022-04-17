@@ -1,5 +1,7 @@
 import algorithms
 import controller
+from controller.PID import Robot_PID
+from controller.simple_LQR import TwoSidesLQR, SimpleLQR
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 
@@ -8,7 +10,7 @@ import numpy as np
 
 class Scratch(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match, "asdgasad")
+        super().__init__(match, "asdgasad", controller=TwoSidesLQR)
         
 
         """
@@ -60,9 +62,9 @@ class Scratch(Strategy):
         self.field.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = lambda m: (m.ball.x, m.ball.y),
-                radius = 0.05, # 5cm
-                decay = lambda x: x,
+                target = lambda m: (0.75, 0.65),
+                radius = 0.25, # 1cm
+                decay = lambda x: x**2,
                 multiplier = 0.5 # 50 cm/s
             )
         )
@@ -81,7 +83,7 @@ class Scratch(Strategy):
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
         print(">>>>>>>>>>> ROBOT POS::", self.robot.x, self.robot.y, self.robot.robot_id)
-        print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.speed)
+        print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.vtheta)
         behaviour = self.field
         return behaviour.compute([self.robot.x, self.robot.y])
 
