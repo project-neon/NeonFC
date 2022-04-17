@@ -101,6 +101,9 @@ def assign_empty_values(raw_frame, field_size, team_side, last_frame=None):
     frame = raw_frame.get('detection')
     w, h = field_size
 
+    h = h-0.08
+    w = w-0.06
+
     frame['ball'] = {}
     if frame.get('balls'):
         
