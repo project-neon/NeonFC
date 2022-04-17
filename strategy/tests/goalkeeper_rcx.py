@@ -56,10 +56,10 @@ class GoalKeeperRCX(Strategy):
 
             if m.ball.x < (self.sa_w/2 + self.robot_w/2):
                 if self.robot.y < m.ball.y < g_hgr:
-                    y = g_hgr
+                    y = g_hgr + self.robot_w/4
                     return (x, y)
                 elif self.robot.y > m.ball.y > g_lwr:
-                    y = g_lwr
+                    y = g_lwr - self.robot_w/4
                     return (x, y)
 
             if m.ball.vx == 0:
@@ -81,11 +81,11 @@ class GoalKeeperRCX(Strategy):
             #trava o goleiro na lateral do gol caso a bola esteja no escanteio ou 
             #acima/abaixo da linha do gol e indo para o escanteio
             if (m.ball.y > g_cvr_sup and m.ball.y > ga_hgr) or (m.ball.y > ga_hgr):
-                y = g_hgr
+                y = g_hgr + self.robot_w/4
                 return (x, y)
 
             elif (m.ball.y < g_cvr_inf and m.ball.y < ga_lwr) or (m.ball.y < ga_lwr):
-                y = g_lwr
+                y = g_lwr - self.robot_w/4
                 return (x, y)
 
             #bloqueia uma possivel trajetoria da bola se ela esta no meio do campo indo para a lateral
@@ -93,9 +93,9 @@ class GoalKeeperRCX(Strategy):
                 y = m.ball.y + m.ball.vy*(12/60)
                 
                 if y > g_hgr:
-                    y = g_hgr
+                    y = g_hgr + self.robot_w/4
                 elif y < g_lwr:
-                    y = g_lwr
+                    y = g_lwr - self.robot_w/4
                 
                 return (x, y)
 
@@ -127,7 +127,7 @@ class GoalKeeperRCX(Strategy):
                 line_size = self.sa_w/2,
                 line_dist = 0.1,
                 line_dist_max = 0.7,
-                multiplier = 1.5,
+                multiplier = 1.6,
                 decay = lambda x : x
             )
         )
@@ -229,9 +229,11 @@ class GoalKeeperRCX(Strategy):
 
         #trave superior do gol
         g_hgr = (self.field_h/2)+0.2
+        ga_hgr = g_hgr + 0.15
 
         #trave inferior do gol
         g_lwr = (self.field_h/2)-0.2
+        ga_lwr = g_lwr - 0.15
 
         if dist_to_ball > 0.08:
             if (self.robot.x <= self.sa_w-0.0375  and self.robot.x > 0.0375  and self.robot.y >= self.sa_y 
@@ -251,7 +253,12 @@ class GoalKeeperRCX(Strategy):
                     if (theta >= 87 and theta <= 93) or (theta >= 267 and theta <= 273):
                         return False
                     else:
-                        return True
+                        for r in self.match.opposites:
+                            if (point_in_rect((r.x, r.y), (self.sa_x, self.sa_y, self.sa_w, self.sa_h)) and
+                               point_in_rect((ball.x, ball.y ), (self.sa_x, self.sa_y, self.sa_w, self.sa_h))):
+                                return False
+                            else:
+                                return True
             else: 
                 return False
         else:
@@ -266,12 +273,9 @@ class GoalKeeperRCX(Strategy):
                         return False
 
                 for r in self.match.opposites:
-                    if point_in_rect((r.x, r.y), (0.15, 0.25, 0.225, 0.7)) or 0 < r.x < self.field_w/4 and g_lwr < r.y < g_hgr:
-                        if self.match.ball.x < self.robot.x and (g_lwr > self.match.ball.y or self.match.ball.y > g_hgr):
-                            if self.match.ball.vx > 0:
-                                return False
-                            else:
-                                return True
+                    if point_in_rect((r.x, r.y), (0.15, 0.25, 0.225, 0.7)) or 0 < r.x < self.field_w/4 and ga_lwr < r.y < ga_hgr:
+                        if self.match.ball.x < self.sa_w/2 and (g_lwr > self.match.ball.y or self.match.ball.y > g_hgr):
+                            return False
                         else:
                             return False
 
