@@ -42,6 +42,7 @@ class SSLVision(threading.Thread):
             (v - i) for i, v in zip(self._frame_times, list(self._frame_times)[1:])
         ]
         self._fps = len(fps_frame_by_frame)/sum(fps_frame_by_frame)
+        print(self._fps)
 
     def run(self):
         print("Starting vision...")
@@ -104,11 +105,11 @@ def assign_empty_values(raw_frame, field_size, team_side, last_frame=None):
     if frame.get('balls'):
         
         if team_side == 'right':
-            frame['ball']['x'] = -frame['balls'][0].get('x', 0)
-            frame['ball']['y'] = -frame['balls'][0].get('y', 0)
+            frame['ball']['x'] = -frame['balls'][0].get('x', 0)  / 100
+            frame['ball']['y'] = -frame['balls'][0].get('y', 0)  / 100
 
-        frame['ball']['x'] = frame['balls'][0].get('x', 0) + w/2
-        frame['ball']['y'] = frame['balls'][0].get('y', 0) + h/2
+        frame['ball']['x'] = frame['balls'][0].get('x', 0)  / 1000 + w/2
+        frame['ball']['y'] = frame['balls'][0].get('y', 0)  / 1000 + h/2
     else:
         # TODO: definir como vamos tratar quando nao ha um elemento necessario no campo como a bola
         frame['ball']['x'] = -1
@@ -116,23 +117,23 @@ def assign_empty_values(raw_frame, field_size, team_side, last_frame=None):
     
     for robot in frame.get("robotsYellow", []):
         if team_side == 'right':
-            robot['x'] = - robot.get('x', 0)
-            robot['y'] = - robot.get('y', 0)
+            robot['x'] = - robot.get('x', 0)  / 1000
+            robot['y'] = - robot.get('y', 0)  / 1000
             robot['orientation'] = robot.get('orientation', 0) + math.pi
 
-        robot['x'] = robot.get('x', 0) + w/2
-        robot['y'] = robot.get('y', 0) + h/2
+        robot['x'] = robot.get('x', 0)  / 1000 + w/2
+        robot['y'] = robot.get('y', 0)  / 1000 + h/2
         robot['robotId'] = robot.get('robotId', 0)
         robot['orientation'] = robot.get('orientation', 0)
     
     for robot in frame.get("robotsBlue", []):
         if team_side == 'right':
-            robot['x'] = - robot.get('x', 0)
-            robot['y'] = - robot.get('y', 0)
+            robot['x'] = - robot.get('x', 0)  / 1000
+            robot['y'] = - robot.get('y', 0)  / 1000
             robot['orientation'] = robot.get('orientation', 0) + math.pi
 
-        robot['x'] = robot.get('x', 0) + w/2
-        robot['y'] = robot.get('y', 0) + h/2
+        robot['x'] = robot.get('x', 0)  / 1000 + w/2
+        robot['y'] = robot.get('y', 0)  / 1000+ h/2
         robot['robotId'] = robot.get('robotId', 0)
         robot['orientation'] = robot.get('orientation', 0)
 

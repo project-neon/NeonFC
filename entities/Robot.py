@@ -31,7 +31,7 @@ class Robot(object):
 
         self.dimensions = {
             'L': 0.075,
-            'R': 0.02
+            'R': 0.035
         }
 
         self.power_left, self.power_right = 0, 0
@@ -44,6 +44,7 @@ class Robot(object):
 
         self.vx, self.vy, self.vtheta = 0, 0, 0
         self.x, self.y, self.theta = 0, 0, 0
+        self.speed = 0
 
     def start(self):
         self.strategy.start(self)

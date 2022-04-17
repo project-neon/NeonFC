@@ -17,10 +17,10 @@ def py_ang(v1, v2):
 Essa variavel experimental serve para converter o resultado do LQR
 para um valor coerente a velocidade desejada em m/s
 """
-EXPERIMENTAL_SPEED_CONSTANT = 2678.57
+EXPERIMENTAL_SPEED_CONSTANT = 7000
 
 class SimpleLQR(object):
-    def __init__(self, robot, l=0.185):
+    def __init__(self, robot, l=0.125):
         self.desired = np.array([0, 0])
         self.robot = robot
 
@@ -54,7 +54,7 @@ class SimpleLQR(object):
         return pwr_left, pwr_right
 
 class TwoSidesLQR(object):
-    def __init__(self, robot, l=0.195):
+    def __init__(self, robot, l=0.125):
         self.desired = np.array([0, 0])
         self.robot = robot
 
@@ -73,10 +73,12 @@ class TwoSidesLQR(object):
         B = np.array([math.cos(self.robot.theta), math.sin(self.robot.theta)])
         between = py_ang(A, B)
 
-        if (between > math.pi/2):
+        if (between < math.pi/2):
             theta = self.robot.theta - math.pi
+            print("LADO 1")
         else:
             theta = self.robot.theta
+            print("LADO 2")
 
         v = self.desired[0] * math.cos(-theta) - self.desired[1] * math.sin(-theta)
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))

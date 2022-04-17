@@ -41,32 +41,35 @@ class Robot_PID(object):
         self.game = self.robot.game
 
         self.desired = np.array([0, 0])
-        self.linear_pid = PID(2, 1.2, 0)
-        self.angular_pid = PID(12, 4, 0)
+        self.linear_pid = PID(1, 0, 0)
+        self.angular_pid = PID(100, 0, 0)
         self.power_left , self.power_right = 0, 0
 
         # self.pid_file = open("pid.log", "a")
         
     def update(self):
         linear_speed, angular_speed = self.robot._get_differential_robot_speeds(self.robot.vx, self.robot.vy, self.robot.theta)
+        
         linear_speed, angular_speed = linear_speed * 100, angular_speed
 
         linear_desired, angular_desired = self.robot._get_desired_differential_robot_speeds(self.desired[0],self.desired[1], self.robot.theta)
         
         linear_desired, angular_desired =  linear_desired * 100, angular_desired
+        linear_desired, angular_desired = 0, -1.5
 
         vl, va = self.update_Speed(linear_desired,angular_desired,linear_speed, angular_speed)
-
+        
         acc_left  = vl - va
         acc_right = vl + va
 
         if self.game.vision._fps != 0:
-            self.power_left = self.power_left + acc_left * (1/self.game.vision._fps)
-            self.power_right = self.power_right + acc_right * (1/self.game.vision._fps)
+            # self.power_left = self.power_left + acc_left * (1/self.game.vision._fps)
+            # self.power_right = self.power_right + acc_right * (1/self.game.vision._fps)
+            self.power_left = acc_left * (1/self.game.vision._fps)
+            self.power_right = acc_right * (1/self.game.vision._fps)
 
-            self.power_left = min(500, max(self.power_left, -500))
-            self.power_right = min(500, max(self.power_right, -500))
-
+            self.power_left = min(255, max(self.power_left, -255))
+            self.power_right = min(255, max(self.power_right, -255))
             return self.power_left , self.power_right
         
         return 0, 0
