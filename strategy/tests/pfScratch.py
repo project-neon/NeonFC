@@ -123,32 +123,48 @@ class Scratch(Strategy):
                         y = ((m.ball.y-mp)/m.ball.x)*(x_rob-m.ball.x) + m.ball.y
             return x, y
 
-        """self.field.add_field(
+        #campo potencial para seguir a posição/projeção da bola
+        self.field.add_field(
             algorithms.fields.LineField(
                 self.match,
                 target = set_boundaries,
                 theta = 0,
-                line_size = 0.075,
-                line_dist = 0.25,
-                line_dist_max = 1.3,
-                decay = lambda x: x**2,
+                line_size = 0.5,
+                line_dist = 0.1,
+                decay = lambda x: x**5,
                 multiplier = 0.4,
             )
         )
 
+        #campo potencial para reposicionamento na area do gol
         self.field.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = (0.16, 0.75),
+                target = (0.12, 0.75),
                 theta = -math.pi/2,
                 line_size = 1.3,
-                line_dist = 0.25,
-                decay = lambda x: 1,
+                line_dist = 0.05,
+                decay = lambda x: x**5,
                 multiplier = 0.6,
                 line_dist_single_side = True
             )
-        )"""
+        )
 
+        #campo potencial para repulsão de dentro do gol
+        self.field.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target = (-0.05, 0.65),
+                theta = math.pi/2,
+                line_size = 1.3,
+                line_dist = 0.07,
+                line_dist_max = 0.07,
+                decay = lambda x: -1,
+                multiplier = 0.5
+            )
+        )
+
+        #campo potencial para parar no centro do gol quando a bola estiver no campo adversário
         self.calm.add_field(
             algorithms.fields.LineField(
                 self.match,
@@ -161,6 +177,7 @@ class Scratch(Strategy):
             )
         )
 
+        #campo potencial para reposicionamento na area do gol
         self.calm.add_field(
             algorithms.fields.LineField(
                 self.match,
@@ -174,6 +191,7 @@ class Scratch(Strategy):
             )
         )
         
+        #campo potencial para repulsão de dentro do gol
         self.calm.add_field(
             algorithms.fields.LineField(
                 self.match,
@@ -202,6 +220,6 @@ class Scratch(Strategy):
         print(">>>>>>>>>>> ROBOT POS::", self.robot.x, self.robot.y, self.robot.robot_id)
         print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.vtheta)
         print(">>>>>>>>>>> BALL POS <<<<<<<<::", self.match.ball.x, self.match.ball.y)
-        behaviour = self.calm
+        behaviour = self.field
         return behaviour.compute([self.robot.x, self.robot.y])
 

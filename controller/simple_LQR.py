@@ -64,7 +64,7 @@ class SimpleLQR(object):
         return angular, linear 
 
 class TwoSidesLQR(object):
-    def __init__(self, robot, l=0.025):
+    def __init__(self, robot, l=0.010):
         self.desired = np.array([0, 0])
         self.robot = robot
 
