@@ -221,6 +221,13 @@ class Scratch(Strategy):
         print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.vtheta)
         print(">>>>>>>>>>> BALL POS <<<<<<<<::", self.match.ball.x, self.match.ball.y)
         print(">>>>>>>>>>> BALL SPEED <<<<<<<<::", self.match.ball.vx, self.match.ball.vy)
-        behaviour = self.field
+        
+        behaviour = None
+
+        if self.match.ball.x > 1.2:
+            behaviour = self.calm
+        else:
+            behaviour = self.field
+        
         return behaviour.compute([self.robot.x, self.robot.y])
 
