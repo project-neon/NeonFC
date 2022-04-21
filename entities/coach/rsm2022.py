@@ -8,17 +8,17 @@ class Coach(BaseCoach): # heranca da classe abstrata
         super().__init__(match) # chamada do metodo da classe mae
 
         # vamos usar strategies de teste por enquanto, essa deixa o robo parado
-        self.test = strategy.tests.Scratch(self.match)
-        self.idle_1 = strategy.tests.Idle(self.match)
-        self.idle_2 = strategy.tests.Idle(self.match)
+        self._9 = strategy.rsm2022.Midfielder(self.match)
+        self._3 = strategy.rsm2022.Attacker(self.match)
+        self._0 = strategy.rsm2022.Goalkeeper(self.match)
 
     def decide(self):
         # esta lista eh ordenada em [robot_0, ..., robot_n]
         robots = [(i, r.robot_id) for i, r in enumerate(self.match.robots)]
         strategies = [
-            self.idle_1, 
-            self.test,
-            self.idle_2
+            self._3, 
+            self._9,
+            self._0
         ]
         print(robots)
         for robot, strategy in zip(robots, strategies):
