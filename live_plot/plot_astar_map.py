@@ -19,4 +19,4 @@ while True:
     data = sock.recv(10240)
     data = json.loads(data.decode('utf8').replace("'", '"'))
     if [a['name'] == 'Astar' for a in data]:
-        print(data)
+        pass

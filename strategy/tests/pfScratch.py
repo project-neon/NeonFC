@@ -5,10 +5,12 @@ from controller.PID import Robot_PID
 from controller.simple_LQR import TwoSidesLQR, SimpleLQR
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
+from strategy import DebugTools
 
 import json
 import numpy as np
 
+#class Scratch(DebugTools.DebugPotentialFieldStrategy):
 class Scratch(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(match, "asdgasad", controller=TwoSidesLQR)
@@ -217,9 +219,9 @@ class Scratch(Strategy):
         comportamento sera execuetado nesse momento. crie o conjunto de regras
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
-        print(">>>>>>>>>>> ROBOT POS::", self.robot.x, self.robot.y, self.robot.robot_id)
-        print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.vtheta)
-        print(">>>>>>>>>>> BALL POS <<<<<<<<::", self.match.ball.x, self.match.ball.y)
+        # print(">>>>>>>>>>> ROBOT POS::", self.robot.x, self.robot.y, self.robot.robot_id)
+        # print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.vtheta)
+        # print(">>>>>>>>>>> BALL POS <<<<<<<<::", self.match.ball.x, self.match.ball.y)
         behaviour = self.field
+        #return super().decide(behaviour)
         return behaviour.compute([self.robot.x, self.robot.y])
-

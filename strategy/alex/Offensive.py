@@ -395,7 +395,7 @@ class OffensivePlay(Strategy):
 
                 behaviour = self.tangential
         
-        print(behaviour.name)
+        #print(behaviour.name)
         # return super().decide(behaviour)
         return behaviour.compute([self.robot.x, self.robot.y])
         

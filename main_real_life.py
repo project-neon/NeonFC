@@ -68,5 +68,18 @@ class Game():
         self.comm.send(commands)
         pass
 
+        print(f">>>>>>>>> ${self.match.game_status}<<<<<<<<<<<<<\n")
+
+        if self.use_api and self.match.game_status == 'stop':
+            commands = [
+                {
+                    'robot_id': r['robot_id'],
+                    'color': r['color'],
+                    'wheel_left': 0,
+                    'wheel_right': 0
+                } for r in commands
+            ]
+            self.comm.send(commands)
+
 
 g = Game(config_file=args.config_file)

@@ -27,7 +27,7 @@ class RLComm(object):
 
     def start(self):
         print("Starting communication...")
-        self.comm = serial.Serial(self.command_port, self.baud_rate)
+        #self.comm = serial.Serial(self.command_port, self.baud_rate)
         print(f"Communication port created on {self.command_port}!")
     
     def send(self, robot_commands = []):
@@ -51,11 +51,11 @@ class RLComm(object):
 
         message = message[:-1] + '>'
 
-        self.comm.write(message.encode())
+        #self.comm.write(message.encode())
 
         # battery = self.comm.readline().decode('ascii')
 
-        print('mensagem', message)
+        #print('mensagem', message)
         # print('bateria: ', battery)
 
 

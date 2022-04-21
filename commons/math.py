@@ -60,7 +60,6 @@ def angular_speed(_list, _fps):
 
 
 def speed(_list, _fps):
-    print(_list)
     if len(_list) <= 1:
         return 0
     

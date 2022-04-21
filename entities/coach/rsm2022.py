@@ -20,7 +20,7 @@ class Coach(BaseCoach): # heranca da classe abstrata
             self.test,
             self.idle_2
         ]
-        print(robots)
+        # print(robots)
         for robot, strategy in zip(robots, strategies):
             if self.match.robots[robot[0]].strategy is not None:
             # vamos evitar chamar o start todo frame

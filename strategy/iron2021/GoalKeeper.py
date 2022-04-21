@@ -387,7 +387,7 @@ class GoalKeeper(Strategy):
         else:
             behaviour = self.alert
 
-        print('{}::{}'.format(self.robot.get_name(), behaviour.name))
+        #print('{}::{}'.format(self.robot.get_name(), behaviour.name))
         # print(self.match.ball.x)
 
         if self.exporter:

@@ -1,6 +1,6 @@
 {
     "network" : {
-        "multicast_ip": "224.5.23.2",
+        "multicast_ip": "224.5.23.4",
         "referee_ip": "224.5.23.3",
         "host_ip": "localhost",
         "blue_port": 30011,
@@ -30,5 +30,5 @@
     },
     "referee": true,
     "data_sender": false,
-    "api": false
+    "api": true
 }
