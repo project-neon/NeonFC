@@ -93,9 +93,9 @@ class Scratch(Strategy):
         """
 
         def set_boundaries(m):
-            x = 0.26
-            g_hgr = 0.96
-            g_lwr = 0.58
+            x = 0.04
+            g_hgr = 0.9
+            g_lwr = 0.45
 
             x_rob = x + 0.075/2
             if m.ball.vx == 0:
@@ -123,7 +123,7 @@ class Scratch(Strategy):
                         y = ((m.ball.y-mp)/m.ball.x)*(x_rob-m.ball.x) + m.ball.y
             return x, y
 
-        self.field.add_field(
+        """self.field.add_field(
             algorithms.fields.LineField(
                 self.match,
                 target = set_boundaries,
@@ -139,7 +139,7 @@ class Scratch(Strategy):
         self.field.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = (0.30, 0.75),
+                target = (0.16, 0.75),
                 theta = -math.pi/2,
                 line_size = 1.3,
                 line_dist = 0.25,
@@ -147,31 +147,43 @@ class Scratch(Strategy):
                 multiplier = 0.6,
                 line_dist_single_side = True
             )
-        )
+        )"""
 
         self.calm.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = (0.26, 0.75),
                 theta = 0,
-                line_size = 0.15/2,
+                target = (0.25, 0.65),
+                line_size = 0.5,
                 line_dist = 0.1,
-                line_dist_max = 0.7,
-                decay = lambda x: x,
-                multiplier = 0.7,
+                decay = lambda x: x**5,
+                multiplier = 0.25,
             )
         )
 
         self.calm.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = (0.30, 0.75),
+                target = (0.15, 0.75),
                 theta = -math.pi/2,
                 line_size = 1.3,
-                line_dist = 0.25,
-                decay = lambda x: 1,
-                multiplier = 0.6,
+                line_dist = 0.1,
+                decay = lambda x: x**5,
+                multiplier = 0.25,
                 line_dist_single_side = True
+            )
+        )
+        
+        self.calm.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target = (-0.05, 0.65),
+                theta = math.pi/2,
+                line_size = 1.3,
+                line_dist = 0.07,
+                line_dist_max = 0.07,
+                decay = lambda x: -1,
+                multiplier = 0.5
             )
         )
 
@@ -190,6 +202,6 @@ class Scratch(Strategy):
         print(">>>>>>>>>>> ROBOT POS::", self.robot.x, self.robot.y, self.robot.robot_id)
         print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.vtheta)
         print(">>>>>>>>>>> BALL POS <<<<<<<<::", self.match.ball.x, self.match.ball.y)
-        behaviour = self.field
+        behaviour = self.calm
         return behaviour.compute([self.robot.x, self.robot.y])
 

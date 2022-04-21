@@ -16,9 +16,6 @@ from google.protobuf.json_format import MessageToJson
 
 from protocols.ssl_vision import messages_robocup_ssl_wrapper_pb2
 
-FIX_ROBOT_H = 0.012 + 0.09
-FIX_ROBOT_W = 0.006
-
 
 class SSLVision(threading.Thread):
     def __init__(self):
@@ -104,9 +101,6 @@ def assign_empty_values(raw_frame, field_size, team_side, last_frame=None):
     frame = raw_frame.get('detection')
     w, h = field_size
 
-    h = h-0.08
-    w = w-0.06
-
     frame['ball'] = {}
     if frame.get('balls'):
         
@@ -127,8 +121,8 @@ def assign_empty_values(raw_frame, field_size, team_side, last_frame=None):
             robot['y'] = - robot.get('y', 0) 
             robot['orientation'] = robot.get('orientation', 0) + math.pi
 
-        robot['x'] = robot.get('x', 0)  / 1000 + w/2 + FIX_ROBOT_W
-        robot['y'] = robot.get('y', 0)  / 1000 + h/2 + FIX_ROBOT_H
+        robot['x'] = robot.get('x', 0)  / 1000 + w/2
+        robot['y'] = robot.get('y', 0)  / 1000 + h/2
         robot['robotId'] = robot.get('robotId', 0)
         robot['orientation'] = robot.get('orientation', 0)
     
@@ -138,8 +132,8 @@ def assign_empty_values(raw_frame, field_size, team_side, last_frame=None):
             robot['y'] = - robot.get('y', 0) 
             robot['orientation'] = robot.get('orientation', 0) + math.pi
 
-        robot['x'] = robot.get('x', 0)  / 1000 + w/2 + FIX_ROBOT_W
-        robot['y'] = robot.get('y', 0)  / 1000+ h/2 + FIX_ROBOT_H
+        robot['x'] = robot.get('x', 0)  / 1000 + w/2
+        robot['y'] = robot.get('y', 0)  / 1000+ h/2
         robot['robotId'] = robot.get('robotId', 0)
         robot['orientation'] = robot.get('orientation', 0)
 

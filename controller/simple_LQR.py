@@ -52,6 +52,11 @@ class SimpleLQR(object):
         linear = v*self.R
         angular = self.R*(w*self.L)/2
 
+        # if abs(linear) <= 1:
+        #     linear = 0
+        # if abs(angular) <= 1:
+        #     angular = 0
+
         # if self.inverted:
         #     return -pwr_right, -pwr_left,
         # return pwr_left, pwr_right
