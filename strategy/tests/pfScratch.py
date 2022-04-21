@@ -94,7 +94,7 @@ class Scratch(Strategy):
 
         def set_boundaries(m):
             x = 0.04
-            g_hgr = 0.9
+            g_hgr = 0.83
             g_lwr = 0.45
 
             x_rob = x + 0.075/2
@@ -131,7 +131,7 @@ class Scratch(Strategy):
                 theta = 0,
                 line_size = 0.5,
                 line_dist = 0.1,
-                decay = lambda x: x**5,
+                decay = lambda x: x**7,
                 multiplier = 0.4,
             )
         )
@@ -160,7 +160,7 @@ class Scratch(Strategy):
                 line_dist = 0.07,
                 line_dist_max = 0.07,
                 decay = lambda x: -1,
-                multiplier = 0.5
+                multiplier = 0.4
             )
         )
 
@@ -220,6 +220,7 @@ class Scratch(Strategy):
         print(">>>>>>>>>>> ROBOT POS::", self.robot.x, self.robot.y, self.robot.robot_id)
         print(">>>>>>>>>>> ROBOT SPEED::", self.robot.vx, self.robot.vy, self.robot.vtheta)
         print(">>>>>>>>>>> BALL POS <<<<<<<<::", self.match.ball.x, self.match.ball.y)
+        print(">>>>>>>>>>> BALL SPEED <<<<<<<<::", self.match.ball.vx, self.match.ball.vy)
         behaviour = self.field
         return behaviour.compute([self.robot.x, self.robot.y])
 
