@@ -133,7 +133,7 @@ class SpinnerAttacker(Strategy):
         uvf_radius = 0.072 # 7.5 cm
         uvf_radius_2 = 0.08 # 7.5 cm
 
-        tangential_speed = lambda m: max(.8, (m.ball.vx**2 + m.ball.vy**2)**.5 + .3 ) # 8 cm/s
+        tangential_speed = 0.9 # 8 cm/s
 
         """
         MTG-UVF: move to goal univector field
