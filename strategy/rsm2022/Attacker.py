@@ -14,7 +14,7 @@ import numpy as np
 
 class Attacker(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match, "asdgasad", controller=TwoSidesLQR, controller_kwargs={'l': 0.008})       
+        super().__init__(match, name="RSM-Attacker", controller=TwoSidesLQR, controller_kwargs={'l': 0.008})       
         """
         Ambiente para rascunhar novas estrategias com
         campos potencias:
@@ -147,7 +147,7 @@ class Attacker(Strategy):
                 target = lambda m: (m.ball.x, m.ball.y),
                 radius = 0.20,
                 decay = lambda x: x,
-                multiplier = 0.3
+                multiplier = 0.4
             )
         )
 
@@ -161,7 +161,7 @@ class Attacker(Strategy):
                 line_dist = 0.15,
                 line_dist_max = 0.15,
                 decay = lambda x: x**2,
-                multiplier = 0.3
+                multiplier = 0.4
             )
         )
 

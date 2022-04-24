@@ -8,7 +8,7 @@ class Coach(BaseCoach): # heranca da classe abstrata
         super().__init__(match) # chamada do metodo da classe mae
 
         # vamos usar strategies de teste por enquanto, essa deixa o robo parado
-        self._9 = strategy.rsm2022.Midfielder(self.match)
+        self._9 = strategy.rsm2022.Attacker(self.match)
         self._3 = strategy.rsm2022.Attacker(self.match)
         self._0 = strategy.rsm2022.Goalkeeper(self.match)
 
@@ -20,7 +20,6 @@ class Coach(BaseCoach): # heranca da classe abstrata
             self._9,
             self._0
         ]
-        print(robots)
         for robot, strategy in zip(robots, strategies):
             if self.match.robots[robot[0]].strategy is not None:
             # vamos evitar chamar o start todo frame

@@ -14,7 +14,7 @@ from scipy.spatial import Voronoi
 class Attacker(Strategy):
 
     def __init__(self, match, name = 'UFV-Attacker'):
-        self.ctrl_params = {"l": 0.07}
+        self.ctrl_params = {"l": 0.008}
         super().__init__(match,
             name=name,
             controller=TwoSidesLQR,
@@ -285,7 +285,7 @@ class Attacker(Strategy):
                 target = (field[0]/3, field[1]/2),
                 radius = 0.1,
                 decay = lambda x: x,
-                multiplier = 0.60
+                multiplier = 0.4
             )
         )
 
@@ -300,7 +300,7 @@ class Attacker(Strategy):
                 line_dist = 0.23,
                 line_dist_max = 0.23,
                 decay = lambda x: 1,
-                multiplier = -2
+                multiplier = -1
             )
         )
 

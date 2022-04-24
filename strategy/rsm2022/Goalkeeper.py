@@ -59,6 +59,12 @@ class Goalkeeper(Strategy):
             self.match,
             name="{}|CalmBehaviour".format(self.__class__)
         )
+
+        self.edge = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|EdgeBehaviour".format(self.__class__)
+        )
+
         """
         No Start você ira adicionar campos potenciais aos comportamentos criados no metodo __init__
         de uma olhada na documentação de como se cria cada campo e como eles se comportam. Aqui, por exemplo
@@ -86,6 +92,7 @@ class Goalkeeper(Strategy):
                 return (x, y)
             
             y = (m.ball.vy/m.ball.vx)*(x_rob-m.ball.x) + m.ball.y
+            #y = m.ball.y + m.ball.vy*(4/30)
 
             mp = (0.65+m.ball.y)/2
 
@@ -99,6 +106,18 @@ class Goalkeeper(Strategy):
                         y = ((mp-m.ball.y)/m.ball.x)*(x_rob-m.ball.x) + m.ball.y
                     elif m.ball.y > 0.65:
                         y = ((m.ball.y-mp)/m.ball.x)*(x_rob-m.ball.x) + m.ball.y
+            return x, y
+
+        def edging_point(m):
+            x = 0.04
+            g_hgr = 0.83
+            g_lwr = 0.45
+
+            if m.ball.y < 0.65:
+                y = g_lwr - (0.075/2)
+            elif m.ball.y > 0.65:
+                y = g_hgr + (0.075/2)
+
             return x, y
 
         #campo potencial para seguir a posição/projeção da bola
@@ -183,6 +202,17 @@ class Goalkeeper(Strategy):
             )
         )
 
+        self.edge.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = edging_point,
+                radius = 0.1,
+                decay = lambda x: x**7,
+                multiplier = 0.4
+            )
+        )
+
+
     def reset(self, robot=None):
         super().reset()
         if robot:
@@ -200,8 +230,10 @@ class Goalkeeper(Strategy):
 
         if self.match.ball.x > 1.2:
             behaviour = self.calm
+        elif self.match.ball.x < 0.15:
+            behaviour = self.edge
         else:
             behaviour = self.field
         
         return behaviour.compute([self.robot.x, self.robot.y])
-
+        
