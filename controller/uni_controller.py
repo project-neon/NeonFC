@@ -5,19 +5,20 @@ Controle baseado em angulo desejado
 Referente ao soccer robotics
 """
 
-class SimpleLQR(object):
+class UniController(object):
     def __init__(self, robot):
         self.robot = robot
-        self.L = self.robot.dimensions.get("L") * 100 #cm
-        self.V_M = 100 #cm/s
-        self.R_M = 300 #rad*cm/s
-        self.K_W = 5 #coeficiente de feedback
+        self.L = self.robot.dimensions.get("L") * 100 #m
+        self.R = self.robot.dimensions.get("R") * 100 #m
+        self.V_M = 100 #m/s
+        self.R_M = 300 #rad*m/s
+        self.K_W = 50 #coeficiente de feedback
 
         self.v1 = 0 #restricao de velocidade 1
         self.v2 = 0 #restricao de velocidade 2
         self.theta_d = 0
         self.theta_f = 0
-        self.dl = 0.000001 #aproximar phi_v
+        self.dl = 0.0001 #aproximar phi_v em m
         self.phi_v = 0
         self.a_phi_v = 0 #absoluto de phi_v
         self.theta_e = 0
@@ -37,7 +38,7 @@ class SimpleLQR(object):
             self.phi_v += 2*math.pi
         
         self.phi_v = self.phi_v/self.dl
-        self.a_phi_v = math.abs(self.phi_v)
+        self.a_phi_v = abs(self.phi_v)
 
         #calculate theta_e
         self.theta_e = self.theta_d - self.robot.theta
@@ -47,12 +48,12 @@ class SimpleLQR(object):
         while self.theta_e < -math.pi:
             self.theta_e += 2*math.pi
         
-        self.a_theta_e = math.abs(self.a_theta_e)
+        self.a_theta_e = abs(self.a_theta_e)
 
         #calculate v
         self.v1 = (
             (2 * self.V_M
-            - self.L * self.K_M * math.sqrt(self.a_theta_e)) /
+            - self.L * self.K_W * math.sqrt(self.a_theta_e)) /
             (2 + self.L * self.a_phi_v)
         )
 
@@ -78,12 +79,16 @@ class SimpleLQR(object):
         return v, w
 
     def set_desired(self, theta):
+        vx = theta[0]
+        vy = theta[1]
+        theta = -math.atan2(vy, vx)
+
         self.theta_d = theta
-        self.theta_f = self.robot.strategy.decide(
+        vx_f, vy_f = self.robot.strategy.decide(
             self.robot.x + self.dl * math.cos(self.robot.theta),
             self.robot.y + self.dl * math.sin(self.robot.theta)
         )
-
+        self.theta_f = -math.atan2(vy_f, vx_f)
 
     def update(self):
         v, w = self.control()
@@ -91,5 +96,5 @@ class SimpleLQR(object):
         pwr_left = (2 * v - w * self.L)/2 * self.R
         pwr_right = (2 * v + w * self.L)/2 * self.R
 
-        return pwr_left, pwr_right
+        return pwr_left * 100, pwr_right * 100
 
