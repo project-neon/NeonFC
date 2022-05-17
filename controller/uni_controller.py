@@ -8,11 +8,11 @@ Referente ao soccer robotics
 class UniController(object):
     def __init__(self, robot):
         self.robot = robot
-        self.L = self.robot.dimensions.get("L") * 100 #m
-        self.R = self.robot.dimensions.get("R") * 100 #m
-        self.V_M = 100 #m/s
-        self.R_M = 300 #rad*m/s
-        self.K_W = 50 #coeficiente de feedback
+        self.L = self.robot.dimensions.get("L") #m
+        self.R = self.robot.dimensions.get("R") #m
+        self.V_M = 1 #m/s
+        self.R_M = 3 #rad*m/s
+        self.K_W = 5 #coeficiente de feedback
 
         self.v1 = 0 #restricao de velocidade 1
         self.v2 = 0 #restricao de velocidade 2
@@ -81,20 +81,20 @@ class UniController(object):
     def set_desired(self, theta):
         vx = theta[0]
         vy = theta[1]
-        theta = -math.atan2(vy, vx)
+        theta = math.atan2(vy, vx)
 
         self.theta_d = theta
         vx_f, vy_f = self.robot.strategy.decide(
             self.robot.x + self.dl * math.cos(self.robot.theta),
             self.robot.y + self.dl * math.sin(self.robot.theta)
         )
-        self.theta_f = -math.atan2(vy_f, vx_f)
+        self.theta_f = math.atan2(vy_f, vx_f)
 
     def update(self):
         v, w = self.control()
 
-        pwr_left = (2 * v - w * self.L)/2 * self.R
-        pwr_right = (2 * v + w * self.L)/2 * self.R
+        pwr_left = (2 * v - w * self.L)/2 * self.R * 1000
+        pwr_right = (2 * v + w * self.L)/2 * self.R * 1000
 
-        return pwr_left * 100, pwr_right * 100
+        return pwr_left, pwr_right
 
