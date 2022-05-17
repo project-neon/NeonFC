@@ -10,9 +10,9 @@ class MainPlay(Play):
         self.match = self.coach.match
         self.coach = coach
         self.strategies = [
-            strategy.cbfr2022.Goal(self.match),
+            strategy.cbfr2022.MainGoalkeeper(self.match),
             strategy.cbfr2022.MainAttacker(self.match),
-            strategy.tests.Idle(self.match)
+            strategy.cbfr2022.MainMidFielder(self.match)
         ]
 
     def _can_play(self):
