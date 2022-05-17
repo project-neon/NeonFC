@@ -1,4 +1,3 @@
-from controller.uni_controller import UniController
 from controller.simple_LQR import SimpleLQR
 import math
 import algorithms
@@ -19,7 +18,8 @@ class SpinnerAttacker(Strategy):
         self.ctrl_params = {"l": 0.07}
         super().__init__(match,
             name=name,
-            controller=UniController
+            controller=TwoSidesLQR,
+            controller_kwargs=self.ctrl_params
         )
 
     def voronoi_astar(self, m):
@@ -345,12 +345,7 @@ class SpinnerAttacker(Strategy):
             self.start(robot)
 
 
-    def decide(self, x = None, y = None):
-        if x:
-            self.robot.x = x
-        if y:
-            self.robot.y = y
-        
+    def decide(self):
         small_area = self.match.game.field.get_small_area("defensive")
         goal_area = [
             0             - self.robot.dimensions["L"]/2, 
