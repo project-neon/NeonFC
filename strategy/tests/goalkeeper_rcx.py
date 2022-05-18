@@ -10,6 +10,8 @@ class GoalKeeperRCX(Strategy):
     def __init__(self, match, name="Buffon", midfielder="MidFielderSupporter"):
         super().__init__(match, name, controller=controller.TwoSidesLQR)
 
+        self.midfielder = midfielder
+
     def start(self, robot=None):
         super().start(robot=robot)
 
