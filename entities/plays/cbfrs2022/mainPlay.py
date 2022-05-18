@@ -24,11 +24,15 @@ class MainPlay(Play):
     def update(self):
         super().update()
 
-        robots = [r.robot_id for r in self.match.robots]
+        self.match.robots[0].strategy = self.strategies[0]
+        self.match.robots[1].strategy = self.strategies[1]
+        self.match.robots[2].strategy = self.strategies[2]
+
+        # robots = [r.robot_id for r in self.match.robots]
 
 
-        for robot, strategy in zip(robots, self.strategies):
-            if self.match.robots[robot].strategy is not None:
-                continue
-            self.match.robots[robot].strategy = strategy
-            self.match.robots[robot].start()
+        # for robot, strategy in zip(robots, self.strategies):
+        #     if self.match.robots[robot].strategy is not None:
+        #         continue
+        #     self.match.robots[robot].strategy = strategy
+        #     self.match.robots[robot].start()

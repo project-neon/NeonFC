@@ -138,7 +138,7 @@ class GoalKeeperRCX(Strategy):
                 if r.strategy.name == self.midfielder:
                     self.mid_x, self.mid_y = r.x, r.y
                     is_mid = True
-    
+
             x = self.sa_w/2
             if is_mid:
                 if self.mid_x < self.sa_w and self.mid_y > self.sa_y and self.mid_y < self.sa_y + self.sa_h and self.match.ball.x > self.field_w/2:
