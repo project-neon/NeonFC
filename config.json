@@ -16,10 +16,10 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "CBFRS_2022_2",
+        "coach_name": "RCX_2022",
         "category": "3v3"
     },
-    "referee": false,
+    "referee": true,
     "data_sender": false,
     "api": false
 }
