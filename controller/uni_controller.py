@@ -69,10 +69,6 @@ class UniController(object):
             self.v2 = self.V_M
         
         v = min(self.v1, self.v2)
-        if self.v1>self.v2:
-            print("v2")
-        else:
-            print("v1")
 
         #calcular w
         if self.theta_e > 0:
