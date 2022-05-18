@@ -18,7 +18,7 @@ class UniController(object):
         self.v2 = 0 #restricao de velocidade 2
         self.theta_d = 0
         self.theta_f = 0
-        self.dl = 0.0001 #aproximar phi_v em m
+        self.dl = 0.000001 #aproximar phi_v em m
         self.phi_v = 0
         self.a_phi_v = 0 #absoluto de phi_v
         self.theta_e = 0
@@ -48,7 +48,7 @@ class UniController(object):
         while self.theta_e < -math.pi:
             self.theta_e += 2*math.pi
         
-        self.a_theta_e = abs(self.a_theta_e)
+        self.a_theta_e = abs(self.theta_e)
 
         #calculate v
         self.v1 = (
@@ -59,16 +59,20 @@ class UniController(object):
 
         if self.a_phi_v > 0:
             self.v2 = (
-                math.sqrt(
+                (math.sqrt(
                     (self.K_W ** 2) * self.a_theta_e +
                     4 * self.R_M * self.a_phi_v) -
-                self.K_W * math.sqrt(self.a_theta_e) /
+                self.K_W * math.sqrt(self.a_theta_e)) /
                 (2 * self.a_phi_v)
             )
         else:
             self.v2 = self.V_M
         
         v = min(self.v1, self.v2)
+        if self.v1>self.v2:
+            print("v2")
+        else:
+            print("v1")
 
         #calcular w
         if self.theta_e > 0:
@@ -95,6 +99,8 @@ class UniController(object):
 
         pwr_left = (2 * v - w * self.L)/2 * self.R * 1000
         pwr_right = (2 * v + w * self.L)/2 * self.R * 1000
+
+        print(pwr_left, pwr_right)
 
         return pwr_left, pwr_right
 

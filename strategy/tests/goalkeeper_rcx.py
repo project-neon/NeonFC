@@ -10,8 +10,6 @@ class GoalKeeperRCX(Strategy):
     def __init__(self, match, name="Buffon", midfielder="MidFielderSupporter"):
         super().__init__(match, name, controller=controller.TwoSidesLQR)
 
-        self.midfielder = midfielder
-
     def start(self, robot=None):
         super().start(robot=robot)
 
@@ -132,32 +130,11 @@ class GoalKeeperRCX(Strategy):
             )
         )
 
-        def kalm(m):
-            is_mid = False
-            for r in self.match.robots:
-                if r.strategy.name == self.midfielder:
-                    self.mid_x, self.mid_y = r.x, r.y
-                    is_mid = True
-    
-            x = self.sa_w/2
-            if is_mid:
-                if self.mid_x < self.sa_w and self.mid_y > self.sa_y and self.mid_y < self.sa_y + self.sa_h and self.match.ball.x > self.field_w/2:
-                    if self.mid_y > self.robot.y:
-                        y = self.mid_y - 0.35
-                    else:
-                        y = self.mid_y + 0.35
-                else:
-                    y = self.field_h/2
-            else:
-                y = self.field_h/2
-
-            return (x, y)
-
         # permanece no centro da área
         self.kalm.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = kalm,
+                target = (self.sa_w/2, self.field_h/2),
                 theta = 0,
                 line_size = self.sa_w/2,
                 line_dist = 0.1,
