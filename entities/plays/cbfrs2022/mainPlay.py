@@ -11,7 +11,7 @@ class MainPlay(Play):
         self.coach = coach
         self.strategies = [
             strategy.cbfr2022.MainGoalkeeper(self.match),
-            strategy.tests.Univector_Field(self.match),
+            strategy.tests.RealUnivectField(self.match),
             strategy.cbfr2022.MainMidFielder(self.match)
         ]
 
