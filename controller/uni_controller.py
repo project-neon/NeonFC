@@ -24,6 +24,9 @@ class UniController(object):
         self.theta_e = 0
         self.a_theta_e = 0 #absoluto de theta_e
 
+        self.wheel_velocity_received = False
+        self.vl = 0 # left-wheel velocity
+        self.vr = 0 # right-wheel velocity
 
     def control(self):
         """
@@ -90,11 +93,19 @@ class UniController(object):
         )
         self.theta_f = math.atan2(vy_f, vx_f)
 
+    def set_flag(self, flag, vl = 0, vr = 0):
+        self.vl = vl
+        self.vr = vr
+        self.wheel_velocity_received = flag
+    
     def update(self):
         v, w = self.control()
 
-        pwr_left = (2 * v - w * self.L)/2 * self.R * 1000
-        pwr_right = (2 * v + w * self.L)/2 * self.R * 1000
+        pwr_left = (2 * v - w * self.L)/2 * self.R * 2500
+        pwr_right = (2 * v + w * self.L)/2 * self.R * 2500
 
+        if self.wheel_velocity_received:
+            return self.vl, self.vr
+        
         return pwr_left, pwr_right
 
