@@ -22,3 +22,4 @@ from strategy.tests.asScratch import Scratch as astarVoronoi
 from strategy.tests.guideAttacker import My_Attacker
 from strategy.tests.newAttacker import newAttacker
 from strategy.tests.uvf_attacker import Attacker as UVFAttacker
+from strategy.tests.univector_field import Univector_Field
