@@ -93,8 +93,8 @@ class UniController(object):
     def update(self):
         v, w = self.control()
 
-        pwr_left = (2 * v - w * self.L)/2 * self.R * 1000
-        pwr_right = (2 * v + w * self.L)/2 * self.R * 1000
+        pwr_left = (2 * v - w * self.L)/2 * self.R * 2500
+        pwr_right = (2 * v + w * self.L)/2 * self.R * 2500
 
         return pwr_left, pwr_right
 
