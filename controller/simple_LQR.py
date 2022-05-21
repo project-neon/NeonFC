@@ -4,13 +4,6 @@ import math
 from commons.math import angle_between
 
 import numpy as np
-import numpy.linalg as la
- 
-def py_ang(v1, v2):
-    """ Returns the angle in radians between vectors 'v1' and 'v2'    """
-    cosang = np.dot(v1, v2)
-    sinang = la.norm(np.cross(v1, v2))
-    return np.arctan2(sinang, cosang)
 
 
 """
@@ -71,7 +64,7 @@ class TwoSidesLQR(object):
 
         A = np.array(self.desired)
         B = np.array([math.cos(self.robot.theta), math.sin(self.robot.theta)])
-        between = py_ang(A, B)
+        between = angle_between(A, B)
 
         if (between > math.pi/2):
             theta = self.robot.theta - math.pi

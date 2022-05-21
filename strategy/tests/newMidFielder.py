@@ -17,7 +17,7 @@ class newMidFielder(Strategy):
         super().start(robot=robot)
 
         for r in self.match.robots:
-            if r.strategy.name in ["UFV-Attacker", "shooter"]:
+            if r.strategy.name in ["UFV-Attacker", "shooter", "SpinnerAttacker"]:
                 self.atk_x, self.atk_y = r.x, r.y
 
         self.triangulate = algorithms.fields.PotentialField(self.match, name="TriangulateBehaviour")
@@ -42,7 +42,7 @@ class newMidFielder(Strategy):
         self.id = self.robot.robot_id
 
         if self.match.category == "3v3":
-            self.x = self.sa_w + 0.02
+            self.x = self.sa_w + 0.04
         else:
             self.x = self.sa_w + 0.225
 
@@ -264,7 +264,7 @@ class newMidFielder(Strategy):
                 radius_max = self.field_w,
                 clockwise = False,
                 decay = lambda x: 1,
-                multiplier = 0.8
+                multiplier = 0.65
             )
         )
 
@@ -276,7 +276,7 @@ class newMidFielder(Strategy):
                 radius_max = self.field_w,
                 clockwise = True,
                 decay = lambda x: 1,
-                multiplier = 0.8
+                multiplier = 0.65
             )
         )
     

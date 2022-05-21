@@ -11,9 +11,9 @@ class MainPlay(Play):
         self.coach = coach
         self._reset = False
         self.constraints = [
-            (strategy.tests.GoalKeeperRCX(self.match, "Goalkeeper", "MidFielderSupporter"), self._elect_goalkeeper),
+            (strategy.tests.GoalKeeperRCX(self.match, "Goalkeeper", "Defender"), self._elect_goalkeeper),
             (strategy.tests.SpinnerAttacker(self.match), self._elect_attacker),
-            (strategy.tests.MidFielderSupporter(self.match, attacker="SpinnerAttacker"), self._elect_midfielder)
+            (strategy.tests.newMidFielder(self.match, ""), self._elect_midfielder)
         ]
 
     def _can_play(self):
@@ -36,6 +36,7 @@ class MainPlay(Play):
 
         robots = [r.robot_id for r in self.match.robots]
         constraints = self.constraints
+        w = self.match.game.field.get_dimensions()[0]
 
         # verify if the game is running
         # if is running don't change goalkeeper or attacker
@@ -46,6 +47,9 @@ class MainPlay(Play):
 
         if self._reset == True:
             self._reset = False
+
+        if self.match.ball.x <= w/5 and self.match.robots[0].strategy is not None:
+            return
 
         for strategy, fit_fuction in constraints:
             elected, best_fit = -1, -99999

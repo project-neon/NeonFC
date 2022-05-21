@@ -1,7 +1,14 @@
 import math
 import numpy as np
+import numpy.linalg as la
 
 from scipy.signal import savgol_filter
+
+def angle_between(v1, v2):
+    """ Returns the angle in radians between vectors 'v1' and 'v2'    """
+    cosang = np.dot(v1, v2)
+    sinang = la.norm(np.cross(v1, v2))
+    return np.arctan2(sinang, cosang)
 
 def dist_point_line(x1, y1, x2, y2, x3, y3):
     """
@@ -98,9 +105,6 @@ def dotproduct(v1, v2):
 
 def length(v):
   return math.sqrt(dotproduct(v, v))
-
-def angle_between(v1, v2):
-  return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
 
 from numpy import arccos, array, dot, pi, cross
 from numpy.linalg import det, norm

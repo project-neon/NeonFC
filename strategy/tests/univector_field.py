@@ -52,19 +52,6 @@ class Univector_Field(Strategy):
 
             return [point_x-0.01, point_y]
 
-
-        # to calculate potentential fiels multiplier
-        yl = upper_point(self.match)[1] + radius_e
-        yr = bottom_point(self.match)[1] - radius_e
-        
-
-        # multiplier calculus
-        # if y is inside the spiral radius
-        def move_to_goal_between_points():
-            multiplier = ((yl * bottom_point(self.match)[1] + (yr * upper_point(self.match)[1]))/(2*radius_e))
-            
-            return multiplier
-
         # if y is under the spiral radius
         def move_to_goal_under_point():
             multiplier_ = bottom_point(self.match)[1]

@@ -1,5 +1,8 @@
 import math
 
+import numpy as np
+from commons.math import angle_between
+
 """
 Controle baseado em angulo desejado
 Referente ao soccer robotics
@@ -10,19 +13,22 @@ class UniController(object):
         self.robot = robot
         self.L = self.robot.dimensions.get("L") #m
         self.R = self.robot.dimensions.get("R") #m
-        self.V_M = 1 #m/s
-        self.R_M = 3 #rad*m/s
-        self.K_W = 5 #coeficiente de feedback
+        self.V_M = 1.1 #m/s
+        self.R_M = self.V_M * 3 #rad*m/s
+        self.K_W = 4.2 #coeficiente de feedback
 
         self.v1 = 0 #restricao de velocidade 1
         self.v2 = 0 #restricao de velocidade 2
         self.theta_d = 0
         self.theta_f = 0
-        self.dl = 0.000001 #aproximar phi_v em m
+        self.dl = 0.0001 #aproximar phi_v em m
         self.phi_v = 0
         self.a_phi_v = 0 #absoluto de phi_v
         self.theta_e = 0
         self.a_theta_e = 0 #absoluto de theta_e
+
+        self.theta_robot = 0 # theta robot
+        self.between = 0
 
         self.wheel_velocity_received = False
         self.vl = 0 # left-wheel velocity
@@ -86,10 +92,23 @@ class UniController(object):
         vy = theta[1]
         theta = math.atan2(vy, vx)
 
+        self.theta_robot = self.robot.theta
+
+        A = np.array([math.cos(self.theta_d), math.sin(self.theta_d)])
+        B = np.array([math.cos(self.theta_robot), math.sin(self.theta_robot)])
+        self.between = angle_between(A, B)
+
+        if (self.between > math.pi/2):
+            self.theta_robot = self.theta_robot - math.pi
+        else:
+            self.theta_robot = self.theta_robot
+        self.theta_robot = self.theta_robot
+        
+
         self.theta_d = theta
         vx_f, vy_f = self.robot.strategy.decide(
-            self.robot.x + self.dl * math.cos(self.robot.theta),
-            self.robot.y + self.dl * math.sin(self.robot.theta)
+            self.robot.x + self.dl * math.cos(self.theta_robot),
+            self.robot.y + self.dl * math.sin(self.theta_robot)
         )
         self.theta_f = math.atan2(vy_f, vx_f)
 
@@ -106,6 +125,9 @@ class UniController(object):
 
         if self.wheel_velocity_received:
             return self.vl, self.vr
+
+        if (self.between > math.pi/2):
+            return -pwr_right, -pwr_left,
         
         return pwr_left, pwr_right
 
