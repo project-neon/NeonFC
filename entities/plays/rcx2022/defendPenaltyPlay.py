@@ -2,7 +2,7 @@ import math
 import random
 
 import strategy
-from entities.plays.larc2021.mainPlay import MainPlay
+from entities.plays.rcx2022.mainPlay import MainPlay
 
 
 class DefendPenaltyPlay(MainPlay):

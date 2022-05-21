@@ -48,8 +48,6 @@ class MainPlay(Play):
         if self._reset == True:
             self._reset = False
 
-        if self.match.ball.x <= w/5 and self.match.robots[0].strategy is not None:
-            return
 
         for strategy, fit_fuction in constraints:
             elected, best_fit = -1, -99999
