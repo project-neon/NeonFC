@@ -4,7 +4,7 @@ import json
 
 
 class Coach(BaseCoach):
-    NAME = "CBRFS_2022_5V5"
+    NAME = "CBFRS_2022_5V5"
     def __init__(self, match):
         super().__init__(match)
 

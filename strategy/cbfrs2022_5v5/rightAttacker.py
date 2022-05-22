@@ -7,7 +7,7 @@ import algorithms
 # class RightAttacker(DebugPotentialFieldStrategy):
 class RightAttacker(Strategy):
     def __init__(self, match, name="RightAttacker"):
-        super().__init__(match, name, controller=UniController)
+        super().__init__(match, name, controller=TwoSidesLQR)
 
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
@@ -37,4 +37,4 @@ class RightAttacker(Strategy):
     def decide(self):
         behaviour = self.point
 
-        return super().decide(behaviour)
+        return behaviour.compute([self.robot.x, self.robot.y])
