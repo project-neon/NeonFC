@@ -13,7 +13,7 @@ class MainPlay(Play):
             (strategy.cbfrs2022_5v5.Goalkeeper(self.match), self._elect_goalkeeper),
             (strategy.cbfrs2022_5v5.LeftWing(self.match), self._elect_leftwing),
             (strategy.cbfrs2022_5v5.RightWing(self.match), self._elect_rightwing),
-            (strategy.cbfrs2022_5v5.LeftAttacker(self.match), self._elect_leftattacker),
+            (strategy.cbfrs2022_5v5.LeftAttacker(self.match, self.coach), self._elect_leftattacker),
             (strategy.cbfrs2022_5v5.RightAttacker(self.match), self._elect_rightattacker),
         ]
 
@@ -65,6 +65,12 @@ class MainPlay(Play):
                 self.match.robots[elected].start()
 
             robots.remove(elected)
+
+        self.coach.ball_dists = {
+                f"{robot.robot_id}": math.sqrt(
+                    (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
+                ) for robot in self.match.robots if not robot.strategy.name == "MainGoalkeeper"
+            }
 
     def _elect_goalkeeper(self, robot):
         dist_to_goal = math.sqrt(

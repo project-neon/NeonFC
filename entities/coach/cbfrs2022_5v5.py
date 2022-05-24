@@ -8,6 +8,7 @@ class Coach(BaseCoach):
     def __init__(self, match):
         super().__init__(match)
 
+        self.ball_dists = []
         self.positions = json.loads(open('foul_placements5v5.json', 'r').read())
         self.playbook = plays.Playbook(self)
         main_play = plays.cbfrs2022_5v5.MainPlay(self)
