@@ -33,7 +33,6 @@ class Coach(BaseCoach):
     
     def get_positions(self, foul, team_color, foul_color, quadrant):
         play_positioning = self.playbook.get_actual_play().get_positions(foul, team_color, foul_color, quadrant)
-        print(play_positioning)
         return play_positioning
 
     def decide (self):

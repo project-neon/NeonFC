@@ -10,12 +10,14 @@ class MainPlay(Play):
         self.coach = coach
         self._reset = False
         self.constraints = [
-            (strategy.cbfrs2022_5v5.Goalkeeper(self.match), self._elect_goalkeeper),
+            (strategy.cbfrs2022_5v5.GoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
+            (strategy.tests.UVFAttacker(self.match, self.coach), self._elect_leftattacker),
             (strategy.cbfrs2022_5v5.LeftWing(self.match), self._elect_leftwing),
             (strategy.cbfrs2022_5v5.RightWing(self.match), self._elect_rightwing),
-            (strategy.cbfrs2022_5v5.LeftAttacker(self.match, self.coach), self._elect_leftattacker),
             (strategy.cbfrs2022_5v5.RightAttacker(self.match), self._elect_rightattacker),
         ]
+
+        self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
     def _can_play(self):
         return self.match.game.referee.can_play()
@@ -69,35 +71,41 @@ class MainPlay(Play):
         self.coach.ball_dists = {
                 f"{robot.robot_id}": math.sqrt(
                     (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
-                ) for robot in self.match.robots if not robot.strategy.name == "MainGoalkeeper"
+                ) for robot in self.match.robots if not robot.strategy.name == "Goalkeeper"
             }
 
     def _elect_goalkeeper(self, robot):
         dist_to_goal = math.sqrt(
-            (robot.x - 0)**2 + (robot.y - 0.65)**2
+            (robot.x - 0)**2 + (robot.y - self.field_h/2)**2
         )
         return 1000 - dist_to_goal
 
     def _elect_leftattacker(self, robot):
-        dist_to_1q = math.sqrt(
-            (robot.x - 1.5)**2 + (robot.y - 1.3)**2
+        is_behind = 2 if robot.x > self.match.ball.x else 1
+        dist_to_ball = math.sqrt(
+            (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
         )
-        return 1000 - dist_to_1q
+        return 1000 - dist_to_ball * is_behind
+        
 
     def _elect_rightattacker(self, robot):
-        dist_to_4q = math.sqrt(
-            (robot.x - 1.5)**2 + (robot.y - 0)**2
+        dist_to_target = math.sqrt(
+            (robot.x - self.field_w/2 - 0.3)**2 + (robot.y - self.field_h/2 - 0.15)**2
         )
-        return 1000 - dist_to_4q
+        
+        return 1
 
     def _elect_leftwing(self, robot):
-        dist_to_2q = math.sqrt(
-            (robot.x-0)**2 + (robot.y - 1.3)**2
+        dist_to_2q = self.field_h - robot.y
+        dist_to_ball = math.sqrt(
+            (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
         )
+        
         return 1000 - dist_to_2q
 
     def _elect_rightwing(self, robot):
-        dist_to_3q = math.sqrt(
-            (robot.x - 0)**2 + (robot.y - 0)**2
+        dist_to_3q = robot.y
+        dist_to_ball = math.sqrt(
+            (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
         )
         return 1000 - dist_to_3q
