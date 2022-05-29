@@ -14,6 +14,9 @@ class RightAttacker(Strategy):
 
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
+        self.g_hgr = (self.field_h/2)+0.185
+        self.g_lwr = (self.field_h/2)-0.185
+
     def start(self, robot=None):
         super().start(robot=robot)
 
@@ -37,10 +40,18 @@ class RightAttacker(Strategy):
             name="{}|ChangePositionBehaviour".format(self.__class__)
         )
 
+        def defen_pos(m):
+            if m.ball.y > self.g_hgr:
+                return (self.sa_x + 0.25, self.field_h/2 + 0.25)
+            if m.ball.y < self.g_lwr:
+                return (self.sa_x + 0.25, self.field_h/2 - 0.25)
+            
+            return (self.sa_x + 0.4, self.field_h/2)
+
         self.defend.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = (self.sa_x + 0.4, self.field_h/2),
+                target = defen_pos,
                 radius = .075,
                 decay = lambda x: x**6,
                 multiplier = 1

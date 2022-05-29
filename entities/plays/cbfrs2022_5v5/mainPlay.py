@@ -10,7 +10,7 @@ class MainPlay(Play):
         self.coach = coach
         self._reset = False
         self.constraints = [
-            (strategy.cbfrs2022_5v5.GoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
+            (strategy.cbfrs2022_5v5.GoalKeeper(self.match), self._elect_goalkeeper),
             (strategy.tests.UVFAttacker(self.match, self.coach), self._elect_leftattacker),
             (strategy.cbfrs2022_5v5.LeftWing(self.match), self._elect_leftwing),
             (strategy.cbfrs2022_5v5.RightWing(self.match), self._elect_rightwing),
@@ -31,7 +31,7 @@ class MainPlay(Play):
         robots = [
             r_id for r_id in robots 
             if self.match.robots[r_id].strategy.name not in (
-                "Goalkeeper", "LeftDefender", "RightDefender"
+                "Goalkeeper", "LeftWing", "RightWing", "RightAttacker", "UFV-Attacker"
             )
         ]
         return constraints, robots

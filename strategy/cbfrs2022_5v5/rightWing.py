@@ -13,6 +13,9 @@ class RightWing(Strategy):
 
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
+        self.g_hgr = (self.field_h/2)+0.185
+        self.g_lwr = (self.field_h/2)-0.185
+
     def start(self, robot=None):
         super().start(robot=robot)
 
@@ -31,10 +34,16 @@ class RightWing(Strategy):
             name="{}|AttackBehaviour".format(self.__class__)
         )
 
+        def defen_pos(m):
+            if m.ball.y > self.g_hgr:
+                return (0.45, self.field_h/2 - 0.35)
+            else:
+                return (m.ball.x, (self.sa_y - 0.2))
+
         self.defend.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = lambda m: (m.ball.x, (self.sa_y - 0.2)),
+                target = defen_pos,
                 radius = .075,
                 decay = lambda x: x**6,
                 multiplier = 1
@@ -69,7 +78,7 @@ class RightWing(Strategy):
     def decide(self):
         ball = self.match.ball
 
-        if ball.y < self.sa_y - 0.1 and ball.x > self.robot.x:
+        if ball.y < self.sa_y - 0.1 and ball.x > self.robot.x and ball.x > self.field_w/4:
             behaviour = self.combat
         else:
             if ball.x > self.sa_w + 0.2 and ball.y > self.sa_y - 0.15:
