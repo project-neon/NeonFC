@@ -1,9 +1,10 @@
+from dataclasses import field
 from strategy.BaseStrategy import Strategy
 from strategy.DebugTools import DebugPotentialFieldStrategy
 from controller.uni_controller import UniController
 from controller.simple_LQR import TwoSidesLQR
 import algorithms
-
+import math
 
 # class RightAttacker(DebugPotentialFieldStrategy):
 class RightAttacker(Strategy):
@@ -13,6 +14,8 @@ class RightAttacker(Strategy):
         self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
 
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
+
+        self.robot_w = self.robot_h = 0.075
 
         self.g_hgr = (self.field_h/2)+0.185
         self.g_lwr = (self.field_h/2)-0.185
@@ -25,9 +28,9 @@ class RightAttacker(Strategy):
             name="{}|PointBehaviour".format(self.__class__)
         )
 
-        self.push = algorithms.fields.PotentialField(
+        self.follow = algorithms.fields.PotentialField(
             self.match,
-            name="{}|PushBehaviour".format(self.__class__)
+            name="{}|FollowBehaviour".format(self.__class__)
         )
 
         self.attack = algorithms.fields.PotentialField(
@@ -35,9 +38,9 @@ class RightAttacker(Strategy):
             name="{}|AttackBehaviour".format(self.__class__)
         )
 
-        self.change_position = algorithms.fields.PotentialField(
+        self.push = algorithms.fields.PotentialField(
             self.match,
-            name="{}|ChangePositionBehaviour".format(self.__class__)
+            name="{}|PushBehaviour".format(self.__class__)
         )
 
         def defen_pos(m):
@@ -58,10 +61,10 @@ class RightAttacker(Strategy):
             )
         )
 
-        self.push.add_field(
+        self.follow.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = lambda m: (m.ball.x - 0.3, m.ball.y - 0.05),
+                target = lambda m: (m.ball.x - 0.3, m.ball.y),
                 radius = .075,
                 decay = lambda x: x,
                 multiplier = 1
@@ -78,15 +81,28 @@ class RightAttacker(Strategy):
             )
         )
 
-        self.change_position.add_field(
+        self.push.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = (self.field_w/2, 0.15),
-                radius = .075,
-                decay = lambda x: x**6,
-                multiplier = 1
+                target = lambda m: (m.ball.x, m.ball.y),
+                radius = 0.1,
+                multiplier = lambda m: max(1, (m.ball.vx**2 + m.ball.vy**2)**0.5 + 0.3),
+                decay = lambda x : x
             )
         )
+
+        # self.push.add_field(
+        #     algorithms.fields.LineField(
+        #         self.match,
+        #         target = lambda m: (m.ball.x, m.ball.y),
+        #         theta = lambda m: -((m.ball.x - self.robot.x)/(m.ball.y - self.robot.y)),
+        #         line_size = self.robot_w,
+        #         line_dist = self.field_w/2,
+        #         line_dist_max = self.field_w/2,
+        #         decay = lambda x: 1,
+        #         multiplier = 2,
+        #     )
+        # )
 
     def reset(self, robot=None):
         super().reset()
@@ -94,19 +110,29 @@ class RightAttacker(Strategy):
             self.start(robot)
 
     def decide(self):
+        p = (self.match.ball.y - self.robot.y)/(self.match.ball.x - self.robot.x)
         ball = self.match.ball
 
-        behaviour = self.defend
+        if ball.x > self.field_w-0.35 and self.field_h/2-0.4 < ball.y < self.field_h/2+0.4:
+            x = self.field_w
+            left_proj = p*(x - self.robot.x) + self.robot.y + (self.robot_w/2)
+            right_proj = p*(x - self.robot.x) + self.robot.y - (self.robot_w/2)
 
-        # if ball.x > self.sa_w + 0.3 and self.robot.x > ball.x:
-        #     behaviour = self.change_position
-        # else:
-        if ball.y <= self.sa_y + self.sa_h + 0.1 and ball.y >= self.sa_y - 0.1 and ball.x > self.sa_w + 0.3:
-            behaviour = self.push
+            if left_proj < self.g_hgr and right_proj > self.g_lwr:
+                behaviour = self.push
+            else:
+                behaviour = self.follow
+        # elif ball.y <= self.sa_y + self.sa_h + 0.1 and ball.y >= self.sa_y - 0.1 and ball.x > self.sa_w + 0.3:
+        #     behaviour = self.follow
         else:
             if ball.x > self.field_w/4:
                 behaviour = self.attack
             else:
                 behaviour = self.defend
+
+        # print(ball.x > self.field_w-0.35 and self.field_h/2-0.4 < ball.y < self.field_h/2+0.4)
+        # print(left_proj < self.g_hgr and right_proj > self.g_lwr)
+
+        print(behaviour.name)
 
         return behaviour.compute([self.robot.x, self.robot.y])

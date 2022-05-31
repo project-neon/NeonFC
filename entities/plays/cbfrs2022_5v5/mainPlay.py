@@ -52,6 +52,11 @@ class MainPlay(Play):
         if self._reset == True:
             self._reset = False
 
+        if self.match.ball.x > self.field_w-0.35 and self.field_h/2-0.4 < self.match.ball.y < self.field_h/2+0.4:
+            self.freeze_positions(constraints, robots)
+            print("froze")
+            return
+
         for strategy, fit_fuction in constraints:
             elected, best_fit = -1, -99999
 

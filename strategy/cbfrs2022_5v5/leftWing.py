@@ -68,7 +68,7 @@ class LeftWing(Strategy):
         self.attack.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = lambda m: (m.ball.x - 0.4, (self.sa_y + self.sa_h + 0.2)),
+                target = lambda m: (m.ball.x - 0.6, (self.sa_y + self.sa_h + 0.3)),
                 radius = .075,
                 decay = lambda x: x**6,
                 multiplier = 1
