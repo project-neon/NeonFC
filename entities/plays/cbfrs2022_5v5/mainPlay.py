@@ -27,7 +27,7 @@ class MainPlay(Play):
         self._reset = True
     
     def freeze_positions(self, constraints, robots):
-        constraints = self.constraints[3:]
+        constraints = []
         robots = [
             r_id for r_id in robots 
             if self.match.robots[r_id].strategy.name not in (
@@ -42,12 +42,12 @@ class MainPlay(Play):
         robots = [r.robot_id for r in self.match.robots]
         constraints = self.constraints
 
-        # verify if the game is running
-        # if is running don't change goalkeeper or attacker
-        if self._can_play() and (not self._reset):
-            constraints, robots = self.freeze_positions(
-                constraints, robots
-            )
+        # # verify if the game is running
+        # # if is running don't change goalkeeper or attacker
+        # if self._can_play() and (not self._reset):
+        #     constraints, robots = self.freeze_positions(
+        #         constraints, robots
+        #     )
 
         if self._reset == True:
             self._reset = False
