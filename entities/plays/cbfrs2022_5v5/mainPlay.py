@@ -54,7 +54,7 @@ class MainPlay(Play):
 
         if self.match.ball.x > self.field_w-0.35 and self.field_h/2-0.4 < self.match.ball.y < self.field_h/2+0.4:
             self.freeze_positions(constraints, robots)
-            print("froze")
+            print("frozen")
             return
 
         for strategy, fit_fuction in constraints:

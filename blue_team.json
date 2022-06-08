@@ -15,7 +15,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "LARC_2021",
+        "coach_name": "CBFRS_2022_5V5",
         "category": "3v3"
     },
     "referee": true,
