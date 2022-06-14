@@ -12,6 +12,7 @@ class Coach(BaseCoach):
         self.positions = json.loads(open('foul_placements5v5.json', 'r').read())
         self.playbook = plays.Playbook(self)
         main_play = plays.cbfrs2022_5v5.MainPlay(self)
+        #main_play = plays.cbfrs2022_5v5.TestPlay(self)
         
         self.playbook.add_play(main_play)
         self.playbook.set_play(main_play)
