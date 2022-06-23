@@ -36,9 +36,10 @@ class RightWing(Strategy):
 
         def defen_pos(m):
             if m.ball.y > self.g_hgr:
-                return (0.45, self.field_h/2 - 0.35)
-            else:
+                return (m.ball.x - 1, self.field_h/2 - 0.15)
+            else: 
                 return (m.ball.x, (self.sa_y - 0.2))
+
 
         self.defend.add_field(
             algorithms.fields.PointField(
@@ -63,7 +64,7 @@ class RightWing(Strategy):
         self.attack.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = lambda m: (m.ball.x - 0.6, (self.sa_y - 0.3)),
+                target = lambda m: (m.ball.x - 0.6, (self.g_lwr - 0.1)),
                 radius = .075,
                 decay = lambda x: x**6,
                 multiplier = 1
@@ -78,10 +79,10 @@ class RightWing(Strategy):
     def decide(self):
         ball = self.match.ball
 
-        if ball.y < self.sa_y - 0.1 and ball.x > self.robot.x and ball.x > self.field_w/4:
+        if ball.y < self.g_lwr and ball.x > self.robot.x and ball.x > self.field_w/4:
             behaviour = self.combat
         else:
-            if ball.x > self.sa_w + 0.2 and ball.y > self.sa_y - 0.15:
+            if ball.x > self.sa_w + 0.4 and ball.y > self.sa_y - 0.15:
                 behaviour = self.attack
             else:
                 behaviour = self.defend
