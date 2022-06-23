@@ -7,7 +7,7 @@ class TestPlay(Play):
         self.match = self.coach.match
         self.coach = coach
         self.strategies = [
-            strategy.tests.AsScratch2(self.match),
+            strategy.cbfrs2022_5v5.RightAttacker(self.match),
             strategy.tests.Idle(self.match),
             strategy.tests.Idle(self.match),
             strategy.tests.Idle(self.match),
