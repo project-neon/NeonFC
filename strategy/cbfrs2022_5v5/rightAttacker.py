@@ -117,7 +117,7 @@ class RightAttacker(Strategy):
         if self.match.ball.x < self.robot.x:
             obstacles = obstacles + [ball_pos]
         r_v = astar.calculate(robot_pos, target, obstacles)
-        print(r_v)
+        # print(r_v)
         return r_v
 
     def reset(self, robot=None):
@@ -138,7 +138,7 @@ class RightAttacker(Strategy):
                 behaviour = self.push
             else:
                 behaviour = self.follow
-                print(behaviour.name)
+                # print(behaviour.name)
                 return self.use_astar([ball.x - 0.3, ball.y])
 
         # elif ball.y <= self.sa_y + self.sa_h + 0.1 and ball.y >= self.sa_y - 0.1 and ball.x > self.sa_w + 0.3:
@@ -146,8 +146,7 @@ class RightAttacker(Strategy):
         else:
             if ball.x > self.field_w/4:
                 behaviour = self.attack
-                print(behaviour.name)
-                #return self.use_astar([ball.x - 0.3, (self.field_h/2 - 0.15)])
+                # print(behaviour.name)
                 if self.field_h/2-0.4 < ball.y < self.field_h/2+0.4:
                     return self.use_astar([ball.x - 0.3, ball.y])
                 return self.use_astar([ball.x - 0.3, (self.field_h/2)])
@@ -157,6 +156,6 @@ class RightAttacker(Strategy):
         # print(ball.x > self.field_w-0.35 and self.field_h/2-0.4 < ball.y < self.field_h/2+0.4)
         # print(left_proj < self.g_hgr and right_proj > self.g_lwr)
 
-        print(behaviour.name)
+        # print(behaviour.name)
 
         return behaviour.compute([self.robot.x, self.robot.y])
