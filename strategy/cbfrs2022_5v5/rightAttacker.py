@@ -137,7 +137,7 @@ class RightAttacker(Strategy):
             if left_proj < self.g_hgr and right_proj > self.g_lwr:
                 behaviour = self.push
             else:
-                behaviour = self.follow
+                # behaviour = self.follow
                 # print(behaviour.name)
                 return self.use_astar([ball.x - 0.3, ball.y])
 
@@ -145,7 +145,7 @@ class RightAttacker(Strategy):
         #     behaviour = self.follow
         else:
             if ball.x > self.field_w/4:
-                behaviour = self.attack
+                # behaviour = self.attack
                 # print(behaviour.name)
                 if self.field_h/2-0.4 < ball.y < self.field_h/2+0.4:
                     return self.use_astar([ball.x - 0.3, ball.y])

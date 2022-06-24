@@ -55,25 +55,25 @@ class LeftWing(Strategy):
             )
         )
 
-        self.combat.add_field(
-            algorithms.fields.PointField(
-                self.match,
-                target = lambda m: (m.ball.x - 0.4, m.ball.y),
-                radius = 2.2,
-                decay = lambda x: 1,
-                multiplier = 1
-            )
-        )
+        # self.combat.add_field(
+        #     algorithms.fields.PointField(
+        #         self.match,
+        #         target = lambda m: (m.ball.x - 0.4, m.ball.y),
+        #         radius = 2.2,
+        #         decay = lambda x: 1,
+        #         multiplier = 1
+        #     )
+        # )
 
-        self.attack.add_field(
-            algorithms.fields.PointField(
-                self.match,
-                target = lambda m: (m.ball.x - 0.6, (self.g_hgr + 0.1)),
-                radius = .075,
-                decay = lambda x: x**6,
-                multiplier = 1
-            )
-        )
+        # self.attack.add_field(
+        #     algorithms.fields.PointField(
+        #         self.match,
+        #         target = lambda m: (m.ball.x - 0.6, (self.g_hgr + 0.1)),
+        #         radius = .075,
+        #         decay = lambda x: x**6,
+        #         multiplier = 1
+        #     )
+        # )
 
     def reset(self, robot=None):
         super().reset()
@@ -84,7 +84,7 @@ class LeftWing(Strategy):
         target = target # target better not be the ball
         obstacles = [
             [r.x, r.y] for r in self.match.opposites] + [
-            [r.x, r.y] for r in self.match.robots 
+            [r.x, r.y] for r in self.match.robots
             if r.robot_id != self.robot.robot_id
         ]
         astar = algorithms.astar.PathAstar(self.match)
@@ -95,22 +95,24 @@ class LeftWing(Strategy):
         r_v = astar.calculate(robot_pos, target, obstacles)
         # print(r_v)
         return r_v
-    
+
     def decide(self):
         ball = self.match.ball
 
         if ball.y > self.g_hgr and ball.x > self.robot.x and ball.x > self.field_w/4:
-            behaviour = self.combat
-            print(behaviour.name)
+            # behaviour = self.combat
+            # print(behaviour.name)
+            target_x = max(ball.x - 0.4, self.sa_w + 0.10)
             return self.use_astar([ball.x - 0.4, ball.y])
         else:
             if ball.x > self.sa_w + 0.4 and ball.y < self.sa_y + self.sa_h + 0.15:
-                behaviour = self.attack
-                print(behaviour.name)
-                return self.use_astar([ball.x - 0.6, (self.g_hgr + 0.1)])
+                # behaviour = self.attack
+                # print(behaviour.name)
+                target_x = max(ball.x - 0.6, self.sa_w + 0.10)
+                return self.use_astar([target_x, (self.g_hgr + 0.1)])
             else:
                 behaviour = self.defend
-        
+
         # print(behaviour.name)
 
         return behaviour.compute([self.robot.x, self.robot.y])

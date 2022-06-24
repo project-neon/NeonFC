@@ -51,25 +51,25 @@ class RightWing(Strategy):
             )
         )
 
-        self.combat.add_field(
-            algorithms.fields.PointField(
-                self.match,
-                target = lambda m: (m.ball.x - 0.4, m.ball.y),
-                radius = 2.2,
-                decay = lambda x: 1,
-                multiplier = 1
-            )
-        )
+        # self.combat.add_field(
+        #     algorithms.fields.PointField(
+        #         self.match,
+        #         target = lambda m: (m.ball.x - 0.4, m.ball.y),
+        #         radius = 2.2,
+        #         decay = lambda x: 1,
+        #         multiplier = 1
+        #     )
+        # )
 
-        self.attack.add_field(
-            algorithms.fields.PointField(
-                self.match,
-                target = lambda m: (m.ball.x - 0.6, (self.g_lwr - 0.1)),
-                radius = .075,
-                decay = lambda x: x**6,
-                multiplier = 1
-            )
-        )
+        # self.attack.add_field(
+        #     algorithms.fields.PointField(
+        #         self.match,
+        #         target = lambda m: (m.ball.x - 0.6, (self.g_lwr - 0.1)),
+        #         radius = .075,
+        #         decay = lambda x: x**6,
+        #         multiplier = 1
+        #     )
+        # )
 
     def reset(self, robot=None):
         super().reset()
@@ -96,14 +96,16 @@ class RightWing(Strategy):
         ball = self.match.ball
 
         if ball.y < self.g_lwr and ball.x > self.robot.x and ball.x > self.field_w/4:
-            behaviour = self.combat
+            # behaviour = self.combat
             # print(behaviour.name)
-            return self.use_astar([ball.x - 0.4, ball.y])
+            target_x = max(ball.x - 0.4, self.sa_w + 0.10)
+            return self.use_astar([target_x, ball.y])
         else:
             if ball.x > self.sa_w + 0.4 and ball.y > self.sa_y - 0.15:
-                behaviour = self.attack
+                # behaviour = self.attack
                 # print(behaviour.name)
-                return self.use_astar([ball.x - 0.6, (self.g_lwr - 0.1)])
+                target_x = max(ball.x - 0.6, self.sa_w + 0.10)
+                return self.use_astar([target_x, (self.g_lwr - 0.1)])
             else:
                 behaviour = self.defend
         
