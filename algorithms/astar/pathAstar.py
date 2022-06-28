@@ -80,7 +80,7 @@ class PathAstar:
             self.road = [start, target]
         dist = ( (self.road[0][0] - self.road[1][0])**2 + (self.road[0][1] - self.road[1][1])**2 )**.5
         r_v = [
-            0.85 * (self.road[1][0] - self.road[0][0])/dist,
-            0.85 * (self.road[1][1] - self.road[0][1])/dist
+            0.9 * (self.road[1][0] - self.road[0][0])/dist,
+            0.9 * (self.road[1][1] - self.road[0][1])/dist
         ]
         return r_v
