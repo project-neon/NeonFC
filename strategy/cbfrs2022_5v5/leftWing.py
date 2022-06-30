@@ -52,7 +52,7 @@ class LeftWing(Strategy):
         if ball.y > self.g_hgr and ball.x > self.robot.x and ball.x > self.field_w/4:
             # behaviour = self.combat
             target_x = max(ball.x - 0.4, self.sa_w + 0.10)
-            return self.use_astar([ball.x - 0.4, ball.y])
+            return self.use_astar([target_x, ball.y])
         else:
             if ball.x > self.sa_w + 0.4 and ball.y < self.sa_y + self.sa_h + 0.15:
                 # behaviour = self.attack
