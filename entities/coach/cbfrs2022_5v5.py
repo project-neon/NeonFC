@@ -53,6 +53,7 @@ class Coach(BaseCoach):
             replacements = foul.get(foul_color, foul.get("POSITIONS"))
         else:
             replacements = foul.get(f"{quad}")
+        
         return replacements
 
     

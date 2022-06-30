@@ -13,8 +13,8 @@ class RightWing(Strategy):
 
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
-        self.g_hgr = (self.field_h/2)+0.185
-        self.g_lwr = (self.field_h/2)-0.185
+        self.g_hgr = (self.field_h/2)+0.2
+        self.g_lwr = (self.field_h/2)-0.2
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -26,7 +26,7 @@ class RightWing(Strategy):
     
     def defend_position(self, match):
             if match.ball.y > self.g_hgr:
-                return [match.ball.x - 0.05, self.field_h/2 - 0.25]
+                return [match.ball.x, self.field_h/2 - 0.3]
             else: 
                 return [match.ball.x, (self.sa_y - 0.2)]
 
