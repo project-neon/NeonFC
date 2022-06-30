@@ -21,7 +21,7 @@ class LeftWing(Strategy):
 
     def defend_position(self, match):
         if match.ball.y < self.g_lwr:
-            return [match.ball.x - 0.05, self.field_h/2 + 0.15]
+            return [match.ball.x - 0.05, self.field_h/2 + 0.25]
         else:
             return [match.ball.x, (self.sa_y + self.sa_h + 0.2)]
 
