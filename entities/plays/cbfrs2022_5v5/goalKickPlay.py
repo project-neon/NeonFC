@@ -29,8 +29,8 @@ class GoalKickPlay(MainPlay):
                     {
                         "robot_id": 0, 
                         "x": -field_size[0]/2 + 0.1,
-                        "y": -0.14,
-                        "orientation": 67
+                        "y": 0.2,
+                        "orientation": 60
                     }
                 )
             else:
@@ -38,8 +38,8 @@ class GoalKickPlay(MainPlay):
                     {
                         "robot_id": 0, 
                         "x": field_size[0]/2 - 0.1,
-                        "y": -0.14,
-                        "orientation": 67
+                        "y": 0.2,
+                        "orientation": angle_of_interest
                     }
                 )
                 
