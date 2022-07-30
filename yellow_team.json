@@ -15,8 +15,8 @@
     "match" : {
         "team_side": "right",
         "team_color": "yellow",
-        "coach_name": "RCX_2022",
-        "category": "3v3"
+        "coach_name": "CBFRS_2022_5V5",
+        "category": "5v5"
     },
     "referee": true,
     "data_sender": false,
