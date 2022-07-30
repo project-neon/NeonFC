@@ -6,7 +6,7 @@ class GoalKickPlay(MainPlay):
         super().__init__(coach)
 
         self.constraints = [
-            (strategy.cbfrs2022_5v5.GoalKeeper(self.match), self._elect_goalkeeper),
+            (strategy.larc2021.Shooter(self.match), self._elect_goalkeeper),
             (strategy.larc2021.Shooter(self.match), self._elect_leftattacker),
             (strategy.cbfrs2022_5v5.LeftWing(self.match), self._elect_leftwing),
             (strategy.cbfrs2022_5v5.RightWing(self.match), self._elect_rightwing),
@@ -29,8 +29,8 @@ class GoalKickPlay(MainPlay):
                     {
                         "robot_id": 0, 
                         "x": -field_size[0]/2 + 0.1,
-                        "y": 0.2,
-                        "orientation": 60
+                        "y": -0.14,
+                        "orientation": 67
                     }
                 )
             else:
@@ -38,8 +38,8 @@ class GoalKickPlay(MainPlay):
                     {
                         "robot_id": 0, 
                         "x": field_size[0]/2 - 0.1,
-                        "y": 0.2,
-                        "orientation": angle_of_interest
+                        "y": -0.14,
+                        "orientation": 67
                     }
                 )
                 
