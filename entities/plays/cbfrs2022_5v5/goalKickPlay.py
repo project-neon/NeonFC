@@ -6,7 +6,7 @@ class GoalKickPlay(MainPlay):
         super().__init__(coach)
 
         self.constraints = [
-            (strategy.cbfrs2022_5v5.GoalKeeper(self.match), self._elect_goalkeeper),
+            (strategy.larc2021.Shooter(self.match), self._elect_goalkeeper),
             (strategy.larc2021.Shooter(self.match), self._elect_leftattacker),
             (strategy.cbfrs2022_5v5.LeftWing(self.match), self._elect_leftwing),
             (strategy.cbfrs2022_5v5.RightWing(self.match), self._elect_rightwing),
