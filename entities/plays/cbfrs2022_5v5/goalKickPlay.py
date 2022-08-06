@@ -14,9 +14,6 @@ class GoalKickPlay(MainPlay):
         ]
 
     def get_positions(self, foul, team_color, foul_color, quadrant):
-        angle_of_interest = 115
-        dist_to_ball = 0.225
-
         replacements = self.coach._get_positions(foul, team_color, foul_color, quadrant)
 
         if foul == "GOAL_KICK" and foul_color == team_color:
@@ -30,7 +27,7 @@ class GoalKickPlay(MainPlay):
                         "robot_id": 0, 
                         "x": -field_size[0]/2 + 0.1,
                         "y": -0.14,
-                        "orientation": 67
+                        "orientation": 67 + 45
                     }
                 )
             else:

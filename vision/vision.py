@@ -30,6 +30,8 @@ class FiraVision(threading.Thread):
         self._fps = 0
         self._frame_times = deque(maxlen=60)
 
+        self.game = None
+
     def assign_vision(self, game):
         self.game = game
 
