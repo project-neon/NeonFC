@@ -79,7 +79,7 @@
             "QUADRANT_1": [
                 {"robot_id": 0, "x": 1.05, "y": 0, "orientation": 90},   
                 {"robot_id": 1, "x": 0.80, "y": 0.6, "orientation": 0},  
-                {"robot_id": 2, "x": 0.75, "y": -0.10, "orientation": 90}, 
+                {"robot_id": 2, "x": 0.8, "y": -0.10, "orientation": 90}, 
                 {"robot_id": 3, "x": 0.75, "y": -0.30, "orientation": 90}, 
                 {"robot_id": 4, "x": 0.95, "y": -0.50, "orientation": 0} 
             ],
