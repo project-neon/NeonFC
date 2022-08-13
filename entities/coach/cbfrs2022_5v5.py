@@ -23,7 +23,7 @@ class Coach(BaseCoach):
 
         penalty_seconds_trigger = plays.WaitForTrigger(10)
         defendpenalty_seconds_trigger = plays.WaitForTrigger(9)
-        goalkick_seconds_trigger = plays.WaitForTrigger(12)
+        goalkick_seconds_trigger = plays.WaitForTrigger(13)
 
         self.playbook.add_play(main_play)
         self.playbook.add_play(penalty_play)
