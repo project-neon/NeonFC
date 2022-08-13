@@ -36,7 +36,7 @@
                 {"robot_id": 1, "x": 0.30, "y": -0.60, "orientation": 0}, 
                 {"robot_id": 2, "x": -0.10, "y": -0.60, "orientation": 0}, 
                 {"robot_id": 3, "x": -0.10, "y": -0.20, "orientation": 0}, 
-                {"robot_id": 4, "x": 0.10, "y": 0.10, "orientation": -60}  
+                {"robot_id": 4, "x": 0.05, "y": 0.10, "orientation": -60}  
             ]
         },
         "GOAL_KICK": {
