@@ -15,7 +15,7 @@
                 {"robot_id": 1, "x": 0.30, "y": 0.60, "orientation": 0},   
                 {"robot_id": 2, "x": -0.10, "y": 0.60, "orientation": 0}, 
                 {"robot_id": 3, "x": -0.10, "y": 0.20, "orientation": 0}, 
-                {"robot_id": 4, "x": 0.10, "y": -0.10, "orientation": 60} 
+                {"robot_id": 4, "x": 0.05, "y": -0.10, "orientation": 60} 
             ],
             "QUADRANT_2": [
                 {"robot_id": 0, "x": -1.06, "y": 0, "orientation": 90},   
@@ -42,7 +42,7 @@
         "GOAL_KICK": {
             "BLUE": [
                 {"robot_id": 0, "x": -1, "y": 0, "orientation": 0},
-                {"robot_id": 1, "x": -0.4, "y": -0.4, "orientation": 0},
+                {"robot_id": 1, "x": -0.4, "y": -0.45, "orientation": 0},
                 {"robot_id": 2, "x": 0.4, "y": 0.2, "orientation": 0},
                 {"robot_id": 3, "x": 0.2, "y": -0.4, "orientation": 0},
                 {"robot_id": 4, "x": 0.45, "y": 0.45, "orientation": 0}
@@ -108,7 +108,7 @@
         "GOAL_KICK": {
             "YELLOW": [
                 {"robot_id": 0, "x": 1, "y": 0, "orientation": 0},
-                {"robot_id": 1, "x": 0.4, "y": 0.4, "orientation": 0},
+                {"robot_id": 1, "x": 0.4, "y": 0.45, "orientation": 0},
                 {"robot_id": 2, "x": -0.4, "y": -0.2, "orientation": 0},
                 {"robot_id": 3, "x": -0.2, "y": 0.5, "orientation": 0},
                 {"robot_id": 4, "x": -0.45, "y": -0.45, "orientation": 0}
