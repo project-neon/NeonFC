@@ -1,6 +1,5 @@
 from unicodedata import name
 
-from cv2 import threshold
 import algorithms
 import math
 import controller
@@ -203,6 +202,7 @@ class Attacker(Strategy):
         comportamento sera execuetado nesse momento. crie o conjunto de regras
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
+        print(self.robot.x, self.robot.y)
         
         if self.swap_attacker() or self.on_ball():
             behaviour = self.push
