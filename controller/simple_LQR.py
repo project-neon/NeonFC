@@ -99,11 +99,9 @@ class TwoSidesLQR(object):
         linear = v*self.R
         angular = self.R*(w*self.L)/2
 
-        
-
         if (between > math.pi/2):
-            return -angular, -linear
-        return angular, linear 
+            v, w = -v, -w
+        return v, w
 
         # return 0, 0
         '''if (between > math.pi/2):

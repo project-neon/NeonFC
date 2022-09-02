@@ -13,7 +13,7 @@ import numpy as np
 
 class Attacker(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match, name="RSM-Attacker", controller=TwoSidesLQR, controller_kwargs={'l': 0.008})       
+        super().__init__(match, name="RSM-Attacker", controller=TwoSidesLQR, controller_kwargs={'l': 0.15})       
         """
         Ambiente para rascunhar novas estrategias com
         campos potencias:
@@ -143,26 +143,27 @@ class Attacker(Strategy):
         self.push.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = lambda m: (m.ball.x, m.ball.y),
-                radius = 0.20,
-                decay = lambda x: x,
-                multiplier = 0.4
+                target = (0.75, 0.65),
+                radius = 1,
+                radius_max = 0.3,
+                decay = lambda x: x**10,
+                multiplier = 0.7
             )
         )
 
-        self.push.add_field(
-            algorithms.fields.LineField(
-                self.match,
-                target=follow_ball,
-                theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
-                line_size = 1,
-                line_size_single_side = True,
-                line_dist = 0.15,
-                line_dist_max = 0.15,
-                decay = lambda x: x**2,
-                multiplier = 0.4
-            )
-        )
+        # self.push.add_field(
+        #     algorithms.fields.LineField(
+        #         self.match,
+        #         target=follow_ball,
+        #         theta=lambda m: ( -math.atan2((0.65-m.ball.y), (0.75*2 - m.ball.x))),
+        #         line_size = 1,
+        #         line_size_single_side = True,
+        #         line_dist = 0.15,
+        #         line_dist_max = 0.15,
+        #         decay = lambda x: x**2,
+        #         multiplier = 0.4
+        #     )
+        # )
 
 
     def swap_attacker(self):
@@ -202,13 +203,14 @@ class Attacker(Strategy):
         comportamento sera execuetado nesse momento. crie o conjunto de regras
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
-        print(self.robot.x, self.robot.y)
         
         if self.swap_attacker() or self.on_ball():
             behaviour = self.push
         else:
             behaviour = self.recover
-        print(behaviour.name)
+        # print(behaviour.name)
+
+        behaviour = self.push
 
         return behaviour.compute([self.robot.x, self.robot.y])
 

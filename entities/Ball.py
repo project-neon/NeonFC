@@ -23,8 +23,8 @@ class Ball(object):
         self.current_data = []
 
         self._frames = {
-            'x': deque(maxlen=5),
-            'y': deque(maxlen=5)
+            'x': deque(maxlen=10),
+            'y': deque(maxlen=10)
         }
 
         self.vx, self.vy = 0, 0

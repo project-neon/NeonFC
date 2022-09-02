@@ -42,7 +42,7 @@ class SSLVision(threading.Thread):
             (v - i) for i, v in zip(self._frame_times, list(self._frame_times)[1:])
         ]
         self._fps = len(fps_frame_by_frame)/sum(fps_frame_by_frame)
-        print(self._fps)
+        # print(self._fps)
 
     def run(self):
         print("Starting vision...")
@@ -56,7 +56,7 @@ class SSLVision(threading.Thread):
             self.set_fps()
             env.ParseFromString(data)
             self.frame = json.loads(MessageToJson(env))
-            print(self.frame)
+            # print(self.frame)
 
             self.game.update()
             
@@ -141,7 +141,7 @@ def assign_empty_values(raw_frame, field_size, team_side, last_frame=None):
 
 if __name__ == "__main__":
     import time
-    v = FiraVision()
+    v = SSLVision()
 
     v.start()
 
