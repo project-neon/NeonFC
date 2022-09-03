@@ -16,8 +16,8 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "CBFRS_2022_5V5",
-        "category": "5v5"
+        "coach_name": "CBFRS_2022",
+        "category": "3v3"
     },
     "referee": true,
     "data_sender": false,
