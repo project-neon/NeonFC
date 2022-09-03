@@ -7,7 +7,7 @@ import threading
 from commons.utils import get_config
 
 from google.protobuf.json_format import MessageToJson
-from protocols import command_pb2, packet_pb2, vssref_command_pb2
+from protocols import command_pb2, common_pb2, packet_pb2, vssref_command_pb2, replacement_pb2
 
 class FiraComm(object):
     def __init__(self):
@@ -60,6 +60,55 @@ class FiraComm(object):
     
     def _create_socket(self):
         return socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+class FiraFullComm(FiraComm):
+    def __init__(self):
+        super().__init__()
+        self.replacement_port = int(os.environ.get('REPLACER_PORT', self.config['network']['replacer_port']))
+
+
+    def start(self):
+        super().start()
+        print("Starting replacer communication...")
+        self.replacer_sock = self._create_socket()
+        print("Replacer Communication socket created!")
+
+    def replace(self, robots=None, ball=None):
+        """
+        replace comm:
+        [
+            {'robot_id': X, 'color': '', 'x': 0, 'y': 0, 'theta'},
+            ...
+        ]
+        ball comm:
+            {'x', 'y', 'theta'}
+        """
+        replacements = replacement_pb2.Replacement()
+        
+        for robot in robots:
+            replacement = replacements.robots.add()
+            
+            replacement.yellowteam = self._get_robot_color(robot)
+            replacement.turnon = True
+
+            replacement.position.x = robot['x']
+            replacement.position.y = robot['y']
+            replacement.position.orientation = robot['theta']
+            replacement.position.robot_id = robot['robot_id']
+        
+        
+        replacements.ball.x = ball['x']
+        replacements.ball.x = ball['y']
+
+
+        packet = packet_pb2.Packet()
+        packet.replace.CopyFrom(replacements)
+
+        self.replacer_sock.sendto(
+            packet.SerializeToString(), 
+            (self.host, self.command_port)
+        )
+
 
 class RefereeComm(threading.Thread):
         def __init__(self):
