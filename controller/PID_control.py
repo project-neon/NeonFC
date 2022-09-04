@@ -36,7 +36,7 @@ class PID_control(object):
         self.alpha_old = 0 # stores previous iteration alpha
 
         # Max speeds for the robot
-        self.v_max = 1.4 # linear speed 
+        self.v_max = 1.6 # linear speed 
         self.w_max = math.radians(3600) # angular speed rad/s
     
     def set_desired(self, vector):
@@ -67,7 +67,7 @@ class PID_control(object):
         """Calculate the parameters of PID control"""
         self._update_fps()
         self.dif_alpha = alpha - self.alpha_old / self.dt # Difentential of alpha
-        self.int_alpha = self.int_alpha + self.dif_alpha
+        self.int_alpha = self.int_alpha + alpha
 
         """Linear speed (v)"""
         v = self.v_max # if [self.robot.x, self.robot.y] < [self.desired[0], self.desired[1]] else min(self.K_RHO*rho, self.v_max)
