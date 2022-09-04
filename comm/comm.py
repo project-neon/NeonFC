@@ -96,9 +96,9 @@ class FiraFullComm(FiraComm):
             replacement.position.orientation = robot['theta']
             replacement.position.robot_id = robot['robot_id']
         
-        
-        replacements.ball.x = ball['x']
-        replacements.ball.x = ball['y']
+        if ball:
+            replacements.ball.x = ball['x']
+            replacements.ball.y = ball['y']
 
 
         packet = packet_pb2.Packet()

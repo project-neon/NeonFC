@@ -17,6 +17,7 @@ class LabMatch(object):
         self.team_side = os.environ.get('TEAM_SIDE', team_side) 
         self.team_color = os.environ.get('TEAM_COLOR', team_color)
         self.category = os.environ.get('CATEGORY', category)
+
         self.n_robots = CATEGORIES.get(self.category)
 
         self.opposite_team_color = 'blue'
@@ -28,13 +29,21 @@ class LabMatch(object):
         print("Starting match module starting ...")
         self.ball = entities.Ball(self.game)
 
-        self.essay_robot = entities.Robot(self.game, 0, 'blue')
+        self.opposites = [
+            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
+        ]
 
-        self.train = entities.train.TRAIN[self.coach_name](self)
+        self.robots = [
+            entities.Robot(self.game, i, self.team_color) for i in range(self.n_robots)
+        ]
+
+        self.essay_robot = self.robots[0] # will awalys be zero from the main team
+
+        self.train = entities.trainer.TRAINERS[self.train_name](self)
 
         print(f"Essay started! traning is is [{self.train.NAME}]")
 
-        self.train.decide()
+        self.train.setup()
 
         self.essay_robot.start()
 

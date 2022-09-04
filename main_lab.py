@@ -15,20 +15,23 @@ class Game():
     def __init__(self, config_file=None):
         self.config = get_config(config_file)
 
-        self.match = match.Match(self,
+        self.match = match.LabMatch(self,
             **self.config.get('match')
         )
         self.vision = vision.FiraVision()
         self.comm = comm.FiraFullComm()
         self.field = pitch.Field(self.match.category)
+
+        self.use_referee = False
         
         self.start()
 
     def start(self):
         self.vision.assign_vision(self)
-        self.match.start()
+        
         self.vision.start()
         self.comm.start()
+        self.match.start()
         
 
     def update(self):

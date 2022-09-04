@@ -1,3 +1,6 @@
+import math
+from collections import deque
+
 from strategy.BaseStrategy import Strategy
 from controller import PID_control
 
@@ -9,6 +12,8 @@ class Attacker(Strategy):
             controller=PID_control
         )
 
+        self.circuit = [(0, 0)]
+
     def start(self, robot=None):
         super().start(robot=robot)
 
@@ -18,6 +23,20 @@ class Attacker(Strategy):
         if robot:
             self.start(robot)
 
+    def set_circuit(self, circuit):
+        self.circuit = deque(circuit)
+    
+    def next_point(self):
+        point = self.circuit[0]
+        dx = point[0] - self.robot.x
+        dy = point[1] - self.robot.y
+    
+        if math.sqrt(dx**2 + dy**2) < 0.025:
+            self.circuit.rotate(-1)
+            print("Change point! ", self.circuit[0])
+
+        return self.circuit[0]
+
 
     def decide(self):
-        return self.match.ball.x, self.match.ball.y
+        return self.next_point()
