@@ -12,6 +12,7 @@ from entities.coach.cbfrs2022_5v5 import Coach as CBFRS_2022_5V5
 
 from entities.coach.guideCoach import Coach as GuideCoach
 
+from entities.coach.test_coach import Coach as TestCoach
 
 _coach_list = [
     # Tournament coaches
@@ -23,7 +24,8 @@ _coach_list = [
     RCX_2022,
     CBFRS_2022,
     CBFRS_2022_2,
-    CBFRS_2022_5V5
+    CBFRS_2022_5V5,
+    TestCoach
 ]
 
 COACHES = {c.NAME: c for c in _coach_list}
