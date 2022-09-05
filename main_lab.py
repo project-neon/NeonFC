@@ -1,3 +1,4 @@
+import api
 import comm
 import vision
 import match
@@ -22,6 +23,11 @@ class Game():
         self.comm = comm.FiraFullComm()
         self.field = pitch.Field(self.match.category)
 
+        api_address = self.config.get("network").get("api_address")
+        api_port = self.config.get("network").get("api_port")
+
+        self.api = api.Api(api_address, api_port)
+
         self.use_referee = False
         
         self.start()
@@ -31,6 +37,7 @@ class Game():
         
         self.vision.start()
         self.comm.start()
+        self.api.start()
         self.match.start()
         
 

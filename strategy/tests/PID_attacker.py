@@ -1,4 +1,5 @@
 import math
+import api
 from collections import deque
 
 from strategy.BaseStrategy import Strategy
@@ -39,4 +40,11 @@ class Attacker(Strategy):
 
 
     def decide(self):
+        api.Api().send_custom_data(
+            {
+                'circuit': list(self.circuit),
+                'robot': {'x': self.robot.x, 'y': self.robot.y, 'theta': self.robot.theta},
+                'speed': (self.robot.vx**2 + self.robot.vy**2)**.5
+            }
+        )
         return self.next_point()
