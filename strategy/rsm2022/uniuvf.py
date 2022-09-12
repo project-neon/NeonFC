@@ -73,7 +73,7 @@ class UVF_Agent(Strategy):
 
     def decide(self):
         print(f"{self.robot.x=}\n{self.robot.y=}")
-        print(math.sqrt((self.robot.x-self.match.ball.x)**2 + (self.robot.y-self.match.ball.y)**2))
+        # print(math.sqrt((self.robot.x-self.match.ball.x)**2 + (self.robot.y-self.match.ball.y)**2))
         
         dl = 0.000001
         bq = math.atan2(0.65-self.match.ball.y, 1.5-self.match.ball.x)
@@ -83,8 +83,8 @@ class UVF_Agent(Strategy):
         # for r in self.match.robots:
         #     if not r.robot_id == self.robot.robot_id:
         #         Uvect = self.N_Obstacle(x, y, r.x, r.y, Uvect)
-        #         Uvect_dl = self.N_Obstacle(x, y, r.x, r.y, Uvect_dl)
-        
+        #         Uvect_dl = self.N_Obstacle(x, y, r.x, r.y, Uvect_dl)d
+
         return Uvect, Uvect_dl
 
     def reset(self, robot=None):

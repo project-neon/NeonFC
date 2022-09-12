@@ -10,9 +10,9 @@ class UniController(object):
         self.robot = robot
         self.L = self.robot.dimensions.get("L") #m
         self.R = self.robot.dimensions.get("R") #m
-        self.V_M = 149 #m/s
+        self.V_M = 300 #m/s
         self.R_M = 3*self.V_M #rad*m/s
-        self.K_W = 7 #coeficiente de feedback #20
+        self.K_W = 18 #coeficiente de feedback #20
         self.K_P = 1
         self.v1 = 0 #restricao de velocidade 1
         self.v2 = 0 #restricao de velocidade 2
@@ -65,7 +65,7 @@ class UniController(object):
 
         ball_x, ball_y = self.match.ball.x, self.match.ball.y
 
-        self.v3 = self.K_P * (self.robot.x - ball_x)
+        self.v3 = self.K_P * (self.robot.x - .75)
         
         v = min(self.v1, self.v2)
 
