@@ -33,10 +33,13 @@ class Api(metaclass=SingletonMeta):
     # Initiate socket connection
     def start(self):
         self.obj_socket = socket(AF_INET, SOCK_DGRAM)
-        self.obj_socket.connect((self.address, self.port))
 
     # Sends dict game data to socket listener
     def send_data(self, obj):
+        if obj.game.referee.can_play():
+            game_status = 'GAME_ON'
+        else:
+            game_status = obj.game.referee.get_foul()
         data_dict = dict({
             'COACH_NAME' :  obj.coach_name,
             'TEAM_COLOR' :  obj.team_color,
@@ -44,7 +47,12 @@ class Api(metaclass=SingletonMeta):
             'TEAM_ROBOTS_POS' : [{f"{robot.robot_id}": (robot.x, robot.y, robot.theta)} for robot in obj.robots],
             'OPPOSITE_ROBOTS_POS' : [{f"{robot.robot_id}": (robot.x, robot.y, robot.theta)} for robot in obj.opposites],
             'BALL_POS' : (obj.ball.x, obj.ball.y),
-            'GAME_STATUS' : obj.game.referee.get_foul()
+            'GAME_STATUS' : game_status,
+            'TEAM_SIDE' : obj.team_side
         })
         msg = json.dumps(data_dict)
         self.obj_socket.sendto(msg.encode(), (self.address, self.port))
+    
+    def send_custom_data(self, data):
+         msg = json.dumps(data)
+         self.obj_socket.sendto(msg.encode(), (self.address, self.port))

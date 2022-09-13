@@ -12,7 +12,7 @@ class UniController(object):
         self.R = self.robot.dimensions.get("R") #m
         self.V_M = 300 #m/s
         self.R_M = 3*self.V_M #rad*m/s
-        self.K_W = 18 #coeficiente de feedback #20
+        self.K_W = 18 #coeficiente de feedback
         self.K_P = 1
         self.v1 = 0 #restricao de velocidade 1
         self.v2 = 0 #restricao de velocidade 2
@@ -92,7 +92,7 @@ class UniController(object):
 
     def update(self):
         v, w = self.control()
-
+        
         pwr_left = v - 0.5 * self.L * w
         pwr_right = v + 0.5 * self.L * w
 

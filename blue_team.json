@@ -1,6 +1,4 @@
 {
-    "referee": false,
-    "api": true,
     "network" : {
         "multicast_ip": "224.0.0.1",
         "referee_ip": "224.5.23.2",
@@ -17,7 +15,10 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "LARC_2021",
-        "category": "3v3"
-    }
+        "coach_name": "CBFRS_2022_5V5",
+        "category": "5v5"
+    },
+    "referee": true,
+    "data_sender": false,
+    "api": false
 }
