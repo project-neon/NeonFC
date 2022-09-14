@@ -96,6 +96,6 @@ class UniController(object):
         pwr_left = v - 0.5 * self.L * w
         pwr_right = v + 0.5 * self.L * w
 
-        print(f"{v=}\n{w=}")
+        # print(f"{v=}\n{w=}")
 
         return v, w
