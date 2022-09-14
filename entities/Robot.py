@@ -161,10 +161,10 @@ class Robot(object):
         return self._get_command(self.power_left, self.power_right)
 
 
-    def _get_command(self, v, w):
+    def _get_command(self, power_left, power_right):
         return {
             'robot_id': self.robot_id,
-            'v': v,
-            'w': w,
+            'wheel_left': power_left,
+            'wheel_right': power_right,
             'color': self.team_color
         }
