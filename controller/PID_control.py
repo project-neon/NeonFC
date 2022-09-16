@@ -36,8 +36,8 @@ class PID_control(object):
         self.alpha_old = 0 # stores previous iteration alpha
 
         # Max speeds for the robot
-        self.v_max = 1.6 # linear speed 
-        self.w_max = math.radians(3600) # angular speed rad/s
+        self.v_max = 1.2 # linear speed 
+        self.w_max = math.radians(2400) # angular speed rad/s
     
     def set_desired(self, vector):
         self.desired = vector
@@ -88,5 +88,6 @@ class PID_control(object):
         pwr_right = (2 * v + w * self.l)/2 * self.R
 
         return pwr_left * 1000, pwr_right * 1000
+
 
 
