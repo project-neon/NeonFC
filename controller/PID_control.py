@@ -73,7 +73,7 @@ class PID_control(object):
         v = self.v_max # if [self.robot.x, self.robot.y] < [self.desired[0], self.desired[1]] else min(self.K_RHO*rho, self.v_max)
 
         """Objective behind the robot"""
-        if(abs(alpha) > math.pi/2):
+        if(abs(alpha) < math.pi/2):
             v = -v
             alpha = angle_adjustment(alpha - math.pi)
 
@@ -87,6 +87,7 @@ class PID_control(object):
         pwr_left = (2 * v - w * self.l)/2 * self.R
         pwr_right = (2 * v + w * self.l)/2 * self.R
 
-        return pwr_left * 1000, pwr_right * 1000
+        print(f"{v=}\n{w=}")
 
-
+        return -v, w
+        # return pwr_left * 1000, pwr_right * 1000
