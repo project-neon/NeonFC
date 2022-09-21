@@ -17,3 +17,6 @@ class MainPlay(Play):
 
     def _can_play(self):
         return self.match.game.referee.can_play()
+
+    def start_up(self):
+        super().start_up()
