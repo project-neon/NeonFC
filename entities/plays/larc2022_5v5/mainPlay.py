@@ -14,3 +14,6 @@ class MainPlay(Play):
             strategy.tests.Idle(self.match),
             strategy.tests.Idle(self.match)
         ]
+
+    def _can_play(self):
+        return self.match.game.referee.can_play()
