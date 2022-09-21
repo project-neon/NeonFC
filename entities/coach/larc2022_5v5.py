@@ -60,3 +60,6 @@ class Coach(BaseCoach):
             return play_positioning
         
         return self._get_positions(foul, team_color, foul_color, quadrant)
+
+    def decide (self):
+        self.playbook.update()
