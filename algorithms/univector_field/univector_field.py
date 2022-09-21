@@ -2,8 +2,6 @@ import math
 from collections import namedtuple
 import numpy as np
 import json
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 
 Obstacle = namedtuple("obstacle", "center radius margin eradius")
 
@@ -102,8 +100,8 @@ class UnivectorField:
 
         # check if the position is inside the rectangle behind obstacle
         j = ang_rg + math.pi * .5
-        g1 = (self.g[0] + self.delta_g * .5 * math.cos(j), self.g[1] + self.delta_g * 0.5 * math.sin(j))
-        g2 = (self.g[0] - self.delta_g * .5 * math.cos(j), self.g[1] - self.delta_g * 0.5 * math.sin(j))
+        g1 = (self.r[0] + self.delta_g * .5 * math.cos(j), self.r[1] + self.delta_g * 0.5 * math.sin(j))
+        g2 = (self.r[0] - self.delta_g * .5 * math.cos(j), self.r[1] - self.delta_g * 0.5 * math.sin(j))
 
         r_g1 = {'a': math.tan(ang_rg),
                 'b': -1,
@@ -115,7 +113,7 @@ class UnivectorField:
         d_pg2 = abs(r_g2['a']*p[0] + r_g2['b']*p[1] + r_g2['c']) / (r_g2['a']**2 + r_g2['b']**2)**.5
 
         if d_pg1 < self.delta_g and d_pg2 < self.delta_g:
-            if distance(self.r, self.g) <= distance(self.r, p) and distance(self.r, p) > distance(p, self.g):
+            if distance(self.r, p) >= distance(p, self.g):
                 angle_f_p = ang_rg
 
         for obstacle in self.obstacles:

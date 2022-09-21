@@ -8,4 +8,4 @@ from algorithms.potential_fields import fields
 # Dijkstra + waypoint planning
 from algorithms import dijkstra_waypoint
 
-from univector_field import UnivectorField
+from algorithms.univector_field import UnivectorField
