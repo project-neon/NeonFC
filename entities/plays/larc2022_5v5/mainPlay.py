@@ -20,3 +20,12 @@ class MainPlay(Play):
 
     def start_up(self):
         super().start_up()
+
+    def update(self):
+        super().update()
+
+        self.match.robots[0].strategy = self.strategies[0]
+        self.match.robots[1].strategy = self.strategies[1]
+        self.match.robots[2].strategy = self.strategies[2]
+        self.match.robots[3].strategy = self.strategies[3]
+        self.match.robots[4].strategy = self.strategies[4]
