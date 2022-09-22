@@ -8,7 +8,7 @@ class MainPlay(Play):
         self.match = self.coach.match
         self.coach = coach
         self.strategies = [
-            strategy.cbfr2022.MainGoalkeeper(self.match),
+            strategy.larc2022_5v5.GoalKeeper(self.match),
             strategy.tests.Idle(self.match),
             strategy.tests.Idle(self.match),
             strategy.tests.Idle(self.match),
