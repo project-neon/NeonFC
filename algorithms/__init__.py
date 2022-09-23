@@ -10,3 +10,5 @@ from algorithms import dijkstra_waypoint
 
 # Limit-cycle navigation
 from algorithms import limit_cycle
+
+from univector_field import UnivectorField
