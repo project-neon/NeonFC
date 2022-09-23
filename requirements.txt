@@ -1,6 +1,7 @@
 protobuf
 numpy
 scipy
+matplotlib
 
 # live plot view stuff
 pyqtgraph
