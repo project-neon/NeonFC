@@ -1,11 +1,10 @@
-from algorithms.limit_cycle import LimitCycle, Obstacle
+from algorithms.limit_cycle import LimitCycle, Obstacle, Point
 import math
 from controller.PID_control import PID_control
 from controller.simple_LQR import TwoSidesLQR, SimpleLQR
 from strategy.BaseStrategy import Strategy
 from collections import deque
-import json
-import numpy as np
+from controller.uni_controller import UniController
 
 class PID_Test(Strategy):
     def __init__(self, match, plot_field=False):
@@ -29,11 +28,13 @@ class PID_Test(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        # for r in self.match.robots:
-        #     if r.robot_id == 9 or r.robot_id == 0:
-        #         o1 = Obstacle(r.x, r.y, r=.2)
+        target = Point(.75, .65)
 
-        self.limit_cycle = LimitCycle(self.robot, [], self.match.ball, target_is_ball=True)
+        for r in self.match.robots:
+            if r.robot_id == 1:
+                o1 = Obstacle(r.x, r.y, r=.2)
+
+        self.limit_cycle = LimitCycle(self.robot, [o1], target, target_is_ball=False)
 
     def reset(self, robot=None):
         super().reset()
@@ -41,6 +42,7 @@ class PID_Test(Strategy):
             self.start(robot)
 
     def decide(self):
-        desired = self.next_point() # self.limit_cycle.compute()
+        # desired = self.next_point()
+        desired = self.limit_cycle.compute()
 
         return desired
