@@ -1,4 +1,5 @@
 import math
+import time
 
 """
 Controle baseado em angulo desejado
@@ -8,12 +9,13 @@ Referente ao soccer robotics
 
 class UniController(object):
     def __init__(self, robot):
+        self.t = time.time()
         self.robot = robot
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m
         self.V_M = 20  # m/s
-        self.R_M = 5 * self.V_M  # rad*m/s
-        self.K_W = .3  # coeficiente de feedback #20
+        self.R_M = 15 * self.V_M  # rad*m/s
+        self.K_W = 1.8  # coeficiente de feedback #20
         self.K_P = 5
         self.v1 = 0  # restricao de velocidade 1
         self.v2 = 0  # restricao de velocidade 2
@@ -54,16 +56,17 @@ class UniController(object):
         # calculate v
         self.v1 = (2 * self.V_M - self.L * self.K_W * math.sqrt(self.a_theta_e)) / (2 + self.L * self.a_phi_v)
 
-        self.v2 = (math.sqrt(self.K_W ** 2 + 4 * self.R_M * self.a_phi_v) - self.K_W * math.sqrt(self.a_theta_e)) \
+        self.v2 = (math.sqrt(self.a_theta_e * self.K_W ** 2 + 4 * self.R_M * self.a_phi_v) - self.K_W * math.sqrt(
+            self.a_theta_e)) \
                   / (2 * self.a_phi_v) if self.a_phi_v > 0 else self.V_M
 
         ball_x, ball_y = self.match.ball.x, self.match.ball.y
 
         self.v3 = self.K_P * ((self.robot.x - ball_x) ** 2 + (self.robot.y - ball_y) ** 2) ** .5
-        #self.v3 = self.K_P * ((self.robot.x - .75) ** 2 + (self.robot.y - .65) ** 2) ** .5
+        # self.v3 = self.K_P * ((self.robot.x - .75) ** 2 + (self.robot.y - .65) ** 2) ** .5
         print(f"{self.v3=}")
 
-        v = min(self.v1, self.v2)#, self.v3)
+        v = min(self.v1, self.v2)  # , self.v3)
 
         # calcular w
         if self.theta_e > 0:
@@ -71,9 +74,7 @@ class UniController(object):
         else:
             w = v * self.phi_v - self.K_W * math.sqrt(self.a_theta_e)
 
-        print(f"{self.robot.speed/v:.2f}, {self.robot.vtheta/w:.2f}")
-
-        w *= -7
+        w *= -3
 
         return v, w
 

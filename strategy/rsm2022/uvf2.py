@@ -8,12 +8,23 @@ class UVFAgent2(Strategy):
     def __init__(self, match, name="UVF_Test_2"):
         super().__init__(match, name=name, controller=UniController)
         self.dl = 0.000001
-        self.field = UnivectorField(n=8, rect_size=.06, plot=True, path="uvf_plot.json")
-        self.vs=[1]
-        self.ws=[1]
+        self.field = UnivectorField(n=8, rect_size=.0, plot=True, path="uvf_plot.json")
+        self.shooting_momentum = 0
 
     def start(self, robot=None):
         super().start(robot=robot)
+
+    def position_to_shoot(self, g, theta_d):
+        math.atan2(self.robot.x - 1.5, self.robot.y - .65)
+        threshold_p = 0.2
+        threshold_a = 0.7
+
+        angle = abs(theta_d - self.robot.theta) < threshold_a
+        print(angle)
+        position = ((g[0] - self.robot.x) ** 2 + (g[1] - self.robot.y) ** 2) ** .5 < threshold_p
+        print(position)
+
+        return angle and position
 
     def decide(self):
         self.dl = 1 / self.match.game.vision._fps if self.match.game.vision._fps != 0 else self.dl
@@ -24,8 +35,8 @@ class UVFAgent2(Strategy):
         y = self.robot.y
 
         g = (self.match.ball.x, self.match.ball.y)  # (.75, .65)
-        delta_x = g[0] - (g[0]-1.5)*.05
-        delta_y = g[1] - (g[1]-.65)*.05
+        delta_x = g[0] - (g[0] - 1.5) * .05
+        delta_y = g[1] - (g[1] - .65) * .05
         r = (delta_x, delta_y)
 
         if 0 <= g[0] <= 1.5 and 0 <= g[1] <= 1.3:
@@ -36,25 +47,25 @@ class UVFAgent2(Strategy):
             if (robot.x, robot.y) != (x, y) and (robot.x, robot.y) != (0, 0):
                 self.field.add_obstacle(
                     (robot.x, robot.y),
-                    0.075*1.4*1,
-                    0.075*1.4*1
+                    0.075 * 1.4,
+                    0.075 * 1.4
                 )
-        for robot in self.match.opposites:
-            if (robot.x, robot.y) != (0, 0):
-                self.field.add_obstacle(
-                    (robot.x, robot.y),
-                    0.075*1.4*0.5,
-                    0.075*1.4*0.3
-                )
-        self.field.save()
 
         theta_d = self.field((x, y))
-        theta_f = self.field((x + self.dl*math.cos(theta), y + self.dl*math.sin(theta)))
+        theta_f = self.field((x + self.dl * math.cos(theta), y + self.dl * math.sin(theta)))
 
-        print(f"theta: {theta:.2f}, error: {theta_d-theta:.2f}, phi: {(theta_f-theta_d)/self.dl:.2f}")
+        g = g if 0 <= g[0] <= 1.5 and 0 <= g[1] <= 1.3 else self.field.g
+        if self.position_to_shoot(g, theta_d):
+            distance_to_goal = ((self.robot.x - 1.5) ** 2 + (self.robot.y - .65) ** 2) ** .5
+            self.shooting_momentum = 90 * distance_to_goal
 
-        if len(self.vs) < 150:
-            self.vs.append(self.robot.speed)
-            self.ws.append(self.robot.vtheta)
-        print(f"(x, y): ({x}, {y}), (w, v, rw): ({sum(self.ws)/len(self.ws)}, {sum(self.vs)/len(self.vs)}, {300/(sum(self.ws)/len(self.ws))})")
+        if self.shooting_momentum > 0:
+            g = (1.5, .65)
+            self.field.set_target(g, g)
+            theta_d = self.field((x, y))
+            theta_f = self.field((x + self.dl * math.cos(theta), y + self.dl * math.sin(theta)))
+            self.shooting_momentum -= 1
+
+        self.field.save()
+
         return theta_d, theta_f
