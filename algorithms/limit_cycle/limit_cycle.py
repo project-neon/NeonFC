@@ -1,4 +1,5 @@
 import math
+from controller import UniController
 
 def discriminant(a, b, c, o):
     '''
@@ -21,25 +22,27 @@ def filter_func(a, b, c, r, t, o):
     return discriminant(a, b, c, o) > 0 and dist(o, r) < dist(r, t) and dist(o, t) < dist(r, t)
 
 class LimitCycle(object):
-    def __init__(self, robot, obstacles, target, target_is_ball=True):
+    def __init__(self, strategy, robot, obstacles, target, target_is_ball=True):
         '''
         - obstacles:        list of the obstacles, not sorted yet
         - target_is_ball:   if the ball is the target, two virtual obstacles are added
                             to make the robot head to the goal when arriving
         '''
+        self.strategy = strategy
+        self.game = self.strategy.match.game
         self.robot = robot
         self.target = target
         self.obstacles = obstacles
         self.target_is_ball = target_is_ball
 
-        if self.robot.game.vision._fps:
-            self._fps = self.robot.game.vision._fps
+        if self.game.vision._fps:
+            self._fps = self.game.vision._fps
         else:
             self._fps = 60
 
         self.dt = 1/self._fps
 
-        self.field_w, self.field_h = robot.game.field.get_dimensions()
+        self.field_w, self.field_h = self.game.field.get_dimensions()
 
     def contour(self, a, b, c, obst, idx=15):
         '''
@@ -69,6 +72,15 @@ class LimitCycle(object):
         ddx =  (d/abs(d))*dy + mlt*dx*(obst.r**2 - dx**2 - dy**2)
         ddy = -(d/abs(d))*dx + mlt*dy*(obst.r**2 - dx**2 - dy**2)
 
+        '''
+        Unicontroller
+        '''
+        if self.strategy.controller.__class__ is UniController:
+            return math.atan2(ddy, ddx)
+
+        '''
+        PID_Control
+        '''
         return (self.robot.x + self.dt*ddx, self.robot.y + self.dt*ddy)
 
     def compute(self):
@@ -128,10 +140,11 @@ class LimitCycle(object):
                 r_x = self.robot.x + self.dt*(dx/abs(dx))
                 r_y = (-a*r_x - c)/b
 
-                return (r_x, r_y)
+                if self.strategy.controller.__class__ is UniController:
+                    dy = self.target.y - self.robot.y
+                    return math.atan2(dy, dx)
 
-class LimitCycleUni(object):
-    pass
+                return (r_x, r_y)
 
 class Point(object):
     def __init__(self, x, y):
