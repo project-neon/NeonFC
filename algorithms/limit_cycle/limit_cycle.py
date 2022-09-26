@@ -83,6 +83,10 @@ class LimitCycle(object):
         '''
         return (self.robot.x + self.dt*ddx, self.robot.y + self.dt*ddy)
 
+    def update(self, robot_x, robot_y):
+        self.robot.x = robot_x
+        self.robot.y = robot_y
+
     def compute(self):
         '''
         a, b and c are the indexes of a linear equation: a*x + b*y + c = 0

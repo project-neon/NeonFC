@@ -13,6 +13,7 @@ class PID_Test(Strategy):
         xs = [i/10 + .45 for i in range(10)]
         self.circuit = [(x, (1/3)*math.sin(5*math.pi*x/1.5)+0.65) for x in xs]
         self.circuit = deque(self.circuit)
+        self.dl = 0.000001
 
     def next_point(self):
         point = self.circuit[0]
@@ -30,17 +31,20 @@ class PID_Test(Strategy):
 
         target = Point(.75, .65)
 
-        for r in self.match.robots:
-            if r.robot_id == 1:
-                o1 = Obstacle(r.x, r.y, r=.2)
+        # for r in self.match.robots:
+        #     if r.robot_id == 1:
+        #         o1 = Obstacle(r.x, r.y, r=.2)
 
-        self.limit_cycle = LimitCycle(self, self.robot, [o1], target, target_is_ball=False)
+        self.dl = 1 / self.match.game.vision._fps if self.match.game.vision._fps != 0 else self.dl
+        self.controller.dl = self.dl
+
+        self.limit_cycle = LimitCycle(self, self.robot, [], self.match.ball, target_is_ball=True)
 
         if self.controller.__class__ is UniController:
-            robot_dl = Point(self.robot.x + 0.000001*math.cos(self.robot.theta),
-                             self.robot.y + 0.000001*math.sin(self.robot.theta))
+            robot_dl = Point(self.robot.x + self.dl*math.cos(self.robot.theta),
+                             self.robot.y + self.dl*math.sin(self.robot.theta))
 
-            self.limit_cycle_dl = LimitCycle(self, robot_dl, [o1], target, target_is_ball=False)
+            self.limit_cycle_dl = LimitCycle(self, robot_dl, [], self.match.ball, target_is_ball=True)
 
     def reset(self, robot=None):
         super().reset()
@@ -51,8 +55,16 @@ class PID_Test(Strategy):
         # desired = self.next_point()
         desired = self.limit_cycle.compute()
 
+        # print(self.robot.x, self.robot.y)
+        # print(self.limit_cycle_dl.robot.x, self.limit_cycle_dl.robot.y)
+
         if self.controller.__class__ is UniController:
+            self.limit_cycle_dl.update(
+                self.robot.x + self.dl*math.cos(self.robot.theta),
+                self.robot.y + self.dl*math.sin(self.robot.theta)
+            )
             desired_dl = self.limit_cycle_dl.compute()
+
             return desired, desired_dl
 
         return desired
