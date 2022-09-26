@@ -14,8 +14,8 @@ class UniController(object):
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m
         self.V_M = 20 # m/s
-        self.R_M = 5 * self.V_M # rad*m/s
-        self.K_W = 7 # coeficiente de feedback
+        self.R_M = 15 * self.V_M # rad*m/s
+        self.K_W = 1.8 # coeficiente de feedback
         self.K_P = 5
         self.v1 = 0  # restricao de velocidade 1
         self.v2 = 0  # restricao de velocidade 2
@@ -78,7 +78,7 @@ class UniController(object):
 
         w *= -3
 
-        return v, w
+        return v*2, w
 
     def set_desired(self, match, theta_d, theta_f):
         self.match = match

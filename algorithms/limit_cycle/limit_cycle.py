@@ -113,7 +113,7 @@ class LimitCycle(object):
             '''
             j = math.atan2(self.field_h/2 - self.target.y, self.field_w - self.target.x)
             m = j + math.pi/2
-            p = 0.055
+            p = 0.05
 
             r = (.0427/2)
 
