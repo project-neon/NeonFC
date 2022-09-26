@@ -1,19 +1,15 @@
 import math
+import time
 
 """
 Controle baseado em angulo desejado
 Referente ao soccer robotics
 """
 
-''' simulado
-
-self.V_M = 200
-self.R_M = 3 * self.V_M
-self.K_W = 16.5
-'''
 
 class UniController(object):
     def __init__(self, robot):
+        self.t = time.time()
         self.robot = robot
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m
@@ -70,7 +66,7 @@ class UniController(object):
         #self.v3 = self.K_P * ((self.robot.x - .75) ** 2 + (self.robot.y - .65) ** 2) ** .5
         # print(f"{self.v3=}")
 
-        v = min(self.v1, self.v2)#, self.v3)
+        v = min(self.v1, self.v2)  # , self.v3)
 
         # calcular w
         if self.theta_e > 0:
@@ -86,8 +82,15 @@ class UniController(object):
 
     def set_desired(self, match, theta_d, theta_f):
         self.match = match
+        # vx = theta[0]
+        # vy = theta[1]
+        # theta = math.atan2(vy, vx)
 
         self.theta_d = theta_d
+        # vx_f, vy_f = self.robot.strategy.decide(
+        #     self.robot.x + self.dl * math.cos(self.robot.theta),
+        #     self.robot.y + self.dl * math.sin(self.robot.theta)
+        # )
         self.theta_f = theta_f
 
     def update(self):
@@ -96,5 +99,4 @@ class UniController(object):
         pwr_left = v - 0.5 * self.L * w
         pwr_right = v + 0.5 * self.L * w
 
-        # return pwr_left, pwr_right
         return v, w

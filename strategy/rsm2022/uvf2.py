@@ -58,6 +58,7 @@ class UVFAgent2(Strategy):
         if self.position_to_shoot(g, theta_d):
             distance_to_goal = ((self.robot.x - 1.5) ** 2 + (self.robot.y - .65) ** 2) ** .5
             self.shooting_momentum = 90 * distance_to_goal
+<<<<<<< HEAD
 
         if self.shooting_momentum > 0:
             g = (1.5, .65)
@@ -69,3 +70,16 @@ class UVFAgent2(Strategy):
         self.field.save()
 
         return theta_d, theta_f
+=======
+
+        if self.shooting_momentum > 0:
+            g = (1.5, .65)
+            self.field.set_target(g, g)
+            theta_d = self.field((x, y))
+            theta_f = self.field((x + self.dl * math.cos(theta), y + self.dl * math.sin(theta)))
+            self.shooting_momentum -= 1
+
+        self.field.save()
+
+        return theta_d, theta_f
+>>>>>>> c780f5deafbc0455cb8e0f1d94ce0c848eaf58ad
