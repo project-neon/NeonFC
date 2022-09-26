@@ -4,7 +4,7 @@ import controller
 from controller.uni_controller import UniController
 
 class Strategy(ABC):
-    def __init__(self, match, name, controller=UniController, controller_kwargs={}):
+    def __init__(self, match, name, controller=controller.SimpleLQR, controller_kwargs={}):
         self.match = match
         self._controller = controller
         self._ctr_kwargs = controller_kwargs
@@ -37,4 +37,4 @@ class Strategy(ABC):
         retorna: vetor (x, y) objetivo
         '''
         
-        return self.robot.x, self.robot.y
+        return 0, 0
