@@ -29,22 +29,10 @@ class PID_Test(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        target = Point(.75, .65)
-
-        # for r in self.match.robots:
-        #     if r.robot_id == 1:
-        #         o1 = Obstacle(r.x, r.y, r=.2)
-
         self.dl = 1 / self.match.game.vision._fps if self.match.game.vision._fps != 0 else self.dl
         self.controller.dl = self.dl
 
-        self.limit_cycle = LimitCycle(self, self.robot, [], self.match.ball, target_is_ball=True)
-
-        if self.controller.__class__ is UniController:
-            robot_dl = Point(self.robot.x + self.dl*math.cos(self.robot.theta),
-                             self.robot.y + self.dl*math.sin(self.robot.theta))
-
-            self.limit_cycle_dl = LimitCycle(self, robot_dl, [], self.match.ball, target_is_ball=True)
+        self.limit_cycle = LimitCycle(self, target_is_ball=True)
 
     def reset(self, robot=None):
         super().reset()
@@ -52,19 +40,33 @@ class PID_Test(Strategy):
             self.start(robot)
 
     def decide(self):
-        # desired = self.next_point()
+        robot = Point(self.robot.x, self.robot.y)
+        target = Point(self.match.ball.x, self.match.ball.y)
+
+        if not (0 <= target.x <= 1.5) and not (0 <= target.y <= 1.3):
+            target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
+        
+        # target = Point(0.75, 0.65)
+
+        # for r in self.match.robots:
+        #     if r.robot_id == 1:
+        #         o1 = Obstacle(r.x, r.y, r=.2)
+
+        self.limit_cycle.update(robot, target, [])
         desired = self.limit_cycle.compute()
 
-        # print(self.robot.x, self.robot.y)
-        # print(self.limit_cycle_dl.robot.x, self.limit_cycle_dl.robot.y)
-
         if self.controller.__class__ is UniController:
-            self.limit_cycle_dl.update(
+
+            robot_dl = Point(
                 self.robot.x + self.dl*math.cos(self.robot.theta),
                 self.robot.y + self.dl*math.sin(self.robot.theta)
             )
-            desired_dl = self.limit_cycle_dl.compute()
+
+            self.limit_cycle.update(robot_dl, target, [])
+            desired_dl = self.limit_cycle.compute()
 
             return desired, desired_dl
+
+        # desired = self.next_point()
 
         return desired
