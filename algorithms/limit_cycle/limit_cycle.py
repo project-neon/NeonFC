@@ -22,7 +22,7 @@ def filter_func(a, b, c, r, t, o):
     return discriminant(a, b, c, o) > 0 and dist(o, r) < dist(r, t) and dist(o, t) < dist(r, t)
 
 class LimitCycle(object):
-    def __init__(self, strategy, robot, obstacles, target, target_is_ball=True):
+    def __init__(self, strategy, target_is_ball=True):
         '''
         - obstacles:        list of the obstacles, not sorted yet
         - target_is_ball:   if the ball is the target, two virtual obstacles are added
@@ -30,9 +30,6 @@ class LimitCycle(object):
         '''
         self.strategy = strategy
         self.game = self.strategy.match.game
-        self.robot = robot
-        self.target = target
-        self.obstacles = obstacles
         self.target_is_ball = target_is_ball
 
         if self.game.vision._fps:
@@ -83,9 +80,10 @@ class LimitCycle(object):
         '''
         return (self.robot.x + self.dt*ddx, self.robot.y + self.dt*ddy)
 
-    def update(self, robot_x, robot_y):
-        self.robot.x = robot_x
-        self.robot.y = robot_y
+    def update(self, robot, target, obstacles):
+        self.robot = robot
+        self.target = target
+        self.obstacles = obstacles
 
     def compute(self):
         '''
