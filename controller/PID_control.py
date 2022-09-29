@@ -26,7 +26,7 @@ class PID_control(object):
         self.K_RHO = 5 # Linear speed gain
 
         # PID of angular speed
-        self.KP = 120 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KP = 75 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
         self.KI = 0 # Integral gain of w 
         self.KD = 0 # Derivative gain of w
 
@@ -37,7 +37,7 @@ class PID_control(object):
 
         # Max speeds for the robot
         self.v_max = 2 # linear speed 
-        self.w_max = math.radians(3800) # angular speed rad/s
+        self.w_max = math.radians(2400) # angular speed rad/s
     
     def set_desired(self, vector):
         self.desired = vector
@@ -73,9 +73,9 @@ class PID_control(object):
         v = self.v_max # if [self.robot.x, self.robot.y] < [self.desired[0], self.desired[1]] else min(self.K_RHO*rho, self.v_max)
 
         # """Objective behind the robot"""
-        # if(abs(alpha) > math.pi/2):
-        #     v = -v
-        #     alpha = angle_adjustment(alpha - math.pi)
+        if(abs(alpha) > math.pi/2):
+            v = -v
+            alpha = angle_adjustment(alpha - math.pi)
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha

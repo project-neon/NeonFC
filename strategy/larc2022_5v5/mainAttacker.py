@@ -1,11 +1,14 @@
-from collections import deque
 import math
 import threading
-from algorithms.potential_fields.fields import PotentialField, TangentialField
-from commons import math as nfc_math
-import controller
+
+from collections import deque
+
 from strategy.BaseStrategy import Strategy
-from algorithms.astar import astart_voronoi
+
+from controller import PID_control
+
+from algorithms.astar.astart_voronoi import voronoi_astar
+from algorithms.limit_cycle import LimitCycle, Point
 
 def aim_projection_ball(strategy):
     m = strategy.match
@@ -35,20 +38,49 @@ class AstarPlanning(threading.Thread):
 
         self.path = []
 
-        
-
     def run(self):
         while True:
             if self.robot.strategy:
-                self.path = astart_voronoi.voronoi_astar(self.robot.strategy, self.match, aim_projection_ball)
+                self.path = voronoi_astar(
+                    self.robot.strategy, self.match, aim_projection_ball
+                )
                 self.iteration += 1
 
                 if self.path:
                     self.path = self.path[1:]
 
+class LimitCyclePlanning():
+    def __init__(self, match, robot):
+        super().__init__()
+        self.match = match
+        self.robot = robot
+
+        self.limit_cycle = LimitCycle(
+            self.match, 
+            target_is_ball=True
+        )
+
+        self.desired_point = None
+
+    def run(self):
+        desired = 0, 0
+        if self.robot.strategy:
+            robot = Point(self.robot.x, self.robot.y)
+            target = Point(self.match.ball.x, self.match.ball.y)
+
+            if not (0 <= target.x <= 1.5 * 2) and not (0 <= target.y <= 1.3 * 2):
+                target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
+
+            self.limit_cycle.update(robot, target, [])
+
+            desired = self.limit_cycle.compute()
+
+
+        return desired
+
 class MainAttacker(Strategy):
     def __init__(self, match, name="MainAttacker"):
-        super().__init__(match, name, controller=controller.PID_control)
+        super().__init__(match, name, controller=PID_control)
 
         self.planning = None
         self.path = []
@@ -62,150 +94,17 @@ class MainAttacker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        self.planning = AstarPlanning(self.match, robot)
-        self.planning.start()
+        self.astar = AstarPlanning(self.match, robot)
+        self.limitcycle = LimitCyclePlanning(self.match, robot)
 
-        self.seek = PotentialField(
-            self.match,
-            name="{}|SeekBehaviour".format(self.__class__)
-        )
+        self.astar.start()
 
-        def get_aim_point(m):
-            field_w, field_h = m.game.field.get_dimensions()
-            aim_point_x = field_w
-            if field_h/2 - 0.2 < m.ball.y < field_h/2 + 0.2:
-                aim_point_y = m.ball.y
-            else:
-                aim_point_y = field_h/2
-            return aim_point_x, aim_point_y
-
-        def shifted_target_left(m, radius_2=0.075):
-            field_h, field_w = m.game.field.get_dimensions()
-            aim_point_x, aim_point_y = get_aim_point(m)
-
-            if m.ball.y > field_w - 0.075:
-                aim_point_y = field_w - 0.05
-            if m.ball.y < 0.075:
-                aim_point_y = 0.05
-
-            pos_x = (
-                m.ball.x -
-                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2)*radius_2
-            )
-
-            pos_y = (
-                m.ball.y -
-                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2)*radius_2
-            )
-
-            return [pos_x, pos_y]
-
-        def shifted_target_right(m, radius=0.075):
-            field_h, field_w = m.game.field.get_dimensions()
-            aim_point_x, aim_point_y = get_aim_point(m)
-
-            if m.ball.y > field_w - 0.075:
-                aim_point_y = field_w - 0.05
-            if m.ball.y < 0.075:
-                aim_point_y = 0.05
-
-            pos_x = (
-                m.ball.x +
-                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2) * radius
-            )
-
-            pos_y = (
-                m.ball.y +
-                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2) * radius
-            )
-
-            return [pos_x, pos_y]
         
-        def uvf_mean_contributtion_left(m, radius=0.075, robot=self.robot, speed=lambda _: 0.5):
-            pos =  [robot.x, robot.y]
-            field_h, field_w = m.game.field.get_dimensions()
-            aim_point_x, aim_point_y = get_aim_point(m)
-
-            if m.ball.y > field_w - 0.075:
-                aim_point_y = field_w - 0.05
-            if m.ball.y < 0.075:
-                aim_point_y = 0.05
-            
-            target = [
-                m.ball.x,
-                m.ball.y
-            ]
-
-            target2 = [
-                m.ball.x +
-                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))) * 0.025,
-                m.ball.y +
-                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x- m.ball.x))) * 0.025
-            ]
-
-            dist = nfc_math.distance_to_line(pos[0], pos[1], target[0], target[1], target2[0], target2[1])
-            if abs(dist) > radius and dist < 0:
-                return 0
-            dist = 0.5 * max(0, min(dist, radius))/ (radius)
-            return speed(m) * (dist + 0.5)
-
-        def uvf_mean_contributtion_right(m, radius=0.075, robot=self.robot, speed=lambda _: 0.5):
-            pos =  [robot.x, robot.y]
-            field_h, field_w = m.game.field.get_dimensions()
-            aim_point_x, aim_point_y = get_aim_point(m)
-            
-            if m.ball.y > field_w - 0.075:
-                aim_point_y = field_w - 0.05
-            if m.ball.y < 0.075:
-                aim_point_y = 0.05
-            
-            target = [
-                m.ball.x,
-                m.ball.y
-            ]
-
-            target2 = [
-                m.ball.x +
-                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))) * 0.025,
-                m.ball.y +
-                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x- m.ball.x))) * 0.025
-            ]
-
-            dist = -nfc_math.distance_to_line(pos[0], pos[1], target[0], target[1], target2[0], target2[1])
-            if abs(dist) > radius and dist < 0:
-                return 0
-            dist = 0.5 * max(0, min(dist, radius))/ (radius )
-            return speed(m) * (dist + 0.5)
-
-        self.seek.add_field(
-            TangentialField(
-                self.match,
-                target=shifted_target_left,                                                                                                                                                                                                                                                                                                                                          
-                radius = 0.075,
-                radius_max = 2,
-                clockwise = False,
-                decay=lambda x: 1,
-                multiplier = uvf_mean_contributtion_left
-            )
-        )
-
-        self.seek.add_field(
-            TangentialField(
-                self.match,
-                target=shifted_target_right,                                                                                                                                                                                                                                                                                                                                          
-                radius = 0.075,
-                radius_max = 2,
-                clockwise = True,
-                decay=lambda x: 1,
-                multiplier = uvf_mean_contributtion_right
-            )
-        )
-
 
     def next_point(self):
-        if self.planning.iteration > self.actual_iteration:
-            self.path = deque(self.planning.path)
-            self.actual_iteration = self.planning.iteration
+        if self.astar.iteration > self.actual_iteration:
+            self.path = deque(self.astar.path)
+            self.actual_iteration = self.astar.iteration
         
         if len(self.path) == 0:
             return self.robot.x, self.robot.y
@@ -233,20 +132,11 @@ class MainAttacker(Strategy):
         
         robot_pos = [self.robot.x, self.robot.y]
         aim_pos = aim_projection_ball(self)
-
-        if not self.next_to(robot_pos, aim_pos, 0.30):
-            self.is_on_attack = False
         
-        if self.next_to(robot_pos, aim_pos, 0.15) or self.is_on_attack == True:
-            self.is_on_attack = True
-            print("ball")
-            vector = self.seek.compute([self.robot.x, self.robot.y])
-            angle = math.atan2(vector[1], vector[0])
+        if self.next_to(robot_pos, aim_pos, 0.40):
+            return self.limitcycle.run()
 
-            return self.robot.x + math.cos(angle) * 0.1 , self.robot.y  + math.sin(angle) * 0.1
-
-        if len(self.planning.path):
-            print("astar")
+        if len(self.astar.path):
             return self.next_point()
         
-        return 0, 0
+        return self.limitcycle.run()

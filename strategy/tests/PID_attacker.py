@@ -1,6 +1,6 @@
 import math
 import time
-from algorithms.RRT.rrt import RRT
+
 
 import api
 import threading
@@ -8,7 +8,6 @@ from collections import deque
 
 from controller import PID_control
 from algorithms.RRT.rrtstar import RRTStar
-from multiprocessing import Process
 
 from strategy.BaseStrategy import Strategy
 
@@ -61,13 +60,6 @@ class OffensivePathPlanning(threading.Thread):
             self.last_calculation += 1
             time.sleep(1/30)
             
-            
-
-
-
-        
-
-
 class Attacker(Strategy):
     def __init__(self, match, name = 'PID-Attacker'):
         super().__init__(match,
