@@ -29,17 +29,17 @@ class LimitCycle(object):
                             to make the robot head to the goal when arriving
         '''
         self.strategy = strategy
-        self.game = self.strategy.match.game
+        self.match = self.strategy.match
         self.target_is_ball = target_is_ball
 
-        if self.game.vision._fps:
-            self._fps = self.game.vision._fps
+        if self.match.game.vision._fps:
+            self._fps = self.match.game.vision._fps
         else:
             self._fps = 60
 
         self.dt = 1/self._fps
 
-        self.field_w, self.field_h = self.game.field.get_dimensions()
+        self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
     def contour(self, a, b, c, obst, idx=15):
         '''
@@ -111,7 +111,7 @@ class LimitCycle(object):
             '''
             j = math.atan2(self.field_h/2 - self.target.y, self.field_w - self.target.x)
             m = j + math.pi/2
-            p = 0.05
+            p = 0.08
 
             r = (.0427/2)
 
@@ -119,7 +119,7 @@ class LimitCycle(object):
             the terms r*cos(j) and r*sin(j) are subtracted to move
             the center of the obstacles behind the ball instead of its center
             '''
-            if self.robot.y < j*(self.robot.x - self.target.x) + self.target.y:
+            if self.robot.y < math.tan(j)*(self.robot.x - self.target.x) + self.target.y:
                 vo = Obstacle(self.target.x - p*math.cos(m) - r*math.cos(j), self.target.y - p*math.sin(m) - r*math.sin(j), p, side="R", is_vo=True)
             else:
                 vo = Obstacle(self.target.x + p*math.cos(m) - r*math.cos(j), self.target.y + p*math.sin(m) - r*math.sin(j), p, side="L", is_vo=True)
@@ -130,23 +130,29 @@ class LimitCycle(object):
         '''
         self.obstacles.sort(key=lambda o: math.sqrt((o.x - self.robot.x)**2 + (o.y - self.robot.y)**2))
 
+        t_a = (self.target.y - self.robot.y)/(self.target.x - self.robot.x)
+        proj = t_a*(1.5 - self.robot.x) + self.robot.y
+        ball_behind = self.target.x > self.robot.x
+
+        if self.target_is_ball and .45 < proj < .85 and ball_behind:
+            return self.match.ball.x, self.match.ball.y
+
         if len(self.obstacles) > 0:
             return self.contour(a, b, c, self.obstacles[0])
 
         else:
-            if self.target_is_ball:
-                return self.contour(a, b, c, vo, 10)
+            if 0.7 < proj < 1.1 and ball_behind:
+                return self.match.ball.x, self.match.ball.y
 
-            else:
-                dx = self.target.x - self.robot.x
-                r_x = self.robot.x + self.dt*(dx/abs(dx))
-                r_y = (-a*r_x - c)/b
+            dx = self.target.x - self.robot.x
+            r_x = self.robot.x + self.dt*(dx/abs(dx))
+            r_y = (-a*r_x - c)/b
 
-                if self.strategy.controller.__class__ is UniController:
-                    dy = self.target.y - self.robot.y
-                    return math.atan2(dy, dx)
+            if self.strategy.controller.__class__ is UniController:
+                dy = self.target.y - self.robot.y
+                return math.atan2(dy, dx)
 
-                return (r_x, r_y)
+            return (r_x, r_y)
 
 class Point(object):
     def __init__(self, x, y):

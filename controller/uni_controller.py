@@ -1,5 +1,4 @@
 import math
-import time
 
 """
 Controle baseado em angulo desejado
@@ -9,7 +8,6 @@ Referente ao soccer robotics
 
 class UniController(object):
     def __init__(self, robot):
-        self.t = time.time()
         self.robot = robot
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m

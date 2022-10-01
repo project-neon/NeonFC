@@ -26,7 +26,7 @@ class PID_control(object):
         self.K_RHO = 8.5 # Linear speed gain
 
         # PID of angular speed
-        self.KP = 85 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KP = 30 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
         self.KI = 0 # Integral gain of w 
         self.KD = 0 # Derivative gain of w
 
@@ -36,7 +36,7 @@ class PID_control(object):
         self.alpha_old = 0 # stores previous iteration alpha
 
         # Max speeds for the robot
-        self.v_max = 1.6 # linear speed 
+        self.v_max = 1 # linear speed 
         self.w_max = math.radians(3600) # angular speed rad/s
     
     def set_desired(self, vector):
@@ -73,7 +73,7 @@ class PID_control(object):
         v = self.v_max # if [self.robot.x, self.robot.y] < [self.desired[0], self.desired[1]] else min(self.K_RHO*rho, self.v_max)
 
         """Objective behind the robot"""
-        if(abs(alpha) < math.pi/2):
+        if(abs(alpha) > math.pi/2):
             v = -v
             alpha = angle_adjustment(alpha - math.pi)
 
@@ -87,7 +87,7 @@ class PID_control(object):
         pwr_left = (2 * v - w * self.l)/2 * self.R
         pwr_right = (2 * v + w * self.l)/2 * self.R
 
-        print(f"{v=}\n{w=}")
+        # print(f"{v=}\n{w=}")
 
-        return -v, w
-        # return pwr_left * 1000, pwr_right * 1000
+        # return -v, w
+        return pwr_left * 1000, pwr_right * 1000
