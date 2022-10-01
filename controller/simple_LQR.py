@@ -84,7 +84,6 @@ class TwoSidesLQR(object):
         pwr_left = (2 * v - w * self.L)/2 * self.R
         pwr_right = (2 * v + w * self.L)/2 * self.R
 
-        # return 0, 0
         if (between > math.pi/2):
             return -pwr_right, -pwr_left,
         return pwr_left, pwr_right

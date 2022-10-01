@@ -11,6 +11,15 @@ class FieldGraph():
     def set_nodes(self, nodes = []):
         self.nodes = nodes
 
+    def add_node(self, node):
+        self.nodes.append(node)
+
+    def remove_node(self, n1):
+        for n2 in self.nodes:
+            self.remove_edge([n1, n2])
+
+        self.nodes.remove(n1)
+
     def update_neighbours(self, edges):
         for edge in edges:
             self.add_edge(edge)

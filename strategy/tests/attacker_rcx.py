@@ -15,7 +15,7 @@ from commons.math import point_in_rect
 class SpinnerAttacker(Strategy):
 
     def __init__(self, match, name = "SpinnerAttacker"):
-        self.ctrl_params = {"l": 0.07}
+        self.ctrl_params = {"l": 0.135}
         super().__init__(match,
             name=name,
             controller=TwoSidesLQR,
@@ -130,10 +130,10 @@ class SpinnerAttacker(Strategy):
     
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
-        uvf_radius = 0.072 # 7.5 cm
+        uvf_radius = 0.08 # 7.5 cm
         uvf_radius_2 = 0.08 # 7.5 cm
 
-        tangential_speed = 0.9 # 8 cm/s
+        tangential_speed = 0.75 # 8 cm/s
 
         """
         MTG-UVF: move to goal univector field

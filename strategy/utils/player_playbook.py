@@ -24,6 +24,28 @@ class PlayerPlay(Play):
     def add_transition(self, trigger, destination):
         self.transitions.append( (trigger, destination) )
 
+
+class OnDefensiveTransitionTrigger(Trigger):
+    def __init__(self, robot, match, in_defense=True, defensive_distance=0.25):
+        super().__init__()
+        self.match = match
+        self.robot = robot
+
+        self.in_defense = in_defense
+        self.defensive_distance = defensive_distance
+
+        self.goal_pos = [
+            self.match.game.field.get_dimensions()[0],
+            self.match.game.field.get_dimensions()[1]/2
+        ]
+
+    def evaluate(self, *args, **kwargs):
+
+        if self.in_defense:
+            return self.match.ball.x < self.defensive_distance
+        else:
+            return self.match.ball.x > self.defensive_distance
+
 class OnAttackerPushTrigger(Trigger):
     def __init__(self, robot, match, min_angle=0.60):
         super().__init__()

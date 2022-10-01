@@ -1,8 +1,41 @@
+import sys
 import math
-from algorithms.astar.astar import AStar, Node
+import copy
+from algorithms.astar.astar import AStar, Node, distance
 from algorithms.astar.fieldGraph import FieldGraph
 
 from scipy.spatial import Voronoi
+
+
+
+def sample_astar(strategy, objective_function, graph):
+    g = copy.copy(graph)
+
+    robot_node = Node([strategy.robot.x, strategy.robot.y])
+
+    objective_node = Node(objective_function(strategy))
+
+    g.add_node(robot_node)
+    g.add_node(objective_node)
+
+    g.set_start(robot_node)
+
+    for node in g.nodes:
+        if distance(node.position, robot_node.position) <= 0.05:
+            g.add_edge([robot_node, node])
+
+    for node in g.nodes:
+        if distance(node.position, objective_node.position) <= 0.05:
+            g.add_edge([objective_node, node])
+
+    return AStar(robot_node, objective_node).calculate()
+
+    
+
+
+
+    
+
 
 
 
