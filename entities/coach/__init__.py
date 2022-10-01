@@ -9,6 +9,7 @@ from entities.coach.rcx2022 import Coach as RCX_2022
 from entities.coach.cbfrs2022 import Coach as CBFRS_2022
 from entities.coach.cbfrs2022_2 import Coach as CBFRS_2022_2
 from entities.coach.cbfrs2022_5v5 import Coach as CBFRS_2022_5V5
+from entities.plays.larc2022_5v5.mainPlay import MainPlay
 
 from entities.coach.guideCoach import Coach as GuideCoach
 

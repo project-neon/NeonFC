@@ -10,9 +10,9 @@ class Coach(BaseCoach):
 
         self.constraints = [
             #estratégia - função eleitora - prioridade
-            (strategy.larc2020.GoalKeeper(self.match), self.elect_goalkeeper, 0),
-            (strategy.larc2020.Attacker(self.match), self.elect_attacker, 0),
-            (strategy.larc2020.MidFielder(self.match), self.elect_midfielder, 0)
+            (strategy.tests.thales_atacante(self.match, "defender_1"), self.elect_goalkeeper, 0),
+            (strategy.tests.thales_atacante(self.match, "defender_2"), self.elect_attacker, 0),
+            (strategy.tests.Idle(self.match), self.elect_midfielder, 0)
         ]
     
     def decide (self):
@@ -36,13 +36,13 @@ class Coach(BaseCoach):
         dist_to_ball = math.sqrt(
             (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
         )
-        return 1000 - dist_to_ball
+        return 0.1
 
     def elect_goalkeeper(self, robot):
         dist_to_goal = math.sqrt(
             (robot.x - 0)**2 + (robot.y - 0.65)**2
         )
-        return 1000 - dist_to_goal
+        return 1000
 
     def elect_midfielder(self, robot):
-        return 1
+        return 1000

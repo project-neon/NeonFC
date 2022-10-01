@@ -8,4 +8,4 @@ from algorithms.potential_fields import fields
 # Dijkstra + waypoint planning
 from algorithms import dijkstra_waypoint
 
-from algorithms.RRT import rrt
+#from algorithms.RRT import rrt
