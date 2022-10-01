@@ -12,6 +12,8 @@ class Coach(BaseCoach):
             #estratégia - função eleitora - prioridade
             (strategy.tests.thales_atacante(self.match, "defender_1"), self.elect_goalkeeper, 0),
             (strategy.tests.thales_atacante(self.match, "defender_2"), self.elect_attacker, 0),
+            (strategy.tests.Idle(self.match), self.elect_midfielder, 0),
+            (strategy.tests.Idle(self.match), self.elect_midfielder, 0),
             (strategy.tests.Idle(self.match), self.elect_midfielder, 0)
         ]
     

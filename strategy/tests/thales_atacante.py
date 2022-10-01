@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 
 #class Attacker(DebugPotentialFieldStrategy):
 class Attacker(Strategy):
-    a = 0.4 # metade do tamanho x da elipse
+    a = 0.3 # metade do tamanho x da elipse
     b = 0.5 # metade do tamanho y da elipse
     dist_robos = 3.14/30 # algo como o angulo em radianos entre o robo e o ponto central
-    ponto_gol = [1.5,0.65] # ponto do gol (x,y)
+    ponto_gol = [0,0.65] # ponto do gol (x,y)
     ponto_objetivo = [0,0] # o melhor ponto pertencente a elipse para defender
     robo_cima = True
     mr = 0
@@ -26,10 +26,11 @@ class Attacker(Strategy):
 
         super().start(robot=robot)
         
-
-       #ponto_gol = [self.match.game.field.get_dimensions()[0],self.match.game.field.get_dimensions()[1]/2]
-        
-
+        if self.match.game.field.get_dimensions()[0] == 2.2:
+            self.ponto_gol = [0,0.9]
+            self.b = 0.5
+            self.a = 0.4
+            self.dist_robos = 3.14/60
         self.seek = PotentialField(self.match,name="SeekBehaviour")
 
         self.aim = PotentialField(self.match,name="AimBehaviour")
@@ -57,7 +58,6 @@ class Attacker(Strategy):
         b = self.b
         a = self.a
         dd = 0.2 #distancia angular do robo e o ponto próximo
-        print(self.robot.get_name(), self.robo_cima)
 
         for robot in self.match.robots:
             
@@ -80,7 +80,7 @@ class Attacker(Strategy):
             m = (self.mr + math.tan(dd))/(1 - self.mr*math.tan(dd))
         elif self.mr > m + 0.2: 
             m = (self.mr - math.tan(dd))/(1 + self.mr*math.tan(dd))
-        self.ponto_objetivo[0] = (2*px*m**2/b**2 + 2*px/a**2 - math.sqrt((-2*px*m**2/b**2 - 2*px/a**2)**2 - 4*(m**2/b**2 + 1/a**2)*((m*px/b)**2 - 1 + px**2/a**2)))/(2*(m**2/b**2 + 1/a**2))
+        self.ponto_objetivo[0] = (2*px*m**2/b**2 + 2*px/a**2 + math.sqrt((-2*px*m**2/b**2 - 2*px/a**2)**2 - 4*(m**2/b**2 + 1/a**2)*((m*px/b)**2 - 1 + px**2/a**2)))/(2*(m**2/b**2 + 1/a**2))
         
         self.ponto_objetivo[1] = m*(self.ponto_objetivo[0] - px) + py
         
