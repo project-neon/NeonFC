@@ -3,6 +3,7 @@ from algorithms.potential_fields.fields import PotentialField, PointField, LineF
 import math
 import numpy as np
 from controller.simple_LQR import TwoSidesLQR
+from controller.PID_control import PID_control
 
 from strategy.DebugTools import DebugPotentialFieldStrategy
 import matplotlib.pyplot as plt
@@ -19,7 +20,7 @@ class Attacker(Strategy):
 
     def __init__(self, match, name):
         controller_args = {}
-        super().__init__(match, name, TwoSidesLQR)
+        super().__init__(match, name, PID_control)
 
     def start(self, robot=None):
 
@@ -28,7 +29,7 @@ class Attacker(Strategy):
         
         if self.match.game.field.get_dimensions()[0] == 2.2:
             self.ponto_gol = [0,0.9]
-            self.b = 0.5
+            self.b = 0.6
             self.a = 0.4
             self.dist_robos = 3.14/60
         self.seek = PotentialField(self.match,name="SeekBehaviour")
@@ -37,16 +38,6 @@ class Attacker(Strategy):
 
         self.carry = PotentialField(self.match,name="CarryBehaviour")
 
-
-        self.seek.add_field(
-            PointField(
-                self.match,
-                target = lambda m : self.ponto_objetivo,
-                radius = 0.1,
-                decay = lambda x: x**2,
-                multiplier = 1
-            )
-        )
            
             
     
@@ -85,7 +76,7 @@ class Attacker(Strategy):
         self.ponto_objetivo[1] = m*(self.ponto_objetivo[0] - px) + py
         
         #return super().decide(self.seek)
-        return self.seek.compute([self.robot.x, self.robot.y])
+        return self.ponto_objetivo
         # return self.aim.compute([self.robot.x, self.robot.y])
         
         #return (   self.speed*((self.ponto[0]-self.robot.x)/self.dist),    self.speed*((self.ponto[1]-self.robot.y)/self.dist))

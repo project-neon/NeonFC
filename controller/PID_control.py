@@ -26,7 +26,7 @@ class PID_control(object):
         self.K_RHO = 8.5 # Linear speed gain
 
         # PID of angular speed
-        self.KP = 85 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KP = 160 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
         self.KI = 0 # Integral gain of w 
         self.KD = 0 # Derivative gain of w
 
