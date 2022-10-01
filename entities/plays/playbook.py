@@ -24,6 +24,7 @@ class Playbook(object):
     def _transition_if_have(self):
         for transition, next_play in self.plays[self.actual_play].transitions:
             if transition.evaluate(self.coach, self.plays[self.actual_play]):
+                print(f"Transition to {next_play.get_name()}")
                 self.set_play(next_play)
 
     def update(self):
