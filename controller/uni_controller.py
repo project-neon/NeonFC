@@ -5,15 +5,17 @@ Controle baseado em angulo desejado
 Referente ao soccer robotics
 """
 
-
 class UniController(object):
     def __init__(self, robot):
         self.robot = robot
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m
-        self.V_M = 20 # m/s
-        self.R_M = 15 * self.V_M # rad*m/s
-        self.K_W = 1.8 # coeficiente de feedback
+        # self.V_M = 20 # m/s
+        # self.R_M = 15 * self.V_M # rad*m/s
+        # self.K_W = 1.8 # coeficiente de feedback
+        self.V_M = 500 # m/s
+        self.R_M = 3 * self.V_M # rad*m/s
+        self.K_W = 100 # coeficiente de feedback
         self.K_P = 5
         self.v1 = 0  # restricao de velocidade 1
         self.v2 = 0  # restricao de velocidade 2
@@ -61,10 +63,9 @@ class UniController(object):
         ball_x, ball_y = self.match.ball.x, self.match.ball.y
 
         self.v3 = self.K_P * ((self.robot.x - ball_x) ** 2 + (self.robot.y - ball_y) ** 2) ** .5
-        #self.v3 = self.K_P * ((self.robot.x - .75) ** 2 + (self.robot.y - .65) ** 2) ** .5
         # print(f"{self.v3=}")
 
-        v = min(self.v1, self.v2)  # , self.v3)
+        v = min(self.v1, 2*self.v2)  # , self.v3)
 
         # calcular w
         if self.theta_e > 0:
@@ -74,21 +75,14 @@ class UniController(object):
 
         # print(f"{self.robot.speed/v:.2f}, {self.robot.vtheta/w:.2f}")
 
-        w *= -3
+        # w *= -3
 
-        return v*2, w
+        return v, w
 
     def set_desired(self, match, theta_d, theta_f):
         self.match = match
-        # vx = theta[0]
-        # vy = theta[1]
-        # theta = math.atan2(vy, vx)
 
         self.theta_d = theta_d
-        # vx_f, vy_f = self.robot.strategy.decide(
-        #     self.robot.x + self.dl * math.cos(self.robot.theta),
-        #     self.robot.y + self.dl * math.sin(self.robot.theta)
-        # )
         self.theta_f = theta_f
 
     def update(self):
@@ -97,4 +91,5 @@ class UniController(object):
         pwr_left = v - 0.5 * self.L * w
         pwr_right = v + 0.5 * self.L * w
 
-        return v, w
+        # return v, w
+        return pwr_left, pwr_right

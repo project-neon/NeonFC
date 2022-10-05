@@ -8,7 +8,7 @@ from controller.uni_controller import UniController
 
 class PID_Test(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match, "PID_Test", controller=UniController)
+        super().__init__(match, "PID_Test", controller=PID_control)
 
         xs = [i/10 + .45 for i in range(10)]
         self.circuit = [(x, (1/3)*math.sin(5*math.pi*x/1.5)+0.65) for x in xs]
@@ -25,6 +25,14 @@ class PID_Test(Strategy):
             print("Change point! ", self.circuit[0])
 
         return self.circuit[0]
+
+    def can_shoot(self):
+        ball = self.match.ball
+        t_a = (ball.y - self.robot.y)/(ball.x - self.robot.x)
+        proj = t_a*(1.5 - self.robot.x) + self.robot.y
+        ball_behind = ball.x > self.robot.x
+
+        return self.limit_cycle.target_is_ball and .45 < proj < .85 and ball_behind
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -55,6 +63,9 @@ class PID_Test(Strategy):
         self.limit_cycle.update(robot, target, [])
         desired = self.limit_cycle.compute()
 
+        if self.can_shoot():
+            desired = target.x, target.y
+
         if self.controller.__class__ is UniController:
 
             robot_dl = Point(
@@ -64,6 +75,10 @@ class PID_Test(Strategy):
 
             self.limit_cycle.update(robot_dl, target, [])
             desired_dl = self.limit_cycle.compute()
+
+            if self.can_shoot():
+                desired = math.atan2(target.y - robot.y, target.x - robot.x)
+                desired_dl = math.atan2(target.y - robot_dl.y, target.x - robot_dl.x)
 
             return desired, desired_dl
 
