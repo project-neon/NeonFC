@@ -25,6 +25,14 @@ class PID_Test(Strategy):
 
         return self.circuit[0]
 
+    def can_shoot(self):
+        ball = self.match.ball
+        t_a = (ball.y - self.robot.y)/(ball.x - self.robot.x)
+        proj = t_a*(1.5 - self.robot.x) + self.robot.y
+        ball_behind = ball.x > self.robot.x
+
+        return self.limit_cycle.target_is_ball and .45 < proj < .85 and ball_behind
+
     def start(self, robot=None):
         super().start(robot=robot)
 
@@ -54,6 +62,9 @@ class PID_Test(Strategy):
         self.limit_cycle.update(robot, target, [])
         desired = self.limit_cycle.compute()
 
+        if self.can_shoot():
+            desired = target.x, target.y
+
         if self.controller.__class__ is UniController:
 
             robot_dl = Point(
@@ -63,6 +74,10 @@ class PID_Test(Strategy):
 
             self.limit_cycle.update(robot_dl, target, [])
             desired_dl = self.limit_cycle.compute()
+
+            if self.can_shoot():
+                desired = math.atan2(target.y - robot.y, target.x - robot.x)
+                desired_dl = math.atan2(target.y - robot_dl.y, target.x - robot_dl.x)
 
             return desired, desired_dl
 

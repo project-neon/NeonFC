@@ -99,6 +99,10 @@ class LimitCycle(object):
         '''
         self.obstacles = list(filter(lambda o: filter_func(a, b, c, self.robot, self.target, o), self.obstacles))
 
+        '''
+        todo: remove the addition of virtual obstacles conditional from here,
+              this is up to the strategy not part of the algorithm itself
+        '''
         if self.target_is_ball:
             '''
             - m:    angle of the line perpendicular to the line between the ball and
@@ -130,19 +134,10 @@ class LimitCycle(object):
         '''
         self.obstacles.sort(key=lambda o: math.sqrt((o.x - self.robot.x)**2 + (o.y - self.robot.y)**2))
 
-        t_a = (self.target.y - self.robot.y)/(self.target.x - self.robot.x)
-        proj = t_a*(1.5 - self.robot.x) + self.robot.y
-        ball_behind = self.target.x > self.robot.x
-
-        if self.target_is_ball and .45 < proj < .85 and ball_behind:
-            return self.match.ball.x, self.match.ball.y
-
         if len(self.obstacles) > 0:
             return self.contour(a, b, c, self.obstacles[0])
 
         else:
-            if 0.7 < proj < 1.1 and ball_behind:
-                return self.match.ball.x, self.match.ball.y
 
             dx = self.target.x - self.robot.x
             r_x = self.robot.x + self.dt*(dx/abs(dx))
