@@ -4,3 +4,4 @@ from entities import coach
 from entities import plays
 
 from entities import trainer
+from entities import visualization

@@ -8,10 +8,9 @@ from controller.uni_controller import UniController
 
 class PID_Test(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match, "PID_Test", controller=UniController)
+        super().__init__(match, "PID_Test", controller=PID_control)
 
-        xs = [i/10 + .45 for i in range(10)]
-        self.circuit = [(x, (1/3)*math.sin(5*math.pi*x/1.5)+0.65) for x in xs]
+        self.circuit = [(1.2, .40), (1.2, .90), (.75, .65), (.3, .90), (.3, .40)]
         self.circuit = deque(self.circuit)
         self.dl = 0.000001
 
@@ -32,7 +31,7 @@ class PID_Test(Strategy):
         self.dl = 1 / self.match.game.vision._fps if self.match.game.vision._fps != 0 else self.dl
         self.controller.dl = self.dl
 
-        self.limit_cycle = LimitCycle(self, target_is_ball=True)
+        self.limit_cycle = LimitCycle(self, target_is_ball=False)
 
     def reset(self, robot=None):
         super().reset()
@@ -41,11 +40,11 @@ class PID_Test(Strategy):
 
     def decide(self):
         robot = Point(self.robot.x, self.robot.y)
-        target = Point(self.match.ball.x, self.match.ball.y)
+        target = Point(.75, .65)# self.match.ball.x, self.match.ball.y)
 
         if not (0 <= target.x <= 1.5) and not (0 <= target.y <= 1.3):
             target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
-        
+
         # target = Point(0.75, 0.65)
 
         # for r in self.match.robots:
@@ -67,6 +66,6 @@ class PID_Test(Strategy):
 
             return desired, desired_dl
 
-        # desired = self.next_point()
+        desired = self.next_point()
 
         return desired

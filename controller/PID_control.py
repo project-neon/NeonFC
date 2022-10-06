@@ -1,5 +1,8 @@
 import math
 import numpy as np
+from entities.visualization import Writer, Parameter
+import time
+from collections import deque
 
 def angle_adjustment(angle):
         """Adjust angle of the robot when objective is "behind" the robot"""
@@ -26,9 +29,9 @@ class PID_control(object):
         self.K_RHO = 8.5 # Linear speed gain
 
         # PID of angular speed
-        self.KP = 30 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
-        self.KI = 0 # Integral gain of w 
-        self.KD = 0 # Derivative gain of w
+        self.KP = Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KI = Parameter(0, 'pid_tuner', 'ki') # Integral gain of w
+        self.KD = Parameter(-7.5, 'pid_tuner', 'kd') # Derivative gain of w
 
         # PID params for error
         self.dif_alpha = 0 # diferential param
@@ -36,8 +39,20 @@ class PID_control(object):
         self.alpha_old = 0 # stores previous iteration alpha
 
         # Max speeds for the robot
-        self.v_max = 1 # linear speed 
-        self.w_max = math.radians(3600) # angular speed rad/s
+        self.v_max = -40 # 40 # linear speed
+        self.w_max = 250 # math.radians(7200) # angular speed rad/
+
+        """self.pid_writer = Writer('pid',
+                                 {'kp': 'FLOAT',
+                                  'ki': 'FLOAT',
+                                  'kd': 'FLOAT',
+                                  'set_point': 'FLOAT',
+                                  'error': 'FLOAT',
+                                  'w': 'FLOAT'
+                                  })"""
+        self.robot_writer = Writer('robot',
+                                   {'x': 'FLOAT',
+                                    'y': 'FLOAT'})
     
     def set_desired(self, vector):
         self.desired = vector
@@ -51,8 +66,8 @@ class PID_control(object):
     def update(self):
         # Params calculation
         # Feedback errors
-        D_x =  self.desired[0] - self.robot.x
-        D_y =  self.desired[1] - self.robot.y
+        D_x = self.desired[0] - self.robot.x
+        D_y = self.desired[1] - self.robot.y
 
         # RHO distance of the robot to the objective
         rho = math.sqrt((D_x**2 + D_y**2))
@@ -66,16 +81,16 @@ class PID_control(object):
 
         """Calculate the parameters of PID control"""
         self._update_fps()
-        self.dif_alpha = alpha - self.alpha_old / self.dt # Difentential of alpha
+        self.dif_alpha = (alpha - self.alpha_old) / self.dt # Difentential of alpha
         self.int_alpha = self.int_alpha + alpha
 
         """Linear speed (v)"""
         v = self.v_max # if [self.robot.x, self.robot.y] < [self.desired[0], self.desired[1]] else min(self.K_RHO*rho, self.v_max)
 
         """Objective behind the robot"""
-        if(abs(alpha) > math.pi/2):
-            v = -v
-            alpha = angle_adjustment(alpha - math.pi)
+        # if(abs(alpha) > math.pi/2):
+        #     v = -v
+        #     alpha = angle_adjustment(alpha - math.pi)
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha
@@ -87,7 +102,8 @@ class PID_control(object):
         pwr_left = (2 * v - w * self.l)/2 * self.R
         pwr_right = (2 * v + w * self.l)/2 * self.R
 
-        # print(f"{v=}\n{w=}")
+        #self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
+        self.robot_writer.write([self.robot.x, self.robot.y])
 
-        # return -v, w
-        return pwr_left * 1000, pwr_right * 1000
+        return -v, w
+        # return pwr_left * 1000, pwr_right * 1000
