@@ -49,7 +49,7 @@ class Attacker(Strategy):
         py = self.ponto_gol[1]
         b = self.b
         a = self.a
-        dd = 0.15 #distancia angular do robo e o ponto próximo
+        dd = 0.30 #distancia angular do robo e o ponto próximo
 
         for robot in self.match.robots:
             
@@ -87,30 +87,34 @@ class Attacker(Strategy):
         self.ponto_objetivo[0] = (2*px*m**2/b**2 + 2*px/a**2 + math.sqrt((-2*px*m**2/b**2 - 2*px/a**2)**2 - 4*(m**2/b**2 + 1/a**2)*((m*px/b)**2 - 1 + px**2/a**2)))/(2*(m**2/b**2 + 1/a**2))
         
         self.ponto_objetivo[1] = m*(self.ponto_objetivo[0] - px) + py
-        print(np.arctan(b**2*(px - self.ponto_objetivo[0])/(a**2*(self.ponto_objetivo[1] - py))))
+        # print(np.arctan(b**2*(px - self.ponto_objetivo[0])/(a**2*(self.ponto_objetivo[1] - py))))
         #return super().decide(self.seek)
         return self.ponto_objetivo
-        # return self.aim.compute([self.robot.x, self.robot.y])
+        # return self.aim.compute([self.robot.x, self.robot.y])<<<
+
+
     def update(self):
         ang = np.arctan(self.b**2*(self.ponto_gol[0] - self.ponto_objetivo[0])/(self.a**2*(self.ponto_objetivo[1] - self.ponto_gol[1])))
         erro = 3.14/2
         angular_speed = 5*(abs(ang - self.robot.theta))
         
         #if math.sqrt(self.robot.vx**2 + self.robot.vy**2) >
-        if self.robot.theta < 0 and ang < 0:
-            if self.robot.theta < ang + erro:
-                return -angular_speed, angular_speed
-            elif self.robot.theta >= ang - erro:
-                return angular_speed, -angular_speed
-            else:
-                return self.controller.update()
-        elif self.robot.theta > 0 and ang > 0:
-            if self.robot.theta > ang + erro:
-                return angular_speed, -angular_speed
-            elif self.robot.theta <= ang - erro:
-                return -angular_speed, angular_speed
-            else:
-                return self.controller.update()
-        else:
-            return self.controller.update()
+        # if self.robot.theta < 0 and ang < 0:
+        #     if self.robot.theta < ang + erro:
+        #         print(f"########### GIRANDO {self.robot.get_name()}")
+        #         return -angular_speed, angular_speed
+        #     elif self.robot.theta >= ang - erro:
+        #         print(f"########### GIRANDO {self.robot.get_name()}")
+        #         return angular_speed, -angular_speed
+        # elif self.robot.theta > 0 and ang > 0:
+        #     if self.robot.theta > ang + erro:
+        #         print(f"########### GIRANDO {self.robot.get_name()}")
+        #         return angular_speed, -angular_speed
+        #     elif self.robot.theta <= ang - erro:
+        #         print(f"########### GIRANDO {self.robot.get_name()}")
+        #         return -angular_speed, angular_speed
+
+
+        # print(f"########### NORRMAL {self.robot.get_name()}")
+        return self.controller.update()
         #return (   self.speed*((self.ponto[0]-self.robot.x)/self.dist),    self.speed*((self.ponto[1]-self.robot.y)/self.dist))
