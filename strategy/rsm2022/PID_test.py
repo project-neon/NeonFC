@@ -39,7 +39,7 @@ class PID_Test(Strategy):
         self.dl = 1 / self.match.game.vision._fps if self.match.game.vision._fps != 0 else self.dl
         self.controller.dl = self.dl
 
-        self.limit_cycle = LimitCycle(self, target_is_ball=False)
+        self.limit_cycle = LimitCycle(self, target_is_ball=True)
 
     def reset(self, robot=None):
         super().reset()
@@ -48,12 +48,10 @@ class PID_Test(Strategy):
 
     def decide(self):
         robot = Point(self.robot.x, self.robot.y)
-        target = Point(.75, .65)# self.match.ball.x, self.match.ball.y)
+        target = Point(self.match.ball.x, self.match.ball.y)
 
         if not (0 <= target.x <= 1.5) and not (0 <= target.y <= 1.3):
             target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
-
-        # target = Point(0.75, 0.65)
 
         # for r in self.match.robots:
         #     if r.robot_id == 1:
@@ -81,6 +79,6 @@ class PID_Test(Strategy):
 
             return desired, desired_dl
 
-        desired = self.next_point()
+        # desired = self.next_point()
 
         return desired
