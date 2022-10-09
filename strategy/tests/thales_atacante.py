@@ -14,9 +14,13 @@ class Attacker(Strategy):
     b = 0.5 # metade do tamanho y da elipse
     dist_robos = 3.14/10 # algo como o angulo em radianos entre o robo e o ponto central
     ponto_gol = [0,0.65] # ponto do gol (x,y)
+    ponto_gol_3V3 = [0,0.65]
+    ponto_g_5v5 = (0,0.9)
     ponto_objetivo = [0,0] # o melhor ponto pertencente a elipse para defender
     robo_cima = True
     mr = 0
+    y_inicio_gol = 0.7
+    y_final_gol = 1.1
 
     def __init__(self, match, name):
         controller_args = {}
@@ -42,9 +46,17 @@ class Attacker(Strategy):
             
     
     def decide(self):
-        m = (self.ponto_gol[1] - self.match.ball.y)/(self.ponto_gol[0] - self.match.ball.x) # tangente do angulo entre a bola, o gol e o eixo x.
-         # tangente do angulo entre a bola, o gol e o eixo x.
-        self.mr = (self.ponto_gol[1] - self.robot.y)/(self.ponto_gol[0] - self.robot.x)
+        m = 0 # tangente do angulo entre a bola, o gol e o eixo x.
+        if self.ponto_gol[0] - self.match.ball.x != 0:
+            m = (self.ponto_gol[1] - self.match.ball.y)/(self.ponto_gol[0] - self.match.ball.x)
+        else:
+            m = (self.ponto_gol[1] - self.match.ball.y)/(0.000001)
+        if self.ponto_gol[0] - self.robot.x != 0:
+            self.mr = (self.ponto_gol[1] - self.robot.y)/(self.ponto_gol[0] - self.robot.x)
+        else:
+            self.mr = (self.ponto_gol[1] - self.robot.y)/(0.000001)
+
+        self.calcular_ponto_gol()
         px = self.ponto_gol[0]
         py = self.ponto_gol[1]
         b = self.b
@@ -91,10 +103,26 @@ class Attacker(Strategy):
         #return super().decide(self.seek)
         return self.ponto_objetivo
         # return self.aim.compute([self.robot.x, self.robot.y])<<<
-
+    def calcular_ponto_gol(self):
+        velocidade_minima = 0.1
+        if self.match.ball.vx != 0 and math.sqrt(self.match.ball.vx**2 + self.match.ball.vy**2) > velocidade_minima:
+            if (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y > self.y_inicio_gol and (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y < self.y_final_gol:
+                self.ponto_gol[1] = (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y
+            else:
+                self.ponto_gol[0] = self.ponto_g_5v5[0] #alterar para 3v3 e 5v5
+                self.ponto_gol[1] = self.ponto_g_5v5[1]
+        else:
+            self.ponto_gol[0] = self.ponto_g_5v5[0] #alterar para 3v3 e 5v5
+            self.ponto_gol[1] = self.ponto_g_5v5[1]
+        #print(self.ponto_gol, self.ponto_g_5v5, math.sqrt(self.match.ball.vx**2 + self.match.ball.vy**2))
+        #print(self.ponto_gol, math.sqrt(self.match.ball.vx**2 + self.match.ball.vy**2))
 
     def update(self):
-        ang = np.arctan(self.b**2*(self.ponto_gol[0] - self.ponto_objetivo[0])/(self.a**2*(self.ponto_objetivo[1] - self.ponto_gol[1])))
+        ang = 0
+        if self.ponto_objetivo[1] - self.ponto_gol[1] != 0:
+            np.arctan(self.b**2*(self.ponto_gol[0] - self.ponto_objetivo[0])/(self.a**2*(self.ponto_objetivo[1] - self.ponto_gol[1])))
+        else:
+            np.arctan(self.b**2*(self.ponto_gol[0] - self.ponto_objetivo[0])/(self.a**2*(0.00001)))
         erro = 3.14/2
         angular_speed = 5*(abs(ang - self.robot.theta))
         
