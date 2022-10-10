@@ -46,6 +46,15 @@ class OnDefensiveTransitionTrigger(Trigger):
         else:
             return self.match.ball.x > self.defensive_distance
 
+class OnStuckTrigger(Trigger):
+    def __init__(self, robot, seconds_stuck=1):
+        super().__init__()
+        self.robot = robot
+        self.seconds_stuck = seconds_stuck
+
+    def evaluate(self, *args, **kwargs):
+        return self.robot.is_stuck(self.seconds_stuck)
+
 class OnAttackerPushTrigger(Trigger):
     def __init__(self, robot, match, min_angle=0.60):
         super().__init__()

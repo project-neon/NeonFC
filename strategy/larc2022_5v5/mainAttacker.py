@@ -8,6 +8,7 @@ from collections import deque
 from algorithms.astar.fieldGraph import FieldGraph
 from algorithms.potential_fields import fields
 from controller.simple_LQR import TwoSidesLQR
+from entities import plays
 
 from strategy.BaseStrategy import Strategy
 
@@ -17,11 +18,12 @@ from commons import math as nfc_math
 
 from algorithms.astar.astart_voronoi import voronoi_astar
 from algorithms.limit_cycle import LimitCycle, Point
-from strategy.utils.player_playbook import OnAttackerPushTrigger, OnDefensiveTransitionTrigger, OnNextTo, PlayerPlay, PlayerPlaybook
+from strategy.utils.player_playbook import OnAttackerPushTrigger, OnDefensiveTransitionTrigger, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
 
 def aim_projection_ball(strategy):
     m = strategy.match
     b = strategy.match.ball
+    r = strategy.robot
 
     ball = [b.x, b.y]
     goal_pos = [
@@ -35,7 +37,21 @@ def aim_projection_ball(strategy):
     ]
     angle = math.atan2(dir_to_goal_vector[1], dir_to_goal_vector[0])
 
-    return ball[0] - 0.2* math.cos(angle), ball[1] - 0.2 * math.sin(angle)
+    side = -1 if b.y > r.y else 1
+
+    side_size = 0.05
+    recoil_size = 0.05
+
+    angle_of_attack = math.atan2(dir_to_goal_vector[1], dir_to_goal_vector[0]) + math.pi/2
+
+    point_with_recoil = [ball[0] - recoil_size* math.cos(angle), ball[1] - recoil_size * math.sin(angle)]
+
+    point_of_attack = [
+        point_with_recoil[0] + side * side_size * math.cos(angle_of_attack), 
+        point_with_recoil[1] + side * side_size * math.cos(angle_of_attack)
+    ]
+
+    return point_of_attack
 
 class AstarPlanning(PlayerPlay):
     def __init__(self, match, robot):
@@ -52,124 +68,107 @@ class AstarPlanning(PlayerPlay):
         self.next_path = []
 
     def start_up(self):
-            super().start_up()
-            controller = PID_control
-            controller_kwargs = {'max_speed': 2.75}
-            self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+        super().start_up()
+        controller = PID_control
+        controller_kwargs = {'max_speed': 2, 'max_angular': 4800}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
-    def get_name(self):
-        return f"<{self.robot.get_name()} Voronoi Astar Planning>"
-
-    def run(self):
-        if self.robot.strategy:
-            self.next_path = voronoi_astar(
-                self.robot.strategy, self.match, aim_projection_ball
-            )
-            self.next_iterarion += 1
-
-            if self.next_path:
-                self.next_path = self.next_path[1:]
-
-    def next_point(self):
-        self.run()
-
-        if self.next_iterarion > self.actual_iteration:
-            self.path = deque(self.next_path)
-            self.actual_iteration = self.next_iterarion
-        
-        if len(self.path) == 0:
-            return self.robot.x, self.robot.y
-        
-        point = self.path[0]
-        dx = point[0] - self.robot.x
-        dy = point[1] - self.robot.y
-
-        if math.sqrt(dx**2 + dy**2) < 0.01:
-            print("next point!")
-            self.path.rotate(-1)
-        
-        return self.path[0]
-    
-    def update(self):
-        res = self.next_point()
-        if len(res):
-            return res
-        else:
-            return 0, 0
-
-class LimitCyclePlanning(PlayerPlay):
-    def __init__(self, match, robot):
-        super().__init__(match, robot)
-        self.match = match
-        self.robot = robot
-
-        self.limit_cycle = LimitCycle(
-            self.match, 
-            target_is_ball=True
+    def start(self):
+        self.astar = fields.PotentialField(
+            self.match,
+            name="{}|AstarBehaviour".format(self.__class__)
         )
 
-        self.desired_point = None
-
-    def start_up(self):
-            super().start_up()
-            controller = PID_control
-            controller_kwargs = {'max_speed': 2}
-            self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+        self.astar.add_field(
+            fields.PointField(
+                self.match,
+                target = lambda m, s=self : voronoi_astar(
+                    s.robot.strategy, s.match, aim_projection_ball
+                )[1],
+                radius = .075,
+                decay = lambda x: x,
+                multiplier = 1
+            )
+        )
 
     def get_name(self):
-        return f"<{self.robot.get_name()} LimitCycle Planning>"
+        return f"<{self.robot.get_name()} Astar Potential Field Planning>"
 
-    def run(self):
-        desired = 0, 0
-        if self.robot.strategy:
-            robot = Point(self.robot.x, self.robot.y)
-            target = Point(self.match.ball.x, self.match.ball.y)
-
-            if not (0 <= target.x <= 1.5 * 2) and not (0 <= target.y <= 1.3 * 2):
-                target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
-
-            self.limit_cycle.update(robot, target, [])
-
-            desired = self.limit_cycle.compute()
-
-
-        return desired
-    
     def update(self):
-        res = self.run()
+        robot_pos = [self.robot.x, self.robot.y]
+        dt = 0.3
+        res = self.astar.compute(robot_pos)
+        res[0] = self.robot.x + res[0] * dt
+        res[1] = self.robot.y + res[1] * dt
         return res
 
-
-class WaitPlanning(PlayerPlay):
+class AvoidRobotsPlanning(PlayerPlay):
     def __init__(self, match, robot):
-        super().__init__(match, robot)
+        threading.Thread.__init__(self)
+        super().__init__(
+            match, 
+            robot
+        )
 
-        self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
-        self.field_w, self.field_h = self.match.game.field.get_dimensions()
+        self.actual_iteration = 0
+        self.next_iterarion = 0
+
+        self.path = []
+        self.next_path = []
 
     def start_up(self):
         super().start_up()
         controller = PID_control
-        self.robot.strategy.controller = controller(self.robot)
+        controller_kwargs = {'max_speed': 2, 'max_angular': 4800}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def start(self):
+        self.avoid = fields.PotentialField(
+            self.match,
+            name="{}|AstarBehaviour".format(self.__class__)
+        )
+
+        field_h, field_w = self.match.game.field.get_dimensions()
+
+        for robot in self.match.robots + self.match.opposites:
+            if robot.get_name() == self.robot.get_name():
+                continue
+            self.avoid.add_field(
+                fields.PointField(
+                    self.match,
+                    target = lambda m, r=robot: (
+                        r.x,
+                        r.y
+                    ),
+                    radius = .1,
+                    radius_max = .1,
+                    decay = lambda x: -1,
+                    multiplier = 1.5
+                )
+            )
+        self.avoid.add_field(
+            fields.PointField(
+                self.match,
+                target = [field_h/2, field_w/2],
+                radius = .1,
+                decay = lambda x: 1,
+                multiplier = 1
+            )
+        )
+        
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Avoid Robots Potential Field Planning>"
 
     def update(self):
-        m = self.match
-        if m.ball.y > self.sa_y + self.sa_h and m.ball.y > self.robot.y:
-            x = 0.0375
-            y = self.sa_y + self.sa_h + 0.0375
-        elif m.ball.y < self.sa_y and m.ball.y < self.robot.y:
-            x = 0.0375
-            y = self.sa_y - 0.0375
-        else:
-            if m.ball.y > self.field_h/2:
-                x = self.sa_w - 0.09 
-                y = self.field_h - 0.1
-            else:
-                x = self.sa_w - 0.07
-                y = 0.1
+        robot_pos = [self.robot.x, self.robot.y]
+        dt = 0.3
+        res = self.avoid.compute(robot_pos)
+        res[0] = self.robot.x + res[0] * dt
+        res[1] = self.robot.y + res[1] * dt
+        return res
 
-        return x, y
-                
+
 
 class PushPotentialFieldPlanning(PlayerPlay):
     def __init__(self, match, robot):
@@ -180,8 +179,9 @@ class PushPotentialFieldPlanning(PlayerPlay):
 
     def start_up(self):
             super().start_up()
-            controller = TwoSidesLQR
-            self.robot.strategy.controller = controller(self.robot, l=0.135)
+            controller = PID_control
+            controller_kwargs = {'max_speed': 2, 'max_angular': 4800}
+            self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
         return super().update()
@@ -192,10 +192,10 @@ class PushPotentialFieldPlanning(PlayerPlay):
             name="{}|SeekBehaviour".format(self.__class__)
         )
 
-        uvf_radius = 0.05 # 7.5 cm
-        uvf_radius_2 = 0.05 # 7.5 cm
+        uvf_radius = 0.075 # 7.5 cm
+        uvf_radius_2 = 0.075 # 7.5 cm
 
-        tangential_speed = 0.75 # 8 cm/s
+        tangential_speed = lambda m: max(.6, (m.ball.vx**2 + m.ball.vy**2)**.5 + .3 ) # 8 cm/s
 
 
         def shifted_target_left(m, radius_2=uvf_radius_2):
@@ -203,14 +203,29 @@ class PushPotentialFieldPlanning(PlayerPlay):
             aim_point_y = field_w/2
             aim_point_x = field_h
 
+            ball = [m.ball.x, m.ball.y]
+            goal_pos = [
+                m.game.field.get_dimensions()[0] + 0.04,
+                m.game.field.get_dimensions()[1]/2
+            ]
+
+            dir_to_goal_vector = [
+                goal_pos[0] - ball[0], 
+                goal_pos[1] - ball[1]
+            ]
+            angle = math.atan2(dir_to_goal_vector[1], dir_to_goal_vector[0])
+
+            ball_x = ball[0] - 0.07 * math.cos(angle)
+            ball_y = ball[1] - 0.07 * math.sin(angle)
+
             pos_x = (
-                m.ball.x -
-                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2)*radius_2
+                ball_x -
+                math.cos(math.atan2((aim_point_y-ball_y), (aim_point_x - ball_x))+ math.pi/2)*radius_2
             )
 
             pos_y = (
-                m.ball.y -
-                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2)*radius_2
+                ball_y -
+                math.sin(math.atan2((aim_point_y-ball_y), (aim_point_x - ball_x))+ math.pi/2)*radius_2
             )
 
             return [pos_x, pos_y]
@@ -220,14 +235,29 @@ class PushPotentialFieldPlanning(PlayerPlay):
             aim_point_y = field_w/2
             aim_point_x = field_h
 
+            ball = [m.ball.x, m.ball.y]
+            goal_pos = [
+                m.game.field.get_dimensions()[0] + 0.04,
+                m.game.field.get_dimensions()[1]/2
+            ]
+
+            dir_to_goal_vector = [
+                goal_pos[0] - ball[0], 
+                goal_pos[1] - ball[1]
+            ]
+            angle = math.atan2(dir_to_goal_vector[1], dir_to_goal_vector[0])
+
+            ball_x = ball[0] - 0.07 * math.cos(angle)
+            ball_y = ball[1] - 0.07 * math.sin(angle)
+
             pos_x = (
-                m.ball.x +
-                math.cos(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2) * radius
+                ball_x +
+                math.cos(math.atan2((aim_point_y-ball_y), (aim_point_x - ball_x))+ math.pi/2) * radius
             )
 
             pos_y = (
-                m.ball.y +
-                math.sin(math.atan2((aim_point_y-m.ball.y), (aim_point_x - m.ball.x))+ math.pi/2) * radius
+                ball_y +
+                math.sin(math.atan2((aim_point_y-ball_y), (aim_point_x - ball_x))+ math.pi/2) * radius
             )
 
             return [pos_x, pos_y]
@@ -237,7 +267,7 @@ class PushPotentialFieldPlanning(PlayerPlay):
             field_h, field_w = m.game.field.get_dimensions()
             aim_point_y = field_w/2
 
-            aim_point_x = field_h
+            aim_point_x = field_h  + 0.04
             target = [
                 m.ball.x,
                 m.ball.y
@@ -254,14 +284,14 @@ class PushPotentialFieldPlanning(PlayerPlay):
             if abs(dist) > radius and dist < 0:
                 return 0
             dist = 0.5 * max(0, min(dist, radius))/ (radius)
-            return speed * (dist + 0.5)
+            return speed(m) * (dist + 0.5)
 
         def uvf_mean_contributtion_right(m, radius=uvf_radius_2, robot=self.robot, speed=tangential_speed):
             pos =  [robot.x, robot.y]
             field_h, field_w = m.game.field.get_dimensions()
             aim_point_y = field_w/2
 
-            aim_point_x = field_h
+            aim_point_x = field_h  + 0.04
             target = [
                 m.ball.x,
                 m.ball.y
@@ -278,8 +308,9 @@ class PushPotentialFieldPlanning(PlayerPlay):
             if abs(dist) > radius and dist < 0:
                 return 0
             dist = 0.5 * max(0, min(dist, radius))/ (radius )
-            return speed * (dist + 0.5)
+            return speed(m) * (dist + 0.5)
 
+        # field_h, field_w = self.match.game.field.get_dimensions()
         self.seek.add_field(
             fields.TangentialField(
                 self.match,
@@ -288,7 +319,8 @@ class PushPotentialFieldPlanning(PlayerPlay):
                 radius_max = 2,
                 clockwise = False,
                 decay=lambda x: 1,
-                multiplier = uvf_mean_contributtion_left
+                multiplier = uvf_mean_contributtion_left,
+                K = 1/250
             )
         )
 
@@ -300,13 +332,18 @@ class PushPotentialFieldPlanning(PlayerPlay):
                 radius_max = 2,
                 clockwise = True,
                 decay=lambda x: 1,
-                multiplier = uvf_mean_contributtion_right
+                multiplier = uvf_mean_contributtion_right,
+                K = 1/250
             )
         )
 
     def update(self):
         robot_pos = [self.robot.x, self.robot.y]
-        return self.seek.compute(robot_pos)
+        dt = 0.3
+        res = self.seek.compute(robot_pos)
+        res[0] = self.robot.x + res[0] * dt
+        res[1] = self.robot.y + res[1] * dt
+        return res
 
 
 
@@ -333,65 +370,76 @@ class MainAttacker(Strategy):
 
         # Criando Path Planning baseado em Astar
         astar = AstarPlanning(self.match, self.robot)
-        # astar.start()
+        astar.start()
 
-        # Criando Path Planning baseado em Limit Cycle
-        limitcycle = LimitCyclePlanning(self.match, self.robot)
 
         # Criando Potential Field
         push_potentialfield = PushPotentialFieldPlanning(self.match, self.robot)
         push_potentialfield.start()
 
-        wait = WaitPlanning(self.match, self.robot)
+        
 
+        avoid_potentialfield = AvoidRobotsPlanning(self.match, self.robot)
+        avoid_potentialfield.start()
 
         # Adiciona ambas plays no livro do jogador
         self.playerbook.add_play(astar)
-        self.playerbook.add_play(limitcycle)
+        # self.playerbook.add_play(limitcycle)
         self.playerbook.add_play(push_potentialfield)
+        self.playerbook.add_play(avoid_potentialfield)
 
-        self.playerbook.add_play(wait)
+        # self.playerbook.add_play(wait)
 
-        # # Transicao para caso esteja perto da bola ( < 10 cm)
+        # # # Transicao para caso esteja perto da bola ( < 10 cm)
         next_to_ball_transition = OnNextTo(
-            self.robot, aim_projection_ball, 0.1
+            self.robot, aim_projection_ball, 0.40
         )
 
         # # Transicao para caso esteja longe da bola ( > 20 cm)
         far_to_ball_transition = OnNextTo(
-            self.robot, aim_projection_ball, 0.3, True
+            self.robot, aim_projection_ball, 0.60, True
         )
 
-        angle_to_goal_transition = OnAttackerPushTrigger(
-            self.robot, self.match
-        )
+        stuck_transition = OnStuckTrigger(self.robot, 1)
 
-        on_defensive_transition = OnDefensiveTransitionTrigger(
-            self.robot, self.match, True, 0.25
-        )
+        wait_transition = plays.WaitForTrigger(2/3)
 
-        out_defensive_transition = OnDefensiveTransitionTrigger(
-            self.robot, self.match, False, 0.25
-        )
+        # angle_to_goal_transition = OnAttackerPushTrigger(
+        #     self.robot, self.match
+        # )
 
-        # Adiciona caminhos de ida e volta com transicoes
-        astar.add_transition(next_to_ball_transition, limitcycle)
+        # on_defensive_transition = OnDefensiveTransitionTrigger(
+        #     self.robot, self.match, True, 0.1
+        # )
 
-        limitcycle.add_transition(far_to_ball_transition, astar)
-        limitcycle.add_transition(angle_to_goal_transition, push_potentialfield)
+        # out_defensive_transition = OnDefensiveTransitionTrigger(
+        #     self.robot, self.match, False, 0.25
+        # )
+
+        # # Adiciona caminhos de ida e volta com transicoes
+        astar.add_transition(next_to_ball_transition, push_potentialfield)
+        astar.add_transition(stuck_transition, avoid_potentialfield)
+
+        # limitcycle.add_transition(far_to_ball_transition, astar)
+        # limitcycle.add_transition(angle_to_goal_transition, push_potentialfield)
 
         push_potentialfield.add_transition(far_to_ball_transition, astar)
+        push_potentialfield.add_transition(stuck_transition, avoid_potentialfield)
 
-        astar.add_transition(on_defensive_transition, wait)
-        limitcycle.add_transition(on_defensive_transition, wait)
-        push_potentialfield.add_transition(on_defensive_transition, wait)
+        avoid_potentialfield.add_transition(wait_transition, astar)
 
-        wait.add_transition(out_defensive_transition, astar)
+        # astar.add_transition(on_defensive_transition, wait)
+        # limitcycle.add_transition(on_defensive_transition, wait)
+        # push_potentialfield.add_transition(on_defensive_transition, wait)
+
+        # wait.add_transition(out_defensive_transition, astar)
 
         # Estado inicial é o astar
         self.playerbook.set_play(astar)
         # self.playerbook.set_play(push_potentialfield)
 
     def decide(self):
+        # dt = 0.3
         res = self.playerbook.update()
+
         return res

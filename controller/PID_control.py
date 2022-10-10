@@ -23,10 +23,10 @@ class PID_control(object):
         self.dt = 1/self.default_fps
 
         # Control params
-        self.K_RHO = 75 # Linear speed gain
+        self.K_RHO = 100 # Linear speed gain
 
         # PID of angular speed
-        self.KP = 100 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KP = 60 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
         self.KI = 0 # Integral gain of w 
         self.KD = 0 # Derivative gain of w
 
