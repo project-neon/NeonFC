@@ -11,16 +11,16 @@ def main():
     #uvf_visualizer = UVFVisualizer()
     #uvf_visualizer()
 
-    #pid_visualizer = PIDVisualizer(500)
-    #pid_visualizer()
+    pid_visualizer = PIDVisualizer(500)
+    pid_visualizer()
 
-    position_visualizer = PositionVisualizer(500)
-    position_visualizer(1)
+    # position_visualizer = PositionVisualizer(500)
+    # position_visualizer(1)
 
-    circuit = [(1.2, .40), (1.2, .90), (.75, .65), (.3, .90), (.3, .40)]
-    x, y = list(map(list, zip(*circuit)))
+    # circuit = [(1.2, .40), (1.2, .90), (.75, .65), (.3, .90), (.3, .40)]
+    # x, y = list(map(list, zip(*circuit)))
 
-    plt.scatter(x, y, c='r')
+    # plt.scatter(x, y, c='r')
     plt.show()
 
 class PositionVisualizer(MPLVisualizer):

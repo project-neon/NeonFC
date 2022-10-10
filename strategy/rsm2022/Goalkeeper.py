@@ -9,7 +9,6 @@ from commons.math import unit_vector
 import json
 import numpy as np
 
-
 class Goalkeeper(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(match, "asdgasad", controller=TwoSidesLQR)
@@ -44,7 +43,7 @@ class Goalkeeper(Strategy):
 
     def start(self, robot=None):
         super().start(robot=robot)
-        self.defend = algorithms.fields.PotentialField(
+        self.field = algorithms.fields.PotentialField(
             self.match,
             name="{}|FieldBehaviour".format(self.__class__)
         )
@@ -59,6 +58,10 @@ class Goalkeeper(Strategy):
             name="{}|EdgeBehaviour".format(self.__class__)
         )
 
+        self.test = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|TestBehaviour".format(self.__class__)
+        )
         """
         No Start você ira adicionar campos potenciais aos comportamentos criados no metodo __init__
         de uma olhada na documentação de como se cria cada campo e como eles se comportam. Aqui, por exemplo
@@ -75,7 +78,7 @@ class Goalkeeper(Strategy):
             g_hgr = 0.83
             g_lwr = 0.45
 
-            x_rob = x + 0.075 / 2
+            x_rob = x + 0.075/2
             if m.ball.vx == 0:
                 if m.ball.y > g_hgr:
                     y = g_hgr
@@ -84,11 +87,11 @@ class Goalkeeper(Strategy):
                 else:
                     y = m.ball.y
                 return (x, y)
+            
+            y = (m.ball.vy/m.ball.vx)*(x_rob-m.ball.x) + m.ball.y
+            #y = m.ball.y + m.ball.vy*(4/30)
 
-            y = (m.ball.vy / m.ball.vx) * (x_rob - m.ball.x) + m.ball.y
-            # y = m.ball.y + m.ball.vy*(4/30)
-
-            mp = (0.65 + m.ball.y) / 2
+            mp = (0.65+m.ball.y)/2
 
             if m.ball.y > g_hgr:
                 y = g_hgr
@@ -97,9 +100,9 @@ class Goalkeeper(Strategy):
             else:
                 if y > g_hgr or y < g_lwr:
                     if m.ball.y < 0.65:
-                        y = ((mp - m.ball.y) / m.ball.x) * (x_rob - m.ball.x) + m.ball.y
+                        y = ((mp-m.ball.y)/m.ball.x)*(x_rob-m.ball.x) + m.ball.y
                     elif m.ball.y > 0.65:
-                        y = ((m.ball.y - mp) / m.ball.x) * (x_rob - m.ball.x) + m.ball.y
+                        y = ((m.ball.y-mp)/m.ball.x)*(x_rob-m.ball.x) + m.ball.y
             return x, y
 
         def edging_point(m):
@@ -108,53 +111,139 @@ class Goalkeeper(Strategy):
             g_lwr = 0.45
 
             if m.ball.y < 0.65:
-                y = g_lwr - (0.075 / 2)
+                y = g_lwr - (0.075/2)
             elif m.ball.y > 0.65:
-                y = g_hgr + (0.075 / 2)
+                y = g_hgr + (0.075/2)
 
             return x, y
 
+        #campo potencial para seguir a posição/projeção da bola
+        self.field.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target = lambda m: (0.04, m.ball.y),
+                theta = 0,
+                line_size = .5,
+                line_dist = .4,
+                line_dist_max = 1.3,
+                decay = lambda x: x**7,
+                multiplier = 0.3,
+            )
+        )
 
+        #campo potencial para reposicionamento na area do gol
+        # self.field.add_field(
+        #     algorithms.fields.LineField(
+        #         self.match,
+        #         target = (0.12, 0.75),
+        #         theta = -math.pi/2,
+        #         line_size = 1.3,
+        #         line_dist = 0.05,
+        #         decay = lambda x: x**5,
+        #         multiplier = 0.6,
+        #         line_dist_single_side = True
+        #     )
+        # )
+
+        #campo potencial para repulsão de dentro do gol
+        # self.field.add_field(
+        #     algorithms.fields.LineField(
+        #         self.match,
+        #         target = (-0.05, 0.65),
+        #         theta = math.pi/2,
+        #         line_size = 1.3,
+        #         line_dist = 0.07,
+        #         line_dist_max = 0.07,
+        #         decay = lambda x: -1,
+        #         multiplier = 0.4
+        #     )
+        # )
+
+        #campo potencial para parar no centro do gol quando a bola estiver no campo adversário
         self.calm.add_field(
-            algorithms.fields.PointField(
+            algorithms.fields.LineField(
                 self.match,
-                target=(0.04, 0.68),
-                radius=0.2,
-                decay=lambda x: x ** 10,
-                multiplier=0.4
+                theta = 0,
+                target = (0.25, 0.65),
+                line_size = 0.5,
+                line_dist = 0.1,
+                decay = lambda x: x**5,
+                multiplier = 0.25,
             )
         )
 
-        self.defend.add_field(
-            algorithms.fields.PointField(
+        #campo potencial para reposicionamento na area do gol
+        self.calm.add_field(
+            algorithms.fields.LineField(
                 self.match,
-                target=lambda m: (m.ball.x, m.ball.y),
-                radius=0.2,
-                decay=lambda x: 1,
-                multiplier=0.4
+                target = (0.15, 0.75),
+                theta = -math.pi/2,
+                line_size = 1.3,
+                line_dist = 0.1,
+                decay = lambda x: x**5,
+                multiplier = 0.25,
+                line_dist_single_side = True
             )
         )
+        
+        #campo potencial para repulsão de dentro do gol
+        self.calm.add_field(
+            algorithms.fields.LineField(
+                self.match,
+                target = (-0.05, 0.65),
+                theta = math.pi/2,
+                line_size = 1.3,
+                line_dist = 0.07,
+                line_dist_max = 0.07,
+                decay = lambda x: -1,
+                multiplier = 0.5
+            )
+        )
+
+        self.edge.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = edging_point,
+                radius = 0.1,
+                decay = lambda x: x**7,
+                multiplier = 0.4
+            )
+        )
+
+        self.test.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = lambda m: (0.04, m.ball.y),
+                radius = 0.35,
+                decay = lambda x: x**6,
+                multiplier = 0.35
+            )
+        )
+
 
     def reset(self, robot=None):
         super().reset()
         if robot:
             self.start(robot)
 
+
     def decide(self):
         """
-        No decide iremos programar as regras que irão decidir qual
+        No decide iremos programar as regras que irão decidir qual 
         comportamento sera execuetado nesse momento. crie o conjunto de regras
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
-
+        
         behaviour = None
 
-        if self.match.ball.x > 0.75:
-            behaviour = self.calm
-        else:
-            behaviour = self.defend
-
-        behaviour = self.defend
+        # if self.match.ball.x > 1.2:
+        #     behaviour = self.calm
+        # elif self.match.ball.x < 0.15:
+        #     behaviour = self.edge
+        # else:
+        behaviour = self.test
+        # print(behaviour.field_childrens[0].target(self.match))
+        # print(f"{self.match.ball.y=}")
+        print(self.robot.x, self.robot.y)
 
         return behaviour.compute([self.robot.x, self.robot.y])
-        
