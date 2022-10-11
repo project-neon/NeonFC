@@ -70,7 +70,7 @@ class AstarPlanning(PlayerPlay):
     def start_up(self):
         super().start_up()
         controller = PID_control
-        controller_kwargs = {'max_speed': 2, 'max_angular': 4800}
+        controller_kwargs = {'max_speed': 2.8, 'max_angular': 4800}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def start(self):
@@ -119,7 +119,7 @@ class AvoidRobotsPlanning(PlayerPlay):
     def start_up(self):
         super().start_up()
         controller = PID_control
-        controller_kwargs = {'max_speed': 2, 'max_angular': 4800}
+        controller_kwargs = {'max_speed': 3.5, 'max_angular': 4800}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def start(self):
@@ -140,8 +140,8 @@ class AvoidRobotsPlanning(PlayerPlay):
                         r.x,
                         r.y
                     ),
-                    radius = .1,
-                    radius_max = .1,
+                    radius = .3,
+                    radius_max = .3,
                     decay = lambda x: -1,
                     multiplier = 1.5
                 )

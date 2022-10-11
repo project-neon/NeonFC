@@ -47,20 +47,43 @@ def voronoi_astar(strategy, m, objective_function):
 
         strategy.robot_node.position = [strategy.robot.x, strategy.robot.y]
 
+        field_param = strategy.match.game.field.get_dimensions()
+
         corners = [
-            [strategy.match.game.field.get_dimensions()[0], 0],
+            [field_param[0], 0],
             [0, 0],
-            [0, strategy.match.game.field.get_dimensions()[1]],
-            [strategy.match.game.field.get_dimensions()[0], strategy.match.game.field.get_dimensions()[1]],
+            [0, field_param[1]],
+            [field_param[0], field_param[1]],
 
-            [0, strategy.match.game.field.get_dimensions()[1]/2],
-            [strategy.match.game.field.get_dimensions()[0], strategy.match.game.field.get_dimensions()[1]/2],
+            [0, field_param[1]/2],
+            [field_param[0], field_param[1]/2],
 
-            [0, strategy.match.game.field.get_dimensions()[1]/4],
-            [strategy.match.game.field.get_dimensions()[0], strategy.match.game.field.get_dimensions()[1]/4],
+            [0, field_param[1]/4],
+            [field_param[0], field_param[1]/4],
 
-            [0, 3 * strategy.match.game.field.get_dimensions()[1]/4],
-            [strategy.match.game.field.get_dimensions()[0], 3 * strategy.match.game.field.get_dimensions()[1]/4],
+            [0, 3 * field_param[1]/4],
+            [field_param[0], 3 * field_param[1]/4],
+
+            [field_param[0]/8, 0],
+            [field_param[1]/8, field_param[1]],
+
+            [2 * field_param[0]/8, 0],
+            [2 * field_param[1]/8, field_param[1]],
+
+            [3 * field_param[0]/8, 0],
+            [3 * field_param[1]/8, field_param[1]],
+
+            [4 * field_param[0]/8, 0],
+            [4 * field_param[1]/8, field_param[1]],
+
+            [5 * field_param[0]/8, 0],
+            [5 * field_param[1]/8, field_param[1]],
+
+            [6 * field_param[0]/8, 0],
+            [6 * field_param[1]/8, field_param[1]],
+
+            [7 * field_param[0]/8, 0],
+            [7 * field_param[1]/8, field_param[1]],
         ]
         mergeble_obstacles = [ [r.x, r.y] for r in strategy.match.opposites] + [
             [r.x, r.y] for r in strategy.match.robots 
