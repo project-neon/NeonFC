@@ -10,7 +10,7 @@ def angle_adjustment(angle):
         return phi
 
 class PID_control(object):
-    def __init__(self, robot, default_fps=60, max_speed=1.8, max_angular=2400):
+    def __init__(self, robot, default_fps=60, max_speed=1.8, max_angular=2400, krho=100, kp=60, ki=0, kd=0):
         self.vision = robot.game.vision
         self.field_w, self.field_h = robot.game.field.get_dimensions()
         self.robot = robot
@@ -23,12 +23,12 @@ class PID_control(object):
         self.dt = 1/self.default_fps
 
         # Control params
-        self.K_RHO = 100 # Linear speed gain
+        self.K_RHO = krho # Linear speed gain
 
         # PID of angular speed
-        self.KP = 60 # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
-        self.KI = 0 # Integral gain of w 
-        self.KD = 0 # Derivative gain of w
+        self.KP = kp # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KI = ki # Integral gain of w 
+        self.KD = kd # Derivative gain of w
 
         # PID params for error
         self.dif_alpha = 0 # diferential param
