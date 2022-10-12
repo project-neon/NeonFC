@@ -5,7 +5,7 @@ import math
 
 
 class Attacker(Strategy):
-    def __init__(self, match, name="UVF_Attacker"):
+    def __init__(self, match, name="UVF_IRON"):
         super().__init__(match, name=name, controller=UniController)
         self.dl = 0.000001
         self.field = UnivectorField(n=6, rect_size=.0)

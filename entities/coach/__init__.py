@@ -9,6 +9,7 @@ from entities.coach.rcx2022 import Coach as RCX_2022
 from entities.coach.cbfrs2022 import Coach as CBFRS_2022
 from entities.coach.cbfrs2022_2 import Coach as CBFRS_2022_2
 from entities.coach.cbfrs2022_5v5 import Coach as CBFRS_2022_5V5
+from entities.coach.iron2022 import Coach as IRON_2022
 
 from entities.coach.guideCoach import Coach as GuideCoach
 
@@ -28,6 +29,7 @@ _coach_list = [
     CBFRS_2022,
     CBFRS_2022_2,
     CBFRS_2022_5V5,
+    IRON_2022,
     TestCoach
 ]
 
