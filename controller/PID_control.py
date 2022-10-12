@@ -40,19 +40,19 @@ class PID_control(object):
 
         # Max speeds for the robot
         self.v_max = 35 # 40 # linear speed
-        self.w_max = 200 # angular speed rad/
+        self.w_max = 15*self.v_max # math.radians(7200) # angular speed rad/
 
-        self.pid_writer = Writer('pid',
-                                 {'kp': 'FLOAT',
-                                  'ki': 'FLOAT',
-                                  'kd': 'FLOAT',
-                                  'set_point': 'FLOAT',
-                                  'error': 'FLOAT',
-                                  'w': 'FLOAT'
-                                  })
-        self.robot_writer = Writer('robot',
-                                   {'x': 'FLOAT',
-                                    'y': 'FLOAT'})
+        # self.pid_writer = Writer('pid',
+        #                          {'kp': 'FLOAT',
+        #                           'ki': 'FLOAT',
+        #                           'kd': 'FLOAT',
+        #                           'set_point': 'FLOAT',
+        #                           'error': 'FLOAT',
+        #                           'w': 'FLOAT'
+        #                           })
+        # self.robot_writer = Writer('robot',
+        #                            {'x': 'FLOAT',
+        #                             'y': 'FLOAT'})
     
     def set_desired(self, vector):
         self.desired = vector
@@ -74,6 +74,7 @@ class PID_control(object):
 
         # GAMMA robot's position angle to the objetive
         gamma = angle_adjustment(math.atan2(D_y, D_x))
+        gamma = 0
 
         # ALPHA angle between the front of the robot and the objective
         alpha = angle_adjustment(gamma - self.robot.theta)
@@ -102,8 +103,8 @@ class PID_control(object):
         pwr_left = (2 * v - w * self.l)/2 * self.R
         pwr_right = (2 * v + w * self.l)/2 * self.R
 
-        self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
-        self.robot_writer.write([self.robot.x, self.robot.y])
+        # self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
+        # self.robot_writer.write([self.robot.x, self.robot.y])
 
-        return v, w
+        return 0, w
         # return pwr_left * 1000, pwr_right * 1000

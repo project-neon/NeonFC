@@ -10,7 +10,7 @@ class PID_Test(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(match, "PID_Test", controller=PID_control)
 
-        self.circuit = [(1.2, .40), (1.2, .90), (.75, .65), (.3, .90), (.3, .40)]
+        self.circuit = [(1.1, .40), (1.1, .90), (.4, .90), (.4, .40)]
         self.circuit = deque(self.circuit)
         self.dl = 0.000001
 
@@ -39,7 +39,7 @@ class PID_Test(Strategy):
         self.dl = 1 / self.match.game.vision._fps if self.match.game.vision._fps != 0 else self.dl
         self.controller.dl = self.dl
 
-        self.limit_cycle = LimitCycle(self, target_is_ball=False)
+        self.limit_cycle = LimitCycle(self, target_is_ball=True)
 
     def reset(self, robot=None):
         super().reset()
@@ -48,12 +48,10 @@ class PID_Test(Strategy):
 
     def decide(self):
         robot = Point(self.robot.x, self.robot.y)
-        target = Point(.75, .65)# self.match.ball.x, self.match.ball.y)
+        target = Point(.75, .65)
 
         if not (0 <= target.x <= 1.5) and not (0 <= target.y <= 1.3):
             target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
-
-        # target = Point(0.75, 0.65)
 
         # for r in self.match.robots:
         #     if r.robot_id == 1:
@@ -65,21 +63,21 @@ class PID_Test(Strategy):
         if self.can_shoot():
             desired = target.x, target.y
 
-        if self.controller.__class__ is UniController:
+        # if self.controller.__class__ is UniController:
 
-            robot_dl = Point(
-                self.robot.x + self.dl*math.cos(self.robot.theta),
-                self.robot.y + self.dl*math.sin(self.robot.theta)
-            )
+        #     robot_dl = Point(
+        #         self.robot.x + self.dl*math.cos(self.robot.theta),
+        #         self.robot.y + self.dl*math.sin(self.robot.theta)
+        #     )
 
-            self.limit_cycle.update(robot_dl, target, [])
-            desired_dl = self.limit_cycle.compute()
+        #     self.limit_cycle.update(robot_dl, target, [])
+        #     desired_dl = self.limit_cycle.compute()
 
-            if self.can_shoot():
-                desired = math.atan2(target.y - robot.y, target.x - robot.x)
-                desired_dl = math.atan2(target.y - robot_dl.y, target.x - robot_dl.x)
+        #     if self.can_shoot():
+        #         desired = math.atan2(target.y - robot.y, target.x - robot.x)
+        #         desired_dl = math.atan2(target.y - robot_dl.y, target.x - robot_dl.x)
 
-            return desired, desired_dl
+        #     return desired, desired_dl
 
         desired = self.next_point()
 
