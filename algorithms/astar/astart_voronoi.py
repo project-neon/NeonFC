@@ -65,25 +65,25 @@ def voronoi_astar(strategy, m, objective_function):
             [field_param[0], 3 * field_param[1]/4],
 
             [field_param[0]/8, 0],
-            [field_param[1]/8, field_param[1]],
+            [field_param[0]/8, field_param[1]],
 
             [2 * field_param[0]/8, 0],
-            [2 * field_param[1]/8, field_param[1]],
+            [2 * field_param[0]/8, field_param[1]],
 
             [3 * field_param[0]/8, 0],
-            [3 * field_param[1]/8, field_param[1]],
+            [3 * field_param[0]/8, field_param[1]],
 
             [4 * field_param[0]/8, 0],
-            [4 * field_param[1]/8, field_param[1]],
+            [4 * field_param[0]/8, field_param[1]],
 
             [5 * field_param[0]/8, 0],
-            [5 * field_param[1]/8, field_param[1]],
+            [5 * field_param[0]/8, field_param[1]],
 
             [6 * field_param[0]/8, 0],
-            [6 * field_param[1]/8, field_param[1]],
+            [6 * field_param[0]/8, field_param[1]],
 
             [7 * field_param[0]/8, 0],
-            [7 * field_param[1]/8, field_param[1]],
+            [7 * field_param[0]/8, field_param[1]],
         ]
         mergeble_obstacles = [ [r.x, r.y] for r in strategy.match.opposites] + [
             [r.x, r.y] for r in strategy.match.robots 

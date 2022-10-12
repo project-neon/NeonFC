@@ -1,5 +1,6 @@
 
 import math
+from commons.math import point_in_rect
 from entities.plays.playbook import Play, Playbook, Trigger
 
 class PlayerPlaybook(Playbook):
@@ -45,6 +46,18 @@ class OnDefensiveTransitionTrigger(Trigger):
             return self.match.ball.x < self.defensive_distance
         else:
             return self.match.ball.x > self.defensive_distance
+
+class OnInsideBox(Trigger):
+    def __init__(self, match, box, outside=False):
+        super().__init__()
+        self.ball = match.ball
+        self.box = box
+        self.outside = outside
+
+    def evaluate(self, *args, **kwargs):
+        if self.outside:
+            return not point_in_rect([self.ball.x, self.ball.y], self.box)
+        return point_in_rect([self.ball.x, self.ball.y], self.box)
 
 class OnStuckTrigger(Trigger):
     def __init__(self, robot, seconds_stuck=1):
