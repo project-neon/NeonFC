@@ -168,7 +168,6 @@ class WingPlanning(PlayerPlay):
     def update(self):
         robot_pos = [self.robot.x, self.robot.y]
         dt = 0.3
-        print(self.seek.field_childrens[0].clockwise(self.match))
         res = self.seek.compute(robot_pos)
         res[0] = self.robot.x + res[0] * dt
         res[1] = self.robot.y + res[1] * dt
