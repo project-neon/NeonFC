@@ -18,7 +18,7 @@ from commons import math as nfc_math
 
 from algorithms.astar.astart_voronoi import voronoi_astar
 from algorithms.limit_cycle import LimitCycle, Point
-from strategy.utils.player_playbook import OnAttackerPushTrigger, OnDefensiveTransitionTrigger, OnInsideBox, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
+from strategy.utils.player_playbook import OnAttackerPushTrigger, OnCorners, OnDefensiveTransitionTrigger, OnInsideBox, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
 
 def aim_projection_ball(strategy):
     m = strategy.match
@@ -110,60 +110,66 @@ class AstarPlanning(PlayerPlay):
 
 class WingPlanning(PlayerPlay):
     def __init__(self, match, robot):
-        threading.Thread.__init__(self)
-        super().__init__(
-            match, 
-            robot
-        )
+        super().__init__(match, robot)
 
-        self.actual_iteration = 0
-        self.next_iterarion = 0
-
-        self.path = []
-        self.next_path = []
+    def get_name(self):
+        return f"<{self.robot.get_name()} Wing Potential Planning>"
 
     def start_up(self):
-        super().start_up()
-        controller = PID_control
-        controller_kwargs = {'max_speed': 2.8, 'max_angular': 4800}
-        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+            super().start_up()
+            controller = PID_control
+            controller_kwargs = {'max_speed': 2, 'max_angular': 4800}
+            self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def update(self):
+        return super().update()
 
     def start(self):
-        self.astar = fields.PotentialField(
+        self.seek = fields.PotentialField(
             self.match,
-            name="{}|AstarBehaviour".format(self.__class__)
+            name="{}|SeekBehaviour".format(self.__class__)
         )
 
-        self.astar.add_field(
-            fields.PointField(
+        uvf_radius = 0.075 # 7.5 cm
+        uvf_radius_2 = 0.075 # 7.5 cm
+        
+        _, field_w = self.match.game.field.get_dimensions()
+
+        def shifted_target_right(m, radius=uvf_radius_2):
+            which_side = 1 if (m.ball.y < field_w/2) else -1
+            ball = [m.ball.x, m.ball.y + which_side * 0.05]
+            
+            ball_x = ball[0]
+            ball_y = ball[1]
+
+            pos_x = (
+                ball_x
+            )
+
+            pos_y = (
+                ball_y + which_side * uvf_radius_2
+            )
+
+            return [pos_x, pos_y]
+        
+        self.seek.add_field(
+            fields.TangentialField(
                 self.match,
-                target = lambda m, s=self : voronoi_astar(
-                    s.robot.strategy, s.match, aim_behind_ball
-                )[1],
-                radius = .075,
-                decay = lambda x: x,
-                multiplier = 1
+                target=shifted_target_right,                                                                                                                                                                                                                                                                                                                                          
+                radius = uvf_radius,
+                radius_max = 2,
+                clockwise = lambda m: (m.ball.y < field_w/2),
+                decay=lambda x: 1,
+                multiplier = 1,
+                K = 1/250
             )
         )
 
-    def get_name(self):
-        return f"<{self.robot.get_name()} Astar Wing Potential Field Planning>"
-
     def update(self):
         robot_pos = [self.robot.x, self.robot.y]
         dt = 0.3
-        res = self.astar.compute(robot_pos)
-        res[0] = self.robot.x + res[0] * dt
-        res[1] = self.robot.y + res[1] * dt
-        return res
-
-    def get_name(self):
-        return f"<{self.robot.get_name()} Avoid Area Potential Field Planning>"
-
-    def update(self):
-        robot_pos = [self.robot.x, self.robot.y]
-        dt = 0.3
-        res = self.avoid.compute(robot_pos)
+        print(self.seek.field_childrens[0].clockwise(self.match))
+        res = self.seek.compute(robot_pos)
         res[0] = self.robot.x + res[0] * dt
         res[1] = self.robot.y + res[1] * dt
         return res
@@ -506,6 +512,7 @@ class MainAttacker(Strategy):
         self.playerbook.add_play(push_potentialfield)
         self.playerbook.add_play(avoid_potentialfield)
         self.playerbook.add_play(wait_potentialfield)
+        self.playerbook.add_play(wing_potentialfield)
 
         # # # Transicao para caso esteja perto da bola ( < 10 cm)
         next_to_ball_transition = OnNextTo(
@@ -523,6 +530,8 @@ class MainAttacker(Strategy):
         )
         stuck_transition = OnStuckTrigger(self.robot, 1/2)
         wait_transition = plays.WaitForTrigger(2/3)
+        corners_transition = OnCorners(self.match, [0.1, 1.65])
+        out_corners_transition = OnCorners(self.match, [0.1, 1.65], True)
 
         # Adiciona caminhos de ida e volta com transicoes
         astar.add_transition(next_to_ball_transition, push_potentialfield)
@@ -532,10 +541,12 @@ class MainAttacker(Strategy):
 
         push_potentialfield.add_transition(far_to_ball_transition, astar)
         push_potentialfield.add_transition(stuck_transition, avoid_potentialfield)
+        push_potentialfield.add_transition(corners_transition, wing_potentialfield)
         push_potentialfield.add_transition(inside_defender_area_transition, wait_potentialfield)
 
         avoid_potentialfield.add_transition(wait_transition, astar)
         wait_potentialfield.add_transition(outside_defender_area_transition, astar)
+        wing_potentialfield.add_transition(out_corners_transition, push_potentialfield)
 
         # Estado inicial é o astar
         self.playerbook.set_play(astar)

@@ -67,7 +67,7 @@ class OnCorners(Trigger):
         self.outside = outside
 
     def evaluate(self, *args, **kwargs):
-        eval = (self.ball.y < self.corners[0] or self.ball.y < self.corners[1])
+        eval = (self.ball.y < self.corners[0] or self.ball.y > self.corners[1])
         if self.outside:
             return not eval
         return eval
