@@ -59,6 +59,19 @@ class OnInsideBox(Trigger):
             return not point_in_rect([self.ball.x, self.ball.y], self.box)
         return point_in_rect([self.ball.x, self.ball.y], self.box)
 
+class OnCorners(Trigger):
+    def __init__(self, match, corners, outside=False):
+        super().__init__()
+        self.ball = match.ball
+        self.corners = corners
+        self.outside = outside
+
+    def evaluate(self, *args, **kwargs):
+        eval = (self.ball.y < self.corners[0] or self.ball.y < self.corners[1])
+        if self.outside:
+            return not eval
+        return eval
+
 class OnStuckTrigger(Trigger):
     def __init__(self, robot, seconds_stuck=1):
         super().__init__()
