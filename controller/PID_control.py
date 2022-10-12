@@ -26,7 +26,7 @@ class PID_control(object):
         self.K_RHO = 10 # Linear speed gain
 
         # PID of angular speed
-        self.KP = 220 # Proportional gain of w cstability condition: K_RHO > 0 and KP > K_RHO
+        self.KP = 200# Proportional gain of w cstability condition: K_RHO > 0 and KP > K_RHO
         self.KI = 0 # Integral gain of w 
         self.KD = 0 # Derivative gain of w
 
@@ -36,8 +36,8 @@ class PID_control(object):
         self.alpha_old = 0 # stores previous iteration alpha
 
         # Max speeds for the robot
-        self.v_max = 1.5 # linear speed 
-        self.w_max = math.radians(6400) # angular speed rad/s
+        self.v_max = 2 # linear speed 
+        self.w_max = math.radians(9000) # angular speed rad/s
     
     def set_desired(self, vector):
         self.desired = vector
