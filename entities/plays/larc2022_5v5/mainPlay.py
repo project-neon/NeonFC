@@ -11,7 +11,7 @@ class MainPlay(Play):
             strategy.larc2022_5v5.GoalKeeper(self.match, 'Goalkeeper'),
             strategy.larc2022_5v5.RadialDefender(self.match, 'Defender1'),
             strategy.larc2022_5v5.RadialDefender(self.match, 'Defender2'),
-            strategy.tests.Idle(self.match),
+            strategy.cbfrs2022_5v5.RightAttacker(self.match, 'SecondAttacker'),
             strategy.larc2022_5v5.MainAttacker(self.match, 'Attacker'),
         ]
 
