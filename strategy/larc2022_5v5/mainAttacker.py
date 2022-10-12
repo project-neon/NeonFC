@@ -190,7 +190,7 @@ class AttackingWaitPlanning(PlayerPlay):
     def start_up(self):
         super().start_up()
         controller = PID_control
-        controller_kwargs = {'max_speed': 3.5, 'max_angular': 4800}
+        controller_kwargs = {'max_speed': 2, 'max_angular': 4800}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def start(self):
@@ -198,6 +198,8 @@ class AttackingWaitPlanning(PlayerPlay):
             self.match,
             name="{}|AstarBehaviour".format(self.__class__)
         )
+        height, width = self.match.game.field.get_dimensions()
+
         for robot in self.match.robots + self.match.opposites:
             if robot.get_name() == self.robot.get_name():
                 continue
@@ -211,9 +213,18 @@ class AttackingWaitPlanning(PlayerPlay):
                     radius = .3,
                     radius_max = .3,
                     decay = lambda x: -1,
-                    multiplier = 1.5
+                    multiplier = 1
                 )
             )
+        self.avoid.add_field(
+            fields.PointField(
+                self.match,
+                target = [height/2, width/2],
+                radius = .3,
+                decay = lambda x: 1,
+                multiplier = 1.5
+            )
+        )
 
     def get_name(self):
         return f"<{self.robot.get_name()} Avoid Area Potential Field Planning>"
@@ -221,6 +232,7 @@ class AttackingWaitPlanning(PlayerPlay):
     def update(self):
         robot_pos = [self.robot.x, self.robot.y]
         dt = 0.3
+        print(self.match.ball.x, self.match.ball.y)
         res = self.avoid.compute(robot_pos)
         res[0] = self.robot.x + res[0] * dt
         res[1] = self.robot.y + res[1] * dt
@@ -522,10 +534,10 @@ class MainAttacker(Strategy):
             self.robot, aim_projection_ball, 0.60, True
         )
         inside_defender_area_transition = OnInsideBox(
-            self.match, [0, 0.4, 0.5, 1.3]
+            self.match, [0, 0.5, 0.4, 0.5 - 1.3]
         )
         outside_defender_area_transition = OnInsideBox(
-            self.match, [0, 0.4, 0.5, 1.3], True
+            self.match, [0, 0.5, 0.4, 0.5 - 1.3], True
         )
         stuck_transition = OnStuckTrigger(self.robot, 1/2)
         wait_transition = plays.WaitForTrigger(2/3)
