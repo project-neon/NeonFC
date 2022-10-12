@@ -1,6 +1,6 @@
 import sqlite3
 
-DB = "file::memory:?cache=shared"
+DB = "log.db"
 
 
 class Writer:

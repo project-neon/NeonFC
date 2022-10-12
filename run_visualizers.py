@@ -11,14 +11,19 @@ def main():
     #uvf_visualizer = UVFVisualizer()
     #uvf_visualizer()
 
-    #pid_visualizer = PIDVisualizer(500)
-    #pid_visualizer()
+    pid_visualizer = PIDVisualizer(500)
+    pid_visualizer()
 
-    position_visualizer = PositionVisualizer(500)
-    position_visualizer(1)
+    # position_visualizer = PositionVisualizer(1000)
+    # position_visualizer(1)
 
-    circuit = [(1.2, .40), (1.2, .90), (.75, .65), (.3, .90), (.3, .40)]
+    circuit = [(1.1, .40), (1.1, .90), (.4, .90), (.4, .40)]
     x, y = list(map(list, zip(*circuit)))
+
+    ax = plt.gca()
+
+    # ax.add_patch(plt.Circle((.75, .65 + .08), .08, color="blue", fill=None))
+    # ax.add_patch(plt.Circle((.75, .65 - .08), .08, color="blue", fill=None))
 
     plt.scatter(x, y, c='r')
     plt.show()
@@ -52,7 +57,7 @@ class PositionVisualizer(MPLVisualizer):
         plt.xlim([0, 1.5])
         plt.ylim([0, 1.3])
 
-        return [self.ax.scatter(self.xs, self.ys, c='black')]
+        return [self.ax.scatter(self.xs, self.ys, s=1, c='black')]
 
 
 
@@ -94,8 +99,8 @@ class PIDVisualizer(MPLVisualizer):
         plt.xlim([self.times[0], self.times[-1]])
 
         return [self.ax.plot(self.times, self.set_points, 'r--')[0],
-                self.ax.plot(self.times, self.inputs, 'black')[0],
-                self.ax.plot(self.times, self.ws, 'g:')[0]]
+                self.ax.plot(self.times, self.inputs, 'black')[0]]#,
+                #self.ax.plot(self.times, self.ws, 'g:')[0]]
 
 
 

@@ -8,7 +8,7 @@ class UVFAgent2(Strategy):
     def __init__(self, match, name="UVF_Test_2"):
         super().__init__(match, name=name, controller=UniController)
         self.dl = 0.000001
-        self.field = UnivectorField(n=8, rect_size=.0, plot=True, path="uvf_plot.json")
+        self.field = UnivectorField(n=6, rect_size=.0, plot=True, path="uvf_plot.json")
         self.shooting_momentum = 0
 
     def start(self, robot=None):
@@ -16,8 +16,8 @@ class UVFAgent2(Strategy):
 
     def position_to_shoot(self, g, theta_d):
         math.atan2(self.robot.x - 1.5, self.robot.y - .65)
-        threshold_p = 0.2
-        threshold_a = 0.7
+        threshold_p = 0.3
+        threshold_a = 0.6
 
         angle = abs(theta_d - self.robot.theta) < threshold_a
         print(angle)
