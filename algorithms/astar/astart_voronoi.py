@@ -1,10 +1,13 @@
-import sys
 import math
 import copy
-from algorithms.astar.astar import AStar, Node, distance
+
+import numpy
+from algorithms.astar.astar import AStar, Node
 from algorithms.astar.fieldGraph import FieldGraph
 
 from scipy.spatial import Voronoi
+
+from commons.math import point_in_rect
 
 
 
@@ -21,20 +24,37 @@ def sample_astar(strategy, objective_function, graph):
     g.set_start(robot_node)
 
     for node in g.nodes:
-        if distance(node.position, robot_node.position) <= 0.05:
+        if AStarAttacker.distance(node.position, robot_node.position) <= 0.05:
             g.add_edge([robot_node, node])
 
     for node in g.nodes:
-        if distance(node.position, objective_node.position) <= 0.05:
+        if AStarAttacker.distance(node.position, objective_node.position) <= 0.05:
             g.add_edge([objective_node, node])
 
-    return AStar(robot_node, objective_node).calculate()
+    return AStarAttacker(robot_node, objective_node).calculate()
 
     
+class AStarAttacker(AStar):
+    def __init__(self, initial_node, target):
+        super().__init__(initial_node, target)
 
+    def distance(self, pos1, pos2):
+        # Considering pos = [x, y] or pos = (x, y)
+        x1 = pos1[0]
+        x2 = pos2[0]
+        y1 = pos1[1]
+        y2 = pos2[1]
 
+        d = numpy.sqrt(((x2-x1)**2 + (y2-y1)**2))
 
-    
+        if point_in_rect(pos1, [0, 0.5, 0.4, 1.3 - 0.5]) or point_in_rect(pos2, [0, 0.5, 0.4, 1.3 - 0.5]):
+            d = d * 10000
+        
+        median_point = [(pos1[0] + pos2[0])/2, (pos1[1] + pos2[1])/2]
+        if point_in_rect(median_point, [0, 0.5, 0.4, 1.3 - 0.5]):
+            d = d * 10000
+
+        return d
 
 
 
@@ -156,5 +176,5 @@ def voronoi_astar(strategy, m, objective_function):
         for edge_to_ball in set(polygon_robot_edges):
             strategy.graph.add_edge([edge_to_ball, strategy.robot_node])
 
-
-        return AStar(strategy.robot_node, target_node).calculate()
+        solver = AStarAttacker(strategy.robot_node, target_node)
+        return solver.calculate()

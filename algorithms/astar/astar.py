@@ -2,16 +2,6 @@ import numpy
 import heapq
 
 
-def distance(pos1, pos2):
-    # Considering pos = [x, y] or pos = (x, y)
-    x1 = pos1[0]
-    x2 = pos2[0]
-    y1 = pos1[1]
-    y2 = pos2[1]
-    d = numpy.sqrt(((x2-x1)**2 + (y2-y1)**2))
-    return d
-
-
 class Node:
     def __init__(self, position):
         self.previous = None
@@ -47,6 +37,15 @@ class AStar():
         self.target = target
         self.open_list = []
         self.closed_list = []
+
+    def distance(self, pos1, pos2):
+        # Considering pos = [x, y] or pos = (x, y)
+        x1 = pos1[0]
+        x2 = pos2[0]
+        y1 = pos1[1]
+        y2 = pos2[1]
+        d = numpy.sqrt(((x2-x1)**2 + (y2-y1)**2))
+        return d
     
     def create_path(self, current):
         backtracking = []
@@ -70,12 +69,12 @@ class AStar():
             for neighbor in current.neighbours:
                 if neighbor not in self.closed_list:
                     if neighbor not in self.open_list:
-                        neighbor.h = distance(neighbor.position, self.target.position)
-                        neighbor.g = distance(neighbor.position, current.position)
+                        neighbor.h = self.distance(neighbor.position, self.target.position)
+                        neighbor.g = self.distance(neighbor.position, current.position)
                         neighbor.f = neighbor.g + neighbor.h
                         neighbor.previous = current
                     else:
-                        dist_from_previous = current.g + distance(neighbor.position, current.position)
+                        dist_from_previous = current.g + self.distance(neighbor.position, current.position)
                         if dist_from_previous < neighbor.g:
                             neighbor.g = dist_from_previous
                             neighbor.f = neighbor.g + neighbor.h

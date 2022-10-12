@@ -210,8 +210,8 @@ class AttackingWaitPlanning(PlayerPlay):
                         r.x,
                         r.y
                     ),
-                    radius = .3,
-                    radius_max = .3,
+                    radius = .2,
+                    radius_max = .2,
                     decay = lambda x: -1,
                     multiplier = 1
                 )
@@ -270,10 +270,10 @@ class AvoidRobotsPlanning(PlayerPlay):
                         r.x,
                         r.y
                     ),
-                    radius = .3,
-                    radius_max = .3,
+                    radius = .2,
+                    radius_max = .2,
                     decay = lambda x: -1,
-                    multiplier = 1.5
+                    multiplier = 1
                 )
             )
         self.avoid.add_field(
@@ -282,7 +282,7 @@ class AvoidRobotsPlanning(PlayerPlay):
                 target = [field_h/2, field_w/2],
                 radius = .1,
                 decay = lambda x: 1,
-                multiplier = 1
+                multiplier = 1.2
             )
         )
         
@@ -534,10 +534,10 @@ class MainAttacker(Strategy):
             self.robot, aim_projection_ball, 0.60, True
         )
         inside_defender_area_transition = OnInsideBox(
-            self.match, [0, 0.5, 0.4, 0.5 - 1.3]
+            self.match, [0, 0.5, 0.4, 1.3 - 0.5]
         )
         outside_defender_area_transition = OnInsideBox(
-            self.match, [0, 0.5, 0.4, 0.5 - 1.3], True
+            self.match, [0, 0.5, 0.4, 1.3 - 0.5], True
         )
         stuck_transition = OnStuckTrigger(self.robot, 1/2)
         wait_transition = plays.WaitForTrigger(2/3)
