@@ -102,7 +102,7 @@ class AstarPlanning(PlayerPlay):
 
     def update(self):
         robot_pos = [self.robot.x, self.robot.y]
-        dt = 0.3
+        dt = 0.05
         res = self.astar.compute(robot_pos)
         res[0] = self.robot.x + res[0] * dt
         res[1] = self.robot.y + res[1] * dt
