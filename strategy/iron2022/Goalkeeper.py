@@ -57,7 +57,7 @@ class Goalkeeper(Strategy):
             return x, y
 
         def edging_point(m):
-            x = 0.045
+            x = 0.1
             g_hgr = 0.87
             g_lwr = 0.5
 
@@ -76,12 +76,12 @@ class Goalkeeper(Strategy):
         self.field.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = edging_point,
                 theta = 0,
-                line_size = 1.5,
-                line_dist = .9,
-                decay = lambda x: x**2,
-                multiplier = 0.5,
+                target = edging_point,
+                line_size = 0.5,
+                line_dist = .8,
+                decay = lambda x: x**4,
+                multiplier = 5,
             )
         )
 
@@ -89,12 +89,11 @@ class Goalkeeper(Strategy):
             algorithms.fields.PointField(
                 self.match,
                 target = edging_point,
-                radius = 0.8,
-                decay = lambda x: x**7,
-                multiplier = 0.25
+                radius = 0.25,
+                decay = lambda x: x,
+                multiplier = 0.4
             )
         )
-
 
     def reset(self, robot=None):
         super().reset()
@@ -107,9 +106,5 @@ class Goalkeeper(Strategy):
         behaviour = None
 
         behaviour = self.field
-        # print(behaviour.field_childrens[0].target(self.match))
-
-        # print(f"{self.match.ball.y=}")
-        print(self.robot.x, self.robot.y)
 
         return behaviour.compute([self.robot.x, self.robot.y])

@@ -11,8 +11,8 @@ class UniController(object):
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m
         self.V_M = 40 # m/s
-        self.R_M = 30 * self.V_M # rad*m/s
-        self.K_W = 8 # coeficiente de feedback
+        self.R_M = 20 * self.V_M # rad*m/s
+        self.K_W = 5 # coeficiente de feedback
         # self.V_M = 500 # m/s
         # self.R_M = 3 * self.V_M # rad*m/s
         # self.K_W = 100 # coeficiente de feedback

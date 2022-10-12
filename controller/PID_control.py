@@ -29,9 +29,9 @@ class PID_control(object):
         self.K_RHO = 8.5 # Linear speed gain
 
         # PID of angular speed
-        self.KP = -130 # Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KP = -300 # Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
         self.KI = 0 # Parameter(0, 'pid_tuner', 'ki') # Integral gain of w
-        self.KD = -15 # Parameter(-7.5, 'pid_tuner', 'kd') # Derivative gain of w
+        self.KD = 0 # Parameter(-7.5, 'pid_tuner', 'kd') # Derivative gain of w
 
         # PID params for error
         self.dif_alpha = 0 # diferential param
@@ -39,8 +39,8 @@ class PID_control(object):
         self.alpha_old = 0 # stores previous iteration alpha
 
         # Max speeds for the robot
-        self.v_max = 35 # 40 # linear speed
-        self.w_max = 15*self.v_max # math.radians(7200) # angular speed rad/
+        self.v_max = 50 # 40 # linear speed
+        self.w_max = 500 # math.radians(7200) # angular speed rad/
 
         # self.pid_writer = Writer('pid',
         #                          {'kp': 'FLOAT',
@@ -50,9 +50,9 @@ class PID_control(object):
         #                           'error': 'FLOAT',
         #                           'w': 'FLOAT'
         #                           })
-        # self.robot_writer = Writer('robot',
-        #                            {'x': 'FLOAT',
-        #                             'y': 'FLOAT'})
+        self.robot_writer = Writer('robot',
+                                   {'x': 'FLOAT',
+                                    'y': 'FLOAT'})
     
     def set_desired(self, vector):
         self.desired = vector
@@ -74,7 +74,6 @@ class PID_control(object):
 
         # GAMMA robot's position angle to the objetive
         gamma = angle_adjustment(math.atan2(D_y, D_x))
-        gamma = 0
 
         # ALPHA angle between the front of the robot and the objective
         alpha = angle_adjustment(gamma - self.robot.theta)
@@ -89,9 +88,9 @@ class PID_control(object):
         v = self.v_max # if [self.robot.x, self.robot.y] < [self.desired[0], self.desired[1]] else min(self.K_RHO*rho, self.v_max)
 
         """Objective behind the robot"""
-        # if(abs(alpha) > math.pi/2):
-        #     v = -v
-        #     alpha = angle_adjustment(alpha - math.pi)
+        if(abs(alpha) > math.pi/2):
+            v = -v
+            alpha = angle_adjustment(alpha - math.pi)
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha
@@ -104,7 +103,10 @@ class PID_control(object):
         pwr_right = (2 * v + w * self.l)/2 * self.R
 
         # self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
-        # self.robot_writer.write([self.robot.x, self.robot.y])
+        self.robot_writer.write([self.robot.x, self.robot.y])
 
-        return 0, w
+        print(f"{v=}\n{w=}")
+        print(f"v_fps: {self.vision._fps}")
+
+        return v, w
         # return pwr_left * 1000, pwr_right * 1000

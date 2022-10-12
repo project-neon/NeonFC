@@ -11,11 +11,11 @@ def main():
     #uvf_visualizer = UVFVisualizer()
     #uvf_visualizer()
 
-    pid_visualizer = PIDVisualizer(500)
-    pid_visualizer()
+    # pid_visualizer = PIDVisualizer(500)
+    # pid_visualizer()
 
-    # position_visualizer = PositionVisualizer(1000)
-    # position_visualizer(1)
+    position_visualizer = PositionVisualizer(1000)
+    position_visualizer(1)
 
     circuit = [(1.1, .40), (1.1, .90), (.4, .90), (.4, .40)]
     x, y = list(map(list, zip(*circuit)))
