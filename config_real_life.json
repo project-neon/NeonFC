@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "RSM_2022",
+        "coach_name": "IRON_2022",
         "category": "3v3",
         "robot_ids": [
             3,
@@ -28,7 +28,7 @@
         "comm_port": "/dev/ttyUSB0",
         "baud_rate": 115200
     },
-    "referee": true,
+    "referee": false,
     "data_sender": false,
     "api": false
 }
