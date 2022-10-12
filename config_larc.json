@@ -19,7 +19,7 @@
         "coach_name": "LARC_2022_5V5",
         "category": "5v5"
     },
-    "referee": false,
+    "referee": true,
     "data_sender": false,
     "api": false
 }

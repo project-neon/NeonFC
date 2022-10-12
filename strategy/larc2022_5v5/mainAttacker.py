@@ -446,16 +446,16 @@ class MainAttacker(Strategy):
             self.robot, aim_projection_ball, 0.40
         )
 
+        # # Transicao para caso esteja longe da bola ( > 20 cm)
+        far_to_ball_transition = OnNextTo(
+            self.robot, aim_projection_ball, 0.60, True
+        )
+
         inside_defender_area_transition = OnInsideBox(
             self.match, [0, 0.4, 0.5, 1.3]
         )
         outside_defender_area_transition = OnInsideBox(
             self.match, [0, 0.4, 0.5, 1.3], True
-        )
-
-        # # Transicao para caso esteja longe da bola ( > 20 cm)
-        far_to_ball_transition = OnNextTo(
-            self.robot, aim_projection_ball, 0.60, True
         )
 
         stuck_transition = OnStuckTrigger(self.robot, 1/2)
