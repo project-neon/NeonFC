@@ -61,7 +61,7 @@ class Robot(object):
         if len(robot_data) >= 1:
             self.current_data = robot_data[0]
         else:
-            # self.log.warn('Robo [{}] não encontrado, pode estar desligado!'.format(self.get_name()))
+            self.log.warn('Robo [{}] não encontrado, pode estar desligado!'.format(self.get_name()))
             return
 
         self._update_speeds()

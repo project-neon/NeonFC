@@ -11,7 +11,7 @@ import time
 class PID_Test(Strategy):
     def __init__(self, match, plot_field=False):
         self.lt = time.time()
-        super().__init__(match, "PID_Test", controller=PID_control)
+        super().__init__(match, "PID_Test", controller=TwoSidesLQR)
 
         self.circuit = [(1.1, .40), (1.1, .90), (.4, .90), (.4, .40)]
         self.circuit = deque(self.circuit)
@@ -54,8 +54,8 @@ class PID_Test(Strategy):
                 self.match,
                 target = (.75, .65),
                 radius = 0.1,
-                decay = lambda x: 1,
-                multiplier = 1
+                decay = lambda x: x**2,
+                multiplier = .3
             )
         )
 
@@ -97,14 +97,9 @@ class PID_Test(Strategy):
 
         # #     return desired, desired_dl
 
-        desired = self.next_point()
+        # desired = self.next_point()
 
-        # print(desired)
-        # t = time.time()
-        # print("n_fps: ",1/(t-self.lt))
-        # self.lt = t
-
-        return desired
+        # return desired
 
         behaviour = self.field
 
