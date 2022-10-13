@@ -230,7 +230,6 @@ class AttackingWaitPlanning(PlayerPlay):
     def update(self):
         robot_pos = [self.robot.x, self.robot.y]
         dt = 0.3
-        print(self.match.ball.x, self.match.ball.y)
         res = self.avoid.compute(robot_pos)
         res[0] = self.robot.x + res[0] * dt
         res[1] = self.robot.y + res[1] * dt
@@ -484,8 +483,6 @@ class MainAttacker(Strategy):
 
         self.playerbook = None
 
-
-
     def start(self, robot=None):
         super().start(robot=robot)
 
@@ -510,17 +507,16 @@ class MainAttacker(Strategy):
         wing_potentialfield.start()
 
 
-        # Adiciona ambas plays no livro do jogador
+        # Adiciona plays no livro do jogador
         self.playerbook.add_play(astar)
-        # self.playerbook.add_play(limitcycle)
         self.playerbook.add_play(push_potentialfield)
         self.playerbook.add_play(avoid_potentialfield)
         self.playerbook.add_play(wait_potentialfield)
         self.playerbook.add_play(wing_potentialfield)
 
-        # # # Transicao para caso esteja perto da bola ( < 10 cm)
+        # Transicao para caso esteja perto da bola ( < 40 cm)
         next_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.40)
-        # # Transicao para caso esteja longe da bola ( > 20 cm)
+        # Transicao para caso esteja longe da bola ( > 60 cm)
         far_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.60, True)
         inside_defender_area_transition = OnInsideBox(self.match, [0, 0.5, 0.4, 1.3 - 0.5])
         outside_defender_area_transition = OnInsideBox(self.match, [0, 0.5, 0.4, 1.3 - 0.5], True)

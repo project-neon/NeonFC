@@ -3,7 +3,6 @@ import algorithms
 import controller
 import numpy as np
 from strategy.BaseStrategy import Strategy
-from strategy.DebugTools import DebugPotentialFieldStrategy
 from commons.math import point_in_rect
 
 class GoalKeeper(Strategy):
@@ -126,7 +125,7 @@ class GoalKeeper(Strategy):
                 line_size = self.sa_w/2,
                 line_dist = 0.1,
                 line_dist_max = 0.7,
-                multiplier = 1.6,
+                multiplier = 1.8,
                 decay = lambda x : x
             )
         )
@@ -141,7 +140,7 @@ class GoalKeeper(Strategy):
                 line_dist = 0.1,
                 line_dist_max = self.sa_h,
                 decay = lambda x: x,
-                multiplier = 1.3,
+                multiplier = 1.6,
             )
         )
 
@@ -153,7 +152,7 @@ class GoalKeeper(Strategy):
                 radius_max = self.field_w,
                 clockwise = True,
                 decay = lambda x: 1,
-                multiplier = 1.3
+                multiplier = 1.6
             )
         )
 

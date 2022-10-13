@@ -109,6 +109,16 @@ class OnAttackerPushTrigger(Trigger):
 
         return min_angle_to_goal <= self.min_angle
 
+class AndTransition(Trigger):
+    def __init__(self, triggers_list):
+        super().__init__()
+        self.triggers_list = triggers_list
+
+    def evaluate(self, *args, **kwargs):
+        eval = [t.evaluate(*args, **kwargs) for t in self.triggers_list]
+        return all(eval)
+
+
 class OnNextTo(Trigger):
     def next_to(self, p1, p2, err=0.05, far=False):
         res = None
