@@ -39,7 +39,7 @@ class PID_control(object):
         self.alpha_old = 0 # stores previous iteration alpha
 
         # Max speeds for the robot
-        self.v_max = 50 # 40 # linear speed
+        self.v_max = 50 # linear speed
         self.w_max = 500 # math.radians(7200) # angular speed rad/
 
         # self.pid_writer = Writer('pid',
@@ -78,7 +78,6 @@ class PID_control(object):
         # ALPHA angle between the front of the robot and the objective
         alpha = angle_adjustment(gamma - self.robot.theta)
 
-
         """Calculate the parameters of PID control"""
         self._update_fps()
         self.dif_alpha = (alpha - self.alpha_old) / self.dt # Difentential of alpha
@@ -106,7 +105,6 @@ class PID_control(object):
         self.robot_writer.write([self.robot.x, self.robot.y])
 
         print(f"{v=}\n{w=}")
-        print(f"v_fps: {self.vision._fps}")
 
         return v, w
         # return pwr_left * 1000, pwr_right * 1000

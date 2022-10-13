@@ -1,8 +1,5 @@
 import math
-
-
 from commons.math import angle_between
-
 import numpy as np
 import numpy.linalg as la
  
@@ -12,15 +9,14 @@ def py_ang(v1, v2):
     sinang = la.norm(np.cross(v1, v2))
     return np.arctan2(sinang, cosang)
 
-
 """
 Essa variavel experimental serve para converter o resultado do LQR
 para um valor coerente a velocidade desejada em m/s
 """
-EXPERIMENTAL_SPEED_CONSTANT = 3300
+EXPERIMENTAL_SPEED_CONSTANT = 7000
 
 class SimpleLQR(object):
-    def __init__(self, robot, l=0.05):
+    def __init__(self, robot, l=0.025):
         self.desired = np.array([0, 0])
         self.robot = robot
 
@@ -33,9 +29,8 @@ class SimpleLQR(object):
         self.inverted = not self.inverted
 
     def set_desired(self, vector):
-        print("vetor velocida: ", vector)
-        self.desired = (self.robot.x + vector[0] * EXPERIMENTAL_SPEED_CONSTANT, self.robot.y + vector[1] * EXPERIMENTAL_SPEED_CONSTANT)
 
+        self.desired = (self.robot.x + vector[0] * EXPERIMENTAL_SPEED_CONSTANT, self.robot.y + vector[1] * EXPERIMENTAL_SPEED_CONSTANT)
 
     def update(self):
         n = (1/self.l)
@@ -53,16 +48,7 @@ class SimpleLQR(object):
         linear = v*self.R
         angular = self.R*(w*self.L)/2
 
-        # if abs(linear) <= 1:
-        #     linear = 0
-        # if abs(angular) <= 1:
-        #     angular = 0
-
-        # if self.inverted:
-        #     return -pwr_right, -pwr_left,
-        # return pwr_left, pwr_right
-        print("potencia linear e angular:", linear, angular)
-        return linear, angular
+        return angular, linear 
 
 class TwoSidesLQR(object):
     def __init__(self, robot, l=0.010):
@@ -100,13 +86,6 @@ class TwoSidesLQR(object):
         linear = v*self.R
         angular = self.R*(w*self.L)/2
 
-        
-
         if (between > math.pi/2):
-            return -angular, -linear
-        return angular, linear 
-
-        # return 0, 0
-        '''if (between > math.pi/2):
-            return -pwr_right, -pwr_left,
-        return pwr_left, pwr_right'''
+            return -linear, -angular
+        return linear, -angular 
