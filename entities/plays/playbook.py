@@ -3,10 +3,11 @@ import time
 import strategy
 
 class Playbook(object):
-    def __init__(self, coach):
+    def __init__(self, coach, log=False):
         self.coach = coach
         self.plays = {}
         self.actual_play = None
+        self.log = log
     
     def add_play(self, play):
         self.plays[play.get_name()] = play
@@ -24,7 +25,8 @@ class Playbook(object):
     def _transition_if_have(self):
         for transition, next_play in self.plays[self.actual_play].transitions:
             if transition.evaluate(self.coach, self.plays[self.actual_play]):
-                print(f"Transition to {next_play.get_name()}")
+                if self.log:
+                    print(f"Transition to {next_play.get_name()}")
                 self.set_play(next_play)
 
     def update(self):

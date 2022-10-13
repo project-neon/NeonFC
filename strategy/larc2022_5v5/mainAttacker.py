@@ -1,24 +1,16 @@
 import math
-import random
 import threading
 
-from scipy.spatial import Voronoi
-
-from collections import deque
-from algorithms.astar.fieldGraph import FieldGraph
 from algorithms.potential_fields import fields
 from controller.simple_LQR import TwoSidesLQR
 from entities import plays
 
 from strategy.BaseStrategy import Strategy
-
 from controller import PID_control
-
 from commons import math as nfc_math
 
 from algorithms.astar.astart_voronoi import voronoi_astar
-from algorithms.limit_cycle import LimitCycle, Point
-from strategy.utils.player_playbook import OnAttackerPushTrigger, OnCorners, OnDefensiveTransitionTrigger, OnInsideBox, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
+from strategy.utils.player_playbook import OnCorners, OnInsideBox, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
 
 def aim_projection_ball(strategy):
     m = strategy.match
@@ -57,7 +49,6 @@ def aim_behind_ball(strategy):
     b = strategy.match.ball
     ball = [b.x, b.y - 0.05]
     return ball
-
 
 class AstarPlanning(PlayerPlay):
     def __init__(self, match, robot):
@@ -298,8 +289,6 @@ class AvoidRobotsPlanning(PlayerPlay):
         res[1] = self.robot.y + res[1] * dt
         return res
 
-
-
 class PushPotentialFieldPlanning(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
@@ -475,8 +464,6 @@ class PushPotentialFieldPlanning(PlayerPlay):
         res[1] = self.robot.y + res[1] * dt
         return res
 
-
-
 class MainAttacker(Strategy):
     def __init__(self, match, name="MainAttacker"):
         super().__init__(match, name, controller=TwoSidesLQR)
@@ -502,7 +489,6 @@ class MainAttacker(Strategy):
         astar = AstarPlanning(self.match, self.robot)
         astar.start()
 
-
         # Criando Potential Field
         push_potentialfield = PushPotentialFieldPlanning(self.match, self.robot)
         push_potentialfield.start()
@@ -526,19 +512,11 @@ class MainAttacker(Strategy):
         self.playerbook.add_play(wing_potentialfield)
 
         # # # Transicao para caso esteja perto da bola ( < 10 cm)
-        next_to_ball_transition = OnNextTo(
-            self.robot, aim_projection_ball, 0.40
-        )
+        next_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.40)
         # # Transicao para caso esteja longe da bola ( > 20 cm)
-        far_to_ball_transition = OnNextTo(
-            self.robot, aim_projection_ball, 0.60, True
-        )
-        inside_defender_area_transition = OnInsideBox(
-            self.match, [0, 0.5, 0.4, 1.3 - 0.5]
-        )
-        outside_defender_area_transition = OnInsideBox(
-            self.match, [0, 0.5, 0.4, 1.3 - 0.5], True
-        )
+        far_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.60, True)
+        inside_defender_area_transition = OnInsideBox(self.match, [0, 0.5, 0.4, 1.3 - 0.5])
+        outside_defender_area_transition = OnInsideBox(self.match, [0, 0.5, 0.4, 1.3 - 0.5], True)
         stuck_transition = OnStuckTrigger(self.robot, 1/2)
         wait_transition = plays.WaitForTrigger(2/3)
         corners_transition = OnCorners(self.match, [0.1, 1.65])
@@ -548,7 +526,6 @@ class MainAttacker(Strategy):
         astar.add_transition(next_to_ball_transition, push_potentialfield)
         astar.add_transition(stuck_transition, avoid_potentialfield)
         astar.add_transition(inside_defender_area_transition, wait_potentialfield)
-
 
         push_potentialfield.add_transition(far_to_ball_transition, astar)
         push_potentialfield.add_transition(stuck_transition, avoid_potentialfield)
@@ -565,10 +542,3 @@ class MainAttacker(Strategy):
     def decide(self):
         res = self.playerbook.update()
         return res
-
-
-"""
-y < 0.1
-y > 0.65
-
-"""

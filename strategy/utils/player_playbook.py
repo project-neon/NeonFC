@@ -4,8 +4,8 @@ from commons.math import point_in_rect
 from entities.plays.playbook import Play, Playbook, Trigger
 
 class PlayerPlaybook(Playbook):
-    def __init__(self, coach, robot):
-        super().__init__(coach)
+    def __init__(self, coach, robot, log=False):
+        super().__init__(coach, log)
         self.robot = robot
 
     def update(self):

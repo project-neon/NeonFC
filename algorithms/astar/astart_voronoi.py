@@ -304,5 +304,5 @@ def voronoi_astar(strategy, m, objective_function):
         for edge_to_ball in set(polygon_robot_edges):
             strategy.graph.add_edge([edge_to_ball, strategy.robot_node])
 
-        solver = AStarAttacker(strategy.robot_node, target_node, mergeble_obstacles)
+        solver = AStar(strategy.robot_node, target_node)
         return solver.calculate()

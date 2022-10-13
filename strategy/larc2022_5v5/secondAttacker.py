@@ -1,106 +1,170 @@
+import threading
+from algorithms.astar.astart_voronoi import voronoi_astar
+from algorithms.potential_fields import fields
+from controller.PID_control import PID_control
 from strategy.BaseStrategy import Strategy
-from controller.simple_LQR import TwoSidesLQR
 import algorithms
 import math
 
-class SecondAttacker(Strategy):
-    def __init__(self, match, name="RightAttacker"):
-        super().__init__(match, name, controller=TwoSidesLQR)
+from strategy.utils.player_playbook import OnNextTo, PlayerPlay, PlayerPlaybook
 
-        self.sa_x, self.sa_y, self.sa_w, self.sa_h = self.match.game.field.get_small_area("defensive")
+def aim_projection_ball(strategy):
+    m = strategy.match
+    b = strategy.match.ball
+    r = strategy.robot
 
-        self.field_w, self.field_h = self.match.game.field.get_dimensions()
+    ball = [b.x, b.y]
+    goal_pos = [
+        m.game.field.get_dimensions()[0],
+        m.game.field.get_dimensions()[1]/2
+    ]
 
-        self.robot_w = self.robot_h = 0.075
+    dir_to_goal_vector = [
+        goal_pos[0] - ball[0], 
+        goal_pos[1] - ball[1]
+    ]
+    angle = math.atan2(dir_to_goal_vector[1], dir_to_goal_vector[0])
 
-        self.g_hgr = (self.field_h/2)+0.185
-        self.g_lwr = (self.field_h/2)-0.185
+    side = -1 if b.y > r.y else 1
 
-    def start(self, robot=None):
-        super().start(robot=robot)
+    side_size = 0.05
+    recoil_size = 0.05
 
-        self.push = algorithms.fields.PotentialField(
-            self.match,
-            name="{}|PushBehaviour".format(self.__class__)
+    angle_of_attack = math.atan2(dir_to_goal_vector[1], dir_to_goal_vector[0]) + math.pi/2
+
+    point_with_recoil = [ball[0] - recoil_size* math.cos(angle), ball[1] - recoil_size * math.sin(angle)]
+
+    point_of_attack = [
+        point_with_recoil[0] + side * side_size * math.cos(angle_of_attack), 
+        point_with_recoil[1] + side * side_size * math.cos(angle_of_attack)
+    ]
+
+    return point_of_attack
+
+class AstarPlanning(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(
+            match, 
+            robot
         )
 
-        self.avoid_area = algorithms.fields.PotentialField(
+        self.actual_iteration = 0
+        self.next_iterarion = 0
+
+        self.path = []
+        self.next_path = []
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs = {'max_speed': 2.8, 'max_angular': 4800}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def start(self):
+        self.astar = fields.PotentialField(
             self.match,
-            name="{}|AvoidAreaBehaviour".format(self.__class__)
+            name="{}|AstarBehaviour".format(self.__class__)
         )
 
+        self.astar.add_field(
+            fields.PointField(
+                self.match,
+                target = lambda m, s=self : voronoi_astar(
+                    s.robot.strategy, s.match, aim_projection_ball
+                )[1],
+                radius = .075,
+                decay = lambda x: x,
+                multiplier = 1
+            )
+        )
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Astar Potential Field Planning>"
+
+    def update(self):
+        robot_pos = [self.robot.x, self.robot.y]
+        dt = 0.05
+        res = self.astar.compute(robot_pos)
+        res[0] = self.robot.x + res[0] * dt
+        res[1] = self.robot.y + res[1] * dt
+        return res
+
+class DefendPlanning(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(
+            match, 
+            robot
+        )
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs = {'max_speed': 2.5, 'max_angular': 3600, 'kp': 180}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def start(self):
         self.defend = algorithms.fields.PotentialField(
             self.match,
             name="{}|DefendBehaviour".format(self.__class__)
         )
 
-        self.push.add_field(
-            algorithms.fields.PointField(
-                self.match,
-                target = lambda m: (m.ball.x, m.ball.y),
-                radius = 0.1,
-                multiplier = lambda m: max(1, (m.ball.vx**2 + m.ball.vy**2)**0.5 + 0.3),
-                decay = lambda x : x
-            )
-        )
-
         self.defend.add_field(
             algorithms.fields.TangentialField(
                 self.match,
-                target=lambda m: (
-                    m.ball.x + (math.cos(math.pi/3) if m.ball.y < 0.65 else math.cos(5*math.pi/3)) * 0.1,
-                    m.ball.y + (math.sin(math.pi/3) if m.ball.y < 0.65 else math.sin(5*math.pi/3)) * 0.1
+                target=lambda m, r=self.robot: (
+                    m.ball.x + (math.cos(math.pi/3) if (m.ball.y < r.y) else math.cos(5*math.pi/3)) * 0.1,
+                    m.ball.y + (math.sin(math.pi/3) if (m.ball.y < r.y) else math.sin(5*math.pi/3)) * 0.1
                 ),                                                                                                                                                                                                                                                                                                                                          
                 radius = 0.04,
                 radius_max = 2,
-                clockwise = lambda m: (m.ball.y < 0.65),
+                clockwise = lambda m, r=self.robot: (m.ball.y < r.y),
                 decay=lambda x: 1,
-                field_limits = [0.75* 2 , 0.65*2],
                 multiplier = 1
             )
         )
 
-        # Avoid defensive area
-        self.avoid_area.add_field(
-            algorithms.fields.LineField(
-                self.match,
-                target= [self.match.game.field.get_dimensions()[0]+0.45 - self.match.game.field.get_dimensions()[0], 
-                self.match.game.field.get_dimensions()[1]/2],                                                                                                                                                                                                                                                                                                                                          
-                theta = math.pi/2,
-                line_size = (self.match.game.field.get_small_area("defensive")[3]/2) + 0.09,
-                line_dist = 0.23,
-                line_dist_max = 0.23,
-                decay = lambda x: 1,
-                multiplier = -3
-            )
-        )
+    def get_name(self):
+        return f"<{self.robot.get_name()} Defend Potential Field Planning>"
 
-        self.push.add_field(self.avoid_area)
-        self.defend.add_field(self.avoid_area)
-    
-    def defend_position(self, match):
-            if match.ball.y > self.g_hgr:
-                return [self.sa_x + 0.25, self.field_h/2 + 0.25]
-            if match.ball.y < self.g_lwr:
-                return [self.sa_x + 0.25, self.field_h/2 - 0.25]
-            
-            return [self.sa_x + 0.4, self.field_h/2]
-
-    def use_astar(self, target):
-        target = target # target better not be the ball
-        obstacles = [
-            [r.x, r.y] for r in self.match.opposites] + [
-            [r.x, r.y] for r in self.match.robots 
-            if r.robot_id != self.robot.robot_id
-        ]
-        astar = algorithms.astar.PathAstar(self.match)
+    def update(self):
         robot_pos = [self.robot.x, self.robot.y]
-        ball_pos = [self.match.ball.x, self.match.ball.y]
-        if self.match.ball.x < self.robot.x:
-            obstacles = obstacles + [ball_pos]
-        r_v = astar.calculate(robot_pos, target, obstacles)
+        dt = 0.05
+        res = self.defend.compute(robot_pos)
+        res[0] = self.robot.x + res[0] * dt
+        res[1] = self.robot.y + res[1] * dt
+        return res
 
-        return r_v
+class SecondAttacker(Strategy):
+    def __init__(self, match, name="RightAttacker"):
+        controller_kwargs = {'max_speed': 2.5, 'max_angular': 6000, 'kp': 180}
+        super().__init__(match, name, controller=PID_control, controller_kwargs=controller_kwargs)
+
+        self.playerbook = None
+
+    def start(self, robot=None):
+        super().start(robot=robot)
+
+        self.playerbook = PlayerPlaybook(self.match.coach, self.robot, True)
+
+        astar = AstarPlanning(self.match, self.robot)
+        astar.start()
+
+        defend_potentialfield = DefendPlanning(self.match, self.robot)
+        defend_potentialfield.start()
+
+        self.playerbook.add_play(astar)
+        self.playerbook.add_play(defend_potentialfield)
+
+        # Transicao para caso esteja perto da bola ( < 10 cm)
+        next_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.60)
+        # Transicao para caso esteja longe da bola ( > 20 cm)
+        far_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.80, True)
+
+        # astar.add_transition(next_to_ball_transition, defend_potentialfield)
+        # defend_potentialfield.add_transition(far_to_ball_transition, astar)
+
+        self.playerbook.set_play(defend_potentialfield)
+    
 
     def reset(self, robot=None):
         super().reset()
@@ -108,44 +172,5 @@ class SecondAttacker(Strategy):
             self.start(robot)
 
     def decide(self):
-        p = (self.match.ball.y - self.robot.y)/(self.match.ball.x - self.robot.x)
-        ball = self.match.ball
-
-        attacker = [r for r in self.match.robots if r.robot_id != self.robot.robot_id]
-
-        # if ball.x > self.field_w-0.35 and self.field_h/2-0.4 < ball.y < self.field_h/2+0.4:
-        #     x = self.field_w
-        #     left_proj = p*(x - self.robot.x) + self.robot.y + (self.robot_w/2)
-        #     right_proj = p*(x - self.robot.x) + self.robot.y - (self.robot_w/2)
-
-        #     if left_proj < self.g_hgr and right_proj > self.g_lwr:
-        #         behaviour = self.push
-        #     else:
-        #         return self.use_astar([ball.x - 0.3, ball.y])
-
-        # else:
-        #     if ball.x > self.field_w/4:
-
-        #         if self.field_h/2-0.4 < ball.y < self.field_h/2+0.4:
-        #             return self.use_astar([ball.x - 0.3, ball.y])
-        #         return self.use_astar([ball.x - 0.3, (self.field_h/2)])
-        #     else:
-
-        #         return self.use_astar(self.defend_position(self.match))
-
-        if ball.x <= self.match.game.field.get_dimensions()[0]/2:
-            if math.dist([self.robot.x, self.robot.y], [self.match.ball.x, self.match.ball.y]) > 0.1:
-                return self.use_astar([self.match.ball.x, self.match.ball.y])
-            else:
-                behaviour = self.defend
-        else:
-            if math.dist([attacker[0].x, attacker[0].y], [ball.x, ball.y]) > 0.30:
-                behaviour = self.push
-            else:
-                return self.use_astar([attacker[0].x-0.4, self.match.game.field.get_dimensions()[1]/2])
-
-        
-        if behaviour:
-            return behaviour.compute([self.robot.x, self.robot.y])
-        else:
-            return self.use_astar([self.match.game.field.get_dimensions()[0]/2, self.match.game.field.get_dimensions()[1]/2])
+        res = self.playerbook.update()
+        return res
