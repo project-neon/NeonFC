@@ -76,12 +76,19 @@ class AstarPlanning(PlayerPlay):
             name="{}|AstarBehaviour".format(self.__class__)
         )
 
+        def astar_eval(m, s=self):
+            res = voronoi_astar(
+                    s.robot.strategy, s.match, aim_projection_ball
+                )
+            if len(res) > 1:
+                return res[1]
+            else:
+                return [0, 0]
+
         self.astar.add_field(
             fields.PointField(
                 self.match,
-                target = lambda m, s=self : voronoi_astar(
-                    s.robot.strategy, s.match, aim_projection_ball
-                )[1],
+                target = astar_eval,
                 radius = .075,
                 decay = lambda x: x,
                 multiplier = 1
