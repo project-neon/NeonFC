@@ -106,6 +106,60 @@ class AstarPlanning(PlayerPlay):
         res[1] = self.robot.y + res[1] * dt
         return res
 
+class CarryPlanning(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Carry Potential Planning>"
+
+    def start_up(self):
+            super().start_up()
+            controller = TwoSidesLQR
+            controller_kwargs = {'l': 0.185}
+            self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def update(self):
+        return super().update()
+
+    def start(self):
+        self.carry = fields.PotentialField(
+            self.match,
+            name="{}|CarryBehaviour".format(self.__class__)
+        )
+        height, width = self.match.game.field.get_dimensions()
+
+        self.carry.add_field(
+            fields.PointField(
+                self.match,
+                target = lambda m: (m.ball.x, m.ball.y),
+                radius = 0.05, # 30cm
+                decay = lambda x: 1,
+                multiplier = lambda m: max(0.80, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.25) # 50 cm/s
+            )
+        )
+        self.carry.add_field(
+            fields.LineField(
+                self.match,
+                target= lambda m: (
+                    m.ball.x - math.cos(math.atan2((width/2-m.ball.y), (height - m.ball.x))) * 0.025, 
+                    m.ball.y - math.sin(math.atan2((width/2-m.ball.y), (height - m.ball.x))) * 0.025
+                ),
+                theta=lambda m: ( -math.atan2((width/2-m.ball.y), (height - m.ball.x))),
+                line_size = 1,
+                line_size_single_side = True,
+                line_dist = 0.15,
+                line_dist_max = 0.15,
+                decay = lambda x: x**2,
+                multiplier = 1.3 # 75 cm/s
+            )
+        )
+
+    def update(self):
+        robot_pos = [self.robot.x, self.robot.y]
+        res = self.carry.compute(robot_pos)
+        return res
+
 class WingPlanning(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
@@ -487,7 +541,7 @@ class MainAttacker(Strategy):
         super().start(robot=robot)
 
         # Criando Player Playbook: A maquina de estados do jogador
-        self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
+        self.playerbook = PlayerPlaybook(self.match.coach, self.robot, True)
 
         # Criando Path Planning baseado em Astar
         astar = AstarPlanning(self.match, self.robot)
@@ -506,6 +560,9 @@ class MainAttacker(Strategy):
         wing_potentialfield = WingPlanning(self.match, self.robot)
         wing_potentialfield.start()
 
+        carry_potentialfield = CarryPlanning(self.match, self.robot)
+        carry_potentialfield.start()
+
 
         # Adiciona plays no livro do jogador
         self.playerbook.add_play(astar)
@@ -513,6 +570,7 @@ class MainAttacker(Strategy):
         self.playerbook.add_play(avoid_potentialfield)
         self.playerbook.add_play(wait_potentialfield)
         self.playerbook.add_play(wing_potentialfield)
+        self.playerbook.add_play(carry_potentialfield)
 
         # Transicao para caso esteja perto da bola ( < 40 cm)
         next_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.40)
@@ -524,20 +582,27 @@ class MainAttacker(Strategy):
         wait_transition = plays.WaitForTrigger(2/3)
         corners_transition = OnCorners(self.match, [0.1, 1.65])
         out_corners_transition = OnCorners(self.match, [0.1, 1.65], True)
+        goal_zone_transition = OnInsideBox(self.match, [1.85, 0.5, 0.4, 1.3 - 0.5])
+        out_goal_zone_transition = OnInsideBox(self.match, [1.85, 0.5, 0.4, 1.3 - 0.5], True)
 
         # Adiciona caminhos de ida e volta com transicoes
         astar.add_transition(next_to_ball_transition, push_potentialfield)
         astar.add_transition(stuck_transition, avoid_potentialfield)
         astar.add_transition(inside_defender_area_transition, wait_potentialfield)
+        astar.add_transition(goal_zone_transition, carry_potentialfield)
 
         push_potentialfield.add_transition(far_to_ball_transition, astar)
         push_potentialfield.add_transition(stuck_transition, avoid_potentialfield)
         push_potentialfield.add_transition(corners_transition, wing_potentialfield)
         push_potentialfield.add_transition(inside_defender_area_transition, wait_potentialfield)
+        push_potentialfield.add_transition(goal_zone_transition, carry_potentialfield)
 
         avoid_potentialfield.add_transition(wait_transition, astar)
         wait_potentialfield.add_transition(outside_defender_area_transition, astar)
         wing_potentialfield.add_transition(out_corners_transition, push_potentialfield)
+
+        carry_potentialfield.add_transition(out_goal_zone_transition, astar)
+        
 
         # Estado inicial é o astar
         self.playerbook.set_play(astar)
