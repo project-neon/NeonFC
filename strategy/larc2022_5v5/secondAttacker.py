@@ -286,7 +286,7 @@ class SecondAttacker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        self.playerbook = PlayerPlaybook(self.match.coach, self.robot, True)
+        self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
         field_dim = self.match.game.field.get_dimensions()
 
