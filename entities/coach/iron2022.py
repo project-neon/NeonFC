@@ -8,7 +8,7 @@ class Coach(BaseCoach): # heranca da classe abstrata
         super().__init__(match) # chamada do metodo da classe mae
 
         # vamos usar strategies de teste por enquanto, essa deixa o robo parado
-        self._9 = strategy.rsm2022.PID_Test(self.match)
+        self._9 = strategy.iron2022.Attacker_LC(self.match)
         self._3 = strategy.tests.Idle(self.match)
         self._0 = strategy.tests.Idle(self.match)
 

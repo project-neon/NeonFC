@@ -8,8 +8,8 @@ class Attacker_LC(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(match, "Limit_Cycle_Attacker", controller=PID_control)
 
-        self.BALL_Y_MAX = 1.3
-        self.BALL_Y_MIN = 0.2
+        self.BALL_Y_MAX = 1.25
+        self.BALL_Y_MIN = 0.25
 
         self.dl = 0.000001
         self.shooting_momentum = 0
@@ -46,16 +46,22 @@ class Attacker_LC(Strategy):
         goal = [1.5, .65]
 
         # diference between robot angle and (ball-robot) angle
-        c1 = abs(theta - angle_between([x, y], ball)) <= .25
+        c1v = abs(theta - angle_between([x, y], ball))
+        c1 = c1v <= .4 or abs(c1v - math.pi) <= .4
 
         # diference between robot angle and (goal-robot) angle
-        c2 = abs(theta - angle_between([x, y], goal)) <= .5
+        c2v = abs(theta - angle_between([x, y], goal)) #<= .5
+        c2 = c2v <= .4 or abs(c2v - math.pi) <= .4
 
         # distance between ball and robot
-        c3 = dist([x, y], ball) <= .1
+        c3 = dist([x, y], ball) <= .25
+
+        if c3:
+            print(f"{c1v=}, {c2v=}")
+            print(c1, c2, c3)
 
         if c1 and c2 and c3:
-            self.shooting_momentum = 90 * dist([x, y], ball)
+            self.shooting_momentum = 100 * dist([x, y], goal)
 
     def decide(self):
         x = self.robot.x
@@ -76,8 +82,12 @@ class Attacker_LC(Strategy):
 
         self.update_momentum()
         if self.shooting_momentum > 0:
-            print("kicking ------------------ ")
-            self.shooting_momentum -= 1
+            print("kicking ------------------")
+            self.controller.control_linear_speed = False
             desired = [1.5, .65]
+            self.shooting_momentum -= 1
+        else:
+            self.controller.control_linear_speed = True
+            self.controller.lp = [self.match.ball.x, self.match.ball.y]
 
         return desired
