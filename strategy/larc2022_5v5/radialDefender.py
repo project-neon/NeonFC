@@ -95,6 +95,8 @@ class RadialDefender(Strategy):
                 self.ponto_objetivo=[0.41,1.45]
             else:
                 self.ponto_objetivo=[0.41,0.35]
+
+        print(f"{self.robot.get_name()} : {self.robot.x, self.robot.y}")
         return self.ponto_objetivo
     
     def formar_barreira(self,m):

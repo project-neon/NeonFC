@@ -19,15 +19,15 @@
             ],
             "QUADRANT_2": [
                 {"robot_id": 0, "x": -1.06, "y": 0, "orientation": 90},   
-                {"robot_id": 1, "x": -0.86, "y": -0.40, "orientation": 0},  
-                {"robot_id": 2, "x": -0.77, "y": -0.30, "orientation": 90}, 
+                {"robot_id": 1, "x": -0.85, "y": -0.080, "orientation": 90},  
+                {"robot_id": 2, "x": -0.90, "y": -0.150, "orientation": 90}, 
                 {"robot_id": 3, "x": -0.65, "y": -0.30, "orientation": 90}, 
                 {"robot_id": 4, "x": -0.80, "y": 0.6, "orientation": 0}  
             ],
             "QUADRANT_3": [
                 {"robot_id": 0, "x": -1.06, "y": 0, "orientation": 90},   
-                {"robot_id": 1, "x": -0.86, "y": 0.40, "orientation": 0}, 
-                {"robot_id": 2, "x": -0.77, "y": 0.20, "orientation": 90}, 
+                {"robot_id": 1, "x": -0.85, "y": 0.080, "orientation": 90},  
+                {"robot_id": 2, "x": -0.90, "y": 0.150, "orientation": 90},
                 {"robot_id": 3, "x": -0.65, "y": 0.30, "orientation": 90}, 
                 {"robot_id": 4, "x": -0.80, "y": -0.6, "orientation": 0}  
             ],
