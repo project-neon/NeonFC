@@ -64,7 +64,10 @@ class Attacker_LC(Strategy):
             print(c1, c2, c3)
 
         if c1 and c2 and c3 and c4:
-            self.shooting_momentum = 60 * dist([x, y], goal)
+            self.shooting_momentum = 100 * dist([x, y], goal)
+
+        elif ball == [-1, -1]:
+            self.shooting_momentum -= 30
 
     def decide(self):
         x = self.robot.x
@@ -105,5 +108,12 @@ class Attacker_LC(Strategy):
             v_o = Obstacle(self.match.ball.x, self.BALL_Y_MIN - bound_r, r=bound_r)
             self.limit_cycle.update(robot, target, [v_o], target_is_ball=False)
             desired = self.limit_cycle.compute()
+
+        if self.match.ball.x <= .375:
+            if self.match.ball.y < .65:
+                desired = [.5, 1.05]
+            else:
+                desired = [.5, .25]
+
 
         return desired
