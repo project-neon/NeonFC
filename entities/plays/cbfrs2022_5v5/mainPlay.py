@@ -11,10 +11,8 @@ class MainPlay(Play):
 
         self.constraints = [
             (strategy.cbfrs2022_5v5.GoalKeeper(self.match), self._elect_goalkeeper),
-            (strategy.tests.UVFAttacker(self.match), self._elect_leftattacker),
-            (strategy.cbfrs2022_5v5.LeftWing(self.match), self._elect_leftwing),
-            (strategy.cbfrs2022_5v5.RightWing(self.match), self._elect_rightwing),
-            (strategy.cbfrs2022_5v5.RightAttacker(self.match), self._elect_rightattacker)
+            (strategy.larc2022_5v5.RadialDefender(self.match, 'Defender'), self._elect_leftattacker),
+            (strategy.larc2022_5v5.MainAttacker(self.match, 'Attacker'), self._elect_rightattacker)
         ]
 
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
@@ -26,28 +24,12 @@ class MainPlay(Play):
         super().start_up()
         self._reset = True
     
-    def freeze_positions(self, constraints, robots):
-        constraints = []
-        robots = [
-            r_id for r_id in robots 
-            if self.match.robots[r_id].strategy.name not in (
-                "Goalkeeper", "LeftWing", "RightWing", "RightAttacker", "UFV-Attacker"
-            )
-        ]
-        return constraints, robots
 
     def update(self):
         super().update()
 
         robots = [r.robot_id for r in self.match.robots]
         constraints = self.constraints
-
-        # # verify if the game is running
-        # # if is running don't change goalkeeper or attacker
-        # if self._can_play() and (not self._reset):
-        #     constraints, robots = self.freeze_positions(
-        #         constraints, robots
-        #     )
 
         if self._reset == True:
             self._reset = False

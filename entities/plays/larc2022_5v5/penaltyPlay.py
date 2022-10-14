@@ -17,7 +17,7 @@ class PenaltyPlay(MainPlay):
         self.coach = coach
 
         self.penalty_taker = os.environ.get('PENALTY_TAKER', penalty_taker) 
-        self.PENALTY_TAKER_ID = 4
+        self.PENALTY_TAKER_ID = 2
 
         if self.penalty_taker == 'long_shot':
             self.gk = LongShotPenaltyTaker(self.match)
@@ -27,16 +27,11 @@ class PenaltyPlay(MainPlay):
         self.strategies = [
             strategy.larc2022_5v5.GoalKeeper(self.match, 'Goalkeeper'),
             strategy.larc2022_5v5.RadialDefender(self.match, 'Defender1'),
-            strategy.larc2022_5v5.RadialDefender(self.match, 'Defender2'),
-            strategy.larc2022_5v5.SecondAttacker(self.match, 'SecondAttacker'),
             self.gk,
         ]
         
 
     def get_positions(self, foul, team_color, foul_color, quadrant):
-        angle_of_interest = 25
-        dist_to_ball = 0.225
-        shoot_side = random.choice([-1, 1])
 
         replacements = self.coach._get_positions(foul, team_color, foul_color, quadrant)
 

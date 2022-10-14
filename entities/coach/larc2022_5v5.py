@@ -9,13 +9,13 @@ class Coach(BaseCoach):
 
 
         self.coach_parameters = coach_parameters
-        self.positions = json.loads(open('foul_placements5v5.json', 'r').read())
+        self.positions = json.loads(open('foul_placements.json', 'r').read())
         self.playbook = plays.Playbook(self)
 
         main_play = plays.larc2022_5v5.MainPlay(self)
         penalty_play = plays.larc2022_5v5.PenaltyPlay(self, self.coach_parameters['penalty_taker']) # Add later this play to larc2022 5v5 package in plays
-        defend_penalty_play = plays.cbfrs2022_5v5.DefendPenaltyPlay(self) # Add later this play to larc2022 5v5 package in plays
-        goalkick_play = plays.cbfrs2022_5v5.GoalKickPlay(self) # Add later this play to larc2022 5v5 package in plays
+        defend_penalty_play = plays.larc2021.DefendPenaltyPlay(self) # Add later this play to larc2022 5v5 package in plays
+        goalkick_play = plays.larc2021.GoalKickPlay(self) # Add later this play to larc2022 5v5 package in plays
 
         penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.team_color)
         defend_penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.opposite_team_color)

@@ -9,8 +9,6 @@ class DefendPenaltyPlay(MainPlay):
             (strategy.larc2021.Shooter(self.match), self._elect_goalkeeper),
             (strategy.tests.UVFAttacker(self.match), self._elect_leftattacker),
             (strategy.cbfrs2022_5v5.LeftWing(self.match), self._elect_leftwing),
-            (strategy.cbfrs2022_5v5.RightWing(self.match), self._elect_rightwing),
-            (strategy.cbfrs2022_5v5.RightAttacker(self.match), self._elect_rightattacker)
         ]
 
     def get_positions(self, foul, team_color, foul_color, quadrant):

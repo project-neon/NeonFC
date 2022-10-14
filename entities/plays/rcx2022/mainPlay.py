@@ -11,9 +11,9 @@ class MainPlay(Play):
         self.coach = coach
         self._reset = False
         self.constraints = [
-            (strategy.tests.GoalKeeperRCX(self.match, "Goalkeeper", "MidFielderSupporter"), self._elect_goalkeeper),
-            (strategy.larc2022_5v5.MainAttacker(self.match, "NewAttacker"), self._elect_attacker),
-            (strategy.tests.SpinnerAttacker(self.match, name="SpinnerAttacker"), self._elect_midfielder),
+            (strategy.larc2022_5v5.GoalKeeper(self.match, "Goalkeeper"), self._elect_goalkeeper),
+            (strategy.larc2022_5v5.MainAttacker(self.match, "MainAttacker"), self._elect_attacker),
+            (strategy.larc2022_5v5.RadialDefender(self.match, name="SpinnerAttacker"), self._elect_midfielder),
         ]
 
     def _can_play(self):

@@ -65,13 +65,13 @@ class RadialDefender(Strategy):
             if self.mr < mo + erro:
                 mo = np.tan(np.arctan(m) + self.dist_robos)
             elif self.mr > mo - erro: 
-                mo = (self.ponto_gol[1] - self.pos_robo_baixo[1])/(self.ponto_gol[0] - self.pos_robo_baixo[0])
+                # mo = (self.ponto_gol[1] - self.pos_robo_baixo[1])/(self.ponto_gol[0] - self.pos_robo_baixo[0])
                 mo = np.tan(np.arctan(m) + 2*self.dist_robos)
             if self.mr < mo + erro:
                 mo = np.tan(np.arctan(m) + self.dist_robos)
                 dm = np.tan(np.arctan(self.mr) + dd)
             elif self.mr > mo - erro: 
-                mo = (self.ponto_gol[1] - self.pos_robo_baixo[1])/(self.ponto_gol[0] - self.pos_robo_baixo[0])
+                # mo = (self.ponto_gol[1] - self.pos_robo_baixo[1])/(self.ponto_gol[0] - self.pos_robo_baixo[0])
                 mo = np.tan(np.arctan(m) + 2*self.dist_robos)
                 dm = np.tan(np.arctan(self.mr) - dd)
         else:
@@ -119,18 +119,7 @@ class RadialDefender(Strategy):
 
 
     def calcular_robo_cima(self):
-        for robot in self.match.robots:
-            
-            #print(self.name)
-            if "Defender" in robot.strategy.name:
-
-                if robot.get_name() != self.robot.get_name():
-                    self.pos_robo_cima = [robot.x,robot.y]
-                    self.pos_robo_baixo = [robot.x,robot.y]
-                    if robot.strategy.mr <= self.mr:
-                        self.robo_cima = True
-                    else:
-                        self.robo_cima = False
+        self.robo_cima = True
 
     def calcular_ponto_gol(self):
         velocidade_minima = 0.1
