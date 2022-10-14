@@ -270,7 +270,7 @@ class PushPotentialFieldPlanning(PlayerPlay):
     def start_up(self):
             super().start_up()
             controller = PID_control
-            controller_kwargs = {'max_speed': 2, 'max_angular': 4800, 'kd': 1, 'kp': 200}
+            controller_kwargs = {'max_speed': 2.2, 'max_angular': 8400, 'kd': 1.2,  'kp': 200}
             self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
@@ -491,32 +491,32 @@ class MainAttacker(Strategy):
         outside_defender_area_transition = OnInsideBox(self.match, [0, 0.35, 0.15, 0.4], True)
         stuck_transition = OnStuckTrigger(self.robot, 1/2)
         wait_transition = plays.WaitForTrigger(2/3)
-        corners_transition = OnCorners(self.match, [0.1, 1.65])
-        out_corners_transition = OnCorners(self.match, [0.1, 1.65], True)
+        corners_transition = OnCorners(self.match, [0.15, 1.65])
+        out_corners_transition = OnCorners(self.match, [0.15, 1.65], True)
         # goal_zone_transition = OnInsideBox(self.match, [1.85, 0.5, 0.4, 1.3 - 0.5])
         # out_goal_zone_transition = OnInsideBox(self.match, [1.85, 0.5, 0.4, 1.3 - 0.5], True)
 
         # Adiciona caminhos de ida e volta com transicoes
-        # astar.add_transition(next_to_ball_transition, push_potentialfield)
-        # astar.add_transition(stuck_transition, avoid_potentialfield)
-        # astar.add_transition(inside_defender_area_transition, wait_potentialfield)
+        astar.add_transition(next_to_ball_transition, push_potentialfield)
+        astar.add_transition(stuck_transition, avoid_potentialfield)
+        astar.add_transition(inside_defender_area_transition, wait_potentialfield)
         # astar.add_transition(goal_zone_transition, carry_potentialfield)
 
-        # push_potentialfield.add_transition(far_to_ball_transition, astar)
-        # push_potentialfield.add_transition(stuck_transition, avoid_potentialfield)
-        # push_potentialfield.add_transition(corners_transition, wing_potentialfield)
-        # push_potentialfield.add_transition(inside_defender_area_transition, wait_potentialfield)
+        push_potentialfield.add_transition(far_to_ball_transition, astar)
+        push_potentialfield.add_transition(stuck_transition, avoid_potentialfield)
+        push_potentialfield.add_transition(corners_transition, wing_potentialfield)
+        push_potentialfield.add_transition(inside_defender_area_transition, wait_potentialfield)
         # push_potentialfield.add_transition(goal_zone_transition, carry_potentialfield)
 
-        # avoid_potentialfield.add_transition(wait_transition, astar)
-        # wait_potentialfield.add_transition(outside_defender_area_transition, astar)
-        # wing_potentialfield.add_transition(out_corners_transition, push_potentialfield)
+        avoid_potentialfield.add_transition(wait_transition, astar)
+        wait_potentialfield.add_transition(outside_defender_area_transition, astar)
+        wing_potentialfield.add_transition(out_corners_transition, push_potentialfield)
 
         # carry_potentialfield.add_transition(out_goal_zone_transition, astar)
         
 
         # Estado inicial é o astar
-        self.playerbook.set_play(push_potentialfield)
+        self.playerbook.set_play(astar)
 
     def decide(self):
         res = self.playerbook.update()

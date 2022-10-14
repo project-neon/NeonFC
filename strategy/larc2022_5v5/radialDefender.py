@@ -92,11 +92,14 @@ class RadialDefender(Strategy):
         self.formar_barreira(m)
 
         #condição para tirar os robos da elipse caso a bola entre na pequena área
-        if self.match.ball.y > 0.7 and self.match.ball.y<1.1 and self.match.ball.x<0.3:
-            if self.robo_cima:
-                self.ponto_objetivo=[0.41,1.45]
-            else:
-                self.ponto_objetivo=[0.41,0.35]
+        # if self.match.ball.y > 0.7 and self.match.ball.y<1.1 and self.match.ball.x<0.3:
+        #     if self.robo_cima:
+        #         self.ponto_objetivo=[0.08, 1.05]
+        #     else:
+        #         self.ponto_objetivo=[0.08, 0.25]
+
+        
+        # print(self.robot.x, self.robot.y)
 
         return self.ponto_objetivo
     
@@ -105,17 +108,10 @@ class RadialDefender(Strategy):
         if self.robo_cima:
             if np.arctan(m) > limite:
               self.ponto_objetivo[0] = 0.00
-              self.ponto_objetivo[1] = 1.3
+              self.ponto_objetivo[1] = 1.05
             elif np.arctan(m) < -limite:
               self.ponto_objetivo[0] = 0.00
-              self.ponto_objetivo[1] = 0.5
-        else:
-            if np.arctan(m) > limite:
-              self.ponto_objetivo[0] = 0
-              self.ponto_objetivo[1] = 1.3
-            elif np.arctan(m) < -limite:
-              self.ponto_objetivo[0] = 0
-              self.ponto_objetivo[1] = 0.5
+              self.ponto_objetivo[1] = 0.25
 
 
     def calcular_robo_cima(self):
@@ -127,8 +123,8 @@ class RadialDefender(Strategy):
             if (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y > self.y_inicio_gol and (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y < self.y_final_gol:
                 self.ponto_gol[1] = (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y
             else:
-                self.ponto_gol[0] = self.ponto_g_5v5[0] #alterar para 3v3 e 5v5
-                self.ponto_gol[1] = self.ponto_g_5v5[1]
+                self.ponto_gol[0] = self.ponto_gol_3V3[0] #alterar para 3v3 e 5v5
+                self.ponto_gol[1] = self.ponto_gol_3V3[1]
         else:
-            self.ponto_gol[0] = self.ponto_g_5v5[0] #alterar para 3v3 e 5v5
-            self.ponto_gol[1] = self.ponto_g_5v5[1]
+            self.ponto_gol[0] = self.ponto_gol_3V3[0] #alterar para 3v3 e 5v5
+            self.ponto_gol[1] = self.ponto_gol_3V3[1]
