@@ -11,7 +11,7 @@ import time
 class PID_Test(Strategy):
     def __init__(self, match, plot_field=False):
         self.lt = time.time()
-        super().__init__(match, "PID_Test", controller=TwoSidesLQR)
+        super().__init__(match, "PID_Test", controller=PID_control)
 
         self.circuit = [(1.1, .40), (1.1, .90), (.4, .90), (.4, .40)]
         self.circuit = deque(self.circuit)
@@ -97,9 +97,9 @@ class PID_Test(Strategy):
 
         # #     return desired, desired_dl
 
-        # desired = self.next_point()
+        desired = self.next_point()
 
-        # return desired
+        return desired
 
         behaviour = self.field
 
