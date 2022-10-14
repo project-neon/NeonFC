@@ -24,17 +24,17 @@ class Midfielder(Strategy):
 
         self.defender = algorithms.fields.PotentialField(
             self.match,
-            name=f"{self.__class__}|DefenderBehaviour"
+            name = f"{self.__class__}|DefenderBehaviour"
         )
 
         self.push_ball = algorithms.fields.PotentialField(
             self.match,
-            name=f"{self.__class__}|PushBallBehaviour"
+            name = f"{self.__class__}|PushBallBehaviour"
         )
 
         self.recovery = algorithms.fields.PotentialField(
             self.match,
-            name=f"{self.__class__}|RecoveryBehaviour"
+            name = f"{self.__class__}|RecoveryBehaviour"
         )
 
         self.defender.add_field(
@@ -62,10 +62,10 @@ class Midfielder(Strategy):
         self.recovery.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target=(.25, .65),
-                radius=0.25,
-                decay=lambda x: x ** 2,
-                multiplier=.3
+                target = (.25, .65),
+                radius = 0.25,
+                decay = lambda x: x**2,
+                multiplier = .3
             )
         )
         
@@ -83,7 +83,7 @@ class Midfielder(Strategy):
         if ball_x == -1 or ball_y == -1:
             ball_x, ball_y = self.last_b_x, self.last_b_y
 
-        if ball.x < .375:
+        if ball_x < .375:
             self.pushing_ball = True
 
         if self.pushing_ball:
@@ -93,15 +93,12 @@ class Midfielder(Strategy):
             else:
                 behaviour = self.push_ball
         else:
-            if self.robot.x > .25 or self.robot.x < .15:
+            if self.robot.x > .30 or self.robot.x < .15:
                 behaviour = self.recovery
             else:
                 behaviour = self.defender
 
         if ball.x > 0 and ball.y > 0:
             self.last_b_x, self.last_b_y = ball.x, ball.y
-
-        print(behaviour.name)
         
         return behaviour.compute([self.robot.x, self.robot.y])
-

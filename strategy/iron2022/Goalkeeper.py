@@ -155,7 +155,7 @@ class Goalkeeper(Strategy):
         return behaviour.compute([self.robot.x, self.robot.y])
 
     # def update(self):
-    #     if self.robot.x <= .075 and (not -1.61 < self.robot.theta < -1.57 or not 1.57 < self.robot.theta < 1.61):
+    #     if self.g_right < self.robot.y < self.g_left and self.robot.x < .15 and (not -1.61 < self.robot.theta < -1.57 or not 1.57 < self.robot.theta < 1.61):
     #         w = abs(self.robot.theta) - 1.57
-    #         return 0, w
+    #         return 0, 10*w
     #     return self.controller.update()
