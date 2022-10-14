@@ -22,7 +22,7 @@
             "penalty_taker": "short_shot"
         }
     },
-    "referee": false,
+    "referee": true,
     "data_sender": false,
     "api": false
 }
