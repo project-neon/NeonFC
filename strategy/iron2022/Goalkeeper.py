@@ -40,7 +40,7 @@ class Goalkeeper(Strategy):
         self.pebas.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = lambda m: (0.1, m.ball.y),
+                target = lambda m: (0.075, m.ball.y),
                 theta = 0,
                 line_size = 0.1,
                 line_dist = 0.1,
@@ -52,7 +52,7 @@ class Goalkeeper(Strategy):
         self.left_edge.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = (0.05, self.g_left),
+                target = (0.075, self.g_left),
                 radius = 0.1,
                 decay = lambda x: x**2,
                 multiplier = .3
@@ -62,7 +62,7 @@ class Goalkeeper(Strategy):
         self.right_edge.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = (0.05, self.g_right),
+                target = (0.075, self.g_right),
                 radius = 0.1,
                 decay = lambda x: x**2,
                 multiplier = .3
@@ -72,8 +72,18 @@ class Goalkeeper(Strategy):
         self.push_ball.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target = lambda m: (0.05, m.ball.y),
+                target = lambda m: (0.075, m.ball.y),
                 radius = 0.1,
+                decay = lambda x: x**2,
+                multiplier = .3
+            )
+        )
+
+        self.recovery.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = (0.075, .65),
+                radius = 0.25,
                 decay = lambda x: x**2,
                 multiplier = .3
             )
@@ -99,6 +109,15 @@ class Goalkeeper(Strategy):
         else:
             behaviour = self.pebas
 
+        if self.robot.x > 0.075:
+            behaviour = self.recovery
+
         # print(self.robot.y)
 
         return behaviour.compute([self.robot.x, self.robot.y])
+
+    def update(self):
+        if self.robot.x <= .075 and (not -1.61 < self.robot.theta < -1.57 or not 1.57 < self.robot.theta < 1.61):
+            w = abs(self.robot.theta) - 1.57
+            return 0, w
+        return self.controller.update()
