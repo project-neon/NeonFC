@@ -9,8 +9,7 @@ from strategy.BaseStrategy import Strategy
 from controller import PID_control
 from commons import math as nfc_math
 
-from algorithms.astar.astart_voronoi import voronoi_astar
-from strategy.larc2022_5v5.commons import AstarPlanning, aim_projection_ball
+from strategy.larc2022_5v5.commons import AstarPlanning, LimitCyclePlanning, aim_projection_ball
 from strategy.utils.player_playbook import OnCorners, OnInsideBox, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
 
 def aim_behind_ball(strategy):
@@ -460,7 +459,7 @@ class MainAttacker(Strategy):
         astar.start()
 
         # Criando Potential Field
-        push_potentialfield = PushPotentialFieldPlanning(self.match, self.robot)
+        push_potentialfield = LimitCyclePlanning(self.match, self.robot)
         push_potentialfield.start()
 
         avoid_potentialfield = AvoidRobotsPlanning(self.match, self.robot)

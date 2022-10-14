@@ -1,4 +1,5 @@
 import math
+from controller import UniController
 
 def discriminant(a, b, c, o):
     '''
@@ -21,23 +22,24 @@ def filter_func(a, b, c, r, t, o):
     return discriminant(a, b, c, o) > 0 and dist(o, r) < dist(r, t) and dist(o, t) < dist(r, t)
 
 class LimitCycle(object):
-    def __init__(self, match, target_is_ball=True):
+    def __init__(self, strategy, target_is_ball=True):
         '''
         - obstacles:        list of the obstacles, not sorted yet
         - target_is_ball:   if the ball is the target, two virtual obstacles are added
                             to make the robot head to the goal when arriving
         '''
-        self.game = match.game
+        self.strategy = strategy
+        self.match = self.strategy.match
         self.target_is_ball = target_is_ball
 
-        if self.game.vision._fps:
-            self._fps = self.game.vision._fps
+        if self.match.game.vision._fps:
+            self._fps = self.match.game.vision._fps
         else:
             self._fps = 60
 
         self.dt = 1/self._fps
 
-        self.field_w, self.field_h = self.game.field.get_dimensions()
+        self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
     def contour(self, a, b, c, obst, idx=15):
         '''
@@ -68,6 +70,12 @@ class LimitCycle(object):
         ddy = -(d/abs(d))*dx + mlt*dy*(obst.r**2 - dx**2 - dy**2)
 
         '''
+        Unicontroller
+        '''
+        # if self.strategy.controller.__class__ is UniController:
+        #     return math.atan2(ddy, ddx)
+
+        '''
         PID_Control
         '''
         return (self.robot.x + self.dt*ddx, self.robot.y + self.dt*ddy)
@@ -91,6 +99,10 @@ class LimitCycle(object):
         '''
         self.obstacles = list(filter(lambda o: filter_func(a, b, c, self.robot, self.target, o), self.obstacles))
 
+        '''
+        todo: remove the addition of virtual obstacles conditional from here,
+              this is up to the strategy not part of the algorithm itself
+        '''
         if self.target_is_ball:
             '''
             - m:    angle of the line perpendicular to the line between the ball and
@@ -103,7 +115,7 @@ class LimitCycle(object):
             '''
             j = math.atan2(self.field_h/2 - self.target.y, self.field_w - self.target.x)
             m = j + math.pi/2
-            p = 0.05
+            p = 0.1
 
             r = (.0427/2)
 
@@ -111,7 +123,7 @@ class LimitCycle(object):
             the terms r*cos(j) and r*sin(j) are subtracted to move
             the center of the obstacles behind the ball instead of its center
             '''
-            if self.robot.y < j*(self.robot.x - self.target.x) + self.target.y:
+            if self.robot.y < math.tan(j)*(self.robot.x - self.target.x) + self.target.y:
                 vo = Obstacle(self.target.x - p*math.cos(m) - r*math.cos(j), self.target.y - p*math.sin(m) - r*math.sin(j), p, side="R", is_vo=True)
             else:
                 vo = Obstacle(self.target.x + p*math.cos(m) - r*math.cos(j), self.target.y + p*math.sin(m) - r*math.sin(j), p, side="L", is_vo=True)
@@ -126,19 +138,16 @@ class LimitCycle(object):
             return self.contour(a, b, c, self.obstacles[0])
 
         else:
-            if self.target_is_ball:
-                return self.contour(a, b, c, vo, 10)
 
-            else:
-                dx = self.target.x - self.robot.x
-                r_x = self.robot.x + self.dt*(dx/abs(dx))
-                r_y = (-a*r_x - c)/b
+            dx = self.target.x - self.robot.x
+            r_x = self.robot.x + self.dt*(dx/abs(dx))
+            r_y = (-a*r_x - c)/b
 
-                # if self.strategy.controller.__class__ is UniController:
-                #     dy = self.target.y - self.robot.y
-                #     return math.atan2(dy, dx)
+            if self.strategy.controller.__class__ is UniController:
+                dy = self.target.y - self.robot.y
+                return math.atan2(dy, dx)
 
-                return (r_x, r_y)
+            return (r_x, r_y)
 
 class Point(object):
     def __init__(self, x, y):

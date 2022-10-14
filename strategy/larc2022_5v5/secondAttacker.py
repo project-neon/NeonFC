@@ -19,7 +19,7 @@ class DefendPlanning(PlayerPlay):
     def start_up(self):
         super().start_up()
         controller = PID_control
-        controller_kwargs = {'max_speed': 2.5, 'max_angular': 3600, 'kp': 180}
+        controller_kwargs = {'max_speed': 2, 'max_angular': 3600, 'kp': 140}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def start(self):
@@ -35,7 +35,7 @@ class DefendPlanning(PlayerPlay):
                     m.ball.x + (math.cos(math.pi/3) if (m.ball.y < r.y) else math.cos(5*math.pi/3)) * 0.1,
                     m.ball.y + (math.sin(math.pi/3) if (m.ball.y < r.y) else math.sin(5*math.pi/3)) * 0.1
                 ),                                                                                                                                                                                                                                                                                                                                          
-                radius = 0.04,
+                radius = 0.1,
                 radius_max = 2,
                 clockwise = lambda m, r=self.robot: (m.ball.y < r.y),
                 decay=lambda x: 1,
@@ -190,7 +190,7 @@ class SecondAttacker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
+        self.playerbook = PlayerPlaybook(self.match.coach, self.robot, True)
 
         field_dim = self.match.game.field.get_dimensions()
 

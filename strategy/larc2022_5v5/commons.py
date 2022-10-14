@@ -1,6 +1,9 @@
 import math
 from algorithms.astar.astart_voronoi import voronoi_astar
+from algorithms.limit_cycle.limit_cycle import Obstacle, Point
 from algorithms.potential_fields import fields
+from algorithms.limit_cycle import LimitCycle
+from controller.PID_control import PID_control
 from controller.simple_LQR import TwoSidesLQR
 from strategy.utils.player_playbook import PlayerPlay
 
@@ -87,5 +90,103 @@ class AstarPlanning(PlayerPlay):
     def update(self):
         robot_pos = [self.robot.x, self.robot.y]
         res = self.astar.compute(robot_pos)
-        
+
         return res
+
+
+class LimitCyclePlanning(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(
+            match, 
+            robot
+        )
+
+        self.limit_cycle = LimitCycle(self, True)
+        self.BALL_Y_MAX = 1.25
+        self.BALL_Y_MIN = 0.25
+
+        self.dl = 0.000001
+        self.shooting_momentum = 0
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs = {}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+        self.shooting_momentum = 0
+
+    def update_momentum(self):
+        angle_between = lambda p1, p2 : math.atan2(p2[1] - p1[1], p2[0] - p1[0])
+        dist = lambda p1, p2: ((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)**.5
+
+        theta = self.robot.theta
+        x = self.robot.x
+        y = self.robot.y
+        ball = [self.match.ball.x, self.match.ball.y]
+        goal = [1.5, .65]
+
+        # diference between robot angle and (ball-robot) angle
+        c1v = abs(theta - angle_between([x, y], ball))
+        c1 = c1v <= .4 or abs(c1v - math.pi) <= .4
+
+        # diference between robot angle and (goal-robot) angle
+        c2v = abs(theta - angle_between([x, y], goal)) #<= .5
+        c2 = c2v <= .4 or abs(c2v - math.pi) <= .4
+
+        # distance between ball and robot
+        c3 = dist([x, y], ball) <= .25
+
+        if c3:
+            print(f"{c1v=}, {c2v=}")
+            print(c1, c2, c3)
+
+        if c1 and c2 and c3:
+            self.shooting_momentum = 100 * dist([x, y], goal)
+
+    def start(self):
+        pass
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Limit Cycle Planning>"
+
+    def update(self):
+
+        return self.decide()
+
+    def decide(self):
+        x = self.robot.x
+        y = self.robot.y
+
+        ball_virtual_y = max(self.BALL_Y_MIN, min(self.BALL_Y_MAX, self.match.ball.y))
+
+        robot = Point(x, y)
+        target = Point(self.match.ball.x, ball_virtual_y)
+
+        if not (0 <= target.x <= 1.5) and not (0 <= target.y <= 1.3):
+            target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
+
+        boundaries = [
+            Obstacle(r.x, r.y, 0.05) for r in self.match.robots + self.match.opposites if r.get_name() != self.robot.get_name()
+        ]
+
+        boundaries += [
+            Obstacle(self.robot.x, 0, 0.01),
+            Obstacle(self.robot.x, self.match.game.field.get_dimensions()[1], 0.01),
+            Obstacle(self.match.game.field.get_dimensions()[0], self.robot.y, 0.01),
+            Obstacle(self.match.game.field.get_dimensions()[0], 0, 0.01),
+        ]
+
+        self.limit_cycle.update(robot, target, [*boundaries])
+        desired = self.limit_cycle.compute()
+
+        self.update_momentum()
+        if self.shooting_momentum > 0:
+            self.control_linear_speed = False
+            desired = [1.5, .65]
+            self.shooting_momentum -= 1
+        else:
+            self.control_linear_speed = True
+            self.lp = [self.match.ball.x, self.match.ball.y]
+
+        return desired

@@ -52,8 +52,10 @@ class RadialDefender(Strategy):
         self.calcular_ponto_gol()
         px = self.ponto_gol[0]
         py = self.ponto_gol[1]
+        
         b = self.b
         a = self.a
+
         dd = 0.3 #distancia angular do robo e o ponto próximo
         erro = 0.1
         
