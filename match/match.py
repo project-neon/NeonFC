@@ -10,9 +10,11 @@ CATEGORIES = {
 }
 
 class Match(object):
-    def __init__(self, game, team_side, team_color, coach_name=None, category="3v3"):
+    def __init__(self, game, team_side, team_color, coach_name=None, category="3v3", coach_parameters={}):
         super().__init__()
         self.game = game
+
+        self.coach_parameters = coach_parameters
         
         self.coach_name = os.environ.get('COACH_NAME', coach_name) 
         self.team_side = os.environ.get('TEAM_SIDE', team_side) 
@@ -37,7 +39,7 @@ class Match(object):
             entities.Robot(self.game, i, self.team_color) for i in range(self.n_robots)
         ]
 
-        self.coach = entities.coach.COACHES[self.coach_name](self)
+        self.coach = entities.coach.COACHES[self.coach_name](self, self.coach_parameters)
         print(f"Match started! coach is [{self.coach.NAME}]")
         self.coach.decide()
 

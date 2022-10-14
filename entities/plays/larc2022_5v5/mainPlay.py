@@ -1,4 +1,3 @@
-import math
 import strategy
 from entities.plays.playbook import Play
 
@@ -24,8 +23,13 @@ class MainPlay(Play):
     def update(self):
         super().update()
 
-        self.match.robots[0].strategy = self.strategies[0]
-        self.match.robots[1].strategy = self.strategies[1]
-        self.match.robots[2].strategy = self.strategies[2]
-        self.match.robots[3].strategy = self.strategies[3]
-        self.match.robots[4].strategy = self.strategies[4]
+        for robot, strategy in zip(self.match.robots, self.strategies):
+            if robot.strategy is None:
+                robot.strategy = strategy
+                robot.start()
+            elif robot.strategy.name != strategy.name:
+                robot.strategy = strategy
+                robot.start()
+
+
+            
