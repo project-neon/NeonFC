@@ -1,4 +1,5 @@
 import math
+import os
 import random
 
 from entities.plays.larc2022_5v5.mainPlay import MainPlay
@@ -15,7 +16,7 @@ class PenaltyPlay(MainPlay):
         self.match = self.coach.match
         self.coach = coach
 
-        self.penalty_taker = penalty_taker
+        self.penalty_taker = os.environ.get('PENALTY_TAKER', penalty_taker) 
         self.PENALTY_TAKER_ID = 4
 
         if self.penalty_taker == 'long_shot':

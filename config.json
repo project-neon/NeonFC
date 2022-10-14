@@ -14,10 +14,13 @@
         "api_recv_port": 43211
     },
     "match" : {
-        "team_side": "right",
-        "team_color": "yellow",
-        "coach_name": "CBFRS_2022",
-        "category": "3v3"
+        "team_side": "left",
+        "team_color": "blue",
+        "coach_name": "LARC_2022_5V5",
+        "category": "5v5",
+        "coach_parameters": {
+            "penalty_taker": "long_shot"
+        }
     },
     "referee": true,
     "data_sender": false,

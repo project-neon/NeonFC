@@ -17,7 +17,7 @@ class PushPotentialFieldPlanning(PlayerPlay):
     def start_up(self):
             super().start_up()
             controller = PID_control
-            controller_kwargs = {'max_speed': 2, 'max_angular': 4800}
+            controller_kwargs = {'max_speed': 3, 'max_angular': 4800}
             self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
