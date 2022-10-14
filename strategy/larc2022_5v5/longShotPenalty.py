@@ -41,12 +41,20 @@ class LongShotPenaltyTaker(Strategy):
         shoot_side = random.choice([-1, 1])
         field_size = self.match.game.field.get_dimensions()
 
-        return {
-            "robot_id": self.robot.robot_id, 
-            "x": field_size[0]/2 - 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
-            "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
-            "orientation": - shoot_side * angle_of_interest
-        }
+        if self.match.team_color == "blue":
+            return {
+                    "robot_id": 4, 
+                    "x": field_size[0]/2 - 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                    "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
+                    "orientation": - shoot_side * angle_of_interest
+                }
+        else:
+            return {
+                    "robot_id": 4, 
+                    "x": - field_size[0]/2 + 0.375 + math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                    "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
+                    "orientation": + shoot_side * angle_of_interest
+                }
 
 
     def decide(self):

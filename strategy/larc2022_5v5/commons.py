@@ -111,7 +111,7 @@ class LimitCyclePlanning(PlayerPlay):
     def start_up(self):
         super().start_up()
         controller = PID_control
-        controller_kwargs = {}
+        controller_kwargs = {'max_speed': 2.5, 'max_angular': 2400}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
         self.shooting_momentum = 0
@@ -167,7 +167,7 @@ class LimitCyclePlanning(PlayerPlay):
             target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
 
         boundaries = [
-            Obstacle(r.x, r.y, 0.05) for r in self.match.robots + self.match.opposites if r.get_name() != self.robot.get_name()
+            Obstacle(r.x, r.y, 0.075) for r in self.match.robots + self.match.opposites if r.get_name() != self.robot.get_name()
         ]
 
         boundaries += [
@@ -175,6 +175,10 @@ class LimitCyclePlanning(PlayerPlay):
             Obstacle(self.robot.x, self.match.game.field.get_dimensions()[1], 0.01),
             Obstacle(self.match.game.field.get_dimensions()[0], self.robot.y, 0.01),
             Obstacle(self.match.game.field.get_dimensions()[0], 0, 0.01),
+        ]
+
+        boundaries += [
+            Obstacle(0, self.match.game.field.get_dimensions()[1]/2, 0.40),
         ]
 
         self.limit_cycle.update(robot, target, [*boundaries])

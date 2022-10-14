@@ -20,11 +20,11 @@ class RadialDefender(Strategy):
     def __init__(self, match, name):
         controller_args = {
             'max_speed':2,
-            'max_angular':9000, 
+            'max_angular':8400, 
             'krho':10, 
             'kp':200,
             'ki': 0,
-            'kd': 0,
+            'kd': 1,
         }
         super().__init__(match, name, PID_control, controller_args)
 

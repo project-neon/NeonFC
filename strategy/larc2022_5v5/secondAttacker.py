@@ -67,6 +67,23 @@ class DefendPlanning(PlayerPlay):
             )
         )
 
+        for robot in self.match.robots:
+            if robot.get_name() == self.robot.get_name():
+                continue
+            self.defend.add_field(
+                fields.PointField(
+                    self.match,
+                    target = lambda m, r=robot: (
+                        r.x,
+                        r.y
+                    ),
+                    radius = .3,
+                    radius_max = .3,
+                    decay = lambda x: -1,
+                    multiplier = 1
+                )
+            )
+
     def get_name(self):
         return f"<{self.robot.get_name()} Defend Potential Field Planning>"
 
@@ -190,7 +207,7 @@ class SecondAttacker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        self.playerbook = PlayerPlaybook(self.match.coach, self.robot, True)
+        self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
         field_dim = self.match.game.field.get_dimensions()
 

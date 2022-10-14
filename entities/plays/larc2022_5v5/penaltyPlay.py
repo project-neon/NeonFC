@@ -7,7 +7,7 @@ import strategy
 from strategy.larc2022_5v5.shortShotPenaltyTaker import ShortShotPenaltyTaker
 from strategy.larc2022_5v5.longShotPenalty import LongShotPenaltyTaker
 
-PENALTY_TAKER_ID = 4
+
 
 class PenaltyPlay(MainPlay):
     def __init__(self, coach, penalty_taker):
@@ -16,6 +16,7 @@ class PenaltyPlay(MainPlay):
         self.coach = coach
 
         self.penalty_taker = penalty_taker
+        self.PENALTY_TAKER_ID = 4
 
         if self.penalty_taker == 'long_shot':
             self.gk = LongShotPenaltyTaker(self.match)
@@ -39,10 +40,9 @@ class PenaltyPlay(MainPlay):
         replacements = self.coach._get_positions(foul, team_color, foul_color, quadrant)
 
         if foul == "PENALTY_KICK" and foul_color == team_color:
-            kicker_pos = list(filter(lambda r: r["robot_id"] == PENALTY_TAKER_ID, replacements))
+            kicker_pos = list(filter(lambda r: r["robot_id"] == self.PENALTY_TAKER_ID, replacements))
             if len(kicker_pos):
                 replacements.remove(kicker_pos[0])
-            field_size = self.match.game.field.get_dimensions()
             if team_color  == "BLUE":
                 replacements.append(
                     self.gk.get_position()
