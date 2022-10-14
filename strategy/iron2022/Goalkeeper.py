@@ -15,6 +15,9 @@ class Goalkeeper(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
+        def get_project(m):
+            pass
+
         self.pebas = algorithms.fields.PotentialField(
             self.match,
             name=f"{self.__class__}|PebasBehaviour"
@@ -38,6 +41,11 @@ class Goalkeeper(Strategy):
         self.push_ball = algorithms.fields.PotentialField(
             self.match,
             name=f"{self.__class__}|PushBallBehaviour"
+        )
+
+        self.rest = algorithms.fields.PotentialField(
+            self.match,
+            name=f"{self.__class__}|RestBehaviour"
         )
 
         self.repel = algorithms.fields.LineField(
@@ -103,10 +111,21 @@ class Goalkeeper(Strategy):
             )
         )
 
+        self.rest.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = (self.gk_x, .65),
+                radius = 0.1,
+                decay = lambda x: x**2,
+                multiplier = .3
+            )
+        )
+
         self.pebas.add_field(self.repel)
         self.recovery.add_field(self.repel)
         self.right_edge.add_field(self.repel)
         self.left_edge.add_field(self.repel)
+        self.rest.add_field(self.repel)
 
     def reset(self, robot=None):
         super().reset()
