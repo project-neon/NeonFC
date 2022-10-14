@@ -137,9 +137,8 @@ class LimitCyclePlanning(PlayerPlay):
         # distance between ball and robot
         c3 = dist([x, y], ball) <= .25
 
-        if c3:
-            print(f"{c1v=}, {c2v=}")
-            print(c1, c2, c3)
+        # if c3:
+        #     print(c1, c2, c3)
 
         if c1 and c2 and c3:
             self.shooting_momentum = 100 * dist([x, y], goal)
