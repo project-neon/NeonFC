@@ -1,14 +1,15 @@
 from strategy.BaseStrategy import Strategy
 from controller.uni_controller import UniController
+from controller import PID_control
 from algorithms import UnivectorField
 import math
 
 
 class Attacker(Strategy):
     def __init__(self, match, name="UVF_Test_2"):
-        super().__init__(match, name=name, controller=UniController)
+        super().__init__(match, name=name, controller=PID_control)
         self.dl = 0.000001
-        self.field = UnivectorField(n=6, rect_size=.0, plot=True, path="uvf_plot.json")
+        self.field = UnivectorField(n=6, rect_size=.2)
         self.shooting_momentum = 0
 
     def start(self, robot=None):
@@ -43,16 +44,15 @@ class Attacker(Strategy):
             self.field.set_target(g, r)
 
         self.field.del_obstacle(all=True)
-        for robot in self.match.robots:
-            if (robot.x, robot.y) != (x, y) and (robot.x, robot.y) != (0, 0):
-                self.field.add_obstacle(
-                    (robot.x, robot.y),
-                    0.075 * 1.4,
-                    0.075 * 1.4
-                )
+        # for robot in self.match.robots:
+        #     if (robot.x, robot.y) != (x, y) and (robot.x, robot.y) != (0, 0):
+        #         self.field.add_obstacle(
+        #             (robot.x, robot.y),
+        #             0.075 * 1.4,
+        #             0.075 * 1.4
+        #         )
 
         theta_d = self.field((x, y))
-        theta_f = self.field((x + self.dl * math.cos(theta), y + self.dl * math.sin(theta)))
 
         g = g if 0 <= g[0] <= 1.5 and 0 <= g[1] <= 1.3 else self.field.g
         if self.position_to_shoot(g, theta_d):
@@ -63,9 +63,8 @@ class Attacker(Strategy):
             g = (1.5, .65)
             self.field.set_target(g, g)
             theta_d = self.field((x, y))
-            theta_f = self.field((x + self.dl * math.cos(theta), y + self.dl * math.sin(theta)))
             self.shooting_momentum -= 1
 
-        self.field.save()
-
-        return theta_d, theta_f
+        desired = [math.cos(theta_d)+x, math.sin(theta_d)+y]
+        print("saaa", desired)
+        return desired
