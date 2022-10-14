@@ -26,12 +26,12 @@ class PID_control(object):
         self.dt = 1/self.default_fps
 
         # Control params
-        self.K_RHO = .1 # Linear speed gain
+        self.K_RHO = .05 # Linear speed gain
 
         # PID of angular speed
-        self.KP = -500 # Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KP = -580 # Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
         self.KI = 0 # Parameter(0, 'pid_tuner', 'ki') # Integral gain of w
-        self.KD = 0 # Parameter(-7.5, 'pid_tuner', 'kd') # Derivative gain of w
+        self.KD = -1 # Parameter(-7.5, 'pid_tuner', 'kd') # Derivative gain of w
 
         # PID params for error
         self.dif_alpha = 0 # diferential param

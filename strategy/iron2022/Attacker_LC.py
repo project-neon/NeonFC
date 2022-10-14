@@ -54,7 +54,7 @@ class Attacker_LC(Strategy):
         c2 = c2v <= .4 or abs(c2v - math.pi) <= .4
 
         # distance between ball and robot
-        c3 = dist([x, y], ball) <= .25
+        c3 = dist([x, y], ball) <= .15
 
         # check if all is between goal and robot
         c4 = ball[0] > self.robot.x
@@ -64,9 +64,9 @@ class Attacker_LC(Strategy):
             print(c1, c2, c3)
 
         if c1 and c2 and c3 and c4:
-            self.shooting_momentum = 100 * dist([x, y], goal)
+            self.shooting_momentum = 120 * dist([x, y], goal)
 
-        elif ball == [-1, -1]:
+        elif ball != [-1, -1]:
             self.shooting_momentum -= 30
 
     def decide(self):
@@ -90,10 +90,13 @@ class Attacker_LC(Strategy):
         self.update_momentum()
         if self.shooting_momentum > 0:
             print("kicking ------------------")
-            self.controller.control_linear_speed = False
+            self.controller.K_RHO = -10
+            self.controller.lp = [1.5, .65]
+            self.controller.control_linear_speed = True
             desired = [1.5, .65]
             self.shooting_momentum -= 1
         else:
+            self.controller.K_RHO = 0.05
             self.controller.control_linear_speed = True
             self.controller.lp = [self.match.ball.x, self.match.ball.y]
 

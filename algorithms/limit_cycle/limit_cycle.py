@@ -114,7 +114,9 @@ class LimitCycle(object):
             - m:    the normal angle perpendicular to j
             - r:    radius of the ball
             '''
-            j = math.atan2(self.field_h/2 - self.target.y, self.field_w - self.target.x)
+            aim_point = [self.field_h/2, self.field_w]
+
+            j = math.atan2(aim_point[0] - self.target.y, aim_point[1] - self.target.x)
             m = j + math.pi/2
             p = 0.1
 
