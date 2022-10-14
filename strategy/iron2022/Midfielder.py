@@ -16,6 +16,8 @@ class Midfielder(Strategy):
         self.ga_lwr = .3
 
         self.pushing_ball = False
+        self.last_b_x = 0
+        self.last_b_y = 0
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -28,6 +30,11 @@ class Midfielder(Strategy):
         self.push_ball = algorithms.fields.PotentialField(
             self.match,
             name=f"{self.__class__}|PushBallBehaviour"
+        )
+
+        self.recovery = algorithms.fields.PotentialField(
+            self.match,
+            name=f"{self.__class__}|RecoveryBehaviour"
         )
 
         self.defender.add_field(
@@ -51,6 +58,16 @@ class Midfielder(Strategy):
                 multiplier = .5
             )
         )
+
+        self.recovery.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target=(.25, .65),
+                radius=0.25,
+                decay=lambda x: x ** 2,
+                multiplier=.3
+            )
+        )
         
     def reset(self, robot=None):
         super().reset()
@@ -61,19 +78,30 @@ class Midfielder(Strategy):
         behaviour = None
 
         ball = self.match.ball
+        ball_x, ball_y = ball.x, ball.y
+
+        if ball_x == -1 or ball_y == -1:
+            ball_x, ball_y = self.last_b_x, self.last_b_y
 
         if ball.x < .375:
             self.pushing_ball = True
 
         if self.pushing_ball:
-            if self.robot.x >= .575:
+            if ball_x >= .575 or ball_x < .15:
                 self.pushing_ball = False
                 behaviour = self.defender
             else:
                 behaviour = self.push_ball
         else:
-            behaviour = self.defender
+            if self.robot.x > .25 or self.robot.x < .15:
+                behaviour = self.recovery
+            else:
+                behaviour = self.defender
 
+        if ball.x > 0 and ball.y > 0:
+            self.last_b_x, self.last_b_y = ball.x, ball.y
+
+        print(behaviour.name)
         
         return behaviour.compute([self.robot.x, self.robot.y])
 
