@@ -26,10 +26,10 @@ class PID_control(object):
         self.dt = 1/self.default_fps
 
         # Control params
-        self.K_RHO = 2 # Linear speed gain
+        self.K_RHO = .1 # Linear speed gain
 
         # PID of angular speed
-        self.KP = -400 # Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KP = -500 # Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
         self.KI = 0 # Parameter(0, 'pid_tuner', 'ki') # Integral gain of w
         self.KD = 0 # Parameter(-7.5, 'pid_tuner', 'kd') # Derivative gain of w
 
@@ -39,10 +39,10 @@ class PID_control(object):
         self.alpha_old = 0 # stores previous iteration alpha
 
         # Max speeds for the robot
-        self.v_max = 200 # 40 # linear speed
+        self.v_max = 150 # 40 # linear speed
         self.w_max = 500 # math.radians(7200) # angular speed rad/
 
-        self.v_min = 30
+        self.v_min = 65
         self.control_linear_speed = False
         self.lp = [0, 0]
 

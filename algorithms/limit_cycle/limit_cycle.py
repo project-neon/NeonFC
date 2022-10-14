@@ -80,7 +80,8 @@ class LimitCycle(object):
         '''
         return (self.robot.x + self.dt*ddx, self.robot.y + self.dt*ddy)
 
-    def update(self, robot, target, obstacles):
+    def update(self, robot, target, obstacles, target_is_ball=True):
+        self.target_is_ball = target_is_ball
         self.robot = robot
         self.target = target
         self.obstacles = obstacles
@@ -117,7 +118,7 @@ class LimitCycle(object):
             m = j + math.pi/2
             p = 0.1
 
-            r = (.0427/2)
+            r = .1#(.0427/2)
 
             '''
             the terms r*cos(j) and r*sin(j) are subtracted to move

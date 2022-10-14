@@ -8,8 +8,8 @@ class Attacker_LC(Strategy):
     def __init__(self, match, plot_field=False):
         super().__init__(match, "Limit_Cycle_Attacker", controller=PID_control)
 
-        self.BALL_Y_MAX = 1.25
-        self.BALL_Y_MIN = 0.25
+        self.BALL_Y_MAX = 1.2
+        self.BALL_Y_MIN = 0.3
 
         self.dl = 0.000001
         self.shooting_momentum = 0
@@ -56,28 +56,32 @@ class Attacker_LC(Strategy):
         # distance between ball and robot
         c3 = dist([x, y], ball) <= .25
 
+        # check if all is between goal and robot
+        c4 = ball[0] > self.robot.x
+
         if c3:
             print(f"{c1v=}, {c2v=}")
             print(c1, c2, c3)
 
-        if c1 and c2 and c3:
-            self.shooting_momentum = 100 * dist([x, y], goal)
+        if c1 and c2 and c3 and c4:
+            self.shooting_momentum = 60 * dist([x, y], goal)
 
     def decide(self):
         x = self.robot.x
         y = self.robot.y
+        print('posssss', x, y)
 
         ball_virtual_y = max(self.BALL_Y_MIN, min(self.BALL_Y_MAX, self.match.ball.y))
 
         robot = Point(x, y)
-        target = Point(self.match.ball.x, ball_virtual_y)
+        target = Point(self.match.ball.x, self.match.ball.y)
 
         if not (0 <= target.x <= 1.5) and not (0 <= target.y <= 1.3):
             target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
 
-        boundaries = [Obstacle(x-.2, 0, r=.2), Obstacle(x-.2, 1.3, r=.2), Obstacle(0, y, r=.2), Obstacle(1.5, y, r=.2)]
+        #boundaries = [Obstacle(x-.2, 0, r=.2), Obstacle(x-.2, 1.3, r=.2), Obstacle(0, y, r=.2), Obstacle(1.5, y, r=.2)]
 
-        self.limit_cycle.update(robot, target, [*boundaries])
+        self.limit_cycle.update(robot, target, [])#, [*boundaries])
         desired = self.limit_cycle.compute()
 
         self.update_momentum()
@@ -89,5 +93,17 @@ class Attacker_LC(Strategy):
         else:
             self.controller.control_linear_speed = True
             self.controller.lp = [self.match.ball.x, self.match.ball.y]
+
+        bound_r = .15
+
+        if self.match.ball.y >= self.BALL_Y_MAX:
+            v_o = Obstacle(self.match.ball.x, self.BALL_Y_MAX + bound_r, r=bound_r)
+            self.limit_cycle.update(robot, target, [v_o], target_is_ball=False)
+            desired = self.limit_cycle.compute()
+
+        if self.match.ball.y <= self.BALL_Y_MIN:
+            v_o = Obstacle(self.match.ball.x, self.BALL_Y_MIN - bound_r, r=bound_r)
+            self.limit_cycle.update(robot, target, [v_o], target_is_ball=False)
+            desired = self.limit_cycle.compute()
 
         return desired
