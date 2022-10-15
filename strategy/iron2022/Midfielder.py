@@ -44,7 +44,7 @@ class Midfielder(Strategy):
                 theta = 0,
                 line_size = 0.1,
                 line_dist = 0.1,
-                multiplier = 0.5,
+                multiplier = 0.7,
                 decay = lambda x : x**3
             )
         )
@@ -55,17 +55,17 @@ class Midfielder(Strategy):
                 target = lambda m: (m.ball.x, m.ball.y),
                 radius = 0.1,
                 decay = lambda x: x,
-                multiplier = .5
+                multiplier = .7
             )
         )
 
         self.recovery.add_field(
             algorithms.fields.PointField(
                 self.match,
-                target=(.25, .65),
+                target=(.35, .65),
                 radius=0.25,
                 decay=lambda x: x ** 2,
-                multiplier=.3
+                multiplier=.7
             )
         )
         

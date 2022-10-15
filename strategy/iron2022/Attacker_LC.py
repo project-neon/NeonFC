@@ -64,7 +64,7 @@ class Attacker_LC(Strategy):
             print(c1, c2, c3)
 
         if c1 and c2 and c3 and c4:
-            self.shooting_momentum = 120 * dist([x, y], goal)
+            self.shooting_momentum = 200 * dist([x, y], goal)
 
         elif ball != [-1, -1]:
             self.shooting_momentum -= 30
@@ -77,7 +77,8 @@ class Attacker_LC(Strategy):
         ball_virtual_y = max(self.BALL_Y_MIN, min(self.BALL_Y_MAX, self.match.ball.y))
 
         robot = Point(x, y)
-        target = Point(self.match.ball.x, self.match.ball.y)
+        dt = .2*((x - self.match.ball.x)**2 + (y - self.match.ball.y)**2)**.5
+        target = Point(self.match.ball.x+self.match.ball.vx*dt, self.match.ball.y+self.match.ball.vy*dt)
 
         if not (0 <= target.x <= 1.5) and not (0 <= target.y <= 1.3):
             target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
@@ -92,12 +93,12 @@ class Attacker_LC(Strategy):
             print("kicking ------------------")
             self.controller.K_RHO = -10
             self.controller.lp = [1.5, .65]
-            self.controller.control_linear_speed = True
+            self.controller.control_linear_speed = False
             desired = [1.5, .65]
             self.shooting_momentum -= 1
         else:
             self.controller.K_RHO = 0.05
-            self.controller.control_linear_speed = True
+            self.controller.control_linear_speed = False
             self.controller.lp = [self.match.ball.x, self.match.ball.y]
 
         bound_r = .15

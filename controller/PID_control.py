@@ -29,9 +29,9 @@ class PID_control(object):
         self.K_RHO = .05 # Linear speed gain
 
         # PID of angular speed
-        self.KP = -580 # Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KP = -350 # Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
         self.KI = 0 # Parameter(0, 'pid_tuner', 'ki') # Integral gain of w
-        self.KD = -1 # Parameter(-7.5, 'pid_tuner', 'kd') # Derivative gain of w
+        self.KD = 0# Parameter(-7.5, 'pid_tuner', 'kd') # Derivative gain of w
 
         # PID params for error
         self.dif_alpha = 0 # diferential param
@@ -40,9 +40,9 @@ class PID_control(object):
 
         # Max speeds for the robot
         self.v_max = 150 # 40 # linear speed
-        self.w_max = 500 # math.radians(7200) # angular speed rad/
+        self.w_max = 550 # math.radians(7200) # angular speed rad/
 
-        self.v_min = 65
+        self.v_min = 80
         self.control_linear_speed = False
         self.lp = [0, 0]
 
@@ -94,9 +94,9 @@ class PID_control(object):
         v = min(self.v_min + self.K_RHO*rho, self.v_max) if self.control_linear_speed else self.v_max
 
         """Objective behind the robot"""
-        if(abs(alpha) > math.pi/2):
-            v = -v
-            alpha = angle_adjustment(alpha - math.pi)
+        # if(abs(alpha) > math.pi/2):
+        #     v = -v
+        #     alpha = angle_adjustment(alpha - math.pi)
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha

@@ -120,7 +120,7 @@ class LimitCycle(object):
             m = j + math.pi/2
             p = 0.1
 
-            r = (.0427+0.075)/2
+            r =  .02 #(.0427)/2
 
             '''
             the terms r*cos(j) and r*sin(j) are subtracted to move
