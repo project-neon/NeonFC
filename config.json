@@ -14,8 +14,8 @@
         "api_recv_port": 43211
     },
     "match" : {
-        "team_side": "right",
-        "team_color": "yellow",
+        "team_side": "left",
+        "team_color": "blue",
         "coach_name": "LARC_2022_5V5",
         "category": "3v3",
         "coach_parameters": {

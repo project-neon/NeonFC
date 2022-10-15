@@ -18,10 +18,14 @@ class Coach(BaseCoach):
         goalkick_play = plays.larc2021.GoalKickPlay(self) # Add later this play to larc2022 5v5 package in plays
         freeball_play = plays.larc2021.FreeballPlay(self) # Add later this play to larc2022 5v5 package in plays
 
+        def_freeball_play = plays.larc2021.DefFreeballPlay(self) # Add later this play to larc2022 5v5 package in plays
+
         penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.team_color)
         defend_penalty_trigger = plays.OnPenaltyKick(self.match.game.referee, self.match.opposite_team_color)
         goalkick_trigger = plays.OnGoalKick(self.match.game.referee, self.match.team_color)
         freeball_trigger = plays.OnFreeBall(self.match.game.referee, self.match.team_color)
+
+        deffreeball_trigger = plays.OnFreeBallDef(self.match.game.referee, self.match.team_color)
 
         penalty_seconds_trigger = plays.WaitForTrigger(10)
         defendpenalty_seconds_trigger = plays.WaitForTrigger(9)
@@ -33,6 +37,7 @@ class Coach(BaseCoach):
         self.playbook.add_play(defend_penalty_play)
         self.playbook.add_play(goalkick_play)
         self.playbook.add_play(freeball_play)
+        self.playbook.add_play(def_freeball_play)
 
         main_play.add_transition(penalty_trigger, penalty_play)
         penalty_play.add_transition(penalty_seconds_trigger, main_play)
@@ -45,6 +50,9 @@ class Coach(BaseCoach):
 
         main_play.add_transition(freeball_trigger, freeball_play)
         freeball_play.add_transition(freeball_seconds_trigger, main_play)
+
+        main_play.add_transition(deffreeball_trigger, def_freeball_play)
+        def_freeball_play.add_transition(freeball_seconds_trigger, main_play)
 
         self.playbook.set_play(main_play)
 

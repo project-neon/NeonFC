@@ -7,6 +7,7 @@ from entities.plays.playbook import StuckRobots as StuckRobotsTrigger
 from entities.plays.playbook import WaitFor as WaitForTrigger
 
 from entities.plays.playbook import OnFreeBall
+from entities.plays.playbook import OnFreeBallDef
 from entities.plays.playbook import OnFreeKick
 from entities.plays.playbook import OnKickOff
 from entities.plays.playbook import OnGoalKick
