@@ -13,7 +13,7 @@ class PID_Test(Strategy):
         self.lt = time.time()
         super().__init__(match, "PID_Test", controller=PID_control)
 
-        self.circuit = [(1.1, .40), (1.1, .90), (.4, .90), (.4, .40)]
+        self.circuit = [(1.1, .40), (1.1, .90), (.75, .65)]#, (.4, .90), (.4, .40)]
         self.circuit = deque(self.circuit)
         self.dl = 0.000001
 
