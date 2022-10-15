@@ -11,7 +11,7 @@ class FreeballPlay(MainPlay):
         self.constraints = [
             (strategy.larc2022_5v5.GoalKeeper(self.match, 'Goalkeeper'), self._elect_goalkeeper),
             (strategy.larc2021.Shooter(self.match, "Shooter"), self._elect_attacker),
-            (strategy.tests.newMidFielder(self.match, ""), self._elect_midfielder)
+            (strategy.larc2022_5v5.MainAttacker(self.match, 'MainAttacker'), self._elect_midfielder)
         ]
 
     def freeze_positions(self, constraints, robots):
