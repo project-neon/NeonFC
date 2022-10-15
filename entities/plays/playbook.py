@@ -249,7 +249,7 @@ class OnFreeBall(Trigger):
     def evaluate(self, coach, actual_play):
         foul = self.referee.get_foul()
         # print(foul, self.referee.get_color())
-        return foul == "FREE_BALL" and self.referee.get_quadrant() in ('QUADRANT_1', 'QUADRANT_4')
+        return foul == "FREE_BALL" # and self.referee.get_quadrant() in ('QUADRANT_1', 'QUADRANT_4')
 
 class OnFreeBallDef(Trigger):
     def __init__(self, referee, team_color):
