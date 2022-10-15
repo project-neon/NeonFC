@@ -9,7 +9,7 @@ class MainPlay(Play):
         self.coach = coach
         self.strategies = [
             strategy.larc2022_5v5.GoalKeeper(self.match, 'Goalkeeper'),
-            strategy.larc2022_5v5.SecondAttacker(self.match, 'Defender1'),
+            strategy.larc2022_5v5.RadialDefender(self.match, 'Defender1'),
             strategy.larc2022_5v5.MainAttacker(self.match, 'MainAttacker'),
         ]
 

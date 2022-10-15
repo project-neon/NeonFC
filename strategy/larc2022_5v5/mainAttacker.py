@@ -9,7 +9,7 @@ from strategy.BaseStrategy import Strategy
 from controller import PID_control
 from commons import math as nfc_math
 
-from strategy.larc2022_5v5.commons import AstarPlanning, aim_projection_ball
+from strategy.larc2022_5v5.commons import AstarPlanning, DefendPlanning, LimitCyclePlanning, aim_projection_ball
 from strategy.utils.player_playbook import OnCorners, OnInsideBox, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
 
 def aim_behind_ball(strategy):
@@ -307,8 +307,8 @@ class PushPotentialFieldPlanning(PlayerPlay):
             super().start_up()
             controller = PID_control
             controller_kwargs = {
-                'max_speed': 6, 'max_angular': 8400, 'kd': 1.2,  
-                'kp': 200, 'krho': 9,'reduce_speed': True
+                'max_speed': 10, 'max_angular': 8400, 'kd': 1.2,  
+                'kp': 180, 'krho': 9,'reduce_speed': True
             }
             self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
@@ -480,8 +480,10 @@ class PushPotentialFieldPlanning(PlayerPlay):
         self.seek.add_field(
             fields.LineField(
                 self.match,
-                target= [self.match.game.field.get_dimensions()[0] - self.match.game.field.get_dimensions()[0], 
-                self.match.game.field.get_dimensions()[1]/2],                                                                                                                                                                                                                                                                                                                                          
+                target= [
+                    self.match.game.field.get_dimensions()[0] - self.match.game.field.get_dimensions()[0] + 0.03, 
+                    self.match.game.field.get_dimensions()[1]/2
+                ],                                                                                                                                                                                                                                                                                                                                          
                 theta = math.pi/2,
                 line_size = (self.match.game.field.get_small_area("defensive")[3]/2),
                 line_dist = 0.2,
@@ -515,6 +517,8 @@ class MainAttacker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
+        field_dim = self.match.game.field.get_dimensions()
+
         # Criando Player Playbook: A maquina de estados do jogador
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
@@ -535,12 +539,29 @@ class MainAttacker(Strategy):
         wing_potentialfield = WingPlanning(self.match, self.robot)
         wing_potentialfield.start()
 
+        defend_potentialfield = DefendPlanning(self.match, self.robot)
+        defend_potentialfield.start()
+
+        carry_potentialfield = CarryPlanning(self.match, self.robot)
+        carry_potentialfield.start()
+
 
         self.playerbook.add_play(push_potentialfield)
         self.playerbook.add_play(wing_potentialfield)
+        self.playerbook.add_play(defend_potentialfield)
+        
 
         corners_transition = OnCorners(self.match, [0.15, 1.20])
         out_corners_transition = OnCorners(self.match, [0.15, 1.20], True)
+
+        on_defensive_sector_transition = OnInsideBox(self.match, [0, 0, field_dim[0]/2, field_dim[1]/2])
+        on_offensive_sector_transition = OnInsideBox(self.match, [field_dim[0]/2, 0, field_dim[0]/2, field_dim[1]/2])
+        
+
+
+        push_potentialfield.add_transition(on_defensive_sector_transition, defend_potentialfield)
+        push_potentialfield.add_transition(corners_transition, wing_potentialfield)
+        wing_potentialfield.add_transition(on_offensive_sector_transition, push_potentialfield)
 
         push_potentialfield.add_transition(corners_transition, wing_potentialfield)
         wing_potentialfield.add_transition(out_corners_transition, push_potentialfield)

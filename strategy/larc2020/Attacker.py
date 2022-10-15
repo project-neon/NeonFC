@@ -97,8 +97,8 @@ class Attacker(Strategy):
             name="{}|HeadingBehaviour".format(self.__class__)
         )
 
-        if self.plot_field:
-            self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
+        # if self.plot_field:
+        #     self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
         
         """
         No Start você ira adicionar campos potenciais aos comportamentos criados no metodo __init__

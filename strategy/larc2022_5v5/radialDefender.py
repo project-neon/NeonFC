@@ -9,7 +9,7 @@ class RadialDefender(Strategy):
     b = 0.5 # metade do tamanho y da elipse
     dist_robos = 0.000 # algo como o angulo em radianos entre o robo e o ponto central
     ponto_gol = [0,0.65] # ponto do gol (x,y)
-    ponto_gol_3V3 = [0,0.65]
+    ponto_gol_3V3 = [0, 0.65]
     ponto_g_5v5 = (0,0.9)
     ponto_objetivo = [0,0] # o melhor ponto pertencente a elipse para defender
     robo_cima = True
@@ -118,6 +118,12 @@ class RadialDefender(Strategy):
         self.robo_cima = True
 
     def calcular_ponto_gol(self):
+
+        self.ponto_gol_3V3 = [
+            0 if self.match.ball.x <= self.match.game.field.get_dimensions()[0]/2 else 0.2,
+            0.65
+        ]
+
         velocidade_minima = 0.1
         if self.match.ball.vx != 0 and math.sqrt(self.match.ball.vx**2 + self.match.ball.vy**2) > velocidade_minima:
             if (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y > self.y_inicio_gol and (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y < self.y_final_gol:

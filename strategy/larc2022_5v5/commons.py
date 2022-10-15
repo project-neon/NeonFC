@@ -27,7 +27,7 @@ def aim_projection_ball(strategy):
     side = -1 if b.y > r.y else 1
 
     side_size = 0.05
-    recoil_size = 0.05
+    recoil_size = 0.01
 
     angle_of_attack = math.atan2(dir_to_goal_vector[1], dir_to_goal_vector[0]) + math.pi/2
 
@@ -39,6 +39,93 @@ def aim_projection_ball(strategy):
     ]
 
     return point_of_attack
+
+class DefendPlanning(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(
+            match, 
+            robot
+        )
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs = {'max_speed': 2, 'max_angular': 3600, 'kp': 140}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def start(self):
+        self.defend = fields.PotentialField(
+            self.match,
+            name="{}|DefendBehaviour".format(self.__class__)
+        )
+
+        self.defend.add_field(
+            fields.TangentialField(
+                self.match,
+                target=lambda m, r=self.robot: (
+                    m.ball.x + (math.cos(math.pi/3) if (m.ball.y < r.y) else math.cos(5*math.pi/3)) * 0.1,
+                    m.ball.y + (math.sin(math.pi/3) if (m.ball.y < r.y) else math.sin(5*math.pi/3)) * 0.1
+                ),                                                                                                                                                                                                                                                                                                                                          
+                radius = 0.1,
+                radius_max = 2,
+                clockwise = lambda m, r=self.robot: (m.ball.y < r.y),
+                decay=lambda x: 1,
+                multiplier = 1
+            )
+        )
+        self.defend.add_field(
+            fields.LineField(
+                self.match,
+                target= [0, self.match.game.field.get_dimensions()[1]/2],                                                                                                                                                                                                                                                                                                                                          
+                theta = math.pi/2,
+                line_size = (self.match.game.field.get_small_area("defensive")[3]/2),
+                line_dist = 0.2,
+                line_dist_max = 0.2,
+                decay = lambda x: 1,
+                multiplier = -2
+            )
+        )
+        self.defend.add_field(
+            fields.LineField(
+                self.match,
+                target= [0, self.match.game.field.get_dimensions()[1]/2],                                                                                                                                                                                                                                                                                                                                          
+                theta = math.pi,
+                line_size = 0.22,
+                line_dist = 0.2,
+                line_dist_max = 0.2,
+                decay = lambda x: 1,
+                multiplier = -2
+            )
+        )
+
+        for robot in self.match.robots:
+            if robot.get_name() == self.robot.get_name():
+                continue
+            self.defend.add_field(
+                fields.PointField(
+                    self.match,
+                    target = lambda m, r=robot: (
+                        r.x,
+                        r.y
+                    ),
+                    radius = .3,
+                    radius_max = .3,
+                    decay = lambda x: -1,
+                    multiplier = 1
+                )
+            )
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Defend Potential Field Planning>"
+
+    def update(self):
+        robot_pos = [self.robot.x, self.robot.y]
+        dt = 0.05
+        res = self.defend.compute(robot_pos)
+        res[0] = self.robot.x + res[0] * dt
+        res[1] = self.robot.y + res[1] * dt
+        return res
+
 
 class AstarPlanning(PlayerPlay):
     def __init__(self, match, robot):
@@ -56,7 +143,7 @@ class AstarPlanning(PlayerPlay):
     def start_up(self):
         super().start_up()
         controller = TwoSidesLQR
-        controller_kwargs = {}
+        controller_kwargs = {'l': 0.165}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def start(self):
@@ -125,7 +212,7 @@ class LimitCyclePlanning(PlayerPlay):
     def start_up(self):
         super().start_up()
         controller = PID_control
-        controller_kwargs = {'max_speed': 2.5, 'max_angular': 2400}
+        controller_kwargs = {'max_speed': 2.8, 'max_angular': 4800, 'kp': 200, 'kd': 1}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
         self.shooting_momentum = 0
