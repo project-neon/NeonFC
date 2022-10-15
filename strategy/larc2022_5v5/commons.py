@@ -84,6 +84,20 @@ class AstarPlanning(PlayerPlay):
             )
         )
 
+        self.astar.add_field(
+            fields.LineField(
+                self.match,
+                target= [self.match.game.field.get_dimensions()[0] - self.match.game.field.get_dimensions()[0], 
+                self.match.game.field.get_dimensions()[1]/2],                                                                                                                                                                                                                                                                                                                                          
+                theta = math.pi/2,
+                line_size = (self.match.game.field.get_small_area("defensive")[3]/2),
+                line_dist = 0.2,
+                line_dist_max = 0.2,
+                decay = lambda x: 1,
+                multiplier = -2
+            )
+        )
+
     def get_name(self):
         return f"<{self.robot.get_name()} Astar Potential Field Planning>"
 

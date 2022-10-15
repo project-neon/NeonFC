@@ -9,7 +9,7 @@ class MainPlay(Play):
         self.coach = coach
         self.strategies = [
             strategy.larc2022_5v5.GoalKeeper(self.match, 'Goalkeeper'),
-            strategy.larc2022_5v5.RadialDefender(self.match, 'Defender1'),
+            strategy.larc2022_5v5.SecondAttacker(self.match, 'Defender1'),
             strategy.larc2022_5v5.MainAttacker(self.match, 'MainAttacker'),
         ]
 
@@ -31,8 +31,8 @@ class MainPlay(Play):
                 best_attacker = attacker_candidate.robot_id
                 best_fit = fit
         
-        if best_attacker == 3:
-            strategies = self.strategies[0:3] + [self.strategies[4], self.strategies[3]]
+        if best_attacker == 1:
+            strategies = self.strategies[0:1] + [self.strategies[2], self.strategies[1]]
         else:
             strategies = self.strategies
 

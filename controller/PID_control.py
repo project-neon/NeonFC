@@ -10,11 +10,15 @@ def angle_adjustment(angle):
         return phi
 
 class PID_control(object):
-    def __init__(self, robot, default_fps=60, max_speed=1.8, max_angular=2400, krho=100, kp=60, ki=0, kd=0):
+    def __init__(self, robot, default_fps=60, max_speed=1.8, max_angular=2400, krho=100, kp=60, ki=0, kd=0, reduce_speed=False):
         self.vision = robot.game.vision
         self.field_w, self.field_h = robot.game.field.get_dimensions()
         self.robot = robot
         self.desired = [0, 0]
+
+        self.ball = self.robot.strategy.match.ball
+
+        self.reduce_speed = reduce_speed
 
         self.l = self.robot.dimensions.get('L')/2 # half_distance_between_robot_wheels
         self.R = self.robot.dimensions.get('R')   # radius of the wheel
@@ -70,8 +74,12 @@ class PID_control(object):
         self.int_alpha = self.int_alpha + alpha
 
         """Linear speed (v)"""
-        v = self.v_max # if [self.robot.x, self.robot.y] < [self.desired[0], self.desired[1]] else min(self.K_RHO*rho, self.v_max)
-
+        if self.reduce_speed:
+            # v = self.v_max if [self.robot.x, self.robot.y] < [self.ball.x, self.ball.y] else min(self.K_RHO*rho, self.v_max)
+            v = min(self.K_RHO*rho, self.v_max)
+        else:
+            v = self.v_max
+        
         # """Objective behind the robot"""
         if(abs(alpha) > math.pi/2):
             v = -v

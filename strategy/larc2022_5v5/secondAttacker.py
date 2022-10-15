@@ -148,6 +148,19 @@ class RightAttackerPlanning(PlayerPlay):
                     multiplier = 1
                 )
             )
+        self.push.add_field(
+            fields.LineField(
+                self.match,
+                target= [self.match.game.field.get_dimensions()[0] - self.match.game.field.get_dimensions()[0], 
+                self.match.game.field.get_dimensions()[1]/2],                                                                                                                                                                                                                                                                                                                                          
+                theta = math.pi/2,
+                line_size = (self.match.game.field.get_small_area("defensive")[3]/2),
+                line_dist = 0.2,
+                line_dist_max = 0.2,
+                decay = lambda x: 1,
+                multiplier = -2
+            )
+        )
     
     def defend_position(self, match):
             if match.ball.y > self.g_hgr:
@@ -207,7 +220,7 @@ class SecondAttacker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
+        self.playerbook = PlayerPlaybook(self.match.coach, self.robot, True)
 
         field_dim = self.match.game.field.get_dimensions()
 
@@ -225,9 +238,9 @@ class SecondAttacker(Strategy):
         self.playerbook.add_play(rightattack_potentialfield)
 
         # Transicao para caso esteja perto da bola ( < 10 cm)
-        next_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.60)
+        next_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.30)
         # Transicao para caso esteja longe da bola ( > 20 cm)
-        far_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.80, True)
+        far_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.40, True)
 
         on_defensive_sector_transition = OnInsideBox(self.match, [0, 0, field_dim[0]/2, field_dim[1]/2])
         on_offensive_sector_transition = OnInsideBox(self.match, [field_dim[0]/2, 0, field_dim[0]/2, field_dim[1]/2])
