@@ -43,7 +43,7 @@ class MatchRealLife(object):
         self.coach.decide()
 
 
-        input()
+        #input()
         for robot in self.robots:
             robot.start()
 

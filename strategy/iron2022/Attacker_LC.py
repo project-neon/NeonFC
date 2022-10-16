@@ -80,8 +80,11 @@ class Attacker_LC(Strategy):
         dt = .2*((x - self.match.ball.x)**2 + (y - self.match.ball.y)**2)**.5
         target = Point(self.match.ball.x+self.match.ball.vx*dt, self.match.ball.y+self.match.ball.vy*dt)
 
-        if not (0 <= target.x <= 1.5) and not (0 <= target.y <= 1.3):
-            target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
+        try:
+            if not (0 <= target.x <= 1.5) and not (0 <= target.y <= 1.3):
+                target = Point(self.limit_cycle.target.x, self.limit_cycle.target.y)
+        except:
+            target = Point(0, 0)
 
         #boundaries = [Obstacle(x-.2, 0, r=.2), Obstacle(x-.2, 1.3, r=.2), Obstacle(0, y, r=.2), Obstacle(1.5, y, r=.2)]
 
