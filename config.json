@@ -16,8 +16,8 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "IRON_2022_3V3",
-        "category": "3v3",
+        "coach_name": "LARC_2022_5V5",
+        "category": "5v5",
         "coach_parameters": {
             "penalty_taker": "short_shot"
         }
