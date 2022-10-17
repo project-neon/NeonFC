@@ -56,7 +56,6 @@ class SSLVision(threading.Thread):
             self.set_fps()
             env.ParseFromString(data)
             self.frame = json.loads(MessageToJson(env))
-            # print(self.frame)
 
             self.game.update()
             

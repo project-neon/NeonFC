@@ -111,8 +111,7 @@ class PID_control(object):
         # self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
         self.robot_writer.write([self.robot.x, self.robot.y])
 
-        print(f"{v=}\n{w=}")
-        print(f"v_fps: {self.vision._fps}")
+        # print(f"{v=}\n{w=}")
 
         return v, w
         # return pwr_left * 1000, pwr_right * 1000

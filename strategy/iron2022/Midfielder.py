@@ -101,7 +101,5 @@ class Midfielder(Strategy):
         if ball.x > 0 and ball.y > 0:
             self.last_b_x, self.last_b_y = ball.x, ball.y
 
-        print(behaviour.name)
-        
         return behaviour.compute([self.robot.x, self.robot.y])
 

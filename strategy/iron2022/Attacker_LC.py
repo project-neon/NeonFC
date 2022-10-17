@@ -72,7 +72,7 @@ class Attacker_LC(Strategy):
     def decide(self):
         x = self.robot.x
         y = self.robot.y
-        print('posssss', x, y)
+        # print('posssss', x, y)
 
         ball_virtual_y = max(self.BALL_Y_MIN, min(self.BALL_Y_MAX, self.match.ball.y))
 
