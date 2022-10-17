@@ -2,7 +2,7 @@ import math
 import os
 import random
 
-from entities.plays.larc2022_5v5.mainPlay import MainPlay
+from entities.plays.iron2022_3v3.mainPlay import MainPlay
 import strategy
 
 from strategy.larc2022_5v5.shortShotPenaltyTaker import ShortShotPenaltyTaker

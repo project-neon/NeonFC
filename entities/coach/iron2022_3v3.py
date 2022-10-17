@@ -3,7 +3,7 @@ from entities import plays
 import json
 
 class Coach(BaseCoach):
-    NAME = "LARC_2022_5V5"
+    NAME = "IRON_2022_3V3"
     def __init__(self, match, coach_parameters={}):
         super().__init__(match)
 
@@ -12,8 +12,8 @@ class Coach(BaseCoach):
         self.positions = json.loads(open('foul_placements.json', 'r').read())
         self.playbook = plays.Playbook(self)
 
-        main_play = plays.larc2022_5v5.MainPlay(self)
-        penalty_play = plays.larc2022_5v5.PenaltyPlay(self, self.coach_parameters['penalty_taker']) # Add later this play to larc2022 5v5 package in plays
+        main_play = plays.iron2022_3v3.MainPlay(self)
+        penalty_play = plays.iron2022_3v3.PenaltyPlay(self, self.coach_parameters['penalty_taker']) # Add later this play to larc2022 5v5 package in plays
         defend_penalty_play = plays.larc2021.DefendPenaltyPlay(self) # Add later this play to larc2022 5v5 package in plays
         goalkick_play = plays.larc2021.GoalKickPlay(self) # Add later this play to larc2022 5v5 package in plays
         freeball_play = plays.larc2021.FreeballPlay(self) # Add later this play to larc2022 5v5 package in plays
@@ -25,6 +25,7 @@ class Coach(BaseCoach):
         goalkick_trigger = plays.OnGoalKick(self.match.game.referee, self.match.team_color)
         freeball_trigger = plays.OnFreeBall(self.match.game.referee, self.match.team_color)
 
+        # Contra bola parada da Bulls
         # deffreeball_trigger = plays.OnFreeBallDef(self.match.game.referee, self.match.team_color)
 
         penalty_seconds_trigger = plays.WaitForTrigger(10)
@@ -51,6 +52,7 @@ class Coach(BaseCoach):
         main_play.add_transition(freeball_trigger, freeball_play)
         freeball_play.add_transition(freeball_seconds_trigger, main_play)
 
+        # Contra bola parada da Bulls
         # main_play.add_transition(deffreeball_trigger, def_freeball_play)
         # def_freeball_play.add_transition(freeball_seconds_trigger, main_play)
 
