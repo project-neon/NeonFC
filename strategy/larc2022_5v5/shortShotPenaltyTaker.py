@@ -183,12 +183,14 @@ class PushPotentialFieldPlanning(PlayerPlay):
         return res
 
 class ShortShotPenaltyTaker(Strategy):
-    def __init__(self, match, name="short_shot", ctr_kwargs={'l': 0.0975}):
+    def __init__(self, match, name="short_shot", ctr_kwargs={'l': 0.0975}, robot_id=2):
         super().__init__(
             match, 
             name, 
             controller=TwoSidesLQR,
             controller_kwargs=ctr_kwargs)
+
+        self.robot_id = robot_id
 
     def reset(self, robot=None):
         super().reset()
@@ -211,15 +213,15 @@ class ShortShotPenaltyTaker(Strategy):
 
         if self.match.team_color == "blue":
             return {
-                    "robot_id": 2, 
-                    "x": field_size[0]/2 - 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                    "robot_id": self.robot_id, 
+                    "x": field_size[0]/2 - field_size[0]/6 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
                     "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
                     "orientation": - shoot_side * angle_of_interest
                 }
         else:
             return {
-                    "robot_id": 2, 
-                    "x": - field_size[0]/2 + 0.375 + math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                    "robot_id": self.robot_id, 
+                    "x": - field_size[0]/2 + field_size[0]/6 + math.cos(math.radians(angle_of_interest)) * dist_to_ball,
                     "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
                     "orientation": + shoot_side * angle_of_interest
                 }

@@ -2,7 +2,7 @@ import math
 import os
 import random
 
-from entities.plays.iron2022_3v3.mainPlay import MainPlay
+from entities.plays.larc2022_5v5.mainPlay import MainPlay
 import strategy
 
 from strategy.larc2022_5v5.shortShotPenaltyTaker import ShortShotPenaltyTaker
@@ -20,9 +20,9 @@ class PenaltyPlay(MainPlay):
         self.PENALTY_TAKER_ID = 4
 
         if self.penalty_taker == 'long_shot':
-            self.gk = LongShotPenaltyTaker(self.match, self.PENALTY_TAKER_ID)
+            self.gk = LongShotPenaltyTaker(self.match, robot_id=self.PENALTY_TAKER_ID)
         elif self.penalty_taker == 'short_shot':
-            self.gk = ShortShotPenaltyTaker(self.match, self.PENALTY_TAKER_ID)
+            self.gk = ShortShotPenaltyTaker(self.match, robot_id=self.PENALTY_TAKER_ID)
 
         self.strategies = [
             strategy.larc2022_5v5.GoalKeeper(self.match, 'Goalkeeper'),

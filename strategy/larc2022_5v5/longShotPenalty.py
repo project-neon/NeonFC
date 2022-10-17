@@ -46,14 +46,14 @@ class LongShotPenaltyTaker(Strategy):
         if self.match.team_color == "blue":
             return {
                     "robot_id": self.robot_id, 
-                    "x": field_size[0]/2 - 0.375 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                    "x": field_size[0]/2 - field_size[0]/6 - math.cos(math.radians(angle_of_interest)) * dist_to_ball,
                     "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
                     "orientation": - shoot_side * angle_of_interest
                 }
         else:
             return {
                     "robot_id": self.robot_id, 
-                    "x": - field_size[0]/2 + 0.375 + math.cos(math.radians(angle_of_interest)) * dist_to_ball,
+                    "x": - field_size[0]/2 + field_size[0]/6 + math.cos(math.radians(angle_of_interest)) * dist_to_ball,
                     "y": shoot_side * math.sin(math.radians(angle_of_interest)) * dist_to_ball,
                     "orientation": + shoot_side * angle_of_interest
                 }

@@ -4,13 +4,13 @@ import math
 import numpy as np
 from controller.PID_control import PID_control
 
-class RadialDefender(Strategy):
+class RadialDefender2(Strategy):
     a = 0.3 # metade do tamanho x da elipse
     b = 0.5 # metade do tamanho y da elipse
     dist_robos = 0.000 # algo como o angulo em radianos entre o robo e o ponto central
     ponto_gol = [0,0.65] # ponto do gol (x,y)
-    ponto_gol_3V3 = [0,0.65]
-    ponto_g_5v5 = (0,0.9)
+    ponto_gol_3V3 = [0, 0.65]
+    ponto_g_5v5 = (0.65, 0.9)
     ponto_objetivo = [0,0] # o melhor ponto pertencente a elipse para defender
     robo_cima = True
     mr = 0
@@ -65,13 +65,13 @@ class RadialDefender(Strategy):
             if self.mr < mo + erro:
                 mo = np.tan(np.arctan(m) + self.dist_robos)
             elif self.mr > mo - erro: 
-                mo = (self.ponto_gol[1] - self.pos_robo_baixo[1])/(self.ponto_gol[0] - self.pos_robo_baixo[0])
+                # mo = (self.ponto_gol[1] - self.pos_robo_baixo[1])/(self.ponto_gol[0] - self.pos_robo_baixo[0])
                 mo = np.tan(np.arctan(m) + 2*self.dist_robos)
             if self.mr < mo + erro:
                 mo = np.tan(np.arctan(m) + self.dist_robos)
                 dm = np.tan(np.arctan(self.mr) + dd)
             elif self.mr > mo - erro: 
-                mo = (self.ponto_gol[1] - self.pos_robo_baixo[1])/(self.ponto_gol[0] - self.pos_robo_baixo[0])
+                # mo = (self.ponto_gol[1] - self.pos_robo_baixo[1])/(self.ponto_gol[0] - self.pos_robo_baixo[0])
                 mo = np.tan(np.arctan(m) + 2*self.dist_robos)
                 dm = np.tan(np.arctan(self.mr) - dd)
         else:
@@ -92,11 +92,14 @@ class RadialDefender(Strategy):
         self.formar_barreira(m)
 
         #condição para tirar os robos da elipse caso a bola entre na pequena área
-        if self.match.ball.y > 0.7 and self.match.ball.y<1.1 and self.match.ball.x<0.3:
-            if self.robo_cima:
-                self.ponto_objetivo=[0.41,1.45]
-            else:
-                self.ponto_objetivo=[0.41,0.35]
+        # if self.match.ball.y > 0.7 and self.match.ball.y<1.1 and self.match.ball.x<0.3:
+        #     if self.robo_cima:
+        #         self.ponto_objetivo=[0.08, 1.05]
+        #     else:
+        #         self.ponto_objetivo=[0.08, 0.25]
+
+        
+        # print(self.robot.x, self.robot.y)
 
         return self.ponto_objetivo
     
@@ -105,35 +108,22 @@ class RadialDefender(Strategy):
         if self.robo_cima:
             if np.arctan(m) > limite:
               self.ponto_objetivo[0] = 0.00
-              self.ponto_objetivo[1] = 1.3
+              self.ponto_objetivo[1] = 1.05
             elif np.arctan(m) < -limite:
               self.ponto_objetivo[0] = 0.00
-              self.ponto_objetivo[1] = 0.5
-        else:
-            if np.arctan(m) > limite:
-              self.ponto_objetivo[0] = 0
-              self.ponto_objetivo[1] = 1.3
-            elif np.arctan(m) < -limite:
-              self.ponto_objetivo[0] = 0
-              self.ponto_objetivo[1] = 0.5
+              self.ponto_objetivo[1] = 0.25
 
 
     def calcular_robo_cima(self):
-        for robot in self.match.robots:
-            self.pos_robo_cima = [1, 1]
-            self.pos_robo_baixo = [1, 1]
-            #print(self.name)
-            if "Defender" in robot.strategy.name:
-
-                if robot.get_name() != self.robot.get_name():
-                    self.pos_robo_cima = [robot.x,robot.y]
-                    self.pos_robo_baixo = [robot.x,robot.y]
-                    if robot.strategy.mr <= self.mr:
-                        self.robo_cima = True
-                    else:
-                        self.robo_cima = False
+        self.robo_cima = True
 
     def calcular_ponto_gol(self):
+
+        self.ponto_g_5v5 = [
+            1.05 if self.match.ball.x <= self.match.game.field.get_dimensions()[0]/2 else 0.65,
+            0.9
+        ]
+
         velocidade_minima = 0.1
         if self.match.ball.vx != 0 and math.sqrt(self.match.ball.vx**2 + self.match.ball.vy**2) > velocidade_minima:
             if (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y > self.y_inicio_gol and (self.match.ball.vy/self.match.ball.vx)*(0-self.match.ball.x) + self.match.ball.y < self.y_final_gol:
