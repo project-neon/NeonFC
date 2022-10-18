@@ -11,7 +11,7 @@ class Goalkeeper(Strategy):
         self.g_left = 0.87
         self.g_right = 0.46
 
-        self.gk_x = 0.075
+        self.gk_x = 0.1
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -44,7 +44,7 @@ class Goalkeeper(Strategy):
 
         # retorna a posição em que o campo deve ser criado, para que a bola seja defendida
         def get_def_spot(m):
-            x = self.gk_x
+            x = self.gk_x + 0.04
 
             if m.ball.x < (self.sa_w / 2 + self.robot_w / 2):
                 if self.robot.y < m.ball.y < g_hgr:
@@ -108,7 +108,6 @@ class Goalkeeper(Strategy):
                     return (x, g_hgr)
                 else:
                     return (x, y)
-
             return (x, y)
 
         self.pebas = algorithms.fields.PotentialField(
@@ -152,14 +151,19 @@ class Goalkeeper(Strategy):
                 multiplier = 1
             )
 
+        def get_def_pos_denovo(m):
+            x, y = get_def_spot(m)
+            print("DEF POS: ", x, y)
+            return x,y
+
         self.pebas.add_field(
             algorithms.fields.LineField(
                 self.match,
-                target = get_def_spot,
+                target = get_def_pos_denovo,
                 theta = 0,
-                line_size = 0.1,
-                line_dist = 0.1,
-                multiplier = 0.5,
+                line_size = 1,
+                line_dist = 0.2,
+                multiplier = .7,
                 decay = lambda x : x**4
             )
         )
@@ -170,7 +174,7 @@ class Goalkeeper(Strategy):
                 target = (self.gk_x, self.g_left),
                 radius = 0.1,
                 decay = lambda x: x**2,
-                multiplier = 0.5
+                multiplier = 0.7
             )
         )
 
@@ -180,7 +184,7 @@ class Goalkeeper(Strategy):
                 target = (self.gk_x, self.g_right),
                 radius = 0.1,
                 decay = lambda x: x**2,
-                multiplier = 0.5
+                multiplier = 0.7
             )
         )
 
@@ -198,7 +202,7 @@ class Goalkeeper(Strategy):
             algorithms.fields.PointField(
                 self.match,
                 target = (self.gk_x, .65),
-                radius = 0.5,
+                radius = 0.25,
                 decay = lambda x: x**3,
                 multiplier = 0.8
             )
@@ -231,24 +235,21 @@ class Goalkeeper(Strategy):
 
         ball = self.match.ball
 
-        # if not self.g_right < ball.y < self.g_left and ball.x < .15:
-        #     behaviour = self.push_ball
-        # elif ball.y > self.g_left:
-        #     behaviour = self.left_edge
-        # elif ball.y < self.g_right:
-        #     behaviour = self.right_edge
-        # else:
-        #     behaviour = self.pebas
-        # else:
-        #     behaviour = self.pebas
+        if not self.g_right < ball.y < self.g_left and ball.x < .15:
+            behaviour = self.push_ball
+        elif ball.y > self.g_left:
+            behaviour = self.left_edge
+        elif ball.y < self.g_right:
+            behaviour = self.right_edge
+        else:
+            behaviour = self.pebas
 
-        # if self.robot.x > 0.1:
-        behaviour = self.recovery
+        if self.robot.x > self.gk_x+0.05:
+            behaviour = self.recovery
 
         # print(self.robot.y)
 
         # print(self.robot.is_visible())
-
         return behaviour.compute([self.robot.x, self.robot.y])
 
     # def update(self):
