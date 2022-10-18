@@ -9,8 +9,8 @@ class Coach(BaseCoach): # heranca da classe abstrata
 
         # vamos usar strategies de teste por enquanto, essa deixa o robo parado
         self._3 = strategy.iron2022.Midfielder(self.match)
-        self._9 = strategy.iron2022.Attacker_LC(self.match)
-        self._0 = strategy.iron2022.Goalkeeper(self.match)
+        self._0 = strategy.iron2022.Attacker_LC(self.match)
+        self._9 = strategy.iron2022.Goalkeeper(self.match)
 
     def decide(self):
         # esta lista eh ordenada em [robot_0, ..., robot_n]
