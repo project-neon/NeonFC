@@ -48,7 +48,7 @@ class MainPlay(Play):
 
             
     def _elect_leftattacker(self, robot):
-        is_behind = 2 if robot.x > self.match.ball.x else 1
+        is_behind = 4 if robot.x > self.match.ball.x else 1
         dist_to_ball = math.sqrt(
             (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
         )
