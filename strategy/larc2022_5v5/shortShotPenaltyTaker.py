@@ -226,7 +226,11 @@ class ShortShotPenaltyTaker(Strategy):
                     "orientation": + shoot_side * angle_of_interest
                 }
 
-
+    def update(self):
+        if self.match.team_side == "left":
+            return 100,100
+        else:
+            return -100,-100
     def decide(self):
         return self.shootout.update()
 
