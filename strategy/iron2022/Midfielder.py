@@ -11,6 +11,8 @@ class Midfielder(Strategy):
         self.lwr_margin = 0.2
         self.hgr_margin = 1.1
 
+        self.pushing_ball = False
+
         self.def_x = 0.27
         self.ga_hgr = 1
         self.ga_lwr = .3
@@ -79,30 +81,30 @@ class Midfielder(Strategy):
         ball = self.match.ball
         ball_x, ball_y = ball.x, ball.y
 
-        if ball_x < .575 and ball_x > self.robot.x:
-            behaviour = self.push_ball
-        elif self.robot.x > .25 or self.robot.x < .15:
-            behaviour = self.recovery
-        else:
-            behaviour = self.defender
+        # if ball_x < .575 and ball_x > self.robot.x:
+        #     behaviour = self.push_ball
+        # elif self.robot.x > .25 or self.robot.x < .15:
+        #     behaviour = self.recovery
+        # else:
+        #     behaviour = self.defender
 
         if ball_x == -1 or ball_y == -1:
             ball_x, ball_y = self.last_b_x, self.last_b_y
 
-        # if ball_x < .375:
-        #     self.pushing_ball = True
+        if ball_x < .375:
+            self.pushing_ball = True
 
-        # if self.pushing_ball:
-        #     if ball_x >= .575 or ball_x < .15:
-        #         self.pushing_ball = False
-        #         behaviour = self.defender
-        #     else:
-        #         behaviour = self.push_ball
-        # else:
-        #     if self.robot.x > .25 or self.robot.x < .15:
-        #         behaviour = self.recovery
-        #     else:
-        #         behaviour = self.defender
+        if self.pushing_ball:
+            if ball_x >= .575 or ball_x < .15:
+                self.pushing_ball = False
+                behaviour = self.defender
+            else:
+                behaviour = self.push_ball
+        else:
+            if self.robot.x > .25 or self.robot.x < .15:
+                behaviour = self.recovery
+            else:
+                behaviour = self.defender
 
         if ball.x > 0 and ball.y > 0:
             self.last_b_x, self.last_b_y = ball.x, ball.y

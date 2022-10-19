@@ -21,5 +21,6 @@ class Idle(Strategy):
 
 
     def decide(self):
+        print(self.robot.x, self.robot.y)
         return 0, 0
 
