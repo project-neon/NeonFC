@@ -28,9 +28,9 @@ class Coach(BaseCoach):
         # Contra bola parada da Bulls
         # deffreeball_trigger = plays.OnFreeBallDef(self.match.game.referee, self.match.team_color)
 
-        penalty_seconds_trigger = plays.WaitForTrigger(10)
-        defendpenalty_seconds_trigger = plays.WaitForTrigger(9)
-        goalkick_seconds_trigger = plays.WaitForTrigger(13)
+        penalty_seconds_trigger = plays.WaitForTrigger(8)
+        defendpenalty_seconds_trigger = plays.WaitForTrigger(7)
+        goalkick_seconds_trigger = plays.WaitForTrigger(11)
         freeball_seconds_trigger = plays.WaitForTrigger(9)
 
         self.playbook.add_play(main_play)
