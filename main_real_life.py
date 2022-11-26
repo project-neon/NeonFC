@@ -22,7 +22,7 @@ class Game():
             **self.config.get('match')
         )
         self.vision = vision.SSLVision()
-        self.comm = comm.RLComm()
+        self.comm = comm.FiraComm()
         self.field = pitch.Field(self.match.category)
 
         self.use_api = self.config.get("api")

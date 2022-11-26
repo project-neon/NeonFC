@@ -38,8 +38,7 @@ class Ball(object):
 
     def update(self, frame):
         self.current_data = frame.get('ball')
-        if self.current_data is not None:
-            self._update_speeds()
+        self._update_speeds()
 
     def pos_next(self, fps=10):
         ball_next = copy.copy(self)

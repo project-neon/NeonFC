@@ -1,8 +1,5 @@
-import algorithms
 import math
-import controller
-from controller.PID import Robot_PID
-from controller.simple_LQR import TwoSidesLQR, SimpleLQR
+import algorithms
 from strategy.BaseStrategy import Strategy
 from commons.math import unit_vector
 
@@ -11,8 +8,7 @@ import numpy as np
 
 class Scratch(Strategy):
     def __init__(self, match, plot_field=False):
-        super().__init__(match, "asdgasad", controller=TwoSidesLQR)
-        
+        super().__init__(match)
 
         """
         Ambiente para rascunhar novas estrategias com
@@ -34,6 +30,9 @@ class Scratch(Strategy):
         comportamentos que evitem que ele cometa faltas ou fique travado na parede, atrapalhe o goleiro e principalmente
         que evite-o de fazer gol contra :P
         """
+        
+        self.plot_field = plot_field
+        self.exporter = None
 
         """
         Essa é uma definição basica de campo, você sempre irá usar o objeto 
@@ -41,7 +40,10 @@ class Scratch(Strategy):
         nesse caso convencionamos que sera 'NOME_CLASSE|NOME_COMPORTAMENTO', o nome da classe
         já é dado pelo cósigo e o nome do comportamento você decide, nesse caso é FieldBehaviour
         """
-
+        self.field = algorithms.fields.PotentialField(
+            self.match,
+            name="{}|FieldBehaviour".format(self.__class__)
+        )
         """
         Crie quantos você quiser, cada um irá representar um comportamento que você definiu no passo (1)
         """
@@ -50,21 +52,27 @@ class Scratch(Strategy):
 
     def start(self, robot=None):
         super().start(robot=robot)
-        self.field = algorithms.fields.PotentialField(
-            self.match,
-            name="{}|FieldBehaviour".format(self.__class__)
-        )
+
+        if self.plot_field:
+            self.exporter = algorithms.fields.PotentialDataExporter(self.robot.get_name())
+        
         """
         No Start você ira adicionar campos potenciais aos comportamentos criados no metodo __init__
         de uma olhada na documentação de como se cria cada campo e como eles se comportam. Aqui, por exemplo
         tem um campo que leva a bola, note que elementos dinamicos podem ser passados como uma função lambda
         referencia util para funções lambdas: https://realpython.com/python-lambda/.
         """
+        self.field.add_field(
+            algorithms.fields.PointField(
+                self.match,
+                target = (0.75, 0.65),
+                radius = 0.05, # 30cm
+                decay = lambda x: 1,
+                field_limits = [0.75*2 , 0.65*2],
+                multiplier = 1.2 # 50 cm/s
+            )
+        )
 
-        """
-        Behaviour to make goalkeeper follow the ball vertically
-        """
-        
 
     def reset(self, robot=None):
         super().reset()
@@ -78,8 +86,10 @@ class Scratch(Strategy):
         comportamento sera execuetado nesse momento. crie o conjunto de regras
         que preferir e no final atribua algum dos comportamentos a variavel behaviour
         """
-        
-        behaviour = None
-        
-        return behaviour.compute([self.robot.x, self.robot.y])
+        behaviour = self.field
 
+        if self.exporter:
+            self.exporter.export(behaviour, self.robot, self.match.ball)
+            return (0, 0)
+
+        return behaviour.compute([self.robot.x, self.robot.y])

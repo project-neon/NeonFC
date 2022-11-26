@@ -15,8 +15,8 @@
     },
     "match" : {
         "team_side": "left",
-        "team_color": "yellow",
-        "coach_name": "IRON_2022",
+        "team_color": "blue",
+        "coach_name": "RCX_2022",
         "category": "3v3",
         "robot_ids": [
             3,
@@ -24,11 +24,7 @@
             0
         ]
     },
-    "comm": {
-        "comm_port": "/dev/ttyUSB0",
-        "baud_rate": 115200
-    },
-    "referee": false,
+    "referee": true,
     "data_sender": false,
     "api": false
 }
