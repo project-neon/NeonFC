@@ -71,6 +71,7 @@ class Robot(object):
             self.current_data = robot_data[0]
             self.last_frame = frame['frameNumber']
         else:
+            self.log.warn('Robo [{}] não encontrado, pode estar desligado!'.format(self.get_name()))
             return
 
         self._update_speeds()
