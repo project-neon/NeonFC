@@ -1,4 +1,3 @@
-
 # Astar and suplementar tools
 from algorithms import astar
 
@@ -12,3 +11,5 @@ from algorithms import dijkstra_waypoint
 from algorithms import limit_cycle
 
 from algorithms.univector_field import UnivectorField
+
+from algorithms.RRT import rrt

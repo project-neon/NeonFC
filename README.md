@@ -12,7 +12,7 @@ Software desenvolvido para LARC 2020 para o VSSS online.
 - PiPy
 - Google protobuf
 
-Além de uma interface que irá enviar os dados do campo. Atualmente o [FIRASim](https://github.com/fira-simurosot/FIRASim) é suportado.
+Além de uma interface que irá enviar os dados do campo. Atualmente o [FIRASim](https://github.com/VSSSLeague/FIRASim) é suportado.
 
 #### passo-a-passo da instalação:
 
