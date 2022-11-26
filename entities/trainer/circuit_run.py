@@ -27,7 +27,7 @@ class CircuitRunTrainer(Trainer):
 
         self.train_strategy = strategy.tests.PID_Test(self.match)
 
-        self.train_strategy.set_circuit(self.circuit)
+        # self.train_strategy.set_circuit(self.circuit)
 
         self.idle_strategy = strategy.tests.Idle(self.match)
 
