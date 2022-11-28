@@ -88,6 +88,3 @@ class PID_control(object):
         pwr_right = (2 * v + w * self.l)/2 * self.R
 
         return pwr_left * 1000, pwr_right * 1000
-
-
-

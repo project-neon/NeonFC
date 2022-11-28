@@ -93,4 +93,3 @@ class Scratch(Strategy):
             return (0, 0)
 
         return behaviour.compute([self.robot.x, self.robot.y])
-

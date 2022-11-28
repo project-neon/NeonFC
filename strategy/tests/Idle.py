@@ -22,4 +22,3 @@ class Idle(Strategy):
 
     def decide(self):
         return 0, 0
-

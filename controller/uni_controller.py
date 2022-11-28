@@ -97,4 +97,3 @@ class UniController(object):
         pwr_right = (2 * v + w * self.L)/2 * self.R * 1000
 
         return pwr_left, pwr_right
-
