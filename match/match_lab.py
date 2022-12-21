@@ -20,7 +20,7 @@ class LabMatch(object):
 
         self.n_robots = CATEGORIES.get(self.category)
 
-        self.opposite_team_color = 'blue'
+        self.opposite_team_color = 'yellow'
 
         self.game_status = 'stop'
 

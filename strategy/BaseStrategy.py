@@ -1,7 +1,6 @@
 from abc import ABC
 
 import controller
-from controller.uni_controller import UniController
 
 class Strategy(ABC):
     def __init__(self, match, name, controller=controller.SimpleLQR, controller_kwargs={}):
@@ -25,11 +24,8 @@ class Strategy(ABC):
     def update(self):
         return self.controller.update()
 
-    def set_desired(self, desired, desired_dl=None):
-        if self.controller.__class__ is UniController:
-            self.controller.set_desired(self.match, desired, desired_dl)
-        else:
-            self.controller.set_desired(desired)
+    def set_desired(self, desired):
+        self.controller.set_desired(desired)
 
     def decide(self):
         '''
@@ -37,4 +33,4 @@ class Strategy(ABC):
         retorna: vetor (x, y) objetivo
         '''
         
-        return 0, 0
+        return self.robot.x, self.robot.y

@@ -16,15 +16,21 @@ def update():
     print(data)
     circuit_x = [p[0] for p in data['circuit']]
     circuit_y = [p[1] for p in data['circuit']]
+
+    obstacles_x = [p['x'] for p in data['obstacles']]
+    obstacles_y = [p['y'] for p in data['obstacles']]
+
     r.data_source.stream({'x': [x], 'y': [y]})
     
     c.data_source.stream({'x': circuit_x, 'y': circuit_y})
+    o.data_source.stream({'x': obstacles_x, 'y': obstacles_y})
     
     
 
 p = figure()
 r = p.circle([], [])
 c = p.circle([], [], color="olive")
+o = p.circle([], [], color="red")
 
 curdoc().add_root(p)
 curdoc().add_root(c)

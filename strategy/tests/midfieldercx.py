@@ -7,14 +7,14 @@ from strategy.DebugTools import DebugPotentialFieldStrategy
 from commons.math import point_in_rect
 
 class MidFielderSupporter(Strategy):
-    def __init__(self, match, name='MidFielderSupporter', attacker='RSM-Attacker'):
+    def __init__(self, match, name='MidFielderSupporter', attacker='UFV-Attacker'):
         super().__init__(match, name, controller=controller.TwoSidesLQR)
         self.attacker = attacker
     
     def start(self, robot=None):
         super().start(robot=robot)
 
-        vel = 0.4
+        vel = 1
 
         self.sobra = algorithms.fields.PotentialField(self.match, name="SobraBehaviour")
 
@@ -153,7 +153,7 @@ class MidFielderSupporter(Strategy):
                 self.match,
                 target = future_point,
                 radius = 0.1,
-                multiplier = 0.4,
+                multiplier = lambda m: max(1, (m.ball.vx**2 + m.ball.vy**2)**0.5 + 0.3),
                 decay = lambda x : x
             )
         )

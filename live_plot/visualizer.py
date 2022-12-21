@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from entities.visualization import logger
+from live_plot import logger
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 

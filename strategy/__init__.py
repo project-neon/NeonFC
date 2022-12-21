@@ -10,4 +10,3 @@ from strategy.BaseStrategy import Strategy
 
 # debug tools
 from strategy import DebugTools
-

@@ -42,8 +42,6 @@ class MatchRealLife(object):
         print(f"Match started! coach is [{self.coach.NAME}]")
         self.coach.decide()
 
-
-        #input()
         for robot in self.robots:
             robot.start()
 
