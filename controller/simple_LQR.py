@@ -1,8 +1,5 @@
 import math
-
-
 from commons.math import angle_between
-
 import numpy as np
 import numpy.linalg as la
  
@@ -12,15 +9,14 @@ def py_ang(v1, v2):
     sinang = la.norm(np.cross(v1, v2))
     return np.arctan2(sinang, cosang)
 
-
 """
 Essa variavel experimental serve para converter o resultado do LQR
 para um valor coerente a velocidade desejada em m/s
 """
-EXPERIMENTAL_SPEED_CONSTANT = 2678.57
+EXPERIMENTAL_SPEED_CONSTANT = 7000
 
 class SimpleLQR(object):
-    def __init__(self, robot, l=0.185):
+    def __init__(self, robot, l=0.025):
         self.desired = np.array([0, 0])
         self.robot = robot
 
@@ -49,12 +45,13 @@ class SimpleLQR(object):
         pwr_left = (2 * v - w * self.L)/2 * self.R
         pwr_right = (2 * v + w * self.L)/2 * self.R
 
-        if self.inverted:
-            return -pwr_right, -pwr_left,
-        return pwr_left, pwr_right
+        linear = v*self.R
+        angular = self.R*(w*self.L)/2
+
+        return angular, linear 
 
 class TwoSidesLQR(object):
-    def __init__(self, robot, l=0.195):
+    def __init__(self, robot, l=0.010):
         self.desired = np.array([0, 0])
         self.robot = robot
 
@@ -75,8 +72,10 @@ class TwoSidesLQR(object):
 
         if (between > math.pi/2):
             theta = self.robot.theta - math.pi
+            #print("LADO 1")
         else:
             theta = self.robot.theta
+            #print("LADO 2")
 
         v = self.desired[0] * math.cos(-theta) - self.desired[1] * math.sin(-theta)
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))
@@ -84,7 +83,9 @@ class TwoSidesLQR(object):
         pwr_left = (2 * v - w * self.L)/2 * self.R
         pwr_right = (2 * v + w * self.L)/2 * self.R
 
-        # return 0, 0
+        linear = v*self.R
+        angular = self.R*(w*self.L)/2
+
         if (between > math.pi/2):
-            return -pwr_right, -pwr_left,
-        return pwr_left, pwr_right
+            return -linear, -angular
+        return linear, -angular 

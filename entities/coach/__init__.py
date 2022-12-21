@@ -9,10 +9,13 @@ from entities.coach.rcx2022 import Coach as RCX_2022
 from entities.coach.cbfrs2022 import Coach as CBFRS_2022
 from entities.coach.cbfrs2022_2 import Coach as CBFRS_2022_2
 from entities.coach.cbfrs2022_5v5 import Coach as CBFRS_2022_5V5
+from entities.coach.iron2022 import Coach as IRON_2022
 
 from entities.coach.guideCoach import Coach as GuideCoach
 
 from entities.coach.test_coach import Coach as TestCoach
+
+from entities.coach.rsm2022 import Coach as RSMCoach
 
 _coach_list = [
     # Tournament coaches
@@ -22,9 +25,11 @@ _coach_list = [
     IronCoach,
     GuideCoach,
     RCX_2022,
+    RSMCoach,
     CBFRS_2022,
     CBFRS_2022_2,
     CBFRS_2022_5V5,
+    IRON_2022,
     TestCoach
 ]
 

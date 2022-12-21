@@ -4,6 +4,7 @@ import numpy as np
 from collections import deque
 from commons.math import angular_speed, rotate_via_numpy
 from commons.math import speed as avg_speed
+from controller.uni_controller import UniController
 
 class Robot(object):
 
@@ -31,7 +32,7 @@ class Robot(object):
 
         self.dimensions = {
             'L': 0.075,
-            'R': 0.02
+            'R': 0.035
         }
 
         self.power_left, self.power_right = 0, 0
@@ -71,7 +72,6 @@ class Robot(object):
             self.current_data = robot_data[0]
             self.last_frame = frame['frameNumber']
         else:
-            self.log.warn('Robo [{}] não encontrado, pode estar desligado!'.format(self.get_name()))
             return
 
         self._update_speeds()
@@ -159,17 +159,22 @@ class Robot(object):
         
 
     def decide(self):
-        desired = self.strategy.decide()
-        self.strategy.set_desired(desired)
-        self.power_left, self.power_right = self.strategy.update()
+        if self.strategy.controller.__class__ is UniController:
+            desired, desired_dl = self.strategy.decide()
+            self.strategy.set_desired(desired, desired_dl)
+            self.power_left, self.power_right = self.strategy.update()
+        else:
+            desired = self.strategy.decide()
+            self.strategy.set_desired(desired)
+            self.power_left, self.power_right = self.strategy.update()
 
         return self._get_command(self.power_left, self.power_right)
 
 
-    def _get_command(self, pl, pr):
+    def _get_command(self, power_left, power_right):
         return {
             'robot_id': self.robot_id,
-            'wheel_left': pl,
-            'wheel_right': pr,
+            'wheel_left': power_left,
+            'wheel_right': power_right,
             'color': self.team_color
         }
