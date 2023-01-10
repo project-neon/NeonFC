@@ -1,6 +1,5 @@
 import os
-from api.new_api import Api
-from api.api_recv import Api_recv
+from api import Api, Api_recv
 import comm
 import vision
 import match

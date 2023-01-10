@@ -1,4 +1,4 @@
-from entities.visualization import Writer
+from live_plot.logger import Writer
 
 kp = -100
 ki = 0

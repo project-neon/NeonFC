@@ -1,4 +1,4 @@
-from entities.visualization.visualizer import MPLVisualizer
+from live_plot.visualizer import MPLVisualizer
 from algorithms import UnivectorField
 from collections import deque
 import math

@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from entities.visualization import Writer, Parameter
+from live_plot import Writer, Parameter
 import time
 from collections import deque
 

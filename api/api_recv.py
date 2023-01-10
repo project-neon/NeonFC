@@ -1,12 +1,5 @@
 from socket import *
-
-from numpy import mat
-
-from concurrent import futures
-
 import json
-import struct
-
 import threading
 
 class Api_recv(threading.Thread):
@@ -16,7 +9,6 @@ class Api_recv(threading.Thread):
         BUFFER_SIZE = 2048
 
         self.match = match
-
         self.address = address
         self.port = port
         self.buffer_size = BUFFER_SIZE
