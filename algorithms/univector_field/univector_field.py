@@ -2,9 +2,9 @@ import math
 from collections import namedtuple
 import numpy as np
 import json
+from commons.math import distance_between_points as distance
 
 Obstacle = namedtuple("obstacle", "center radius margin eradius")
-
 
 def angle_between(p1, p2):
     y = p2[1] - p1[1]
@@ -13,13 +13,6 @@ def angle_between(p1, p2):
 
     return ang
 
-
-def distance(p1, p2):
-    y = (p2[1] - p1[1]) ** 2
-    x = (p2[0] - p1[0]) ** 2
-    return np.sqrt(x + y)
-
-
 def reduce_angle(ang):
     while ang > math.pi:
         ang -= 2 * math.pi
@@ -27,9 +20,7 @@ def reduce_angle(ang):
         ang += 2 * math.pi
     return ang
 
-
 np_reduce_angle = np.vectorize(reduce_angle)
-
 
 class UnivectorField:
     def __init__(self, n, rect_size, plot=False, path=''):
@@ -171,7 +162,6 @@ class UnivectorField:
             uvf.add_obstacle(obstacle['center'], obstacle['r0'], obstacle['m'])
 
         return uvf
-
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt

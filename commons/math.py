@@ -1,11 +1,12 @@
 import math
 import numpy as np
-
+from numpy import arccos, array, dot, pi, cross
+from numpy.linalg import det, norm
 from scipy.signal import savgol_filter
 
 def dist_point_line(x1, y1, x2, y2, x3, y3):
     """
-    veririca a distancia entre um ponto de uma linha
+    verifica a distancia entre um ponto de uma linha
     x1,y1: definicao do primeiro ponto que definira a linha
     x2,y2: definicao do segundo ponto que definira a linha
     x3,y3: definicao do terceiro ponto que sera usado para medir a distancia
@@ -42,7 +43,6 @@ def _fix_angle(theta_1, theta_2):
 
     return rate_theta
 
-
 def angular_speed(_list, _fps):
     if len(_list) <= 1:
         return 0
@@ -57,7 +57,6 @@ def angular_speed(_list, _fps):
     if not speed_fbf:
         return 0
     return _fps * (sum(speed_fbf)/len(speed_fbf))
-
 
 def speed(_list, _fps):
     if len(_list) <= 1:
@@ -76,7 +75,6 @@ def speed(_list, _fps):
     if not speed_fbf:
         return 0
     return _fps * (sum(speed_fbf)/len(speed_fbf))
-
 
 def unit_vector(vector):
     """ Returns the unit vector of the vector."""
@@ -101,9 +99,6 @@ def length(v):
 
 def angle_between(v1, v2):
   return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
-
-from numpy import arccos, array, dot, pi, cross
-from numpy.linalg import det, norm
 
 def distance(A, B, P):
     """ segment line AB, point P, where each one is an array([x, y]) """
@@ -133,3 +128,17 @@ def point_in_rect(point, rect):
         if (y1 < y and y < y2):
             return True
     return False
+
+def distance_between_points(p1, p2):
+    '''
+    Calculates the distance between 2 points, p1 and p2.
+    Arguments:
+        p1: an array([x, y])
+        p2: an array([x, y])
+    Returns:
+        Distance between p1 and p2
+    '''
+    dx = p1[0] - p2[0]
+    dy = p1[1] - p2[1]
+    
+    return np.sqrt(dx**2 + dy**2)
