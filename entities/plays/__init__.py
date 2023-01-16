@@ -20,3 +20,4 @@ from entities.plays import rcx2022
 from entities.plays import cbfrs2022
 from entities.plays import cbfrs2022_5v5
 from entities.plays import iron2022_3v3
+from entities.plays import iron2023_3v3
