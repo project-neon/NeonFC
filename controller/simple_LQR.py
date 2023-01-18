@@ -1,7 +1,7 @@
 import math
-from commons.math import angle_between
 import numpy as np
 import numpy.linalg as la
+from commons.math import speed_to_power
  
 def py_ang(v1, v2):
     """ Returns the angle in radians between vectors 'v1' and 'v2'    """
@@ -19,6 +19,7 @@ class SimpleLQR(object):
     def __init__(self, robot, l=0.025):
         self.desired = np.array([0, 0])
         self.robot = robot
+        self.environment = robot.game.environment
 
         self.l = l
         self.L = self.robot.dimensions.get('L')
@@ -42,8 +43,8 @@ class SimpleLQR(object):
         v = self.desired[0] * math.cos(-theta) - self.desired[1] * math.sin(-theta)
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))
 
-        pwr_left = (2 * v - w * self.L)/2 * self.R
-        pwr_right = (2 * v + w * self.L)/2 * self.R
+        if self.environment == 'simulation':
+            return speed_to_power(v, w)
 
         linear = v*self.R
         angular = self.R*(w*self.L)/2
@@ -54,6 +55,7 @@ class TwoSidesLQR(object):
     def __init__(self, robot, l=0.010):
         self.desired = np.array([0, 0])
         self.robot = robot
+        self.environment = robot.game.environment
 
         self.l = l
         self.L = self.robot.dimensions.get('L')
@@ -80,8 +82,14 @@ class TwoSidesLQR(object):
         v = self.desired[0] * math.cos(-theta) - self.desired[1] * math.sin(-theta)
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))
 
-        pwr_left = (2 * v - w * self.L)/2 * self.R
-        pwr_right = (2 * v + w * self.L)/2 * self.R
+        if self.environment == 'simulation':
+            powers = speed_to_power(v, w)
+
+            if (between > math.pi/2):
+                # this multiplies -1 to both elements of 'powers' and return it as a tuple
+                return tuple(np.dot(-1, powers))
+            else:
+                return powers
 
         linear = v*self.R
         angular = self.R*(w*self.L)/2

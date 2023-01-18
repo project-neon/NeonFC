@@ -11,19 +11,21 @@ from commons.utils import get_config
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config.json')
+parser.add_argument('--env', default='simulation')
 
 args = parser.parse_args()
 
 class Game():
-    def __init__(self, config_file=None):
+    def __init__(self, config_file=None, env='simulation'):
         self.config = get_config(config_file)
-        self.match = match.Match(self,
+        self.match = match.Match(self, env,
             **self.config.get('match')
         )
         self.vision = vision.FiraVision()
         self.comm = comm.FiraComm()
         self.field = pitch.Field(self.match.category)
         self.referee = RefereeComm(config_file)
+        self.environment = env
 
         self.use_api = self.config.get("api")
         self.api_address = self.config.get("network").get("api_address")
@@ -97,4 +99,4 @@ class Game():
         if self.use_api:
             self.api.send_data(self.match)
 
-g = Game(config_file=args.config_file)
+g = Game(config_file=args.config_file, env=args.env)

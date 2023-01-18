@@ -1,4 +1,5 @@
 import math
+from commons.math import speed_to_power
 
 """
 Controle baseado em angulo desejado
@@ -6,17 +7,30 @@ Referente ao soccer robotics
 """
 
 class UniController(object):
+    
+    CONSTANTS = {
+        'simulation': {
+            'V_M': 500,
+            'R_M': 3 * 500, # 3 * V_M
+            'K_W': 100,
+            'K_P': 5
+        },
+        'real_life': {
+            'V_M': 40,
+            'R_M': 20 * 40, # 20 * V_M
+            'K_W': 5,
+            'K_P': 5
+        }
+    }
+
     def __init__(self, robot):
         self.robot = robot
+        self.environment = robot.game.environment
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m
-        self.V_M = 40 # m/s
-        self.R_M = 20 * self.V_M # rad*m/s
-        self.K_W = 5 # coeficiente de feedback
-        # self.V_M = 500 # m/s
-        # self.R_M = 3 * self.V_M # rad*m/s
-        # self.K_W = 100 # coeficiente de feedback
-        self.K_P = 5
+
+        self.__dict__.update( self.CONSTANTS.get(self.environment) )
+
         self.v1 = 0  # restricao de velocidade 1
         self.v2 = 0  # restricao de velocidade 2
         self.theta_d = 0
@@ -63,9 +77,8 @@ class UniController(object):
         ball_x, ball_y = self.match.ball.x, self.match.ball.y
 
         self.v3 = self.K_P * ((self.robot.x - ball_x) ** 2 + (self.robot.y - ball_y) ** 2) ** .5
-        # print(f"{self.v3=}")
 
-        v = min(self.v1, 2*self.v2)  # , self.v3)
+        v = min(self.v1, 2*self.v2)
 
         # calcular w
         if self.theta_e > 0:
@@ -74,7 +87,6 @@ class UniController(object):
             w = v * self.phi_v - self.K_W * math.sqrt(self.a_theta_e)
 
         w *= 1.3
-        print(f"v = {v:.2f}, w = {w:.2f}")
 
         return v, -w
 
@@ -87,8 +99,7 @@ class UniController(object):
     def update(self):
         v, w = self.control()
 
-        pwr_left = v - 0.5 * self.L * w
-        pwr_right = v + 0.5 * self.L * w
-
+        if self.environment == 'simulation':
+            return speed_to_power(v, w)
+            
         return v, w
-        return pwr_left, pwr_right

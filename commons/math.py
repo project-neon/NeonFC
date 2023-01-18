@@ -142,3 +142,10 @@ def distance_between_points(p1, p2):
     dy = p1[1] - p2[1]
     
     return np.sqrt(dx**2 + dy**2)
+
+def speed_to_power(linear_speed, angular_speed, L, R):
+
+    power_left = (2*linear_speed - angular_speed*L)/2 * R
+    power_right = (2*linear_speed + angular_speed*L)/2 * R
+
+    return power_left, power_right

@@ -1,12 +1,5 @@
 import os
-import json
-import struct
 import serial
-import socket
-import threading
-
-from random import randint
-
 import json
 
 def get_config(config_file=None):
@@ -32,7 +25,7 @@ class RLComm(object):
     
     def send(self, robot_commands = []):
         '''
-        Send commands to FIRASim
+        Send commands to ESP-32
 
         robot_commands follows:
         [
@@ -54,10 +47,6 @@ class RLComm(object):
         self.comm.write(message.encode())
 
         # battery = self.comm.readline().decode('ascii')
-
-        # print('mensagem', message)
-        # print('bateria: ', battery)
-
 
     def _get_robot_color(self, robot):
         return True if robot['color'] == 'yellow' else False

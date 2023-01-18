@@ -1,4 +1,3 @@
-import os
 from api import Api, Api_recv
 import comm
 import vision
@@ -11,11 +10,12 @@ from vision.sslvision import assign_empty_values
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config_real_life.json')
+parser.add_argument('--env', default='real_life')
 
 args = parser.parse_args()
 
 class Game():
-    def __init__(self, config_file=None):
+    def __init__(self, config_file=None, env='real_life'):
         self.config = get_config(config_file)
         self.match = match.MatchRealLife(self,
             **self.config.get('match')
@@ -23,6 +23,7 @@ class Game():
         self.vision = vision.SSLVision()
         self.comm = comm.RLComm()
         self.field = pitch.Field(self.match.category)
+        self.environment = env
 
         self.use_api = self.config.get("api")
         self.api_address = self.config.get("network").get("api_address")
@@ -68,4 +69,4 @@ class Game():
         pass
 
 
-g = Game(config_file=args.config_file)
+g = Game(config_file=args.config_file, env=args.env)
