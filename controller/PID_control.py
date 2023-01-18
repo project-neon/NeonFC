@@ -11,7 +11,7 @@ def angle_adjustment(angle):
 
         return phi
 
-class PID_control(object):
+class PID_W_control(object):
 
     CONSTANTS = {
         'simulation': {
@@ -60,7 +60,6 @@ class PID_control(object):
         self.int_alpha = 0 # integral param
         self.alpha_old = 0 # stores previous iteration alpha
 
-        self.control_linear_speed = False
         self.lp = [0, 0]
 
         # self.pid_writer = Writer('pid',
@@ -84,7 +83,7 @@ class PID_control(object):
         else:
             self.dt = 1/self.default_fps
 
-    def update(self):
+    def _update(self):
         # Params calculation
         # Feedback errors
         D_x = self.desired[0] - self.robot.x
@@ -107,7 +106,7 @@ class PID_control(object):
         self.int_alpha = self.int_alpha + alpha
             
         """Linear speed (v)"""
-        v = min(self.V_MIN + self.K_RHO*rho, self.V_MAX) if self.control_linear_speed else self.V_MAX
+        v = self.V_MAX
 
         """Objective behind the robot"""
         # if(abs(alpha) > math.pi/2):
@@ -122,6 +121,24 @@ class PID_control(object):
 
         # self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
         self.robot_writer.write([self.robot.x, self.robot.y])
+
+        return v, w
+
+    def update(self):
+        v, w = self._update()
+
+        if self.environment == 'simulation':
+            powers = speed_to_power(v, w)
+            return tuple(np.dot(1000, powers))
+        
+        return v, w
+
+class PID_control(PID_W_control):
+
+    def update(self):
+        _, w = super()._update()
+
+        v = self.V_MAX
 
         if self.environment == 'simulation':
             powers = speed_to_power(v, w)

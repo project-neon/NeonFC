@@ -33,7 +33,7 @@ class SimpleLQR(object):
 
         self.desired = (self.robot.x + vector[0] * EXPERIMENTAL_SPEED_CONSTANT, self.robot.y + vector[1] * EXPERIMENTAL_SPEED_CONSTANT)
 
-    def update(self):
+    def _update(self):
         n = (1/self.l)
 
         theta = self.robot.theta
@@ -44,12 +44,19 @@ class SimpleLQR(object):
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))
 
         if self.environment == 'simulation':
-            return speed_to_power(v, w)
+            powers = speed_to_power(v, w)
+            if self.inverted:
+                return tuple(np.dot(-1, powers))
+            else:
+                return powers
 
         linear = v*self.R
         angular = self.R*(w*self.L)/2
 
-        return angular, linear 
+        if self.inverted:
+            linear = -linear
+
+        return angular, linear
 
 class TwoSidesLQR(object):
     def __init__(self, robot, l=0.010):
