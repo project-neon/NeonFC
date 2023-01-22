@@ -169,6 +169,25 @@ class UnstuckPlay(Play):
     def _elect_midfielder(self, robot):
         return 1
 
+class OnWall(Trigger):
+    def __init__(self,match,robot):
+        super().__init__()
+        self.robot = robot
+        self.match = match
+        self.field_dim = self.match.game.field.get_dimensions()
+
+    def evaluate(self,coach,actual_play):
+        self.delta = 0.07
+        if abs(self.field_dim[1] - self.robot.y) < self.delta :
+            if abs(self.field_dim[1] - self.match.ball.y) < self.delta:
+                return True
+        elif abs(self.robot.y) < self.delta:
+            if abs(self.robot.y) < self.delta:
+                return True
+        return False
+
+
+
 class WaitFor(Trigger):
     def __init__(self, timeout):
         """
