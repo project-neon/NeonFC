@@ -11,7 +11,7 @@ from commons import math as nfc_math
 
 from strategy.larc2022_5v5.commons import AstarPlanning, DefendPlanning, LimitCyclePlanning, aim_projection_ball
 from strategy.utils.player_playbook import OnCorners, OnInsideBox, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
-from entities.plays.playbook import OnWall
+from entities.plays.playbook import OnWall, WaitFor
 def aim_behind_ball(strategy):
     b = strategy.match.ball
     ball = [b.x, b.y - 0.05]
@@ -175,7 +175,8 @@ class WingPlanning(PlayerPlay):
 class Spinner(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
-
+        self.robot = robot
+        self.timeout = 0.5
     def get_name(self):
         return f"<{self.robot.get_name()} Spinner Planning>"
 
@@ -186,7 +187,18 @@ class Spinner(PlayerPlay):
             self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
-        return [-1000, 1000]
+        field_dim = self.match.game.field.get_dimensions()
+        actual_play = self.robot.strategy.playerbook.get_actual_play()
+        print(self.timeout - actual_play.get_running_time())
+        if self.timeout - actual_play.get_running_time() > 0:
+            if self.robot.y > field_dim[1]/2:
+                self.robot.strategy.spin = -1
+            else:
+                self.robot.strategy.spin = 1
+        else:
+            self.robot.strategy.spin = 0
+            self.robot.strategy.playerbook.set_play(PushPotentialFieldPlanning(self.match, self.robot))
+        return [0,0]
 
     def start(self):
         pass
@@ -533,7 +545,7 @@ class MainAttacker(Strategy):
         self.is_on_attack = False
 
         self.playerbook = None
-
+        self.spin = 0
     def start(self, robot=None):
         super().start(robot=robot)
 
@@ -568,7 +580,6 @@ class MainAttacker(Strategy):
 
         spinner = Spinner(self.match, self.robot)
 
-
         self.playerbook.add_play(push_potentialfield)
         self.playerbook.add_play(wing_potentialfield)
         self.playerbook.add_play(defend_potentialfield)
@@ -599,9 +610,19 @@ class MainAttacker(Strategy):
         self.playerbook.set_play(push_potentialfield)
 
     def decide(self):
+        field_dim = self.match.game.field.get_dimensions()     
+
+
         res = self.playerbook.update()
-        print(self.playerbook.get_actual_play())
+
         return res 
+    def update(self):
+        if self.spin == 0:
+            return self.controller.update()
+        elif self.spin == -1:
+            return 100,-100
+        else:
+            return -100,100
    
 
     
