@@ -11,7 +11,7 @@ from commons import math as nfc_math
 
 from strategy.larc2022_5v5.commons import AstarPlanning, DefendPlanning, LimitCyclePlanning, aim_projection_ball
 from strategy.utils.player_playbook import OnCorners, OnInsideBox, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
-from entities.plays.playbook import OnWall, WaitFor
+from entities.plays.playbook import OnWall, OnWall2
 def aim_behind_ball(strategy):
     b = strategy.match.ball
     ball = [b.x, b.y - 0.05]
@@ -63,7 +63,7 @@ class CarryPlanning(PlayerPlay):
     def start_up(self):
             super().start_up()
             controller = TwoSidesLQR
-            controller_kwargs = {'l': 0.185}
+            controller_kwargs = {'l': 0.185, 'max_speed': 1000, 'max_angular': 1000}
             self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
@@ -82,7 +82,7 @@ class CarryPlanning(PlayerPlay):
                 target = lambda m: (m.ball.x, m.ball.y),
                 radius = 0.05, # 30cm
                 decay = lambda x: 1,
-                multiplier = lambda m: max(0.80, math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.25) # 50 cm/s
+                multiplier = lambda m: max(1, 3*math.sqrt(m.ball.vx**2 + m.ball.vy**2) + 0.5) # 50 cm/s
             )
         )
         self.carry.add_field(
@@ -172,11 +172,40 @@ class WingPlanning(PlayerPlay):
         res[1] = self.robot.y + res[1] * dt
         return res
 
+class NeverWall(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+        self.timeout = 1
+    def get_name(self):
+        return f"<{self.robot.get_name()} Carry Potential Planning>"
+
+    def start_up(self):
+            super().start_up()
+            controller = PID_control
+            controller_kwargs = {'max_speed': 3, 'max_angular': 1000}
+            self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def start(self):
+        pass
+
+    def update(self):
+        delta = 0.01
+        actual_play = self.robot.strategy.playerbook.get_actual_play()
+        print("neverwall")
+        if self.timeout - actual_play.get_running_time() > 0:
+            if self.robot.team_color == "blue":
+                res = self.match.ball.x - delta , self.match.ball.y
+            else:
+                res = self.match.ball.x + delta , self.match.ball.y
+            return res
+        else:
+            self.robot.strategy.playerbook.set_play(PushPotentialFieldPlanning(self.match, self.robot))
+        return 0,0
 class Spinner(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
         self.robot = robot
-        self.timeout = 0.5
+        self.timeout = 0.3
     def get_name(self):
         return f"<{self.robot.get_name()} Spinner Planning>"
 
@@ -191,10 +220,17 @@ class Spinner(PlayerPlay):
         actual_play = self.robot.strategy.playerbook.get_actual_play()
         print(self.timeout - actual_play.get_running_time())
         if self.timeout - actual_play.get_running_time() > 0:
-            if self.robot.y > field_dim[1]/2:
-                self.robot.strategy.spin = -1
+            print(self.robot.team_color)
+            if self.robot.team_color == "blue":
+                if self.robot.y > field_dim[1]/2:
+                    self.robot.strategy.spin = -1
+                else:
+                    self.robot.strategy.spin = 1
             else:
-                self.robot.strategy.spin = 1
+                if self.robot.y > field_dim[1]/2:
+                    self.robot.strategy.spin = 1
+                else:
+                    self.robot.strategy.spin = -1
         else:
             self.robot.strategy.spin = 0
             self.robot.strategy.playerbook.set_play(PushPotentialFieldPlanning(self.match, self.robot))
@@ -579,11 +615,14 @@ class MainAttacker(Strategy):
 
 
         spinner = Spinner(self.match, self.robot)
+        never_wall = NeverWall(self.match, self.robot)
+
 
         self.playerbook.add_play(push_potentialfield)
         self.playerbook.add_play(wing_potentialfield)
         self.playerbook.add_play(defend_potentialfield)
         self.playerbook.add_play(spinner)
+        self.playerbook.add_play(never_wall)
 
         corners_transition = OnCorners(self.match, [0.15, 1.20])
         out_corners_transition = OnCorners(self.match, [0.15, 1.20], True)
@@ -592,6 +631,7 @@ class MainAttacker(Strategy):
         on_offensive_sector_transition = OnInsideBox(self.match, [field_dim[0]/2, 0, field_dim[0]/2, field_dim[1]/2])
         
         on_wall = OnWall(self.match, self.robot)
+        on_wall2 = OnWall2(self.match, self.robot)
 
         push_potentialfield.add_transition(on_defensive_sector_transition, defend_potentialfield)
         push_potentialfield.add_transition(corners_transition, wing_potentialfield)
@@ -602,7 +642,9 @@ class MainAttacker(Strategy):
         
         wing_potentialfield.add_transition(on_wall, spinner)
         push_potentialfield.add_transition(on_wall, spinner)
-
+        wing_potentialfield.add_transition(on_wall2, never_wall)
+        push_potentialfield.add_transition(on_wall2, never_wall)
+        never_wall.add_transition(on_wall, spinner)
         #spinner.add_transition(corners_transition, wing_potentialfield)
         #spinner.add_transition(on_offensive_sector_transition, push_potentialfield)
 
@@ -610,9 +652,7 @@ class MainAttacker(Strategy):
         self.playerbook.set_play(push_potentialfield)
 
     def decide(self):
-        field_dim = self.match.game.field.get_dimensions()     
-
-
+        self.spin = 0
         res = self.playerbook.update()
 
         return res 
