@@ -12,7 +12,7 @@ class Coach(BaseCoach):
         self.positions = json.loads(open('foul_placements.json', 'r').read())
         self.playbook = plays.Playbook(self)
 
-        main_play = plays.iron2022_3v3.MainPlay(self)
+        main_play = plays.iron2023_3v3.MainPlay(self)
         penalty_play = plays.iron2023_3v3.PenaltyPlay(self, self.coach_parameters['penalty_taker']) # Add later this play to larc2022 5v5 package in plays
         defend_penalty_play = plays.larc2021.DefendPenaltyPlay(self) # Add later this play to larc2022 5v5 package in plays
         goalkick_play = plays.larc2021.GoalKickPlay(self) # Add later this play to larc2022 5v5 package in plays
