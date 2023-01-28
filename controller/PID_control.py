@@ -62,14 +62,6 @@ class PID_W_control(object):
 
         self.lp = [0, 0]
 
-        # self.pid_writer = Writer('pid',
-        #                          {'kp': 'FLOAT',
-        #                           'ki': 'FLOAT',
-        #                           'kd': 'FLOAT',
-        #                           'set_point': 'FLOAT',
-        #                           'error': 'FLOAT',
-        #                           'w': 'FLOAT'
-        #                           })
         self.robot_writer = Writer('robot',
                                 {'x': 'FLOAT',
                                     'y': 'FLOAT'})
@@ -108,18 +100,12 @@ class PID_W_control(object):
         """Linear speed (v)"""
         v = self.V_MAX
 
-        """Objective behind the robot"""
-        # if(abs(alpha) > math.pi/2):
-        #     v = -v
-        #     alpha = angle_adjustment(alpha - math.pi)
-
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha
         w = np.sign(w) * min(abs(w), self.W_MAX)
         
         self.alpha_old = alpha
 
-        # self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
         self.robot_writer.write([self.robot.x, self.robot.y])
 
         return v, w

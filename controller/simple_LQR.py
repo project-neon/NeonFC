@@ -33,7 +33,7 @@ class SimpleLQR(object):
 
         self.desired = (self.robot.x + vector[0] * EXPERIMENTAL_SPEED_CONSTANT, self.robot.y + vector[1] * EXPERIMENTAL_SPEED_CONSTANT)
 
-    def _update(self):
+    def update(self):
         n = (1/self.l)
 
         theta = self.robot.theta

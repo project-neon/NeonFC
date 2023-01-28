@@ -6,10 +6,10 @@ from scipy.signal import savgol_filter
 
 def dist_point_line(x1, y1, x2, y2, x3, y3):
     """
-    verifica a distancia entre um ponto de uma linha
-    x1,y1: definicao do primeiro ponto que definira a linha
-    x2,y2: definicao do segundo ponto que definira a linha
-    x3,y3: definicao do terceiro ponto que sera usado para medir a distancia
+    verify the distance between a point and a line
+    x1,y1: definition of the first point that makes the line
+    x2,y2: definition of the second point that makes the line
+    x3,y3: definition of the point that will be used to calculate the distance
     """
     px = x2-x1
     py = y2-y1
@@ -68,9 +68,9 @@ def speed(_list, _fps):
             _list, 
             list(_list)[1:]
         ) if abs((t1 - t0)) < 0.1
-        # considerando que o jogo funciona a 60 fps
-        # limitar 0.1 m/f aqui é dizer que é impossivel
-        # o robo fazer 6 m/s (0.1 [m][f⁻¹] * 60 [f][s⁻¹] = 6[m][s⁻¹])
+        # considering the game runs at 60 fps
+        # to limit 0.1 m/f here is to say that is impossible
+        # for the robot to run at 6 m/s (0.1 [m][f⁻¹] * 60 [f][s⁻¹] = 6[m][s⁻¹])
     ]
     if not speed_fbf:
         return 0
@@ -91,14 +91,14 @@ def rotate_via_numpy(xy, radians):
 
     return float(m.T[0]), float(m.T[1])
 
-def dotproduct(v1, v2):
+def dot_product(v1, v2):
   return sum((a*b) for a, b in zip(v1, v2))
 
 def length(v):
-  return math.sqrt(dotproduct(v, v))
+  return math.sqrt(dot_product(v, v))
 
 def angle_between(v1, v2):
-  return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
+  return math.acos(dot_product(v1, v2) / (length(v1) * length(v2)))
 
 def distance(A, B, P):
     """ segment line AB, point P, where each one is an array([x, y]) """

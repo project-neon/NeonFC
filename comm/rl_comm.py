@@ -46,8 +46,6 @@ class RLComm(object):
 
         self.comm.write(message.encode())
 
-        # battery = self.comm.readline().decode('ascii')
-
     def _get_robot_color(self, robot):
         return True if robot['color'] == 'yellow' else False
 
@@ -66,18 +64,6 @@ if __name__ == "__main__":
                     'wheel_left': 20,
                     'wheel_right': -20,
                     'color': 'blue'
-                },
-                # {
-                #     'robot_id': 3,
-                #     'wheel_left': 40,
-                #     'wheel_right': -40,
-                #     'color': 'blue'
-                # },
-                # {
-                #     'robot_id': 9,
-                #     'wheel_left': 60,
-                #     'wheel_right': -60,
-                #     'color': 'blue'
-                # }
+                }
             ]
         )

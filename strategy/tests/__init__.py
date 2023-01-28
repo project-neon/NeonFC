@@ -16,4 +16,6 @@ from strategy.tests.asScratch2 import AsScratch2
 from strategy.tests.newAttacker import newAttacker
 from strategy.tests.uvf_attacker import Attacker as UVFAttacker
 
-from strategy.tests.PID_attacker import Attacker as PID_Test
+from strategy.tests.PID_attacker import Attacker as PID_Attacker
+
+from strategy.tests.PID_test import PID_Test
