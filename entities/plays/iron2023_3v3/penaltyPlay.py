@@ -2,11 +2,11 @@ import math
 import os
 import random
 
-from entities.plays.iron2022_3v3.mainPlay import MainPlay
+from entities.plays.iron2023_3v3.mainPlay import MainPlay
 import strategy
 
-from strategy.larc2022_5v5.shortShotPenaltyTaker import ShortShotPenaltyTaker
-from strategy.larc2022_5v5.longShotPenalty import LongShotPenaltyTaker
+from strategy.iron2023_3v3.shortShotPenaltyTaker import ShortShotPenaltyTaker
+from strategy.iron2023_3v3.longShotPenalty import LongShotPenaltyTaker
 
 
 
