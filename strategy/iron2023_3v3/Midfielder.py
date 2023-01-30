@@ -152,13 +152,13 @@ class Midfielder(Strategy):
         self.playerbook.add_play(defend_potentialfield)
         self.playerbook.add_play(rightattack_potentialfield)
 
-        # Transicao para caso esteja perto da bola ( < 10 cm)
+        # Transicao para caso esteja perto da bola ( < 30 cm)
         next_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.30)
-        # Transicao para caso esteja longe da bola ( > 20 cm)
+        # Transicao para caso esteja longe da bola ( > 40 cm)
         far_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.40, True)
 
         on_defensive_sector_transition = OnInsideBox(self.match, [0, 0, field_dim[0]/2, field_dim[1]/2])
-        on_offensive_sector_transition = OnInsideBox(self.match, [field_dim[0]/2, 0, field_dim[0]/2, field_dim[1]/2])
+        on_offensive_sector_transition = OnInsideBox(self.match, [field_dim[0]/2, 0, field_dim[0]/2, field_dim[1]])
 
         astar.add_transition(
             AndTransition(
@@ -179,6 +179,7 @@ class Midfielder(Strategy):
 
         rightattack_potentialfield.add_transition(far_to_ball_transition, astar)
 
+        # Estado inicial é o astar
         self.playerbook.set_play(astar)
     
 
