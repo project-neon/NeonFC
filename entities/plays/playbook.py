@@ -169,6 +169,59 @@ class UnstuckPlay(Play):
     def _elect_midfielder(self, robot):
         return 1
 
+class OnWall(Trigger): #Ativado quando a bola e o robo estão nas paredes horizontais e próximos
+    def __init__(self,match,robot):
+        super().__init__()
+        self.robot = robot
+        self.match = match
+        self.field_dim = self.match.game.field.get_dimensions()
+    def evaluate(self,coach,actual_play):
+        self.delta = 0.1
+        ball_distance = 0.1
+        if ((self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2)**(1/2) < ball_distance:
+            if abs(self.field_dim[1] - self.robot.y) < self.delta :
+                if abs(self.field_dim[1] - self.match.ball.y) < self.delta:
+                    return True
+            elif abs(self.robot.y) < self.delta:
+                if abs(self.robot.y) < self.delta:
+                    return True
+        return False
+class OnWall2(Trigger): #Ativado quando apenas a bola está nas paredes horizontais
+    def __init__(self,match,robot):
+        super().__init__()
+        self.robot = robot
+        self.match = match
+        self.field_dim = self.match.game.field.get_dimensions()
+    def evaluate(self,coach,actual_play):
+        self.delta = 0.2
+        ball_distance = 0.1
+        if ((self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2)**(1/2) > ball_distance:
+            if abs(self.field_dim[1] - self.match.ball.y) < self.delta:
+                return True
+            if abs(self.match.ball.y) < self.delta:
+                print("embaixo")
+                return True
+        return False
+
+class StaticInWall(Trigger): #Ativado quando o robo está preso
+    def __init__(self,match,robot):
+        super().__init__()
+        self.robot = robot
+        self.match = match
+        self.field_dim = self.match.game.field.get_dimensions()
+    def evaluate(self,coach,actual_play):
+        self.delta = 0.3
+        self.ball_distance = 0.1
+        if (math.atan((self.robot.y - self.match.ball.y)/(self.robot.x - self.match.ball.x)) - self.robot.theta) > 0.4:
+            if abs((self.robot.vx**2 + self.robot.vy**2)**(1/2) < 0.05 and ((self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2)**(1/2)) > self.ball_distance:
+                return True
+                if abs(self.field_dim[1] - self.robot.y) < self.delta:
+                    return True
+                if abs(self.robot.y) < self.delta:
+                    return True
+        return False
+
+
 class WaitFor(Trigger):
     def __init__(self, timeout):
         """
