@@ -15,8 +15,8 @@
     },
     "match" : {
         "team_side": "left",
-        "team_color": "yellow",
-        "coach_name": "IRON_2022",
+        "team_color": "blue",
+        "coach_name": "TEST",
         "category": "3v3",
         "robot_ids": [
             3,

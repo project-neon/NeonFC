@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from commons.math import speed_to_power
 
 """
@@ -10,15 +11,15 @@ class UniController(object):
     
     CONSTANTS = {
         'simulation': {
-            'V_M': 500,
-            'R_M': 3 * 500, # 3 * V_M
-            'K_W': 100,
+            'V_M': 100,
+            'R_M': 5 * 100, # 3 * V_M
+            'K_W': 150,
             'K_P': 5
         },
         'real_life': {
-            'V_M': 40,
-            'R_M': 20 * 40, # 20 * V_M
-            'K_W': 5,
+            'V_M': 150,
+            'R_M': 10 * 150, # 20 * V_M
+            'K_W': 200,
             'K_P': 5
         }
     }
@@ -74,9 +75,7 @@ class UniController(object):
             self.a_theta_e)) \
                   / (2 * self.a_phi_v) if self.a_phi_v > 0 else self.V_M
 
-        ball_x, ball_y = self.match.ball.x, self.match.ball.y
-
-        self.v3 = self.K_P * ((self.robot.x - ball_x) ** 2 + (self.robot.y - ball_y) ** 2) ** .5
+        # self.v3 = self.K_P * ((self.robot.x - ball_x) ** 2 + (self.robot.y - ball_y) ** 2) ** .5
 
         v = min(self.v1, 2*self.v2)
 
@@ -86,20 +85,19 @@ class UniController(object):
         else:
             w = v * self.phi_v - self.K_W * math.sqrt(self.a_theta_e)
 
-        w *= 1.3
+        # w *= 1.3
 
-        return v, -w
+        return v, w# -w
 
-    def set_desired(self, match, theta_d, theta_f):
-        self.match = match
-
-        self.theta_d = theta_d
-        self.theta_f = theta_f
+    def set_desired(self, desired):
+        self.theta_d = desired[0]
+        self.theta_f = desired[1]
 
     def update(self):
         v, w = self.control()
 
         if self.environment == 'simulation':
-            return speed_to_power(v, w)
+            # print(tuple(np.dot(100, speed_to_power(v, w, self.L, self.R))))
+            return tuple(np.dot(1000, speed_to_power(v, w, self.L, self.R)))
             
         return v, w

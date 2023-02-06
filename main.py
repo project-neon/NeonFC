@@ -18,7 +18,7 @@ args = parser.parse_args()
 class Game():
     def __init__(self, config_file=None, env='simulation'):
         self.config = get_config(config_file)
-        self.match = match.Match(self, env,
+        self.match = match.Match(self,
             **self.config.get('match')
         )
         self.vision = vision.FiraVision()

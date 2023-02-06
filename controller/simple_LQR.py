@@ -44,7 +44,7 @@ class SimpleLQR(object):
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))
 
         if self.environment == 'simulation':
-            powers = speed_to_power(v, w)
+            powers = speed_to_power(v, w, self.L, self.R)
             if self.inverted:
                 return tuple(np.dot(-1, powers))
             else:
@@ -90,7 +90,7 @@ class TwoSidesLQR(object):
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))
 
         if self.environment == 'simulation':
-            powers = speed_to_power(v, w)
+            powers = speed_to_power(v, w, self.L, self.R)
 
             if (between > math.pi/2):
                 # this multiplies -1 to both elements of 'powers' and return it as a tuple

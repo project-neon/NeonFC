@@ -114,7 +114,7 @@ class PID_W_control(object):
         v, w = self._update()
 
         if self.environment == 'simulation':
-            powers = speed_to_power(v, w)
+            powers = speed_to_power(v, w, self.l, self.R)
             return tuple(np.dot(1000, powers))
         
         return v, w
@@ -127,7 +127,7 @@ class PID_control(PID_W_control):
         v = self.V_MAX
 
         if self.environment == 'simulation':
-            powers = speed_to_power(v, w)
+            powers = speed_to_power(v, w, self.l, self.R)
             return tuple(np.dot(1000, powers))
 
         return v, w

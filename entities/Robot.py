@@ -66,10 +66,8 @@ class Robot(object):
 
         robot_data = [i for i in frame.get(team_color_key, []) if i.get('robotId') == self.robot_id]
 
-        self.actual_frame = frame['frameNumber']
         if len(robot_data) >= 1:
             self.current_data = robot_data[0]
-            self.last_frame = frame['frameNumber']
         else:
             return
 
