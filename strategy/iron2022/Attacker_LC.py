@@ -1,4 +1,4 @@
-from algorithms.limit_cycle import LimitCycle, Obstacle, Point
+from algorithms.limit_cycle import LimitCycle
 import math
 from controller.PID_control import PID_control
 from strategy.BaseStrategy import Strategy
@@ -28,7 +28,7 @@ class Attacker_LC(Strategy):
         self.dl = 1 / self.match.game.vision._fps if self.match.game.vision._fps != 0 else self.dl
         self.controller.dl = self.dl
 
-        self.limit_cycle = LimitCycle(self, target_is_ball=True)
+        self.limit_cycle = LimitCycle(self.match)
 
     def reset(self, robot=None):
         super().reset()

@@ -1,6 +1,5 @@
 import math
 import numpy as np
-from live_plot import Writer, Parameter
 from commons.math import speed_to_power
 
 def angle_adjustment(angle):
@@ -55,25 +54,10 @@ class PID_control(object):
 
         self.__dict__.update( self.CONSTANTS.get(self.environment) )
 
-        self.KP = -1000#Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
-        self.KI = 0#Parameter(0, 'pid_tuner', 'ki') # Integral gain of w
-        self.KD = 0#Parameter(0, 'pid_tuner', 'kd') # Derivative gain of w
-
         # PID params for error
         self.dif_alpha = 0 # diferential param
         self.int_alpha = 0 # integral param
         self.alpha_old = 0 # stores previous iteration alpha
-
-        self.lp = [0, 0]
-
-        self.pid_writer = Writer('pid',
-                                 {'kp': 'FLOAT',
-                                  'ki': 'FLOAT',
-                                  'kd': 'FLOAT',
-                                  'set_point': 'FLOAT',
-                                  'error': 'FLOAT',
-                                  'w': 'FLOAT'
-                                  })
 
     def set_desired(self, vector):
         self.desired = vector
@@ -91,9 +75,7 @@ class PID_control(object):
         D_y = self.desired[1] - self.robot.y
 
         # RHO distance of the robot to the objective
-        rhox = self.robot.x - self.lp[0]
-        rhoy = self.robot.y - self.lp[1]
-        rho = math.sqrt((rhox**2 + rhoy**2))
+        rho = math.sqrt((D_x**2 + D_y**2))
 
         # GAMMA robot's position angle to the objetive
         gamma = angle_adjustment(math.atan2(D_y, D_x))
@@ -108,7 +90,6 @@ class PID_control(object):
 
         """Linear speed (v)"""
         v = max(self.V_MIN, min(self.V_MAX, self.V_MAX-rho*self.K_RHO))
-        print(v)
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha
@@ -116,8 +97,6 @@ class PID_control(object):
 
         self.alpha_old = alpha
 
-        #print([self.KP(), self.KI(), self.KD, gamma, alpha, w])
-        self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
         return v, w
 
     def update(self):
