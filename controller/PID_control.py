@@ -11,7 +11,7 @@ def angle_adjustment(angle):
 
         return phi
 
-class PID_W_control(object):
+class PID_control(object):
 
     CONSTANTS = {
         'simulation': {
@@ -28,15 +28,15 @@ class PID_W_control(object):
         },
         'real_life': {
             # Control params
-            'K_RHO': .05, # Linear speed gain
+            'K_RHO': 50, # Linear speed gain
             # PID of angular speed
-            'KP': -350, # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+            'KP': -1000, # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
             'KD': 0, # Derivative gain of w
             'KI': 0, # Integral gain of w
             # Max speeds for the robot
             'V_MAX': 130, # linear speed
             'W_MAX': 550, # angular speed rad/s
-            'V_MIN': 80
+            'V_MIN': 20
         }
     }
 
@@ -55,6 +55,10 @@ class PID_W_control(object):
 
         self.__dict__.update( self.CONSTANTS.get(self.environment) )
 
+        self.KP = -1000#Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+        self.KI = 0#Parameter(0, 'pid_tuner', 'ki') # Integral gain of w
+        self.KD = 0#Parameter(0, 'pid_tuner', 'kd') # Derivative gain of w
+
         # PID params for error
         self.dif_alpha = 0 # diferential param
         self.int_alpha = 0 # integral param
@@ -62,15 +66,20 @@ class PID_W_control(object):
 
         self.lp = [0, 0]
 
-        self.robot_writer = Writer('robot',
-                                {'x': 'FLOAT',
-                                    'y': 'FLOAT'})
-    
+        self.pid_writer = Writer('pid',
+                                 {'kp': 'FLOAT',
+                                  'ki': 'FLOAT',
+                                  'kd': 'FLOAT',
+                                  'set_point': 'FLOAT',
+                                  'error': 'FLOAT',
+                                  'w': 'FLOAT'
+                                  })
+
     def set_desired(self, vector):
         self.desired = vector
 
     def _update_fps(self):
-        if self.vision._fps > 0: 
+        if self.vision._fps > 0:
             self.dt = 1/self.vision._fps
         else:
             self.dt = 1/self.default_fps
@@ -96,18 +105,19 @@ class PID_W_control(object):
         self._update_fps()
         self.dif_alpha = (alpha - self.alpha_old) / self.dt # Difentential of alpha
         self.int_alpha = self.int_alpha + alpha
-            
+
         """Linear speed (v)"""
-        v = self.V_MAX
+        v = max(self.V_MIN, min(self.V_MAX, self.V_MAX-rho*self.K_RHO))
+        print(v)
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha
         w = np.sign(w) * min(abs(w), self.W_MAX)
-        
+
         self.alpha_old = alpha
 
-        self.robot_writer.write([self.robot.x, self.robot.y])
-
+        #print([self.KP(), self.KI(), self.KD, gamma, alpha, w])
+        self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
         return v, w
 
     def update(self):
@@ -116,10 +126,10 @@ class PID_W_control(object):
         if self.environment == 'simulation':
             powers = speed_to_power(v, w, self.l, self.R)
             return tuple(np.dot(1000, powers))
-        
+
         return v, w
 
-class PID_control(PID_W_control):
+class PID_W_control(PID_control):
 
     def update(self):
         _, w = super()._update()
