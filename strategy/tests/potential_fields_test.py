@@ -36,14 +36,18 @@ class Fields_Test(Strategy):
             name=f'{self.__class__}|TestFieldBehaviour'
         )
 
+        # self.test_field.add_field(
+        #     PointField(
+        #         self.match,
+        #         target = (.75, .65),
+        #         radius = .3,
+        #         decay = lambda x: x,
+        #         multiplier = .8,
+        #     )
+        # )
+
         self.test_field.add_field(
-            PointField(
-                self.match,
-                target = (.75, .65),
-                radius = .3,
-                decay = lambda x: x,
-                multiplier = .8,
-            )
+            LineField()
         )
 
     def reset(self, robot=None):
