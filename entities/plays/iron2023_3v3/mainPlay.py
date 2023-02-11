@@ -10,7 +10,7 @@ class MainPlay(Play):
         self.strategies = [
             strategy.larc2022_5v5.GoalKeeper(self.match, 'Goalkeeper'),
             strategy.iron2023_3v3.Midfielder(self.match, 'Midfielder'),
-            strategy.larc2022_5v5.MainAttacker(self.match, 'MainAttacker'),
+            strategy.iron2023_3v3.MainAttacker(self.match, 'MainAttacker'),
         ]
 
     def _can_play(self):
@@ -52,4 +52,8 @@ class MainPlay(Play):
         dist_to_ball = math.sqrt(
             (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
         )
-        return 1000 - dist_to_ball * is_behind
+        is_1 = 0
+        if robot.robot_id == 2:
+            is_1 = 10000
+
+        return is_1

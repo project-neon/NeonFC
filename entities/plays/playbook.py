@@ -26,7 +26,8 @@ class Playbook(object):
         for transition, next_play in self.plays[self.actual_play].transitions:
             if transition.evaluate(self.coach, self.plays[self.actual_play]):
                 if self.log:
-                    print(f"Transition to {next_play.get_name()}")
+                    pass
+                    #print(f"Transition to {next_play.get_name()}")
                 self.set_play(next_play)
 
     def update(self):
@@ -199,7 +200,6 @@ class OnWall2(Trigger): #Ativado quando apenas a bola está nas paredes horizont
             if abs(self.field_dim[1] - self.match.ball.y) < self.delta:
                 return True
             if abs(self.match.ball.y) < self.delta:
-                print("embaixo")
                 return True
         return False
 
@@ -232,6 +232,23 @@ class WaitFor(Trigger):
     
     def evaluate(self, coach, actual_play):
         return (self.timeout - actual_play.get_running_time()) <= 0
+
+class IsAttackerSpin(Trigger):
+    def __init__(self):
+        super().__init__()
+        self.timeout = 0
+    
+    def evaluate(self, coach, actual_play):
+        match = coach.match
+        is_spinning = False
+        for r in match.robots:
+            if r.strategy.name == "MainAttacker":
+                if r.strategy.playerbook.get_actual_play().get_name() == f"<{r.get_name()} Spinner Planning>":
+
+                    is_spinning = True
+                    break
+        return is_spinning
+
 
 class StuckRobots(Trigger):
     def __init__(self, stuck_strategies=[]):

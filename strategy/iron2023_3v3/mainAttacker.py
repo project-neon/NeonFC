@@ -217,7 +217,7 @@ class Spinner(PlayerPlay):
     def update(self):
         field_dim = self.match.game.field.get_dimensions()
         actual_play = self.robot.strategy.playerbook.get_actual_play()
-        print("spinner")
+        
         if self.timeout - actual_play.get_running_time() > 0:
             if self.robot.team_color == "blue":
                 if self.robot.y > field_dim[1]/2:
@@ -660,7 +660,7 @@ class MainAttacker(Strategy):
         on_wall2 = OnWall2(self.match, self.robot)
 
         static_in_wall = StaticInWall(self.match, self.robot)
-
+        
         push_potentialfield.add_transition(on_defensive_sector_transition, defend_potentialfield)
         push_potentialfield.add_transition(corners_transition, wing_potentialfield)
         wing_potentialfield.add_transition(on_offensive_sector_transition, push_potentialfield)
@@ -670,12 +670,15 @@ class MainAttacker(Strategy):
         
         wing_potentialfield.add_transition(on_wall, spinner)
         push_potentialfield.add_transition(on_wall, spinner)
+        defend_potentialfield.add_transition(on_wall, spinner)
+        defend_potentialfield.add_transition(on_wall2, never_wall)
         wing_potentialfield.add_transition(on_wall2, never_wall)
         push_potentialfield.add_transition(on_wall2, never_wall)
+        
         never_wall.add_transition(on_wall, spinner)
-        never_wall.add_transition(static_in_wall, repos)
-        wing_potentialfield.add_transition(static_in_wall, repos)
-        push_potentialfield.add_transition(static_in_wall, repos)
+       # never_wall.add_transition(static_in_wall, repos)
+       # wing_potentialfield.add_transition(static_in_wall, repos)
+        #push_potentialfield.add_transition(static_in_wall, repos)
         #spinner.add_transition(corners_transition, wing_potentialfield)
         #spinner.add_transition(on_offensive_sector_transition, push_potentialfield)
 
@@ -684,7 +687,9 @@ class MainAttacker(Strategy):
 
     def decide(self):
         self.spin = 0
+        
         res = self.playerbook.update()
+        
 
         return res 
     def update(self):

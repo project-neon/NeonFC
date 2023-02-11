@@ -8,6 +8,107 @@ import math
 from strategy.larc2022_5v5.commons import AstarPlanning, DefendPlanning, aim_projection_ball
 
 from strategy.utils.player_playbook import AndTransition, OnInsideBox, OnNextTo, PlayerPlay, PlayerPlaybook
+from entities.plays.playbook import IsAttackerSpin
+
+def define_aim_point(match):
+    field_h, field_w = match.game.field.get_dimensions()
+
+    ball_speed = (match.ball.vx**2 + match.ball.vy**2)*.5
+    ball_speed_vector = [match.ball.vx, match.ball.vy]
+    goal_pos = [field_h, field_w/2]
+    ball_pos = [match.ball.x, match.ball.y]
+    ball_pos_proj = [match.ball.x * match.ball.vx, match.ball.y * match.ball.vy]
+
+    projection = line_intersection(([field_h-0.2, field_w/2], [field_h+0.2, field_w/2]), (ball_pos, ball_pos_proj))
+
+    if projection[0] > field_h-0.2 and projection[0] > field_h+0.2:
+        aim_point = projection
+    else:
+        aim_point = goal_pos
+
+    return aim_point
+    
+
+class Push(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+        self.timeout = 4
+
+        self.match = match
+    def get_name(self):
+        return f"<{self.robot.get_name()} Push Planning>"
+
+    def start_up(self):
+            super().start_up()
+            controller = PID_control
+            controller_kwargs = {'max_speed': 2, 'max_angular': 2000}
+            self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def start(self):
+        pass
+    def update(self):
+        delta = 0.05
+        self.pb = [self.match.ball.x, self.match.ball.y] #ball position
+        self.vb = [max(0.00001,self.match.ball.vx), self.match.ball.vy] # ball speed vector
+        self.vb_mod = (self.vb[0]**2 + self.vb[1]**2)**(1/2) # absolute ball speed
+        self.pr = [self.robot.x, self.robot.y] # robot position
+        self.vr = [self.robot.vx, self.robot.vy] # robot speed vector
+        actual_play = self.robot.strategy.playerbook.get_actual_play()
+        if self.pb[1] > 0.65:
+            self.a = -0.1
+        else:
+            self.a = 0.1
+        self.b = 0.65
+        self.xc = 0
+        if (self.vb[1]/self.vb[0] - self.a) != 0:
+            self.xc = (self.b - self.pb[1])/((self.vb[1]/self.vb[0] - self.a))
+        else:
+            self.xc = (self.b - self.pb[1])/(0.00001)
+        self.yc = self.a*self.xc + self.b
+        self.delta = 0.2
+        if self.timeout - actual_play.get_running_time() > 0:
+            Db = (self.xc**2 + self.yc**2)**(1/2)
+            d = ((self.pr[0]-self.xc)**2 + (self.pr[1] - self.yc)**2)**(1/2)
+            if Db != 0:
+                vr_mod = (d/Db)*self.vb_mod
+            else:
+                vr_mod = (d/0.00001)*self.vb_mod
+            controller = PID_control
+            controller_kwargs = {'max_speed':max(2,vr_mod), 'max_angular': 2000}
+            self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+            print(self.timeout - actual_play.get_running_time())
+            if self.xc < 1.5:
+                return self.pr[0] + self.delta, self.a*(self.pr[0] + self.delta) + self.b
+            else:
+                return 0.75, 0.65
+        else:
+            self.robot.strategy.playerbook.set_play(Mid(self.match, self.robot))
+        return 0,0
+
+class Mid(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+        self.match = match
+        self.field_w, self.field_h = self.match.game.field.get_dimensions()
+    def get_name(self):
+        return f"<{self.robot.get_name()} Mid Planning>"
+
+    def start_up(self):
+            super().start_up()
+            controller = PID_control
+            controller_kwargs = {'max_speed': 2, 'max_angular': 2000}
+            self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def start(self):
+        pass
+    def update(self):
+        if self.match.ball.y > self.field_h/2:
+            return [self.field_w/2,self.field_h*(3/4)]
+        if self.match.ball.y < self.field_h/2:
+            return [self.field_w/2,self.field_h*(1/4)]
+        
+        return [self.field_w/2,self.field_h*(3/4)]
 
 
 class RightAttackerPlanning(PlayerPlay):
@@ -79,9 +180,9 @@ class RightAttackerPlanning(PlayerPlay):
     
     def defend_position(self, match):
             if match.ball.y > self.g_hgr:
-                return [self.sa_x + 0.25, self.field_h/2 + 0.25]
+                return [self.field_w/2,self.field_h*(3/4)]
             if match.ball.y < self.g_lwr:
-                return [self.sa_x + 0.25, self.field_h/2 - 0.25]
+                return [self.field_w/2,self.field_h*(1/4)]
             
             return [self.sa_x + 0.4, self.field_h/2]
 
@@ -129,7 +230,7 @@ class Midfielder(Strategy):
     def __init__(self, match, name="Midfielder"):
         controller_kwargs = {'max_speed': 2, 'max_angular': 6000, 'kp': 180}
         super().__init__(match, name, controller=PID_control, controller_kwargs=controller_kwargs)
-
+        self.spin = 0
         self.playerbook = None
 
     def start(self, robot=None):
@@ -142,15 +243,23 @@ class Midfielder(Strategy):
         astar = AstarPlanning(self.match, self.robot)
         astar.start()
 
+        is_attacker_spin = IsAttackerSpin()
+
         defend_potentialfield = DefendPlanning(self.match, self.robot)
         defend_potentialfield.start()
 
         rightattack_potentialfield = RightAttackerPlanning(self.match, self.robot)
         rightattack_potentialfield.start()
 
+        push_potential_field = Push(self.match, self.robot)
+        push_potential_field.start()
+        mid = Mid(self.match, self.robot)
+
         self.playerbook.add_play(astar)
         self.playerbook.add_play(defend_potentialfield)
         self.playerbook.add_play(rightattack_potentialfield)
+        self.playerbook.add_play(push_potential_field)
+        self.playerbook.add_play(mid)
 
         # Transicao para caso esteja perto da bola ( < 30 cm)
         next_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.30)
@@ -160,27 +269,33 @@ class Midfielder(Strategy):
         on_defensive_sector_transition = OnInsideBox(self.match, [0, 0, field_dim[0]/2, field_dim[1]/2])
         on_offensive_sector_transition = OnInsideBox(self.match, [field_dim[0]/2, 0, field_dim[0]/2, field_dim[1]])
 
+        
+
         astar.add_transition(
             AndTransition(
                 [on_defensive_sector_transition, next_to_ball_transition]
             ), 
-            defend_potentialfield
+            mid
         )
 
-        astar.add_transition(
-            AndTransition(
-                [on_offensive_sector_transition, next_to_ball_transition]
-            ), 
-            rightattack_potentialfield
-        )
+       # astar.add_transition(
+       #     AndTransition(
+       #         [on_offensive_sector_transition, next_to_ball_transition]
+       #     ), 
+       #     rightattack_potentialfield
+       # )
 
-        defend_potentialfield.add_transition(far_to_ball_transition, astar)
-        defend_potentialfield.add_transition(on_offensive_sector_transition, astar)
+        #defend_potentialfield.add_transition(far_to_ball_transition, astar)
+        #defend_potentialfield.add_transition(on_offensive_sector_transition, astar)
 
-        rightattack_potentialfield.add_transition(far_to_ball_transition, astar)
+        #rightattack_potentialfield.add_transition(far_to_ball_transition, astar)
 
+        astar.add_transition(is_attacker_spin, push_potential_field)
+        defend_potentialfield.add_transition(is_attacker_spin, push_potential_field)
+        rightattack_potentialfield.add_transition(is_attacker_spin, push_potential_field)
+        mid.add_transition(is_attacker_spin, push_potential_field)
         # Estado inicial é o astar
-        self.playerbook.set_play(astar)
+        self.playerbook.set_play(mid)
     
 
     def reset(self, robot=None):
@@ -189,5 +304,6 @@ class Midfielder(Strategy):
             self.start(robot)
 
     def decide(self):
+        print(self.playerbook.get_actual_play())
         res = self.playerbook.update()
         return res
