@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from commons.math import speed_to_power
+from commons.math import speed_to_power, angle_between
 
 def angle_adjustment(angle):
         """Adjust angle of the robot when objective is "behind" the robot"""
@@ -27,7 +27,7 @@ class PID_control(object):
         },
         'real_life': {
             # Control params
-            'K_RHO': 50, # Linear speed gain
+            'K_RHO': 500, # Linear speed gain
             # PID of angular speed
             'KP': -1000, # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
             'KD': 0, # Derivative gain of w
@@ -39,7 +39,7 @@ class PID_control(object):
         }
     }
 
-    def __init__(self, robot, default_fps=60):
+    def __init__(self, robot, default_fps=60, **kwargs):
         self.vision = robot.game.vision
         self.field_w, self.field_h = robot.game.field.get_dimensions()
         self.robot = robot
@@ -53,6 +53,7 @@ class PID_control(object):
         self.dt = 1/self.default_fps
 
         self.__dict__.update( self.CONSTANTS.get(self.environment) )
+        self.__dict__.update(kwargs)
 
         # PID params for error
         self.dif_alpha = 0 # diferential param
@@ -79,7 +80,6 @@ class PID_control(object):
 
         # GAMMA robot's position angle to the objetive
         gamma = angle_adjustment(math.atan2(D_y, D_x))
-
         # ALPHA angle between the front of the robot and the objective
         alpha = angle_adjustment(gamma - self.robot.theta)
 
@@ -89,7 +89,11 @@ class PID_control(object):
         self.int_alpha = self.int_alpha + alpha
 
         """Linear speed (v)"""
-        v = max(self.V_MIN, min(self.V_MAX, self.V_MAX-rho*self.K_RHO))
+        v = max(self.V_MIN, min(self.V_MAX, rho*self.K_RHO))
+
+        if (abs(alpha) > math.pi / 2):
+            v = -v
+            alpha = angle_adjustment(alpha - math.pi)
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha
