@@ -9,10 +9,10 @@ class Coach(BaseCoach):
     def __init__(self, match):
         super().__init__(match)
 
-        self.SS_strategy = strategy.iron2022.Midfielder(self.match)
-        self.ST_strategy = strategy.iron2022.Attacker_LC(self.match)
+        self.SS_strategy = strategy.iron2023.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.iron2023.Attacker_LC(self.match)
 
-        self.GK_strategy = strategy.iron2022.Goalkeeper(self.match)
+        self.GK_strategy = strategy.tests.Idle(self.match)
         self.GK_id = 0  # Goalkeeper fixed ID
 
     def decide(self):
