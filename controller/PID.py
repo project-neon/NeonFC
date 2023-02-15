@@ -96,5 +96,4 @@ class Robot_PID(object):
             now_angular=now_angular,
             new_angular=va,
         )
-        # self.pid_file.write(str() + "," + str(now_linear) + "," + str(vl) + "," +  str(self.angular_desired) + "," + str(now_angular) + "," + str(0) + '\n')
         return vl, va

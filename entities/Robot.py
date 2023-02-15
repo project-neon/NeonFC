@@ -4,7 +4,6 @@ import numpy as np
 from collections import deque
 from commons.math import angular_speed, rotate_via_numpy
 from commons.math import speed as avg_speed
-from controller.uni_controller import UniController
 
 class Robot(object):
 
@@ -67,10 +66,8 @@ class Robot(object):
 
         robot_data = [i for i in frame.get(team_color_key, []) if i.get('robotId') == self.robot_id]
 
-        self.actual_frame = frame['frameNumber']
         if len(robot_data) >= 1:
             self.current_data = robot_data[0]
-            self.last_frame = frame['frameNumber']
         else:
             return
 
@@ -96,8 +93,6 @@ class Robot(object):
         self.vtheta = angular_speed(self._frames['theta'], self.game.vision._fps)
 
         self.speed = math.sqrt(self.vx**2 + self.vy**2)
-
-        # print(self.get_name(), '= speeds: vx: {:.4f} m/s :: vy: {:.4f} m/s :: vt: {:.2f} RAD/s'.format(self.vx, self.vy, self.vtheta))
 
     def update_stuckness(self):
         MIN_STUCK_SPEED = 0.005
@@ -159,14 +154,9 @@ class Robot(object):
         
 
     def decide(self):
-        if self.strategy.controller.__class__ is UniController:
-            desired, desired_dl = self.strategy.decide()
-            self.strategy.set_desired(desired, desired_dl)
-            self.power_left, self.power_right = self.strategy.update()
-        else:
-            desired = self.strategy.decide()
-            self.strategy.set_desired(desired)
-            self.power_left, self.power_right = self.strategy.update()
+        desired = self.strategy.decide()
+        self.strategy.set_desired(desired)
+        self.power_left, self.power_right = self.strategy.update()
 
         return self._get_command(self.power_left, self.power_right)
 

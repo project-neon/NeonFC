@@ -1,16 +1,5 @@
-import numpy
 import heapq
-
-
-def distance(pos1, pos2):
-    # Considering pos = [x, y] or pos = (x, y)
-    x1 = pos1[0]
-    x2 = pos2[0]
-    y1 = pos1[1]
-    y2 = pos2[1]
-    d = numpy.sqrt(((x2-x1)**2 + (y2-y1)**2))
-    return d
-
+from commons.math import distance_between_points as distance
 
 class Node:
     def __init__(self, position):
@@ -39,7 +28,6 @@ class Node:
 
     def __hash__(self):
         return hash(str(self.position))
-
 
 class AStar():
     def __init__(self, initial_node, target):

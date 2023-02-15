@@ -72,13 +72,11 @@ class UVF_Agent(Strategy):
         super().start(robot=robot)
 
     def decide(self):
-        print(f"{self.robot.x=}\n{self.robot.y=}")
-        # print(math.sqrt((self.robot.x-self.match.ball.x)**2 + (self.robot.y-self.match.ball.y)**2))
         
         dl = 0.000001
-        bq = math.atan2(0.65-self.match.ball.y, 1.5-self.match.ball.x)
-        Uvect = self.N_Posture(self.robot.x, self.robot.y, self.match.ball.x, self.match.ball.y, bq)
-        Uvect_dl = self.N_Posture(self.robot.x + dl*math.cos(self.robot.theta), self.robot.y + dl*math.sin(self.robot.theta), self.match.ball.x, self.match.ball.y, bq)
+        bq = 0 # math.atan2(0.65-self.match.ball.y, 1.5-self.match.ball.x)
+        Uvect = self.N_Posture(self.robot.x, self.robot.y, 0.75, 0.65, bq)
+        Uvect_dl = self.N_Posture(self.robot.x + dl*math.cos(self.robot.theta), self.robot.y + dl*math.sin(self.robot.theta), 0.75, 0.65, bq)
         
         # for r in self.match.robots:
         #     if not r.robot_id == self.robot.robot_id:

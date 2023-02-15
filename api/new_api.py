@@ -1,7 +1,5 @@
 from socket import *
-
 import json
-import struct
 
 class SingletonMeta(type):
     """

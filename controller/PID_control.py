@@ -1,8 +1,7 @@
 import math
 import numpy as np
-from entities.visualization import Writer, Parameter
-import time
-from collections import deque
+from live_plot import Writer, Parameter
+from commons.math import speed_to_power
 
 def angle_adjustment(angle):
         """Adjust angle of the robot when objective is "behind" the robot"""
@@ -12,12 +11,41 @@ def angle_adjustment(angle):
 
         return phi
 
-class PID_control(object):
+class PID_W_control(object):
+
+    CONSTANTS = {
+        'simulation': {
+            # Control params
+            'K_RHO': 500, # Linear speed gain
+            # PID of angular speed
+            'KP': 3, # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+            'KD': 100, # Derivative gain of w
+            'KI': 5, # Integral gain of w
+            # Max speeds for the robot
+            'V_MAX': 40, # linear speed
+            'W_MAX': math.radians(7200), # angular speed rad/s
+            'V_MIN': 80
+        },
+        'real_life': {
+            # Control params
+            'K_RHO': .05, # Linear speed gain
+            # PID of angular speed
+            'KP': -350, # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+            'KD': 0, # Derivative gain of w
+            'KI': 0, # Integral gain of w
+            # Max speeds for the robot
+            'V_MAX': 130, # linear speed
+            'W_MAX': 550, # angular speed rad/s
+            'V_MIN': 80
+        }
+    }
+
     def __init__(self, robot, default_fps=60):
         self.vision = robot.game.vision
         self.field_w, self.field_h = robot.game.field.get_dimensions()
         self.robot = robot
         self.desired = [0, 0]
+        self.environment = robot.game.environment
 
         self.l = self.robot.dimensions.get('L')/2 # half_distance_between_robot_wheels
         self.R = self.robot.dimensions.get('R')   # radius of the wheel
@@ -25,37 +53,17 @@ class PID_control(object):
         self.default_fps = default_fps
         self.dt = 1/self.default_fps
 
-        # Control params
-        self.K_RHO = .05 # Linear speed gain
-
-        # PID of angular speed
-        self.KP = -350 # Parameter(-130, 'pid_tuner', 'kp') # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
-        self.KI = 0 # Parameter(0, 'pid_tuner', 'ki') # Integral gain of w
-        self.KD = 0# Parameter(-7.5, 'pid_tuner', 'kd') # Derivative gain of w
+        self.__dict__.update( self.CONSTANTS.get(self.environment) )
 
         # PID params for error
         self.dif_alpha = 0 # diferential param
         self.int_alpha = 0 # integral param
         self.alpha_old = 0 # stores previous iteration alpha
 
-        # Max speeds for the robot
-        self.v_max = 130 # 40 # linear speed
-        self.w_max = 550 # math.radians(7200) # angular speed rad/
-
-        self.v_min = 80
-        self.control_linear_speed = False
         self.lp = [0, 0]
 
-        # self.pid_writer = Writer('pid',
-        #                          {'kp': 'FLOAT',
-        #                           'ki': 'FLOAT',
-        #                           'kd': 'FLOAT',
-        #                           'set_point': 'FLOAT',
-        #                           'error': 'FLOAT',
-        #                           'w': 'FLOAT'
-        #                           })
         self.robot_writer = Writer('robot',
-                                   {'x': 'FLOAT',
+                                {'x': 'FLOAT',
                                     'y': 'FLOAT'})
     
     def set_desired(self, vector):
@@ -67,7 +75,7 @@ class PID_control(object):
         else:
             self.dt = 1/self.default_fps
 
-    def update(self):
+    def _update(self):
         # Params calculation
         # Feedback errors
         D_x = self.desired[0] - self.robot.x
@@ -84,34 +92,42 @@ class PID_control(object):
         # ALPHA angle between the front of the robot and the objective
         alpha = angle_adjustment(gamma - self.robot.theta)
 
-
         """Calculate the parameters of PID control"""
         self._update_fps()
         self.dif_alpha = (alpha - self.alpha_old) / self.dt # Difentential of alpha
         self.int_alpha = self.int_alpha + alpha
-
+            
         """Linear speed (v)"""
-        v = min(self.v_min + self.K_RHO*rho, self.v_max) if self.control_linear_speed else self.v_max
-
-        """Objective behind the robot"""
-        # if(abs(alpha) > math.pi/2):
-        #     v = -v
-        #     alpha = angle_adjustment(alpha - math.pi)
+        v = self.V_MAX
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha
-        w = np.sign(w) * min(abs(w), self.w_max)
+        w = np.sign(w) * min(abs(w), self.W_MAX)
         
         self.alpha_old = alpha
 
-        """Wheel power calculation"""
-        pwr_left = (2 * v - w * self.l)/2 * self.R
-        pwr_right = (2 * v + w * self.l)/2 * self.R
-
-        # self.pid_writer.write([self.KP, self.KI, self.KD, gamma, alpha, w])
         self.robot_writer.write([self.robot.x, self.robot.y])
 
-        # print(f"{v=}\n{w=}")
+        return v, w
+
+    def update(self):
+        v, w = self._update()
+
+        if self.environment == 'simulation':
+            powers = speed_to_power(v, w, self.l, self.R)
+            return tuple(np.dot(1000, powers))
+        
+        return v, w
+
+class PID_control(PID_W_control):
+
+    def update(self):
+        _, w = super()._update()
+
+        v = self.V_MAX
+
+        if self.environment == 'simulation':
+            powers = speed_to_power(v, w, self.l, self.R)
+            return tuple(np.dot(1000, powers))
 
         return v, w
-        # return pwr_left * 1000, pwr_right * 1000

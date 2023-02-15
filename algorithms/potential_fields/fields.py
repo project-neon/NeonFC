@@ -2,7 +2,6 @@ import random
 import json
 import math
 import numpy as np
-
 import commons
 
 MIN_WEIGHT_ACTIVE = 0.0
