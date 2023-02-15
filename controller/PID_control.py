@@ -91,9 +91,10 @@ class PID_control(object):
         """Linear speed (v)"""
         v = max(self.V_MIN, min(self.V_MAX, rho*self.K_RHO))
 
-        if (abs(alpha) > math.pi / 2):
-            v = -v
-            alpha = angle_adjustment(alpha - math.pi)
+        # if (abs(alpha) > math.pi / 2):
+        #     v = -v
+        #     alpha = angle_adjustment(alpha - math.pi)
+        v = -v
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha

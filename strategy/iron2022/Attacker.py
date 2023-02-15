@@ -1,7 +1,7 @@
 from strategy.BaseStrategy import Strategy
 from controller.uni_controller import UniController
 from controller import PID_control
-from algorithms import UnivectorField
+from algorithms.univector_field import UnivectorField
 import math
 
 
