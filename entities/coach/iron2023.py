@@ -38,12 +38,11 @@ class Coach(BaseCoach):
 
         a1     = distance_between_points((b_x, b_y), (r1[1].x, r1[1].y))
         a2     = distance_between_points((b_x, b_y), (r2[1].x, r2[1].y))
-        b1, b2 = r1[1].y - self.match.bally, r2[1].y - self.match.bally
-
+        b1, b2 = b_x - r1[1].x, b_x - r2[1].x
         if b1 * b2 > 0:
             if a1 < a2:
                 return r1[0]
             return r2[0]
-        if b1 < 0:
+        if b1 > 0:
             return r1[0]
         return r2[0]
