@@ -103,4 +103,4 @@ cython_debug/
 .vscode
 
 # SQLite database files
-.db
+*.db

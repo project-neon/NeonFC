@@ -16,7 +16,7 @@ para um valor coerente a velocidade desejada em m/s
 EXPERIMENTAL_SPEED_CONSTANT = 7000
 
 class SimpleLQR(object):
-    def __init__(self, robot, l=0.025):
+    def __init__(self, robot, l=0.185):
         self.desired = np.array([0, 0])
         self.robot = robot
         self.environment = robot.game.environment
@@ -59,7 +59,7 @@ class SimpleLQR(object):
         return angular, linear
 
 class TwoSidesLQR(object):
-    def __init__(self, robot, l=0.010):
+    def __init__(self, robot, l=0.195):
         self.desired = np.array([0, 0])
         self.robot = robot
         self.environment = robot.game.environment
@@ -69,7 +69,6 @@ class TwoSidesLQR(object):
         self.R = self.robot.dimensions.get('R')
 
     def set_desired(self, vector):
-
         self.desired = (self.robot.x + vector[0] * EXPERIMENTAL_SPEED_CONSTANT, self.robot.y + vector[1] * EXPERIMENTAL_SPEED_CONSTANT)
 
     def update(self):
@@ -81,22 +80,20 @@ class TwoSidesLQR(object):
 
         if (between > math.pi/2):
             theta = self.robot.theta - math.pi
-            #print("LADO 1")
         else:
             theta = self.robot.theta
-            #print("LADO 2")
 
         v = self.desired[0] * math.cos(-theta) - self.desired[1] * math.sin(-theta)
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))
 
         if self.environment == 'simulation':
-            powers = speed_to_power(v, w, self.L, self.R)
+            power_left, power_right = speed_to_power(v, w, self.L, self.R)
 
             if (between > math.pi/2):
                 # this multiplies -1 to both elements of 'powers' and return it as a tuple
-                return tuple(np.dot(-1, powers))
+                return -power_right, -power_left
             else:
-                return powers
+                return power_left, power_right
 
         linear = v*self.R
         angular = self.R*(w*self.L)/2
