@@ -20,11 +20,11 @@ class UniController(object):
             'V_M': 10000,
             'R_M': 3 * 10000, # 20 * V_M
             'K_W': 270, # 313,
-            'K_P': 500
+            'K_P': 100
         }
     }
 
-    def __init__(self, robot):
+    def __init__(self, robot, control_speed=False):
         self.robot = robot
         self.environment = robot.game.environment
         self.L = self.robot.dimensions.get("L")  # m
@@ -32,6 +32,7 @@ class UniController(object):
 
         self.__dict__.update( self.CONSTANTS.get(self.environment) )
 
+        self.control_speed = control_speed
         self.v1 = 0  # speed limit 1
         self.v2 = 0  # speed limit 2
         self.theta_d = 0
@@ -41,6 +42,8 @@ class UniController(object):
         self.a_phi_v = 0  # absolute value of phi_v
         self.theta_e = 0
         self.a_theta_e = 0  # absolute value of theta_e
+
+        self.target = [1.5, 0.65]
 
     def control(self):
         """
@@ -75,9 +78,12 @@ class UniController(object):
             self.a_theta_e)) \
                   / (2 * self.a_phi_v) if self.a_phi_v > 0 else self.V_M
 
-        self.v3 = self.K_P * ((self.robot.x - .75) ** 2 + (self.robot.y - .65) ** 2) ** .5
+        self.v3 = self.K_P * ((self.robot.x - self.target[0]) ** 2 + (self.robot.y - self.target[1]) ** 2) ** .5
 
-        v = min(self.v1, self.v2 , self.v3)
+        if self.control_speed:
+            v = min(self.v1, self.v2, self.v3)
+        else:
+            v = min(self.v1, self.v2)
 
         # calculate w
         if self.theta_e > 0:
