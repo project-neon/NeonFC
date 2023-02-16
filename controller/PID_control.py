@@ -15,15 +15,15 @@ class PID_control(object):
     CONSTANTS = {
         'simulation': {
             # Control params
-            'K_RHO': 500, # Linear speed gain
+            'K_RHO': 100, # Linear speed gain
             # PID of angular speed
-            'KP': 3, # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
-            'KD': 100, # Derivative gain of w
-            'KI': 5, # Integral gain of w
+            'KP': 60, # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+            'KD': 0, # Derivative gain of w
+            'KI': 0, # Integral gain of w
             # Max speeds for the robot
-            'V_MAX': 40, # linear speed
-            'W_MAX': math.radians(7200), # angular speed rad/s
-            'V_MIN': 80
+            'V_MAX': 1.8, # linear speed
+            'W_MAX': 2400, # angular speed rad/s
+            'V_MIN': 1.8
         },
         'real_life': {
             # Control params

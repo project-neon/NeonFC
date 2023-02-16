@@ -14,7 +14,7 @@ class UniController(object):
             'V_M': 100,
             'R_M': 3 * 100, # 3 * V_M
             'K_W': 90,
-            'K_P': 5
+            'K_P': 10
         },
         'real_life': {
             'V_M': 10000,
@@ -27,6 +27,7 @@ class UniController(object):
     def __init__(self, robot):
         self.robot = robot
         self.environment = robot.game.environment
+        self.match = robot.game.match
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m
 
@@ -75,7 +76,9 @@ class UniController(object):
             self.a_theta_e)) \
                   / (2 * self.a_phi_v) if self.a_phi_v > 0 else self.V_M
 
-        self.v3 = self.K_P * ((self.robot.x - .75) ** 2 + (self.robot.y - .65) ** 2) ** .5
+        ball_x, ball_y = self.match.ball.x, self.match.ball.y
+
+        self.v3 = self.K_P * ((self.robot.x - ball_x) ** 2 + (self.robot.y - ball_y) ** 2) ** .5
 
         v = min(self.v1, self.v2 , self.v3)
 
@@ -85,9 +88,9 @@ class UniController(object):
         else:
             w = v * self.phi_v - self.K_W * math.sqrt(self.a_theta_e)
 
-        w *= 1.3
+        # w *= 1.3
 
-        return v, -w
+        return v, w#-w
 
     def set_desired(self, desired):
         self.theta_d = desired[0]
