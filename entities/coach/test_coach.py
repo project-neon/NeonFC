@@ -8,9 +8,9 @@ class Coach(BaseCoach): # heranca da classe abstrata
         super().__init__(match) # chamada do metodo da classe mae
 
         # vamos usar strategies de teste por enquanto, essa deixa o robo parado
-        self.attacker_strategy = strategy.tests.Fields_Test(self.match)
+        self.attacker_strategy = strategy.tests.Idle(self.match)
         self.midfielder_strategy = strategy.tests.Idle(self.match)
-        self.goalkeeper_strategy = strategy.tests.Idle(self.match)
+        self.goalkeeper_strategy = strategy.iron2023.Goalkeeper(self.match)
 
     def decide(self):
 
