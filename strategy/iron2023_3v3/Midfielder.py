@@ -32,7 +32,7 @@ def define_aim_point(match):
 class Push(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
-        self.timeout = 4
+        self.timeout = 10
 
         self.match = match
     def get_name(self):
@@ -47,41 +47,59 @@ class Push(PlayerPlay):
     def start(self):
         pass
     def update(self):
-        delta = 0.05
+        
+        self.field_dim = self.match.game.field.get_dimensions()
         self.pb = [self.match.ball.x, self.match.ball.y] #ball position
-        self.vb = [max(0.00001,self.match.ball.vx), self.match.ball.vy] # ball speed vector
+        self.vb = [self.match.ball.vx, self.match.ball.vy] # ball speed vector
+        if self.vb[0] == 0:
+            self.vb[0] = 0.0000001
         self.vb_mod = (self.vb[0]**2 + self.vb[1]**2)**(1/2) # absolute ball speed
         self.pr = [self.robot.x, self.robot.y] # robot position
         self.vr = [self.robot.vx, self.robot.vy] # robot speed vector
         actual_play = self.robot.strategy.playerbook.get_actual_play()
         if self.pb[1] > 0.65:
-            self.a = -0.1
+            self.b = 0.55
         else:
-            self.a = 0.1
-        self.b = 0.65
+            self.b = 0.75
+        self.a = 0
         self.xc = 0
+        self.delta = -0.06
         if (self.vb[1]/self.vb[0] - self.a) != 0:
-            self.xc = (self.b - self.pb[1])/((self.vb[1]/self.vb[0] - self.a))
+            self.xc = (self.b - self.pb[1] - (self.vb[1]/self.vb[0])*self.pb[0])/((self.vb[1]/self.vb[0]) - self.a)
         else:
-            self.xc = (self.b - self.pb[1])/(0.00001)
-        self.yc = self.a*self.xc + self.b
-        self.delta = 0.2
+            self.xc = (self.b - self.pb[1] - (self.vb[1]/self.vb[0])*self.pb[0])/(0.00001)
+        self.yc = -self.a*self.xc + self.b
         if self.timeout - actual_play.get_running_time() > 0:
-            Db = (self.xc**2 + self.yc**2)**(1/2)
-            d = ((self.pr[0]-self.xc)**2 + (self.pr[1] - self.yc)**2)**(1/2)
-            if Db != 0:
-                vr_mod = (d/Db)*self.vb_mod
-            else:
-                vr_mod = (d/0.00001)*self.vb_mod
+            distance = ((self.yc - self.pb[1])**2 + (self.xc - self.pb[0])**2)**(1/2)
+            if distance == 0:
+                distance = 0.000001
+            if ((self.pr[0]-self.pb[0])**2+(self.pr[1]-self.pb[1])**2)**(1/2) < 0.1:
+                if self.robot.team_color == "blue":
+                    if self.robot.y > self.field_dim[1]/2:
+                        self.robot.strategy.spin = 1000
+                    else:
+                        self.robot.strategy.spin = -1000
+                else:
+                    if self.robot.y > self.field_dim[1]/2:
+                        self.robot.strategy.spin = -1000
+                    else:
+                        self.robot.strategy.spin = 1000
+            speed = min(2,7*(self.vb_mod/(distance**(1/4))))
+            print(speed)
             controller = PID_control
-            controller_kwargs = {'max_speed':max(2,vr_mod), 'max_angular': 2000}
+            controller_kwargs = {'max_speed':max(2,speed), 'max_angular': 3500}
             self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
-            print(self.timeout - actual_play.get_running_time())
-            if self.xc < 1.5:
-                return self.pr[0] + self.delta, self.a*(self.pr[0] + self.delta) + self.b
+          
+            if self.pb[0] > 0.75 and self.vb_mod > 0.25:
+                return -self.xc + self.delta, self.yc
+            elif self.pb[0] > 0.75:
+                return self.pb[0], self.b
             else:
+                self.robot.strategy.playerbook.set_play(Mid(self.match, self.robot))
                 return 0.75, 0.65
+
         else:
+            self.robot.strategy.spin = 0
             self.robot.strategy.playerbook.set_play(Mid(self.match, self.robot))
         return 0,0
 
@@ -104,9 +122,9 @@ class Mid(PlayerPlay):
         pass
     def update(self):
         if self.match.ball.y > self.field_h/2:
-            return [self.field_w/2,self.field_h*(3/4)]
+            return [self.field_w/2,self.field_h*(3/8)]
         if self.match.ball.y < self.field_h/2:
-            return [self.field_w/2,self.field_h*(1/4)]
+            return [self.field_w/2,self.field_h*(5/8)]
         
         return [self.field_w/2,self.field_h*(3/4)]
 
@@ -244,6 +262,7 @@ class Midfielder(Strategy):
         astar.start()
 
         is_attacker_spin = IsAttackerSpin()
+        
 
         defend_potentialfield = DefendPlanning(self.match, self.robot)
         defend_potentialfield.start()
@@ -294,6 +313,8 @@ class Midfielder(Strategy):
         defend_potentialfield.add_transition(is_attacker_spin, push_potential_field)
         rightattack_potentialfield.add_transition(is_attacker_spin, push_potential_field)
         mid.add_transition(is_attacker_spin, push_potential_field)
+        mid.add_transition(on_defensive_sector_transition,defend_potentialfield)
+        defend_potentialfield.add_transition(on_offensive_sector_transition,mid)
         # Estado inicial é o astar
         self.playerbook.set_play(mid)
     
@@ -304,6 +325,13 @@ class Midfielder(Strategy):
             self.start(robot)
 
     def decide(self):
-        print(self.playerbook.get_actual_play())
+        self.spin = 0
+
         res = self.playerbook.update()
         return res
+    def update(self):
+        if self.spin == 0:
+            return self.controller.update()
+        else:
+            return -self.spin, self.spin
+   
