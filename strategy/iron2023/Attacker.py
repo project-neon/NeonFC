@@ -1,3 +1,4 @@
+import numpy as np
 from algorithms.limit_cycle import LimitCycle
 import math
 from controller.PID_control import PID_W_control
@@ -56,9 +57,44 @@ class Attacker_LC(Strategy):
         '''
         if self.robot.y < math.tan(j) * (self.robot.x - target[0]) + target[1]:
             virtual_obstacle = (
-            target[0] - p * math.cos(m) - r * math.cos(j), target[1] - p * math.sin(m) - r * math.sin(j), p, 1)
+                target[0] - p * math.cos(m) - r * math.cos(j),
+                target[1] - p * math.sin(m) - r * math.sin(j),
+                p,
+                1
+            )
         else:
             virtual_obstacle = (
-            target[0] + p * math.cos(m) - r * math.cos(j), target[1] + p * math.sin(m) - r * math.sin(j), p, -1)
+                target[0] + p * math.cos(m) - r * math.cos(j),
+                target[1] + p * math.sin(m) - r * math.sin(j),
+                p,
+                -1
+            )
+
+        if self.behind_ball():
+            virtual_obstacle = (
+                target[0] - p * math.cos(m) - r * math.cos(j),
+                target[1] - p * math.sin(m) - r * math.sin(j),
+                2 * p,
+                np.sign(target[1] - p * math.sin(m) - r * math.sin(j)-0.65)
+            )
 
         return virtual_obstacle
+
+    def behind_ball(self):
+        # Convert input to numpy arrays for easy calculation
+        point_on_line = np.array((self.match.ball.x, self.match.ball.y))
+        point_on_normal = np.array((1.5, .65))
+        point_to_check = np.array((self.robot.x, self.robot.y))
+
+        # Calculate the normal vector of the line
+        normal = point_on_normal - point_on_line
+
+        # Calculate the vector from the point on the line to the point to check
+        vector_to_check = point_to_check - point_on_line
+
+        # Calculate the dot product of the normal vector and the vector to check
+        dot_product = np.dot(normal, vector_to_check)
+
+        # Check the sign of the dot product to determine if the point is to the right or left of the line
+        return dot_product > 0
+
