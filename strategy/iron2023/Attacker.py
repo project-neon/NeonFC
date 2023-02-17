@@ -43,13 +43,12 @@ class Attacker_LC(Strategy):
         - r:    radius of the ball
         '''
         aim_point = [self.field_w, self.field_h / 2]
-        print(aim_point)
 
-        j = math.atan2(aim_point[0] - target[1], aim_point[1] - target[0])
+        j = math.atan2(aim_point[1] - target[1], aim_point[0] - target[0])
         m = j + math.pi / 2
         p = 0.1
 
-        r = .02  # (.0427)/2
+        r = .0427 / 2
 
         '''
         the terms r*cos(j) and r*sin(j) are subtracted to move
