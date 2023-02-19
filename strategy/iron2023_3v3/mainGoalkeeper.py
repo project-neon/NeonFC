@@ -27,11 +27,11 @@ class GoalKeeper(Strategy):
         self.category = self.match.category
         
         #trave superior do gol
-        g_hgr = (self.field_h/2)+0.185
+        g_hgr = (self.field_h/2)+0.185 + 0.10
         ga_hgr = g_hgr + 0.15
 
         #trave inferior do gol
-        g_lwr = (self.field_h/2)-0.185
+        g_lwr = (self.field_h/2)-0.185 - 0.10
         ga_lwr = g_lwr - 0.15
 
         self.robot_w = self.robot_h = 0.075
