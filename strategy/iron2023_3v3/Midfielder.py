@@ -76,14 +76,14 @@ class Push(PlayerPlay):
             if ((self.pr[0]-self.pb[0])**2+(self.pr[1]-self.pb[1])**2)**(1/2) < 0.1:
                 if self.robot.team_color == "blue":
                     if self.robot.y > self.field_dim[1]/2:
-                        self.robot.strategy.spin = 1000
+                        self.robot.strategy.spin = 500
                     else:
-                        self.robot.strategy.spin = -1000
+                        self.robot.strategy.spin = -500
                 else:
                     if self.robot.y > self.field_dim[1]/2:
-                        self.robot.strategy.spin = -1000
+                        self.robot.strategy.spin = -500
                     else:
-                        self.robot.strategy.spin = 1000
+                        self.robot.strategy.spin = 500
             speed = min(2,7*(self.vb_mod/(distance**(1/4))))
             print(speed)
             controller = PID_control
@@ -285,7 +285,7 @@ class Midfielder(Strategy):
         # Transicao para caso esteja longe da bola ( > 40 cm)
         far_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.40, True)
 
-        on_defensive_sector_transition = OnInsideBox(self.match, [0, 0, field_dim[0]/2, field_dim[1]/2])
+        on_defensive_sector_transition = OnInsideBox(self.match, [0, 0, field_dim[0]/2, field_dim[1]])
         on_offensive_sector_transition = OnInsideBox(self.match, [field_dim[0]/2, 0, field_dim[0]/2, field_dim[1]])
 
         
@@ -310,7 +310,7 @@ class Midfielder(Strategy):
         #rightattack_potentialfield.add_transition(far_to_ball_transition, astar)
 
         astar.add_transition(is_attacker_spin, push_potential_field)
-        defend_potentialfield.add_transition(is_attacker_spin, push_potential_field)
+        #defend_potentialfield.add_transition(is_attacker_spin, push_potential_field)
         rightattack_potentialfield.add_transition(is_attacker_spin, push_potential_field)
         mid.add_transition(is_attacker_spin, push_potential_field)
         mid.add_transition(on_defensive_sector_transition,defend_potentialfield)

@@ -221,14 +221,14 @@ class Spinner(PlayerPlay):
         if self.timeout - actual_play.get_running_time() > 0:
             if self.robot.team_color == "blue":
                 if self.robot.y > field_dim[1]/2:
-                    self.robot.strategy.spin = -1000
+                    self.robot.strategy.spin = -250
                 else:
-                    self.robot.strategy.spin = 1000
+                    self.robot.strategy.spin = 250
             else:
                 if self.robot.y > field_dim[1]/2:
-                    self.robot.strategy.spin = 1000
+                    self.robot.strategy.spin = 250
                 else:
-                    self.robot.strategy.spin = -1000
+                    self.robot.strategy.spin = -250
         else:
             self.robot.strategy.spin = 0
             self.robot.strategy.playerbook.set_play(PushPotentialFieldPlanning(self.match, self.robot))

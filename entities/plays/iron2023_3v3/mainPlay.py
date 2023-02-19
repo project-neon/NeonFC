@@ -53,7 +53,7 @@ class MainPlay(Play):
             (robot.x - self.match.ball.x)**2 + (robot.y - self.match.ball.y)**2
         )
         is_1 = 0
-        if robot.robot_id == 2:
-            is_1 = 10000
+        #if robot.robot_id == 2:
+        #    is_1 = 10000
 
-        return is_1
+        return  1000 - dist_to_ball*is_behind

@@ -5,6 +5,7 @@ from entities.plays.playbook import UnstuckPlay
 
 from entities.plays.playbook import StuckRobots as StuckRobotsTrigger
 from entities.plays.playbook import WaitFor as WaitForTrigger
+from entities.plays.playbook import IsAttackerSpin
 
 from entities.plays.playbook import OnFreeBall
 from entities.plays.playbook import OnFreeBallDef
