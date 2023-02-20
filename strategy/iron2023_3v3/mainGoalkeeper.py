@@ -164,7 +164,7 @@ class GoalKeeper(Strategy):
         if (self.robot.x <= self.sa_w - 0.04  and self.robot.x > 0.0375 and self.robot.y >= self.sa_y 
             and self.robot.y <= self.sa_y + self.sa_h):
 
-            if self.match.ball.x < self.field_w/2:
+            if self.match.ball.x < self.field_w/2-0.10:
                 behaviour = self.path
 
             else:
