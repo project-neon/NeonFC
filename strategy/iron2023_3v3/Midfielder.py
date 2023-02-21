@@ -306,7 +306,8 @@ class Midfielder(Strategy):
         far_to_ball_transition = OnNextTo(self.robot, aim_projection_ball, 0.40, True)
 
         on_defensive_sector_transition = OnInsideBox(self.match, [0, 0, field_dim[0]/2, field_dim[1]])
-        on_offensive_sector_transition = OnInsideBox(self.match, [3*field_dim[0]/4, 0.45, field_dim[0], 0.85])
+        on_offensive_sector_transition = OnInsideBox(self.match, [field_dim[0]/2, 0, 3*field_dim[0]/4,field_dim[1]])
+        on_offensive_sector_transition2 = OnInsideBox(self.match, [3*field_dim[0]/4, 0, field_dim[0], field_dim[1]])
 
         
 
@@ -333,9 +334,10 @@ class Midfielder(Strategy):
         #defend_potentialfield.add_transition(is_attacker_spin, push_potential_field)
         rightattack_potentialfield.add_transition(is_attacker_spin, push_potential_field)
         mid.add_transition(is_attacker_spin, push_potential_field)
-        mid.add_transition(on_offensive_sector_transition,push_potential_field)
+        mid.add_transition(on_offensive_sector_transition2,push_potential_field)
         mid.add_transition(on_defensive_sector_transition,defend_potentialfield)
         defend_potentialfield.add_transition(on_offensive_sector_transition,mid)
+        defend_potentialfield.add_transition(on_offensive_sector_transition2,push_potential_field)
         # Estado inicial é o astar
         self.playerbook.set_play(defend_potentialfield)
     

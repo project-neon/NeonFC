@@ -227,9 +227,9 @@ class Spinner(PlayerPlay):
                     self.robot.strategy.spin = 250
             else:
                 if self.robot.y > field_dim[1]/2:
-                    self.robot.strategy.spin = 250
-                else:
                     self.robot.strategy.spin = -250
+                else:
+                    self.robot.strategy.spin = 250
         else:
             self.robot.strategy.spin = 0
             self.robot.strategy.playerbook.set_play(PushPotentialFieldPlanning(self.match, self.robot))
