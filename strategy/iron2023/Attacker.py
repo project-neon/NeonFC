@@ -3,7 +3,7 @@ from algorithms.limit_cycle import LimitCycle
 import math
 from controller.PID_control import PID_W_control
 from strategy.BaseStrategy import Strategy
-from strategy.utils.player_playbook import PlayerPlay
+from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition
 from commons.math import distance_between_points
 
 
@@ -168,3 +168,73 @@ class WingPlay(PlayerPlay):
             )
 
         return virtual_obstacle
+
+
+class CrossPlay(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Angle Planning>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_W_control
+        controller_kwargs = {'V_MAX': 0}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def update(self):
+        if self.robot.y > .65:
+            ang_diff = self.robot.theta - math.pi
+        else:
+            ang_diff = self.robot.theta + math.pi
+
+        x = self.robot.x + 0.5*math.cos(ang_diff)
+        y = self.robot.y + 0.5*math.sin(ang_diff)
+
+        return x, y
+
+    def start(self):
+        pass
+
+class MainStriker(Strategy):
+    def __init__(self, match, name="MainAttacker"):
+        super().__init__(match, name, controller=PID_W_control)
+
+        self.playerbook = None
+
+    def start(self, robot=None):
+        super().start(robot=robot)
+
+        field_dim = self.match.game.field.get_dimensions()
+
+        # Criando Player Playbook: A maquina de estados do jogador
+        self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
+
+        main = MainPlay(self.match, self.robot)
+        main.start()
+        wing = WingPlay(self.match, self.robot)
+        wing.start()
+        cross = CrossPlay(self.match, self.robot)
+        cross.start()
+
+        self.playerbook.add_play(main)
+        self.playerbook.add_play(wing)
+        self.playerbook.add_play(cross)
+
+        on_wing = OnInsideBox(self.match, [0, 0.3, 1.5, 0.7], True)
+        on_center = OnInsideBox(self.match, [0, 0.3, 1.5, 0.7])
+        on_cross_region = OnInsideBox(self.match, [0, 0, 1.5, .15])
+        on_near_ball = OnNextTo(self.match.ball, self.robot, 0.1)
+
+        main.add_transition(on_wing, wing)
+        wing.add_transition(on_center, main)
+        wing.add_transition(AndTransition([on_near_ball, on_cross_region]), cross)
+        cross.add_transition(on_center, main)
+
+        # Estado inicial
+        self.playerbook.set_play(main)
+
+    def decide(self):
+        res = self.playerbook.update()
+        return res

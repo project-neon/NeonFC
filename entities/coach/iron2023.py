@@ -10,7 +10,7 @@ class Coach(BaseCoach):
         super().__init__(match)
 
         self.SS_strategy = strategy.iron2023.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.iron2023.Attacker_LC(self.match)
+        self.ST_strategy = strategy.iron2023.MainStriker(self.match)
 
         self.GK_strategy = strategy.tests.Idle(self.match)
         self.GK_id = 0  # Goalkeeper fixed ID
