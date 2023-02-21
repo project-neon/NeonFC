@@ -107,6 +107,9 @@ class WingPlay(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
 
+        self.BALL_Y_MIN = 0
+        self.BALL_Y_MAX = 1.3
+
     def get_name(self):
         return f"<{self.robot.get_name()} Wing Attacker Planning>"
 
@@ -198,7 +201,7 @@ class CrossPlay(PlayerPlay):
         pass
 
 class MainStriker(Strategy):
-    def __init__(self, match, name="MainAttacker"):
+    def __init__(self, match, name="Main_Attacker"):
         super().__init__(match, name, controller=PID_W_control)
 
         self.playerbook = None
