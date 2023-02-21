@@ -8,7 +8,7 @@ class MainPlay(Play):
         self.match = self.coach.match
         self.coach = coach
         self.strategies = [
-            strategy.larc2022_5v5.GoalKeeper(self.match, 'Goalkeeper'),
+            strategy.iron2023_3v3.GoalKeeper(self.match, 'Goalkeeper'),
             strategy.iron2023_3v3.Midfielder(self.match, 'Midfielder'),
             strategy.iron2023_3v3.MainAttacker(self.match, 'MainAttacker'),
         ]
