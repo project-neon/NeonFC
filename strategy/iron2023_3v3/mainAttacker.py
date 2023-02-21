@@ -12,6 +12,7 @@ from commons import math as nfc_math
 from strategy.larc2022_5v5.commons import AstarPlanning, DefendPlanning, LimitCyclePlanning, aim_projection_ball
 from strategy.utils.player_playbook import OnCorners, OnInsideBox, OnNextTo, OnStuckTrigger, PlayerPlay, PlayerPlaybook
 from entities.plays.playbook import OnWall, OnWall2, StaticInWall
+
 def aim_behind_ball(strategy):
     b = strategy.match.ball
     ball = [b.x, b.y - 0.05]
@@ -388,6 +389,7 @@ class AvoidRobotsPlanning(PlayerPlay):
         res[1] = self.robot.y + res[1] * dt
         return res
 
+
 class PushPotentialFieldPlanning(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
@@ -573,15 +575,15 @@ class PushPotentialFieldPlanning(PlayerPlay):
             fields.LineField(
                 self.match,
                 target= [
-                    self.match.game.field.get_dimensions()[0] - self.match.game.field.get_dimensions()[0] + 0.03, 
+                    0.03, 
                     self.match.game.field.get_dimensions()[1]/2
                 ],                                                                                                                                                                                                                                                                                                                                          
                 theta = math.pi/2,
                 line_size = (self.match.game.field.get_small_area("defensive")[3]/2),
-                line_dist = 0.2,
-                line_dist_max = 0.2,
+                line_dist = 0.3,
+                line_dist_max = 0.3,
                 decay = lambda x: 1,
-                multiplier = -2
+                multiplier = -3
             )
         )
 
@@ -618,9 +620,13 @@ class MainAttacker(Strategy):
         astar = AstarPlanning(self.match, self.robot)
         astar.start()
 
+        
+
         # Criando Potential Field
         push_potentialfield = PushPotentialFieldPlanning(self.match, self.robot)
         push_potentialfield.start()
+
+    
 
         avoid_potentialfield = AvoidRobotsPlanning(self.match, self.robot)
         avoid_potentialfield.start()
@@ -649,6 +655,7 @@ class MainAttacker(Strategy):
         self.playerbook.add_play(spinner)
         self.playerbook.add_play(never_wall)
         self.playerbook.add_play(repos)
+        
 
         corners_transition = OnCorners(self.match, [0.15, 1.20])
         out_corners_transition = OnCorners(self.match, [0.15, 1.20], True)

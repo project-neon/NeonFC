@@ -115,16 +115,16 @@ class Mid(PlayerPlay):
     def start_up(self):
             super().start_up()
             controller = PID_control
-            controller_kwargs = {'max_speed': 2, 'max_angular': 2000}
+            controller_kwargs = {'max_speed': 2, 'max_angular': 6800,'reduce_speed': True}
             self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def start(self):
         pass
     def update(self):
         if self.match.ball.y > self.field_h/2:
-            return [self.field_w/2,self.field_h*(3/8)]
+            return [self.field_w/2,self.field_h*(2/4)]
         if self.match.ball.y < self.field_h/2:
-            return [self.field_w/2,self.field_h*(5/8)]
+            return [self.field_w/2,self.field_h*(3/4)]
         
         return [self.field_w/2,self.field_h*(3/4)]
 class Defend(PlayerPlay):
@@ -139,7 +139,7 @@ class Defend(PlayerPlay):
     def start_up(self):
             super().start_up()
             controller = PID_control
-            controller_kwargs = {'max_speed': 2, 'max_angular': 9000,"kp":60}
+            controller_kwargs = {'max_speed': 2, 'max_angular': 9000,"kp":60,'reduce_speed': True}
             self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def start(self):
@@ -147,7 +147,7 @@ class Defend(PlayerPlay):
     def update(self):
         self.v = (self.match.ball.vx**2+self.match.ball.vy**2)**(1/2)
         controller_kwargs = {'max_speed': max(2,10*self.v), 'max_angular': 9000,"kp":60 + 100*self.v}
-        return 0.3, min(0.85,max(0.45,self.match.ball.y + self.match.ball.vy/3))
+        return 0.3, min(0.65 + 0.35,max(0.65 - 0.35,self.match.ball.y + self.match.ball.vy/3))
 
 class RightAttackerPlanning(PlayerPlay):
     def __init__(self, match, robot):
@@ -337,7 +337,7 @@ class Midfielder(Strategy):
         mid.add_transition(on_defensive_sector_transition,defend_potentialfield)
         defend_potentialfield.add_transition(on_offensive_sector_transition,mid)
         # Estado inicial é o astar
-        self.playerbook.set_play(mid)
+        self.playerbook.set_play(defend_potentialfield)
     
 
     def reset(self, robot=None):
