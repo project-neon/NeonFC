@@ -3,24 +3,28 @@ from algorithms.limit_cycle import LimitCycle
 import math
 from controller.PID_control import PID_W_control
 from strategy.BaseStrategy import Strategy
+from strategy.utils.player_playbook import PlayerPlay
 from commons.math import distance_between_points
 
 
-class Attacker_LC(Strategy):
-    def __init__(self, match, plot_field=False):
-        super().__init__(match, "Main_Attacker", controller=PID_W_control)
+class MainPlay(PlayerPlay):
+    def __init__(self, match, robot):
+        # super().__init__(match, "Main_Attacker", controller=PID_W_control)
+        super().__init__(match, robot)
 
-    def start(self, robot=None):
-        super().start(robot=robot)
+    def get_name(self):
+        return f"<{self.robot.get_name()} Main Attacker Planning>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_W_control
+        self.robot.strategy.controller = controller(self.robot)
+
+    def start(self):
         self.limit_cycle = LimitCycle(self.match)
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
-    def reset(self, robot=None):
-        super().reset()
-        if robot:
-            self.start(robot)
-
-    def decide(self):
+    def update(self):
         ball = (self.match.ball.x, self.match.ball.y)
         robot = (self.robot.x, self.robot.y)
 
@@ -75,7 +79,7 @@ class Attacker_LC(Strategy):
                 target[0] - p * math.cos(m) - r * math.cos(j),
                 target[1] - p * math.sin(m) - r * math.sin(j),
                 2 * p,
-                np.sign(target[1] - p * math.sin(m) - r * math.sin(j)-0.65)
+                np.sign(target[1] - p * math.sin(m) - r * math.sin(j) - 0.65)
             )
 
         return virtual_obstacle
