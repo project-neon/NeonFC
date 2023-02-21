@@ -178,7 +178,7 @@ class OnWall(Trigger): #Ativado quando a bola e o robo estão nas paredes horizo
         self.field_dim = self.match.game.field.get_dimensions()
     def evaluate(self,coach,actual_play):
         self.delta = 0.1
-        ball_distance = 0.6
+        ball_distance = 0.07
         if ((self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2)**(1/2) < ball_distance and (self.match.ball.vx**2+self.match.ball.vy**2)**(1/2) < 0.1:
             if abs(self.field_dim[0] - self.robot.x) < self.delta :
                 if abs(self.field_dim[0] - self.match.ball.x) < self.delta:
@@ -217,7 +217,7 @@ class StaticInWall(Trigger): #Ativado quando o robo está preso
         self.field_dim = self.match.game.field.get_dimensions()
     def evaluate(self,coach,actual_play):
         self.delta = 0.3
-        self.ball_distance = 0.1
+        self.ball_distance = 0
         if (math.atan((self.robot.y - self.match.ball.y)/(self.robot.x - self.match.ball.x)) - self.robot.theta) > 0.4:
             if abs((self.robot.vx**2 + self.robot.vy**2)**(1/2) < 0.05 and ((self.robot.x - self.match.ball.x)**2 + (self.robot.y - self.match.ball.y)**2)**(1/2)) > self.ball_distance:
                 return True
