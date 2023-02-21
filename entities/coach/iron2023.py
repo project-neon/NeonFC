@@ -9,10 +9,10 @@ class Coach(BaseCoach):
     def __init__(self, match):
         super().__init__(match)
 
-        self.SS_strategy = strategy.iron2022.Midfielder(self.match)
-        self.ST_strategy = strategy.iron2022.Attacker_LC(self.match)
+        self.SS_strategy = strategy.tests.Idle(self.match)
+        self.ST_strategy = strategy.tests.Idle(self.match)
 
-        self.GK_strategy = strategy.iron2022.Goalkeeper(self.match)
+        self.GK_strategy = strategy.iron2023.Goalkeeper(self.match)
         self.GK_id = 0  # Goalkeeper fixed ID
 
     def decide(self):
@@ -38,7 +38,7 @@ class Coach(BaseCoach):
 
         a1     = distance_between_points((b_x, b_y), (r1[1].x, r1[1].y))
         a2     = distance_between_points((b_x, b_y), (r2[1].x, r2[1].y))
-        b1, b2 = r1[1].y - self.match.bally, r2[1].y - self.match.bally
+        b1, b2 = r1[1].y - self.match.ball.y, r2[1].y - self.match.ball.y
 
         if b1 * b2 > 0:
             if a1 < a2:
