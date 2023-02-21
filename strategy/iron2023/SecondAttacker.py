@@ -25,9 +25,9 @@ class ShadowAttacker(Strategy):
         target = main_st[:]
 
         # second attacker offset on x based on the distance of the main attacker to the ball
-        target[0] -= max(min(4*0.075, obs_radius), 1.2)
+        target[0] -= max(4*0.075, obs_radius)
         # second attacker offset on y based on the distance of the ball to the center
-        target[1] += .3*(.65-ball[1])
+        target[1] += .5*(.65-ball[1])
 
         self.univector_field.set_target(target, ball)
         self.univector_field.del_obstacle(all=True)
