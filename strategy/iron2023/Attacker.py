@@ -102,3 +102,69 @@ class MainPlay(PlayerPlay):
         # Check the sign of the dot product to determine if the point is to the right or left of the line
         return dot_product > 0
 
+
+class WingPlay(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Wing Attacker Planning>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_W_control
+        self.robot.strategy.controller = controller(self.robot)
+
+    def start(self):
+        self.limit_cycle = LimitCycle(self.match)
+        self.field_w, self.field_h = self.match.game.field.get_dimensions()
+
+    def update(self):
+        target = [self.match.ball.x, self.match.ball.y]
+        robot = (self.robot.x, self.robot.y)
+
+        target[1] = min(self.BALL_Y_MAX, target[1])
+        target[1] = max(self.BALL_Y_MIN, target[1])
+
+        self.limit_cycle.set_target(target)
+        self.limit_cycle.add_obstacle(self.get_virtual_obstacle(target))
+        return self.limit_cycle.compute(self.robot, fitness=20)
+
+    def get_virtual_obstacle(self, target):
+        """
+        - m:    angle of the line perpendicular to the line between the ball and
+                the center of the goal
+        - p:    distance of the virtual obstacles to the ball / radius of the virtual obstacle
+        - vo:   virtual obstacle
+        - j:    this is the angle between the ball and the center of the goal
+        - m:    the normal angle perpendicular to j
+        - r:    radius of the ball
+        """
+        aim_point = [self.field_w, self.BALL_Y_MAX] if target[1] > .65 else [self.field_w, self.BALL_Y_MIN]
+
+        j = math.atan2(aim_point[1] - target[1], aim_point[0] - target[0])
+        m = j + math.pi / 2
+        p = 0.1
+
+        r = .0427 / 2
+
+        '''
+        the terms r*cos(j) and r*sin(j) are subtracted to move
+        the center of the obstacles behind the ball instead of its center
+        '''
+        if self.robot.y < math.tan(j) * (self.robot.x - target[0]) + target[1]:
+            virtual_obstacle = (
+                target[0] - p * math.cos(m) - r * math.cos(j),
+                target[1] - p * math.sin(m) - r * math.sin(j),
+                p,
+                1
+            )
+        else:
+            virtual_obstacle = (
+                target[0] + p * math.cos(m) - r * math.cos(j),
+                target[1] + p * math.sin(m) - r * math.sin(j),
+                p,
+                -1
+            )
+
+        return virtual_obstacle
