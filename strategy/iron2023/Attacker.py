@@ -1,7 +1,7 @@
 import numpy as np
 from algorithms.limit_cycle import LimitCycle
 import math
-from controller.PID_control import PID_W_control
+from controller.PID_control import PID_W_control, PID_control
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition
 from commons.math import distance_between_points
@@ -224,6 +224,67 @@ class CrossPlay(PlayerPlay):
 
     def start(self):
         pass
+
+
+class Wait(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Position Planning>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs={'V_MIN': 0, 'K_RHO': 75}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def update(self):
+        print(self.position())
+        return self.position()
+
+    def start(self):
+        pass
+
+    def position(self):
+        a = (.35, 1.1)
+        b = (.35, 0.2)
+
+        c = (self.robot.x, self.robot.y)
+        d = [(r.x, r.y) for r in self.match.robots if r.strategy.name == "Shadow_Attacker"][0]
+
+        # Calculate the distances between each robot and each fixed point
+        distance_c_a = math.sqrt((c[0] - a[0]) ** 2 + (c[1] - a[1]) ** 2)
+        distance_c_b = math.sqrt((c[0] - b[0]) ** 2 + (c[1] - b[1]) ** 2)
+        distance_d_a = math.sqrt((d[0] - a[0]) ** 2 + (d[1] - a[1]) ** 2)
+        distance_d_b = math.sqrt((d[0] - b[0]) ** 2 + (d[1] - b[1]) ** 2)
+
+        # Assign the robots to the closer fixed point
+        if distance_c_a + distance_d_b < distance_c_b + distance_d_a:
+            return a
+        else:
+            return b
+
+
+class LookAtBall(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Looking at the ball>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_W_control
+        controller_kwargs = {'V_MIN': 0, 'V_MAX': 0}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def update(self):
+        return self.match.ball.x, self.match.ball.y
+
+    def start(self):
+        pass
+
 
 class MainStriker(Strategy):
     def __init__(self, match, name="Main_Attacker"):
