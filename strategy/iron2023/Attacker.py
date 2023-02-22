@@ -129,9 +129,16 @@ class WingPlay(PlayerPlay):
         target[1] = min(self.BALL_Y_MAX, target[1])
         target[1] = max(self.BALL_Y_MIN, target[1])
 
-        self.limit_cycle.set_target(target)
-        self.limit_cycle.add_obstacle(self.get_virtual_obstacle(target))
-        return self.limit_cycle.compute(self.robot, fitness=20)
+        aim_point = [self.field_w, self.BALL_Y_MAX] if target[1] > .65 else [self.field_w, self.BALL_Y_MIN]
+
+        if distance_between_points(target, robot) < 0.1 and not self.behind_ball(aim_point):
+            desired = aim_point
+        else:
+            self.limit_cycle.set_target(target)
+            self.limit_cycle.add_obstacle(self.get_virtual_obstacle(target))
+            desired = self.limit_cycle.compute(self.robot, fitness=20)
+
+        return desired
 
     def get_virtual_obstacle(self, target):
         """
