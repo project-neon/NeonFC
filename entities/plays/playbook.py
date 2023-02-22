@@ -14,7 +14,7 @@ class Playbook(object):
     def set_play(self, play):
         if play.get_name() in self.plays.keys():
             self.actual_play = play.get_name()
-            play.start_up()
+            self.plays[self.actual_play].start_up()
         else:
             raise KeyError("Play is not defined on actual Playbook")
     

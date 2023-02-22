@@ -2,16 +2,17 @@ import math
 import numpy as np
 from commons.math import speed_to_power, angle_between
 
-def angle_adjustment(angle):
-        """Adjust angle of the robot when objective is "behind" the robot"""
-        phi = angle % math.radians(360)
-        if phi > math.radians(180):
-            phi = phi - math.radians(360)
 
-        return phi
+def angle_adjustment(angle):
+    """Adjust angle of the robot when objective is "behind" the robot"""
+    phi = angle % math.radians(360)
+    if phi > math.radians(180):
+        phi = phi - math.radians(360)
+
+    return phi
+
 
 class PID_control(object):
-
     CONSTANTS = {
         'simulation': {
             # Control params
@@ -23,7 +24,9 @@ class PID_control(object):
             # Max speeds for the robot
             'V_MAX': 40, # linear speed
             'W_MAX': math.radians(7200), # angular speed rad/s
-            'V_MIN': 80
+            'V_MIN': 80,
+
+            'TWO_SIDES': True
         },
         'real_life': {
             # Control params
@@ -35,7 +38,9 @@ class PID_control(object):
             # Max speeds for the robot
             'V_MAX': 130, # linear speed
             'W_MAX': 550, # angular speed rad/s
-            'V_MIN': 20
+            'V_MIN': 20,
+
+            'TWO_SIDES': True
         }
     }
 
@@ -52,7 +57,7 @@ class PID_control(object):
         self.default_fps = default_fps
         self.dt = 1/self.default_fps
 
-        self.__dict__.update( self.CONSTANTS.get(self.environment) )
+        self.__dict__.update(self.CONSTANTS.get(self.environment))
         self.__dict__.update(kwargs)
 
         # PID params for error
@@ -91,7 +96,7 @@ class PID_control(object):
         """Linear speed (v)"""
         v = max(self.V_MIN, min(self.V_MAX, rho*self.K_RHO))
 
-        if (abs(alpha) > math.pi / 2):
+        if (abs(alpha) > math.pi / 2) and self.TWO_SIDES:
             v = -v
             alpha = angle_adjustment(alpha - math.pi)
 
@@ -112,12 +117,13 @@ class PID_control(object):
 
         return v, w
 
+
 class PID_W_control(PID_control):
 
     def update(self):
-        _, w = super()._update()
+        v, w = super()._update()
 
-        v = self.V_MAX
+        v = np.sign(v) * self.V_MAX
 
         if self.environment == 'simulation':
             powers = speed_to_power(v, w, self.l, self.R)
