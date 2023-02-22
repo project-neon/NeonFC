@@ -185,19 +185,19 @@ class CrossPlay(PlayerPlay):
         super().__init__(match, robot)
 
     def get_name(self):
-        return f"<{self.robot.get_name()} Angle Planning>"
+        return f"<{self.robot.get_name()} Cross Planning>"
 
     def start_up(self):
         super().start_up()
         controller = PID_W_control
-        controller_kwargs = {'V_MAX': 0}
+        controller_kwargs = {'V_MAX': 0, 'V_MIN': 0, 'W_MAX': 100000000000}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
         if self.robot.y > .65:
-            ang_diff = self.robot.theta - math.pi
+            ang_diff = self.robot.theta - math.pi/2.1
         else:
-            ang_diff = self.robot.theta + math.pi
+            ang_diff = self.robot.theta + math.pi/2.1
 
         x = self.robot.x + 0.5*math.cos(ang_diff)
         y = self.robot.y + 0.5*math.sin(ang_diff)
