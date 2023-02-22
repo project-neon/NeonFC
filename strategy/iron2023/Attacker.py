@@ -179,6 +179,24 @@ class WingPlay(PlayerPlay):
 
         return virtual_obstacle
 
+    def behind_ball(self, aim_point):
+        # Convert input to numpy arrays for easy calculation
+        point_on_line = np.array((self.match.ball.x, self.match.ball.y))
+        point_on_normal = np.array(aim_point)
+        point_to_check = np.array((self.robot.x, self.robot.y))
+
+        # Calculate the normal vector of the line
+        normal = point_on_normal - point_on_line
+
+        # Calculate the vector from the point on the line to the point to check
+        vector_to_check = point_to_check - point_on_line
+
+        # Calculate the dot product of the normal vector and the vector to check
+        dot_product = np.dot(normal, vector_to_check)
+
+        # Check the sign of the dot product to determine if the point is to the right or left of the line
+        return dot_product > 0
+
 
 class CrossPlay(PlayerPlay):
     def __init__(self, match, robot):
