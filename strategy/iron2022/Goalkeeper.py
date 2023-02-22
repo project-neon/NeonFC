@@ -247,7 +247,6 @@ class Goalkeeper(Strategy):
         # print(self.robot.y)
 
         # print(self.robot.is_visible())
-        print(behaviour.name)
         return behaviour.compute([self.robot.x, self.robot.y])
 
     # def update(self):
