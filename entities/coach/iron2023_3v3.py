@@ -15,7 +15,7 @@ class Coach(BaseCoach):
         main_play = plays.iron2023_3v3.MainPlay(self)
         penalty_play = plays.iron2023_3v3.PenaltyPlay(self, self.coach_parameters['penalty_taker']) 
         defend_penalty_play = plays.iron2023_3v3.DefendPenaltyPlay(self) 
-        goalkick_play = plays.larc2021.GoalKickPlay(self) 
+        goalkick_play = plays.iron2023_3v3.GoalKickPlay(self) 
         freeball_play = plays.larc2021.FreeballPlay(self) 
 
         def_freeball_play = plays.larc2021.DefFreeballPlay(self) 
