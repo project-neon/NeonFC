@@ -1,6 +1,6 @@
 from strategy.BaseStrategy import Strategy
 from controller.uni_controller import UniController
-from algorithms import UnivectorField
+from algorithms.univector_field import UnivectorField
 import math
 
 
