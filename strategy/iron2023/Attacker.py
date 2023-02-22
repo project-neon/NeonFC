@@ -306,20 +306,29 @@ class MainStriker(Strategy):
         wing.start()
         cross = CrossPlay(self.match, self.robot)
         cross.start()
+        defensive = Wait(self.match, self.robot)
+        defensive.start()
+        angle = LookAtBall(self.match, self.robot)
 
         self.playerbook.add_play(main)
         self.playerbook.add_play(wing)
         self.playerbook.add_play(cross)
+        self.playerbook.add_play(defensive)
+        self.playerbook.add_play(angle)
 
         on_wing = OnInsideBox(self.match, [0, 0.3, 1.5, 0.7], True)
-        on_center = OnInsideBox(self.match, [0, 0.3, 1.5, 0.7])
-        on_cross_region = OnInsideBox(self.match, [0, 0, 1.5, .15])
+        on_cross_region = OnInsideBox(self.match, [1.35, 0, .15, 1.3])
         on_near_ball = OnNextTo(self.match.ball, self.robot, 0.1)
+        on_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7])
+        on_positon_1 = OnNextTo([.35, 1.1], self.robot, 0.1)
+        on_positon_2 = OnNextTo([.35, .2], self.robot, 0.1)
 
         main.add_transition(on_wing, wing)
-        wing.add_transition(on_center, main)
-        wing.add_transition(AndTransition([on_near_ball, on_cross_region]), cross)
-        cross.add_transition(on_center, main)
+        main.add_transition(AndTransition([on_near_ball, on_cross_region, on_wing]), cross)
+        main.add_transition(on_defensive_box, defensive)
+
+        main.add_transition(AndTransition([on_positon_1, on_defensive_box]), angle)
+        main.add_transition(AndTransition([on_positon_2, on_defensive_box]), angle)
 
         # Estado inicial
         self.playerbook.set_play(main)
