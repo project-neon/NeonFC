@@ -50,9 +50,6 @@ class Game():
             self.api.start()
             self.api_recv.start()
 
-            
-        
-
     def update(self):
         frame = assign_empty_values(
             self.vision.frame, 
@@ -65,8 +62,19 @@ class Game():
         self.match.update(frame)
         commands = self.match.decide()
 
+        if self.use_api and (self.match.game_status == 'stop' or self.match.game_status == None):
+            commands = [
+                {
+                    'robot_id': r['robot_id'],
+                    'color': r['color'],
+                    'wheel_left': 0,
+                    'wheel_right': 0
+                } for r in commands
+            ]
+
         self.comm.send(commands)
-        pass
 
-
+        if self.use_api:
+            self.api.send_data(self.match)
+            
 g = Game(config_file=args.config_file, env=args.env)
