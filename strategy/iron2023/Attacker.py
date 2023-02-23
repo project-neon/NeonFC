@@ -317,7 +317,7 @@ class MainStriker(Strategy):
         self.playerbook.add_play(angle)
 
         on_wing = OnInsideBox(self.match, [0, 0.3, 1.5, 0.7], True)
-        on_cross_region = OnInsideBox(self.match, [1.35, 0, .15, 1.3])
+        on_cross_region = OnInsideBox(self.match, [1.4, 0, .15, 1.3])
         on_near_ball = OnNextTo(self.match.ball, self.robot, 0.1)
         on_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7])
         on_positon_1 = OnNextTo([.35, 1.1], self.robot, 0.1)
