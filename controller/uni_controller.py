@@ -92,9 +92,7 @@ class UniController(object):
         else:
             w = v * self.phi_v - self.K_W * math.sqrt(self.a_theta_e)
 
-        # w *= 1.3
-
-        return v, w#-w
+        return v, w
 
     def set_desired(self, desired):
         self.theta_d = desired[0]
@@ -106,4 +104,4 @@ class UniController(object):
         if self.environment == 'simulation':
             return tuple(np.dot(250, speed_to_power(v, w, self.L, self.R)))
             
-        return v, w
+        return v, -w
