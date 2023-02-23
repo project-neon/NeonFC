@@ -363,7 +363,7 @@ class Goalkeeper(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
-        print(self.playerbook.actual_play)
+        # print(self.playerbook.actual_play)
         return res
 
 class OutsideOfGoalAreaTrigger(Trigger):
