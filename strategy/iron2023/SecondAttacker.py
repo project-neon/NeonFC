@@ -25,6 +25,7 @@ class MainPlay(PlayerPlay):
         main_st = [[i.x, i.y] for i in self.match.robots if i.strategy.name == "Main_Attacker"][0]
         obs_radius = distance_between_points(main_st, ball)
         target = main_st[:]
+        gk = [[i.x, i.y] for i in self.match.robots if i.strategy.name == "Goalkeeper_IRON2023"][0]
 
         # second attacker offset on x based on the distance of the main attacker to the ball
         target[0] -= max(4*0.075, obs_radius)
@@ -34,6 +35,7 @@ class MainPlay(PlayerPlay):
         self.univector_field.set_target(target, ball)
         self.univector_field.del_obstacle(all=True)
         self.univector_field.add_obstacle(main_st, 0.075*1.4, obs_radius-0.075*1.4)
+        self.univector_field.add_obstacle(gk, 0.075*1.4, 0.1)
 
         x, y = self.robot.x, self.robot.y
         theta_d = self.univector_field.compute((x, y))
