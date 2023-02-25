@@ -73,7 +73,7 @@ class Wait(PlayerPlay):
         b = (.35, 0.2)
 
         c = (self.robot.x, self.robot.y)
-        d = [(r.x, r.y) for r in self.match.robots if r.strategy.name == "Shadow_Attacker"][0]
+        d = [(r.x, r.y) for r in self.match.robots if r.strategy.name == "Main_Attacker"][0]
 
         # Calculate the distances between each robot and each fixed point
         distance_c_a = math.sqrt((c[0] - a[0]) ** 2 + (c[1] - a[1]) ** 2)
