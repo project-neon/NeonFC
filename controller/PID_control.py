@@ -13,6 +13,33 @@ def angle_adjustment(angle):
 
 
 class PID_control(object):
+    """
+    An implementation of the PID controller on linear and angular speed
+
+    The PID_control will receive a target position (x, y) and calculate the angular speed needed to reach the target
+    angle (ensure that the robot angle is in the direction of the target) using the PID algorithm. It will also
+    calculate the linear speed based on the distance from the robot and the target using a P algorithm.
+
+    Attributes
+    ----------
+    K_RHO : float
+        the linear Kp value
+    KP : float
+        the angular Kp value
+    KD : float
+        the angular Kd value
+    KI : float
+        the angular Ki value
+    V_MAX : int
+        the maximum linear speed
+    V_MIN : int
+        the minimum linear speed
+    W_MAX : int
+        the maximum angular speed
+    TWO_SIDES: bool
+        whether the controller will consider the robot as having two equal sides or only one
+    """
+
     CONSTANTS = {
         'simulation': {
             # Control params
