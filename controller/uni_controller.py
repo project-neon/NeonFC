@@ -117,6 +117,14 @@ class UniController(object):
         return v, w
 
     def set_desired(self, desired):
+        """
+        Defines the target angles
+
+            Parameters
+            ----------
+                desired (tuple[float, float]): the desired angle in the current position and in the desired angle in
+                                               front of the robot
+        """
         self.theta_d = desired[0]
         self.theta_f = desired[1]
 
