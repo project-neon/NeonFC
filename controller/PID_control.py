@@ -153,6 +153,28 @@ class PID_control(object):
 
 
 class PID_W_control(PID_control):
+    """
+    An implementation of the PID controller on the angular speed
+
+    The PID_control will receive a target position (x, y) and calculate the angular speed needed to reach the target
+    angle (ensure that the robot angle is in the direction of the target) using the PID algorithm. It will set the robot
+    linear speed as the maximum all times.
+
+    Attributes
+    ----------
+    KP : float
+        the angular Kp value
+    KD : float
+        the angular Kd value
+    KI : float
+        the angular Ki value
+    V_MAX : int
+        the maximum linear speed
+    W_MAX : int
+        the maximum angular speed
+    TWO_SIDES: bool
+        whether the controller will consider the robot as having two equal sides or only one
+    """
 
     def update(self):
         v, w = super()._update()
