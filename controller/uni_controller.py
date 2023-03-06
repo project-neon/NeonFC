@@ -8,6 +8,28 @@ reffering to soccer robotics
 """
 
 class UniController(object):
+    """
+    An implementation of the Uni controller specified on the soccer robotics article
+
+    The UniController will receive a desired angle for the robot current position, the desired angle for the position in
+    front of the robot and along with the current robot angle it will calculate the robot angular and linear speed. it
+    can also be set through the control_speed parameter to slow down when near the target position.
+
+    Attributes
+    ----------
+    K_P : float
+        the linear Kp value
+    control_speed : bool
+        whether the controller will use the P control for linear speed
+    V_M : int
+        the maximum linear speed
+    K_W : float
+        a positive constant
+    R_M : int
+        the maximum turn (v*w)
+    target: tuple[float, float]
+        the target position used for calculating the linear speed P
+    """
     
     CONSTANTS = {
         'simulation': {
