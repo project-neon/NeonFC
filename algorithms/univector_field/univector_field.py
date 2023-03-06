@@ -23,7 +23,23 @@ def reduce_angle(ang):
 np_reduce_angle = np.vectorize(reduce_angle)
 
 class UnivectorField:
+    """
+    An implementation of the uni vector field path planning algotithm
+
+    The UnivectorField will generate vector that guides a given point to the target so that it gets there with an angle
+    directed at the guiding point. This algorithm is also capable of contouring obstacles and generating a rectangle
+    behind the target where the vectors have the save directions as the target-guide vector.
+    """
+
     def __init__(self, n, rect_size, plot=False, path=''):
+        """Inits UnivectorField class.
+
+            Parameters
+            ----------
+                n: Constant the related to how much the path will avoid hitting the target from the wrong direction
+                rect_size: the base side size of the rectangle behind the target where all the vectors are the same
+                           angle of the target-guide line
+        """
         self.obstacles = []
         self.N = n
         self.delta_g = rect_size
@@ -37,18 +53,40 @@ class UnivectorField:
 
             Parameters
             ----------
-                g (tuple[int, int]): target x and y coordinates
-                r (tuple[int, int]): guide point x and y coordinates
+                g (tuple[float, float]): target x and y coordinates
+                r (tuple[float, float]): guide point x and y coordinates
         """
 
         self.g = g
         self.r = r
 
     def add_obstacle(self, p, r0, m):
+        """
+        Add one obstacle
+
+            Parameters
+            ----------
+                p (tuple[float, float]): obstacle center x and y coordinates
+                r0 (float): obstacle radius
+                m (float): obstacle margin (distance the path will avoid)
+
+            Return
+            ----------
+                obstacle (obstacle): the obstacle object
+        """
+
         self.obstacles.append(Obstacle(p, r0, m, m + r0))
         return self.obstacles[-1]
 
     def del_obstacle(self, *args, all=False):
+        """
+        Delete any amount of obstacles
+
+            Parameters
+            ----------
+                *args (list[obstacles]): one or more obstacle to be deleted
+                all (bool): whether to delete all obstacles
+        """
         if all:
             self.obstacles = []
             return
@@ -78,6 +116,17 @@ class UnivectorField:
         return self.compute(p)
 
     def compute(self, p):
+        """
+        Calculate the angle for the given position
+
+            Parameters
+            ----------
+                p (tuple[float, float]): the position for which the angle will be calculated
+
+            Return
+            ----------
+                angle (float): the angle of the vector in the field at the given position
+        """
         behind_angle = None
 
         ang_pr = angle_between(p, self.r)
