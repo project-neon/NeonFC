@@ -93,6 +93,13 @@ class PID_control(object):
         self.alpha_old = 0 # stores previous iteration alpha
 
     def set_desired(self, vector):
+        """
+        Defines the target position
+
+            Parameters
+            ----------
+                vector (tuple[float, float]): target x and y coordinates
+        """
         self.desired = vector
 
     def _update_fps(self):
