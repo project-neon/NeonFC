@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "yellow",
-        "coach_name": "IRON_2023",
+        "coach_name": "TRACKER",
         "category": "3v3",
         "robot_ids": [
             3,
