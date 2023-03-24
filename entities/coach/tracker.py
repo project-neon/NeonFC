@@ -21,7 +21,7 @@ class Coach(BaseCoach): # heranca da classe abstrata
         self.ys = ['y']
         self.t = ['time']
 
-        self.moving_id = 9
+        self.moving_id = 0
 
     def decide(self):
         print('d')
@@ -41,6 +41,7 @@ class Coach(BaseCoach): # heranca da classe abstrata
                     file.write(";".join(line))
                     file.write("\n")
             self.Moving.stop()
+            quit()
         else:
             if self.match.robots[moving[0]].strategy is None:
                 self.match.robots[moving[0]].strategy = self.Moving
@@ -53,10 +54,10 @@ class Coach(BaseCoach): # heranca da classe abstrata
 
 
     def going_2_crash(self, robot):
-        a = .01
+        a = 1 # seconds before hitting the wall
 
-        x_pred = robot.x + self.v * cos(robot.theta) * a
-        y_pred = robot.y + self.v * sin(robot.theta) * a
+        x_pred = robot.x + robot.vx * cos(robot.theta) * a
+        y_pred = robot.y + robot.vy * sin(robot.theta) * a
 
         if x_pred > 1.5 or x_pred < 0 or y_pred > 1.3 or y_pred < 0:
             return True
