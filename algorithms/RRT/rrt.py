@@ -1,6 +1,5 @@
 import math
 import random
-from tkinter import E
 
 import matplotlib.pyplot as plt
 import numpy as np
