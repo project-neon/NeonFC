@@ -17,7 +17,7 @@ class SSLVision(threading.Thread):
         self.frame = {}
         self.last_frame = {}
         
-        self.vision_port = 10006
+        self.vision_port = 10015
         self.host = '224.5.23.2'
 
         self._fps = 0

@@ -5,7 +5,7 @@
         "host_ip": "localhost",
         "blue_port": 30011,
         "yellow_port": 30012,
-        "vision_port": 10006,
+        "vision_port": 10005,
         "command_port": 20011,
         "replacer_port": 10004,
         "referee_port": 10003,
@@ -19,9 +19,9 @@
         "coach_name": "IRON_2023",
         "category": "3v3",
         "robot_ids": [
-            3,
-            9,
-            0
+            1,
+            2,
+            3
         ]
     },
     "comm": {
