@@ -32,11 +32,11 @@ class PID_control(object):
             # Control params
             'K_RHO': 500, # Linear speed gain
             # PID of angular speed
-            'KP': -1000, # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
-            'KD': 0, # Derivative gain of w
+            'KP': -700, # Proportional gain of w (angular speed), respecting the stability condition: K_RHO > 0 and KP > K_RHO
+            'KD': -180, # Derivative gain of w
             'KI': 0, # Integral gain of w
             # Max speeds for the robot
-            'V_MAX': 130, # linear speed
+            'V_MAX': 150, # linear speed
             'W_MAX': 550, # angular speed rad/s
             'V_MIN': 20,
 
@@ -104,7 +104,7 @@ class PID_control(object):
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha
-        w = np.sign(w) * min(abs(w), self.W_MAX)
+        # w = np.sign(w) * min(abs(w), self.W_MAX)
 
         self.alpha_old = alpha
 
