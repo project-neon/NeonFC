@@ -64,6 +64,7 @@ class PID_control(object):
         self.dif_alpha = 0 # diferential param
         self.int_alpha = 0 # integral param
         self.alpha_old = 0 # stores previous iteration alpha
+        self.error = 0
 
     def set_desired(self, vector):
         self.desired = vector
@@ -87,6 +88,7 @@ class PID_control(object):
         gamma = angle_adjustment(math.atan2(D_y, D_x))
         # ALPHA angle between the front of the robot and the objective
         alpha = angle_adjustment(gamma - self.robot.theta)
+        self.error = alpha
 
         """Calculate the parameters of PID control"""
         self._update_fps()
