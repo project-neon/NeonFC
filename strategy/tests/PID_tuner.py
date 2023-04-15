@@ -14,11 +14,12 @@ class PIDTuner(Strategy):
         self.sender.start()
         self.reciver = Api_recv(match, "127.0.0.1", 43211)
         self.reciver.start()
-        self.circuit = [(.75, .65)]  # , (.4, .90), (.4, .40)]
+        self.circuit = [(.2, .65), (1.1, .65)]  # , (.4, .90), (.4, .40)]
         self.circuit = deque(self.circuit)
 
     def start(self, robot=None):
         super().start(robot=robot)
+        self.y = self.robot.y
 
     def reset(self, robot=None):
         super().reset()
@@ -50,5 +51,11 @@ class PIDTuner(Strategy):
             self.controller.KP = data['kp']
             self.controller.KI = data['ki']
             self.controller.KD = data['kd']
+
+        if self.y == 0:
+            self.y = self.robot.y
+        target = [.1,self.y]
+        print(target)
+        return target
 
         return self.next_point()
