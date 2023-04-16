@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from strategy.BaseStrategy import Strategy
-from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox
+from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, AndTransition, OrTransition
 from entities.plays.playbook import Trigger
 from controller import PID_control
 
@@ -299,7 +299,18 @@ class Goalkeeper(Strategy):
         self.playerbook.add_play(forward_corner)
         self.playerbook.add_play(stationary)
 
-        outside_goal_area = OnInsideBox(self.match, [], True)
+        # out_of_alignment = # 1
+        # outside_goal_area = # 2
+        on_follow_ball = OnInsideBox(self.match, [.15, .4, .6, .7]) # 3
+        on_corner = OrTransition([ #4
+            OnInsideBox(self.match, []),
+            OnInsideBox(self.match, [])
+        ])
+        on_forward_corner = OrTransition([ #5
+            OnInsideBox(self.match, []),
+            OnInsideBox(self.match, [])
+        ])
+        on_goal_area = OnInsideBox(self.match, []) # 6
 
         if self.playerbook.actual_play == None:
             self.playerbook.set_play()
@@ -312,5 +323,3 @@ class Goalkeeper(Strategy):
     def decide(self):
         res = self.playerbook.update()
         return res
-
-
