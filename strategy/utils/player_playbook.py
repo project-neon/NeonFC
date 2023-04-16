@@ -117,6 +117,15 @@ class AndTransition(Trigger):
     def evaluate(self, *args, **kwargs):
         eval = [t.evaluate(*args, **kwargs) for t in self.triggers_list]
         return all(eval)
+    
+class OrTransition(Trigger):
+    def __init__(self, triggers_list):
+        super().__init__()
+        self.triggers_list = triggers_list
+
+    def evaluate(self, *args, **kwargs):
+        eval = [t.evaluate(*args, **kwargs) for t in self.triggers_list]
+        return any(eval)
 
 
 class OnNextTo(Trigger):
