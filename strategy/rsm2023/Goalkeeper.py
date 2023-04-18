@@ -17,8 +17,8 @@ class Returning_to_Goal(PlayerPlay):
         super().start_up()
         controller = PID_control
         controller_kwargs = {
-            'V_MAX': 100,
-            'V_MIN': 100
+            'V_MAX': 1,#100,
+            'V_MIN': 1#100
         }
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
@@ -99,8 +99,8 @@ class PushBall(PlayerPlay):
         super().start_up()
         controller = PID_control
         controller_kwargs = {
-            'V_MAX': 100,
-            'V_MIN': 100
+            'V_MAX': 1.8,#100,
+            'V_MIN': 1.8#100
         }
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
@@ -128,7 +128,7 @@ class BallInCorner(PlayerPlay):
         controller = PID_control
         controller_kwargs = {
             'K_RHO': 600,
-            'V_MAX': 150,
+            'V_MAX': 1,#150,
             'V_MIN': 0
         }
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
@@ -163,7 +163,7 @@ class FollowBallPlay(PlayerPlay):
         controller = PID_control
         controller_kwargs = {
             'K_RHO': 1750,
-            'V_MAX': 200,
+            'V_MAX': 1,#200,
             'V_MIN': 0,
             'W_MAX': 0
         }
@@ -212,7 +212,7 @@ class ForwardCornerPlay(PlayerPlay):
         controller = PID_control
         controller_kwargs = {
             'K_RHO': 600,
-            'V_MAX': 150,
+            'V_MAX': 1,#150,
             'V_MIN': 0
         }
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
@@ -244,7 +244,7 @@ class StationaryPlay(PlayerPlay):
         controller = PID_control
         controller_kwargs = {
             'K_RHO': 600,
-            'V_MAX': 150,
+            'V_MAX': 1,#150,
             'V_MIN': 0
         }
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
@@ -296,8 +296,8 @@ class Goalkeeper(Strategy):
         self.playerbook.add_play(forward_corner)
         self.playerbook.add_play(stationary)
 
-        not_aligned = OnAlignment(self.robot, .6*math.pi/2, True)    # 1
-        aligned = OnAlignment(self.robot, .2*math.pi/2)              # !1
+        not_aligned = OnAlignment(self.robot, .4*math.pi/2, True)    # 1
+        aligned = OnAlignment(self.robot, .05*math.pi/2)              # !1
         outside_goal_area = OnReposition(self.robot)                 # 2
         on_follow_ball = OnInsideBox(self.match, [.15, .4, .6, .7])  # 3
         on_corner = OrTransition([                                   # 4
@@ -308,50 +308,58 @@ class Goalkeeper(Strategy):
             OnInsideBox(self.match, [.15, 1, .6, .3]),
             OnInsideBox(self.match, [.15, 0, .6, .3])
         ])
-        on_goal_area = OnInsideBox(self.match, [0, .4, .15, .7])     # 6
+        on_goal_area = OnInsideBox(self.match, [0, .3, .15, .7])     # 6
 
         on_attack_area = OnInsideBox(self.match, [.75, 0, .75, 1.3]) # 7
 
-        aligning_angle.add_transition(outside_goal_area) # 1 -> 2
+        aligning_angle.add_transition(outside_goal_area, returning_to_goal) # 1 -> 2
         aligning_angle.add_transition(AndTransition(     # 1 -> 3
-            aligned, on_follow_ball
-        ))
+            [aligned, on_follow_ball]
+        ), follow_ball)
         aligning_angle.add_transition(AndTransition(     # 1 -> 4
-            aligned, on_corner
-        ))
+            [aligned, on_corner]
+        ), defend_corner)
         aligning_angle.add_transition(AndTransition(     # 1 -> 5
-            aligned, on_forward_corner
-        ))
-        aligning_angle.add_transition(on_goal_area)      # 1 -> 6
+            [aligned, on_forward_corner]
+        ), forward_corner)
+        aligning_angle.add_transition(on_goal_area, pushing_ball)      # 1 -> 6
+        aligning_angle.add_transition(on_attack_area, stationary)      # 1 -> 6
 
         returning_to_goal.add_transition(AndTransition(  # 2 -> 1
-            NotTransition(outside_goal_area), not_aligned
-        ))
+            [NotTransition(outside_goal_area), not_aligned]
+        ), aligning_angle)
 
-        follow_ball.add_transition(not_aligned)       # 3 -> 1
-        follow_ball.add_transition(outside_goal_area) # 3 -> 2
-        follow_ball.add_transition(on_corner)         # 3 -> 4
-        follow_ball.add_transition(on_forward_corner) # 3 -> 5
-        follow_ball.add_transition(on_goal_area)      # 3 -> 6
-        follow_ball.add_transition(on_attack_area)    # 3 -> 7
+        follow_ball.add_transition(not_aligned, aligning_angle)       # 3 -> 1
+        follow_ball.add_transition(outside_goal_area, returning_to_goal) # 3 -> 2
+        follow_ball.add_transition(on_corner, defend_corner)         # 3 -> 4
+        follow_ball.add_transition(on_forward_corner, forward_corner) # 3 -> 5
+        follow_ball.add_transition(on_goal_area, pushing_ball)      # 3 -> 6
+        follow_ball.add_transition(on_attack_area, stationary)    # 3 -> 7
 
-        defend_corner.add_transition(not_aligned) # 4 -> 1
-        defend_corner.add_transition(outside_goal_area) # 4 -> 2
-        defend_corner.add_transition(follow_ball) # 4 -> 3
-        defend_corner.add_transition(on_forward_corner) # 4 -> 5
-        defend_corner.add_transition(on_goal_area) # 4 -> 6
+        defend_corner.add_transition(not_aligned, aligning_angle)       # 4 -> 1
+        defend_corner.add_transition(outside_goal_area, returning_to_goal) # 4 -> 2
+        defend_corner.add_transition(on_follow_ball, follow_ball)       # 4 -> 3
+        defend_corner.add_transition(on_forward_corner, forward_corner) # 4 -> 5
+        defend_corner.add_transition(on_goal_area, pushing_ball)      # 4 -> 6
 
-        forward_corner.add_transition(not_aligned) # 5 -> 1
-        forward_corner.add_transition(outside_goal_area) # 5 -> 2
-        forward_corner.add_transition(follow_ball) # 5 -> 3
-        forward_corner.add_transition(on_corner) # 5 -> 4
-        forward_corner.add_transition(on_goal_area) # 5 -> 6
-        forward_corner.add_transition(on_attack_area) # 5 -> 7
+        forward_corner.add_transition(not_aligned, aligning_angle)       # 5 -> 1
+        forward_corner.add_transition(outside_goal_area, returning_to_goal) # 5 -> 2
+        forward_corner.add_transition(on_follow_ball, follow_ball)       # 5 -> 3
+        forward_corner.add_transition(on_corner, defend_corner)         # 5 -> 4
+        forward_corner.add_transition(on_goal_area, pushing_ball)      # 5 -> 6
+        forward_corner.add_transition(on_attack_area, stationary)    # 5 -> 7
 
-        pushing_ball.add_transition() # 6 -> x
+        pushing_ball.add_transition(AndTransition( # 6 -> 2
+            [NotTransition(on_goal_area), outside_goal_area]
+        ), returning_to_goal)
+
+        stationary.add_transition(not_aligned, aligning_angle) # 7 -> 1
+        stationary.add_transition(outside_goal_area, returning_to_goal) # 7 -> 2
+        stationary.add_transition(on_follow_ball, follow_ball)          # 7 -> 3
+        stationary.add_transition(on_forward_corner, forward_corner)    # 7 -> 5
 
         if self.playerbook.actual_play == None:
-            self.playerbook.set_play(returning_to_goal)
+            self.playerbook.set_play(aligning_angle)
 
     def reset(self, robot=None):
         super().reset()
@@ -360,6 +368,9 @@ class Goalkeeper(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
+        on_goal = OnReposition(self.robot)
+        # print(self.playerbook.actual_play)
+        print(on_goal.evaluate())
         return res
 
 class OnAlignment(Trigger):
@@ -371,20 +382,23 @@ class OnAlignment(Trigger):
 
     def evaluate(self, *args, **kwargs):
         robot_theta = self.robot.theta
+        robot_v_theta = self.robot.vtheta
 
         if self.outside:
-            return ( math.pi - self.tolerance < robot_theta < math.pi + self.tolerance or
+            in_between = ( math.pi + self.tolerance < robot_theta < -math.pi + self.tolerance or
                               -self.tolerance < robot_theta < self.tolerance)
         
         else:
-            return ( math.pi/2 - self.tolerance < robot_theta <  math.pi/2 + self.tolerance or
+            in_between = ( math.pi/2 - self.tolerance < robot_theta <  math.pi/2 + self.tolerance or
                     -math.pi/2 - self.tolerance < robot_theta < -math.pi/2 + self.tolerance)
+            
+        return in_between and robot_v_theta < .1
 
 class OnReposition(Trigger):
     def __init__(self, robot):
         super().__init__()
         self.robot = robot
-        self.box = [0, .4, .15, .7]
+        self.box = [0, .3, .15, .7] # x1, y1, w, h
 
     def evaluate(self, *args, **kwargs):
         return not point_in_rect([self.robot.x, self.robot.y], self.box)
