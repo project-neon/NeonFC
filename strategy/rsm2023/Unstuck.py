@@ -42,14 +42,14 @@ class Reverse(PlayerPlay):
         self.robot.strategy.controller = controller(self.robot)
 
     def update(self):
-        if self.robot.y > 1.25:
+        if self.robot.y > 1:
             return self.robot.x, 1.2
-        if self.robot.y < .05:
+        if self.robot.y < .3:
             return self.robot.x, .1
 
-        if self.robot.x > 1.45:
+        if self.robot.x > 1:
             return 1.4, self.robot.y
-        if self.robot.x < .05:
+        if self.robot.x < .5:
             return .1, self.robot.y
 
     def start(self):
@@ -60,7 +60,7 @@ class OnCloseToWall(Trigger):
     def __init__(self, robot):
         super().__init__()
         self.robot = robot
-        self.box = [.1, .1, 1.3, 1.1]
+        self.box = [.05, .05, 1.4, 1.2]
 
     def evaluate(self, *args, **kwargs):
         return not point_in_rect([self.robot.x, self.robot.y], self.box)
