@@ -95,7 +95,7 @@ class Robot(object):
         self.speed = math.sqrt(self.vx**2 + self.vy**2)
 
     def update_stuckness(self):
-        MIN_STUCK_SPEED = 0.005
+        MIN_STUCK_SPEED = 0.05
 
         if self.game.use_referee and not self.game.referee.can_play:
             self.stuck_time = 0
