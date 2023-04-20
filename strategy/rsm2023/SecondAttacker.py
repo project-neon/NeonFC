@@ -112,7 +112,6 @@ class LookAtBall(PlayerPlay):
     def start(self):
         pass
 
-
 class ShadowAttacker(Strategy):
     def __init__(self, match, name="Shadow_Attacker"):
         super().__init__(match, name, controller=UniController, controller_kwargs={'control_speed': True})
@@ -143,7 +142,7 @@ class ShadowAttacker(Strategy):
         main.add_transition(AndTransition([on_positon_1, on_defensive_box]), angle)
         main.add_transition(AndTransition([on_positon_2, on_defensive_box]), angle)
 
-        # Estado inicial)
+        # Estado inicial
         self.playerbook.set_play(main)
 
     def decide(self):

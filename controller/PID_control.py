@@ -37,7 +37,7 @@ class PID_control(object):
             'KI': 0, # Integral gain of w
             # Max speeds for the robot
             'V_MAX': 150, # linear speed
-            'W_MAX': 550, # angular speed rad/s
+            'W_MAX': -1, # angular speed rad/s
             'V_MIN': 20,
 
             'TWO_SIDES': True
@@ -99,6 +99,7 @@ class PID_control(object):
 
         """Linear speed (v)"""
         v = max(self.V_MIN, min(self.V_MAX, rho*self.K_RHO))
+        # print('v', v)
 
         if (abs(alpha) > math.pi / 2) and self.TWO_SIDES:
             v = -v
@@ -106,7 +107,8 @@ class PID_control(object):
 
         """Angular speed (w)"""
         w = self.KP * alpha + self.KI * self.int_alpha + self.KD * self.dif_alpha
-        # w = np.sign(w) * min(abs(w), self.W_MAX)
+        if self.W_MAX > 0:
+            w = np.sign(w) * min(abs(w), self.W_MAX)
 
         self.alpha_old = alpha
 
