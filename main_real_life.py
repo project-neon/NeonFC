@@ -62,7 +62,7 @@ class Game():
         self.match.update(frame)
         commands = self.match.decide()
 
-        if self.use_api and (self.match.game_status == 'stop' or self.match.game_status == None):
+        if self.use_api and (self.match.game_status == 'STOP' or self.match.game_status == None):
             commands = [
                 {
                     'robot_id': r['robot_id'],
