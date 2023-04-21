@@ -13,7 +13,7 @@ class Coach(BaseCoach):
         self.ST_strategy = strategy.rsm2023.MainStriker(self.match)
 
         self.GK_strategy = strategy.iron2023.Goalkeeper(self.match)
-        self.GK_id = 1  # Goalkeeper fixed ID
+        self.GK_id = 3  # Goalkeeper fixed ID
 
         self.unstucks = {r.robot_id: strategy.rsm2023.Unstuck(self.match) for r in self.match.robots if r.robot_id != self.GK_id}
 
@@ -24,8 +24,13 @@ class Coach(BaseCoach):
 
         st_strat, ss_start = self.handle_stuck(ST, SS)
 
-        self.match.robots[GK].strategy = self.GK_strategy
-        self.match.robots[GK].start()
+        if self.match.robots[GK].strategy is None: 
+            self.match.robots[GK].strategy = self.GK_strategy 
+            self.match.robots[GK].start()
+        else:
+            if self.match.robots[GK].strategy.name != self.GK_strategy:
+                self.match.robots[GK].strategy = self.GK_strategy
+                self.match.robots[GK].start()
 
         ST.strategy = st_strat
         ST.start()
