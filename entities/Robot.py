@@ -96,12 +96,12 @@ class Robot(object):
 
     def update_stuckness(self):
         MIN_STUCK_SPEED = 0.5
-        MIN_STUCK_ANG_SPEED = 0.5
+        MIN_STUCK_ANG_SPEED = 1
 
         if self.game.use_referee and not self.game.referee.can_play:
             self.stuck_time = 0
 
-        if self.speed <= MIN_STUCK_SPEED and self.vtheta <= MIN_STUCK_ANG_SPEED:
+        if self.speed <= MIN_STUCK_SPEED and abs(self.vtheta) <= MIN_STUCK_ANG_SPEED:
             self.stuck_time += 1
         else:
             self.stuck_time = 0
