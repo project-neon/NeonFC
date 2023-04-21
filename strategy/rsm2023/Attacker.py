@@ -33,7 +33,11 @@ class MainPlay(PlayerPlay):
         else:
             self.limit_cycle.set_target(ball)
             self.limit_cycle.add_obstacle(self.get_virtual_obstacle(ball))
-            desired = self.limit_cycle.compute(self.robot, fitness=20)
+            try:
+                desired = self.limit_cycle.compute(self.robot, fitness=20)
+            except ZeroDivisionError:
+                print("ZeroDivisionError on attacker")
+                desired = list(robot)
 
         return desired
 
@@ -136,7 +140,11 @@ class WingPlay(PlayerPlay):
         else:
             self.limit_cycle.set_target(target)
             self.limit_cycle.add_obstacle(self.get_virtual_obstacle(target))
-            desired = self.limit_cycle.compute(self.robot, fitness=20)
+            try:
+                desired = self.limit_cycle.compute(self.robot, fitness=20)
+            except ZeroDivisionError:
+                print("ZeroDivisionError on attacker")
+                desired = list(robot)
 
         return desired
 
@@ -240,7 +248,7 @@ class Wait(PlayerPlay):
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
-        print(self.position())
+        # print(self.position())
         return self.position()
 
     def start(self):
@@ -252,8 +260,7 @@ class Wait(PlayerPlay):
 
         c = (self.robot.x, self.robot.y)
 
-        d = [(r.x, r.y) for r in self.match.robots if r.strategy.name not in ["Main_Attacker", "Goalkeeper_IRON2023"]][0]
-        # TODO: update goalkeeper strategy name
+        d = [(r.x, r.y) for r in self.match.robots if r.strategy.name not in ["Main_Attacker", "Goalkeeper_RSM2023"]][0]
 
         # Calculate the distances between each robot and each fixed point
         distance_c_a = math.sqrt((c[0] - a[0]) ** 2 + (c[1] - a[1]) ** 2)
