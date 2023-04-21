@@ -9,9 +9,9 @@
         "command_port": 20011,
         "replacer_port": 10004,
         "referee_port": 10003,
-        "api_address": "224.1.1.1",
-        "api_port" : 43210,
-        "api_recv_port": 43211
+        "api_address": "127.0.0.1",
+        "api_port" : 43220,
+        "api_recv_port": 43221
     },
     "match" : {
         "team_side": "left",
@@ -25,7 +25,7 @@
         ]
     },
     "comm": {
-        "comm_port": "/dev/ttyUSB0",
+        "comm_port": "/dev/ttyUSB1",
         "baud_rate": 115200
     },
     "referee": false,
