@@ -23,3 +23,5 @@ from strategy.tests.PID_tuner import PIDTuner
 from strategy.tests.uvf_test import UVF_Test
 from strategy.tests.potential_fields_test import Fields_Test
 from strategy.tests.limit_cycle_test import LimitCycle_Test
+
+from strategy.tests.goFoward import Foward
