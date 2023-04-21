@@ -21,7 +21,6 @@ class SingletonMeta(type):
             cls._instances[cls] = instance
         return cls._instances[cls]
 
-
 class Api(metaclass=SingletonMeta):
     def __init__(self, address, port):
         
@@ -30,7 +29,8 @@ class Api(metaclass=SingletonMeta):
 
     # Initiate socket connection
     def start(self):
-        self.obj_socket = socket(AF_INET, SOCK_DGRAM)
+        self.obj_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
+        self.obj_socket.setsockopt(IPPROTO_IP, IP_MULTICAST_TTL, 2)
 
     # Sends dict game data to socket listener
     def send_data(self, obj):

@@ -9,9 +9,9 @@
         "command_port": 20011,
         "replacer_port": 10004,
         "referee_port": 10003,
-        "api_address": "127.0.0.1",
-        "api_port" : 43218,
-        "api_recv_port": 43219
+        "api_address": "224.1.1.1",
+        "api_port" : 43210,
+        "api_recv_port": 43211
     },
     "match" : {
         "team_side": "left",

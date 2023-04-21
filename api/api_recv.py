@@ -1,6 +1,7 @@
 from socket import *
 import json
 import threading
+import struct
 
 class Api_recv(threading.Thread):
     def __init__(self, match, address, port):
@@ -12,13 +13,17 @@ class Api_recv(threading.Thread):
         self.address = address
         self.port = port
         self.buffer_size = BUFFER_SIZE
-        self.decod_data = None
-        
+        self.decod_data = None   
 
     # Receives data
     def run(self):
-        self.obj_socket = socket(AF_INET, SOCK_DGRAM)
-        self.obj_socket.bind((self.address, self.port))
+        self.obj_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
+        self.obj_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        self.obj_socket.bind(('', self.port))
+
+        mreq = struct.pack("4sl", inet_aton(self.address), INADDR_ANY)
+
+        self.obj_socket.setsockopt(IPPROTO_IP, IP_ADD_MEMBERSHIP, mreq)
 
         print("Starting api_recv...")
 
