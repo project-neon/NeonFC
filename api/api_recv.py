@@ -17,13 +17,8 @@ class Api_recv(threading.Thread):
 
     # Receives data
     def run(self):
-        self.obj_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
-        self.obj_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        self.obj_socket.bind(('', self.port))
-
-        mreq = struct.pack("4sl", inet_aton(self.address), INADDR_ANY)
-
-        self.obj_socket.setsockopt(IPPROTO_IP, IP_ADD_MEMBERSHIP, mreq)
+        self.obj_socket = socket(AF_INET, SOCK_DGRAM)
+        self.obj_socket.bind((self.address, self.port))
 
         print("Starting api_recv...")
 

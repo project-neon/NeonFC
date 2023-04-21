@@ -29,8 +29,7 @@ class Api(metaclass=SingletonMeta):
 
     # Initiate socket connection
     def start(self):
-        self.obj_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
-        self.obj_socket.setsockopt(IPPROTO_IP, IP_MULTICAST_TTL, 2)
+        self.obj_socket = socket(AF_INET, SOCK_DGRAM)
 
     # Sends dict game data to socket listener
     def send_data(self, obj):
