@@ -25,7 +25,7 @@
         ]
     },
     "comm": {
-        "comm_port": "/dev/ttyUSB1",
+        "comm_port": "/dev/ttyUSB0",
         "baud_rate": 115200
     },
     "referee": false,

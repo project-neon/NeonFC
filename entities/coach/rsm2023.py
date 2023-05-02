@@ -55,8 +55,9 @@ class Coach(BaseCoach):
         return r2, r1
 
     def handle_stuck(self, ST, SS):
-        stuck_st = ST.is_stuck()
-        stuck_ss = SS.is_stuck()
+        game_runing = not (self.match.game_status == 'STOP' or self.match.game_status == None)
+        stuck_st = ST.is_stuck() and game_runing
+        stuck_ss = SS.is_stuck() and game_runing
 
         if stuck_st and stuck_ss:
             return self.unstucks[ST.robot_id], self.unstucks[SS.robot_id]

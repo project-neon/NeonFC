@@ -33,7 +33,7 @@ class Returning_to_Goal(PlayerPlay):
 
         y_pos = max(.45 , min(ball.y , .85))
 
-        return (.075, y_pos)
+        return (.08, y_pos)
 
 class Aligning_angle(PlayerPlay):
     def __init__(self, match, robot):
@@ -266,7 +266,7 @@ class AttackerAreaPlay(PlayerPlay):
 
         y_pos = max(.45, min(ball.y, .85))
 
-        return (.075, y_pos)
+        return (.08, y_pos)
     
 class StationaryPlay(PlayerPlay):
     def __init__(self, match, robot):
