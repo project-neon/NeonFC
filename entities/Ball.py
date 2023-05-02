@@ -56,3 +56,12 @@ class Ball(object):
 
         self.vx = speed(self._frames['x'], self.game.vision._fps)
         self.vy = speed(self._frames['y'], self.game.vision._fps)
+
+    def __getitem__(self, item):
+        if item == 0:
+            return self.x
+
+        if item == 1:
+            return self.y
+
+        raise IndexError("Ball only has 2 coordinates")
