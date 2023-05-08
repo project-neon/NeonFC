@@ -3,8 +3,8 @@ from entities import plays
 import json
 
 
-class Coach(BaseCoach):
-    NAME = "LARC_2021"
+class PlaybookCoach(BaseCoach):
+    NAME = ""
     def __init__(self, match):
         super().__init__(match)
 
@@ -66,8 +66,3 @@ class Coach(BaseCoach):
 
     def decide (self):
         self.playbook.update()
-        # for r in self.match.robots:
-        #     print(r.get_name(), r.strategy.name)
-
-
-    

@@ -1,5 +1,4 @@
 from abc import ABC
-
 import controller
 
 class Strategy(ABC):

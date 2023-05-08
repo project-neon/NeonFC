@@ -1,14 +1,15 @@
 import math
 import numpy as np
-
+from numpy import arccos, array, dot, pi, cross
+from numpy.linalg import det, norm
 from scipy.signal import savgol_filter
 
 def dist_point_line(x1, y1, x2, y2, x3, y3):
     """
-    veririca a distancia entre um ponto de uma linha
-    x1,y1: definicao do primeiro ponto que definira a linha
-    x2,y2: definicao do segundo ponto que definira a linha
-    x3,y3: definicao do terceiro ponto que sera usado para medir a distancia
+    verify the distance between a point and a line
+    x1,y1: definition of the first point that makes the line
+    x2,y2: definition of the second point that makes the line
+    x3,y3: definition of the point that will be used to calculate the distance
     """
     px = x2-x1
     py = y2-y1
@@ -42,7 +43,6 @@ def _fix_angle(theta_1, theta_2):
 
     return rate_theta
 
-
 def angular_speed(_list, _fps):
     if len(_list) <= 1:
         return 0
@@ -58,7 +58,6 @@ def angular_speed(_list, _fps):
         return 0
     return _fps * (sum(speed_fbf)/len(speed_fbf))
 
-
 def speed(_list, _fps):
     if len(_list) <= 1:
         return 0
@@ -69,14 +68,13 @@ def speed(_list, _fps):
             _list, 
             list(_list)[1:]
         ) if abs((t1 - t0)) < 0.1
-        # considerando que o jogo funciona a 60 fps
-        # limitar 0.1 m/f aqui é dizer que é impossivel
-        # o robo fazer 6 m/s (0.1 [m][f⁻¹] * 60 [f][s⁻¹] = 6[m][s⁻¹])
+        # considering the game runs at 60 fps
+        # to limit 0.1 m/f here is to say that is impossible
+        # for the robot to run at 6 m/s (0.1 [m][f⁻¹] * 60 [f][s⁻¹] = 6[m][s⁻¹])
     ]
     if not speed_fbf:
         return 0
     return _fps * (sum(speed_fbf)/len(speed_fbf))
-
 
 def unit_vector(vector):
     """ Returns the unit vector of the vector."""
@@ -93,17 +91,14 @@ def rotate_via_numpy(xy, radians):
 
     return float(m.T[0]), float(m.T[1])
 
-def dotproduct(v1, v2):
+def dot_product(v1, v2):
   return sum((a*b) for a, b in zip(v1, v2))
 
 def length(v):
-  return math.sqrt(dotproduct(v, v))
+  return math.sqrt(dot_product(v, v))
 
 def angle_between(v1, v2):
-  return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
-
-from numpy import arccos, array, dot, pi, cross
-from numpy.linalg import det, norm
+  return math.acos(dot_product(v1, v2) / (length(v1) * length(v2)))
 
 def distance(A, B, P):
     """ segment line AB, point P, where each one is an array([x, y]) """
@@ -133,3 +128,24 @@ def point_in_rect(point, rect):
         if (y1 < y and y < y2):
             return True
     return False
+
+def distance_between_points(p1, p2):
+    '''
+    Calculates the distance between 2 points, p1 and p2.
+    Arguments:
+        p1: an array([x, y])
+        p2: an array([x, y])
+    Returns:
+        Distance between p1 and p2
+    '''
+    dx = p1[0] - p2[0]
+    dy = p1[1] - p2[1]
+    
+    return np.sqrt(dx**2 + dy**2)
+
+def speed_to_power(linear_speed, angular_speed, L, R):
+
+    power_left = (2*linear_speed - angular_speed*L)/2 * R
+    power_right = (2*linear_speed + angular_speed*L)/2 * R
+
+    return power_left, power_right

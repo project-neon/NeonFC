@@ -1,5 +1,4 @@
 from algorithms.dijkstra_waypoint import dijkstra
-
 from commons.math import dist_point_line
 
 class WaypointSystem():
@@ -70,4 +69,3 @@ class WaypointSystem():
         dijkstra.shortest(target, path)
 
         return [v * speed for v in self.dir_vector(path[::-1], robot)]
-

@@ -3,6 +3,7 @@ Code adapted from https://www.bogotobogo.com/python/python_Dijkstras_Shortest_Pa
 """
 
 import math
+import heapq
 
 class Vertex:
     def __init__(self, node, x, y):
@@ -98,14 +99,6 @@ class Graph:
 
 def shortest(v, path):
     ''' make shortest path from v.previous'''
-    if v.previous:
-        path.append(v.previous.get_id())
-        shortest(v.previous, path)
-    return
-
-import heapq
-
-def shortest(v, path):
     if v.previous:
         path.append(v.previous.get_id())
         shortest(v.previous, path)

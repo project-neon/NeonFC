@@ -25,7 +25,7 @@ class CircuitRunTrainer(Trainer):
             (0 + fx, 0.430 + fy),
         ]
 
-        self.train_strategy = strategy.tests.PID_Test(self.match)
+        self.train_strategy = strategy.tests.UVF_Test(self.match)
 
         # self.train_strategy.set_circuit(self.circuit)
 

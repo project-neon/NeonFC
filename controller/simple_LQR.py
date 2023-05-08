@@ -1,10 +1,7 @@
 import math
-
-
-from commons.math import angle_between
-
 import numpy as np
 import numpy.linalg as la
+from commons.math import speed_to_power
  
 def py_ang(v1, v2):
     """ Returns the angle in radians between vectors 'v1' and 'v2'    """
@@ -12,17 +9,17 @@ def py_ang(v1, v2):
     sinang = la.norm(np.cross(v1, v2))
     return np.arctan2(sinang, cosang)
 
-
 """
 Essa variavel experimental serve para converter o resultado do LQR
 para um valor coerente a velocidade desejada em m/s
 """
-EXPERIMENTAL_SPEED_CONSTANT = 2678.57
+EXPERIMENTAL_SPEED_CONSTANT = 7000
 
 class SimpleLQR(object):
     def __init__(self, robot, l=0.185):
         self.desired = np.array([0, 0])
         self.robot = robot
+        self.environment = robot.game.environment
 
         self.l = l
         self.L = self.robot.dimensions.get('L')
@@ -46,24 +43,32 @@ class SimpleLQR(object):
         v = self.desired[0] * math.cos(-theta) - self.desired[1] * math.sin(-theta)
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))
 
-        pwr_left = (2 * v - w * self.L)/2 * self.R
-        pwr_right = (2 * v + w * self.L)/2 * self.R
+        if self.environment == 'simulation':
+            powers = speed_to_power(v, w, self.L, self.R)
+            if self.inverted:
+                return tuple(np.dot(-1, powers))
+            else:
+                return powers
+
+        linear = v*self.R
+        angular = self.R*(w*self.L)/2
 
         if self.inverted:
-            return -pwr_right, -pwr_left,
-        return pwr_left, pwr_right
+            linear = -linear
+
+        return angular, linear
 
 class TwoSidesLQR(object):
     def __init__(self, robot, l=0.195):
         self.desired = np.array([0, 0])
         self.robot = robot
+        self.environment = robot.game.environment
 
         self.l = l
         self.L = self.robot.dimensions.get('L')
         self.R = self.robot.dimensions.get('R')
 
     def set_desired(self, vector):
-
         self.desired = (self.robot.x + vector[0] * EXPERIMENTAL_SPEED_CONSTANT, self.robot.y + vector[1] * EXPERIMENTAL_SPEED_CONSTANT)
 
     def update(self):
@@ -81,10 +86,18 @@ class TwoSidesLQR(object):
         v = self.desired[0] * math.cos(-theta) - self.desired[1] * math.sin(-theta)
         w = n * (self.desired[0] * math.sin(-theta) + self.desired[1] * math.cos(-theta))
 
-        pwr_left = (2 * v - w * self.L)/2 * self.R
-        pwr_right = (2 * v + w * self.L)/2 * self.R
+        if self.environment == 'simulation':
+            power_left, power_right = speed_to_power(v, w, self.L, self.R)
 
-        # return 0, 0
+            if (between > math.pi/2):
+                # this multiplies -1 to both elements of 'powers' and return it as a tuple
+                return -power_right, -power_left
+            else:
+                return power_left, power_right
+
+        linear = v*self.R
+        angular = self.R*(w*self.L)/2
+
         if (between > math.pi/2):
-            return -pwr_right, -pwr_left,
-        return pwr_left, pwr_right
+            return -linear, -angular
+        return linear, -angular 

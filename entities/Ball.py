@@ -38,7 +38,8 @@ class Ball(object):
 
     def update(self, frame):
         self.current_data = frame.get('ball')
-        self._update_speeds()
+        if self.current_data is not None:
+            self._update_speeds()
 
     def pos_next(self, fps=10):
         ball_next = copy.copy(self)
@@ -55,3 +56,12 @@ class Ball(object):
 
         self.vx = speed(self._frames['x'], self.game.vision._fps)
         self.vy = speed(self._frames['y'], self.game.vision._fps)
+
+    def __getitem__(self, item):
+        if item == 0:
+            return self.x
+
+        if item == 1:
+            return self.y
+
+        raise IndexError("Ball only has 2 coordinates")

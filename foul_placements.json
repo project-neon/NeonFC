@@ -37,7 +37,7 @@
             ],
             "BLUE": [
                 {"robot_id": 0, "x": -0.695, "y": 0, "orientation": 90},
-                {"robot_id": 1, "x": -0.2, "y": 0.325, "orientation": 0},
+                {"robot_id": 1, "x": -0.4, "y": 0.325, "orientation": 0},
                 {"robot_id": 2, "x": -0.25, "y": -0.475, "orientation": 0}
             ]
         },

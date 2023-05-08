@@ -1,1 +1,1 @@
-from logger import Writer, Reader, Parameter
+from live_plot.logger import Writer, Reader, Parameter

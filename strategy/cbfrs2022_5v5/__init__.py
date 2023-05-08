@@ -1,5 +1,0 @@
-from strategy.cbfrs2022_5v5.mainGoalkeeper import GoalKeeper
-from strategy.cbfrs2022_5v5.leftWing import LeftWing
-from strategy.cbfrs2022_5v5.rightWing import RightWing
-from strategy.cbfrs2022_5v5.leftAttacker import LeftAttacker
-from strategy.cbfrs2022_5v5.rightAttacker import RightAttacker
