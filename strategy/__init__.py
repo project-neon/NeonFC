@@ -4,6 +4,7 @@ from strategy import iron2022
 from strategy import rsm2022
 from strategy import cbfr2022
 from strategy import iron2023
+from strategy import rsm2023
 from strategy.BaseStrategy import Strategy
 
 # debug tools
