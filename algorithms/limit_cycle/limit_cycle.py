@@ -27,9 +27,11 @@ Target = namedtuple('Target', ['x', 'y'])
 class LimitCycle(object):
     def __init__(self, match):
         '''
-        - obstacles:        list of the obstacles, not sorted yet
-        - target_is_ball:   if the ball is the target, two virtual obstacles are added
-                            to make the robot head to the goal when arriving
+        Constructor of the Limit Cycle class
+
+            Parameters
+            ----------
+            obstacles [list(Obstacle)] : list of the obstacles, not sorted yet
         '''
         self.match = match
         self.robot = None
@@ -46,9 +48,25 @@ class LimitCycle(object):
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
     def set_target(self, target):
+        '''
+        Defines the target position
+
+            Parameters
+            ----------
+                target (tuple[int, int]): target x and y coordinates
+        '''
+
         self.target = Target(*target)
 
     def add_obstacle(self, obstacle: Obstacle):
+        '''
+        Add an obstacle to the 'obstacles' list
+
+            Parameters
+            ----------
+                obstacle Obstacle(int, int, int, bool): obstacle x and y position, its radius and a 'force_clockwise' property
+        '''
+
         self.obstacles.append(Obstacle(*obstacle))
 
     def contour(self, a, b, c, obstacle: Obstacle, fitness):
@@ -79,6 +97,15 @@ class LimitCycle(object):
         return (self.robot.x + self.dt*ddx, self.robot.y + self.dt*ddy)
 
     def compute(self, robot, fitness=15):
+        '''
+        Runs the Limit Cycle algorithm
+
+            Parameters
+            ----------
+            robot Robot: robot entity from match
+            fitness int: parameter to increase/decrease the 'fitness' of the trajectory
+        '''
+
         self.robot = robot
         '''
         a, b and c are the indexes of a linear equation: a*x + b*y + c = 0
@@ -99,7 +126,7 @@ class LimitCycle(object):
         self.obstacles.sort(key=lambda o: math.sqrt((o.x - self.robot.x)**2 + (o.y - self.robot.y)**2))
 
         '''
-        here we have the conditional, if there are obstacles to contour we do so, else we go to the target
+        here we have the conditional, if there are obstacles to contour we do so, else we go straight to the target
         '''
         if len(self.obstacles) > 0:
             return self.contour(a, b, c, self.obstacles[0], fitness)
