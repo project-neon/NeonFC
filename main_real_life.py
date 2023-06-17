@@ -33,7 +33,7 @@ class Game():
         self.referee = RefereeComm(config_file)
 
         self.api = Api(self.api_address, self.api_port)
-        self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
+        # self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
 
         self.use_referee = False
         
@@ -48,7 +48,7 @@ class Game():
 
         if self.use_api:
             self.api.start()
-            self.api_recv.start()
+            # self.api_recv.start()
 
     def update(self):
         frame = assign_empty_values(
@@ -62,15 +62,15 @@ class Game():
         self.match.update(frame)
         commands = self.match.decide()
 
-        if self.use_api and (self.match.game_status == 'STOP' or self.match.game_status == None):
-            commands = [
-                {
-                    'robot_id': r['robot_id'],
-                    'color': r['color'],
-                    'wheel_left': 0,
-                    'wheel_right': 0
-                } for r in commands
-            ]
+        # if self.use_api and (self.match.game_status == 'STOP' or self.match.game_status == None):
+        #     commands = [
+        #         {
+        #             'robot_id': r['robot_id'],
+        #             'color': r['color'],
+        #             'wheel_left': 0,
+        #             'wheel_right': 0
+        #         } for r in commands
+        #     ]
 
         self.comm.send(commands)
 
