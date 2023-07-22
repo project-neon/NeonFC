@@ -64,7 +64,6 @@ class Wait(PlayerPlay):
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
-        print(self.position())
         return self.position()
 
     def start(self):
