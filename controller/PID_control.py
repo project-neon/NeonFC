@@ -146,7 +146,7 @@ class PID_control(object):
 
         self.alpha_old = alpha
 
-        return v, w
+        return -v, w
 
     def update(self):
         v, w = self._update()

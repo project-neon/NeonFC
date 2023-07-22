@@ -41,7 +41,7 @@ class UniController(object):
         'real_life': {
             'V_M': 0.5,
             'R_M': 0.44, # 20 * V_M
-            'K_W': 4, # 313,
+            'K_W': 3.5, # 313,
             'K_P': 1
         }
     }
@@ -133,5 +133,8 @@ class UniController(object):
 
         if self.environment == 'simulation':
             return tuple(np.dot(250, speed_to_power(v, w, self.L, self.R)))
-            
-        return v, -w
+
+
+        # w = w if abs(w) < 4 else 4 * w / abs(w)
+        print(w)
+        return -v, -w
