@@ -12,6 +12,8 @@ from entities.coach.iron2023 import Coach as IRON_2023
 
 from entities.coach.rsm2023 import Coach as RSM_2023
 
+from entities.coach.rcx2023 import Coach as RCX_2023
+
 _coach_list = [
     # Tournament coaches
     GuideCoach,
@@ -19,6 +21,7 @@ _coach_list = [
     IRON_2022,
     IRON_2023,
     RSM_2023,
+    RCX_2023,
     TestCoach
 ]
 
