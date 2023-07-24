@@ -4,156 +4,9 @@ from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, AndTransition, OrTransition, \
     NotTransition, OnNextTo
 from entities.plays.playbook import Trigger
-from controller import PID_control, PID_W_control
+from controller import PID_control, PID_W_control, UniController
 from commons.math import point_in_rect
-
-
-class Returning_to_Goal(PlayerPlay):
-    def __init__(self, match, robot):
-        super().__init__(match, robot)
-
-    def get_name(self):
-        return f"<{self.robot.get_name()} Return to Goal>"
-
-    def start_up(self):
-        super().start_up()
-        controller = PID_W_control
-        # controller_kwargs = {
-        #     'V_MAX': 100,
-        #     'V_MIN': 100
-        # }
-        self.robot.strategy.controller = controller(self.robot)  # , **controller_kwargs)
-
-    def update(self):
-        return super().update()
-
-    def start(self):
-        pass
-
-    def update(self):
-        ball = self.match.ball
-
-        y_pos = max(.45, min(ball.y, .85))
-
-        return (.08, y_pos)
-
-
-class Aligning_angle(PlayerPlay):
-    def __init__(self, match, robot):
-        super().__init__(match, robot)
-
-    def get_name(self):
-        return f"<{self.robot.get_name()} Align angle>"
-
-    def start_up(self):
-        super().start_up()
-        controller = PID_control
-        controller_kwargs = {
-            'V_MAX': 0,
-            'V_MIN': 0
-        }
-        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
-
-    def update(self):
-        return super().update()
-
-    def start(self):
-        pass
-
-    def update(self):
-        return self.robot.x, self.robot.y + .05
-
-
-class Spinning(PlayerPlay):
-    def __init__(self, match, robot):
-        super().__init__(match, robot)
-
-        self.field_w, self.field_h = self.match.game.field.get_dimensions()
-
-    def get_name(self):
-        return f"<{self.robot.get_name()} Spin>"
-
-    def start_up(self):
-        super().start_up()
-        controller = PID_control
-        controller_kwargs = {
-            'V_MAX': 0,
-            'V_MIN': 0,
-            'W_MAX': 50000
-        }
-        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
-
-    def update(self):
-        return super().update()
-
-    def start(self):
-        pass
-
-    def update(self):
-        ball = self.match.ball
-        side = np.sign(self.robot.y - ball.y)
-        x = self.robot.x + 0.5 * math.cos(self.robot.theta + side * math.pi / 2)
-        y = self.robot.y + 0.5 * math.sin(self.robot.theta + side * math.pi / 2)
-        return x, y
-
-
-class PushBall(PlayerPlay):
-    def __init__(self, match, robot):
-        super().__init__(match, robot)
-
-    def get_name(self):
-        return f"<{self.robot.get_name()} Push Ball>"
-
-    def start_up(self):
-        super().start_up()
-        controller = PID_control
-        controller_kwargs = {
-            'V_MAX': 200,
-            'V_MIN': 200
-        }
-        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
-
-    def update(self):
-        return super().update()
-
-    def start(self):
-        pass
-
-    def update(self):
-        ball = self.match.ball
-        return ball.x, ball.y
-
-
-class BallInCorner(PlayerPlay):
-    def __init__(self, match, robot):
-        super().__init__(match, robot)
-
-        self.field_w, self.field_h = self.match.game.field.get_dimensions()
-
-    def get_name(self):
-        return f"<{self.robot.get_name()} Defend Ball in Corner>"
-
-    def start_up(self):
-        super().start_up()
-        controller = PID_control
-        controller_kwargs = {
-            'K_RHO': 300,
-            'V_MAX': 200,
-            'V_MIN': 75,
-            'W_MAX': 0
-        }
-        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
-
-    def update(self):
-        return super().update()
-
-    def start(self):
-        pass
-
-    def update(self):
-        ball = self.match.ball
-        side = np.sign(ball.y - self.robot.y)
-        return self.robot.x, self.field_h / 2 + side * 0.2
+from algorithms import UnivectorField
 
 
 class FollowBallPlay(PlayerPlay):
@@ -174,15 +27,10 @@ class FollowBallPlay(PlayerPlay):
         super().start_up()
         controller = PID_control
         controller_kwargs = {
-            'K_RHO': 300,
-            'V_MAX': 200,
-            'V_MIN': 75,
-            'W_MAX': 0
+            'K_RHO': 1,
+            'V_MIN': 0,
         }
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
-
-    def update(self):
-        return super().update()
 
     def start(self):
         pass
@@ -190,7 +38,7 @@ class FollowBallPlay(PlayerPlay):
     def update(self):
         ball = self.match.ball
 
-        projection_rate = (ball.x - .15) / (1 - .15)
+        projection_rate = 0.5 #(ball.x - .15) / (1 - .15)
 
         # projection_limit = 0.15*projection_rate
 
@@ -200,109 +48,72 @@ class FollowBallPlay(PlayerPlay):
 
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
-        return self.robot.x, y
+        return 0.04, y
 
 
-class ForwardCornerPlay(PlayerPlay):
+class InsideArea(PlayerPlay):
     def __init__(self, match, robot):
+        # super().__init__(match, "Main_Attacker", controller=PID_W_control)
         super().__init__(match, robot)
+        self.dl = 0.000001
 
+    def get_name(self):
+        return f"<{self.robot.get_name()} Inside Area Planning>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_W_control
+        self.robot.strategy.controller = controller(self.robot, W_MAX=10)
+
+    def start(self):
+        self.univector = UnivectorField(n=6, rect_size=.1)
         self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
-        self.goal_vertical_line = .15
-
-        self.goal_left = self.field_h / 2 + .2
-        self.goal_right = self.field_h / 2 - .2
-
-        self.goal_area_left = self.field_h / 2 + .7 / 2
-        self.goal_area_right = self.field_h / 2 - .7 / 2
-
-    def get_name(self):
-        return f"<{self.robot.get_name()} Forward Corners Play>"
-
-    def start_up(self):
-        super().start_up()
-        controller = PID_control
-        controller_kwargs = {
-            'K_RHO': 300,
-            'V_MAX': 200,
-            'V_MIN': 75,
-            'W_MAX': 0
-        }
-        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
-
-    def update(self):
-        return super().update()
-
-    def start(self):
-        pass
-
     def update(self):
         ball = self.match.ball
+        theta_ball = math.atan2(0.3 - ball.y, 0.15 - ball.x) if ball.y < self.robot.y else math.atan2(1 - ball.y, 0.15 - ball.x)
+        ball_rx, ball_ry = ball.x + .05 * math.cos(theta_ball), ball.y + .05 * math.sin(theta_ball)
 
-        side = np.sign(ball.y - self.field_h / 2)
+        self.univector.set_target(g=(ball.x, ball.y), r=(ball_rx, ball_ry))
 
-        y = self.field_h / 2 + 0.2 * side
+        x, y = self.robot.x, self.robot.y
 
-        return self.robot.x, y
+        theta_d = self.univector.compute((x, y))
+        theta_f = self.univector.compute(
+            (x + self.dl * math.cos(self.robot.theta),
+             y + self.dl * math.sin(self.robot.theta))
+        )
+
+        return ball.x, ball.y
+        return x+0.01*math.cos(theta_d), y+0.01*math.sin(theta_d)
 
 
-class AttackerAreaPlay(PlayerPlay):
+class Spin(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
 
     def get_name(self):
-        return f"<{self.robot.get_name()} Attacker Area>"
+        return f"<{self.robot.get_name()} Spin Planning>"
 
     def start_up(self):
         super().start_up()
-        controller = PID_control
-        controller_kwargs = {
-            'K_RHO': 300,
-            'V_MAX': 200,
-            'V_MIN': 75
-        }
+        controller = PID_W_control
+        controller_kwargs = {'V_MAX': 0, 'V_MIN': 0, 'W_MAX': 100000000000, 'KP':-10000000}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
-        return super().update()
+        if self.robot.y > .65:
+            ang_diff = self.robot.theta - math.pi/2.1
+        else:
+            ang_diff = self.robot.theta + math.pi/2.1
+
+        x = self.robot.x + 0.5*math.cos(ang_diff)
+        y = self.robot.y + 0.5*math.sin(ang_diff)
+
+        return x, y
 
     def start(self):
         pass
-
-    def update(self):
-        ball = self.match.ball
-
-        y_pos = max(.45, min(ball.y, .85))
-
-        return (.08, y_pos)
-
-
-class StationaryPlay(PlayerPlay):
-    def __init__(self, match, robot):
-        super().__init__(match, robot)
-
-    def get_name(self):
-        return f"<{self.robot.get_name()} Stationary>"
-
-    def start_up(self):
-        super().start_up()
-        controller = PID_control
-        controller_kwargs = {
-            'V_MAX': 0,
-            'V_MIN': 0
-        }
-        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
-
-    def update(self):
-        return super().update()
-
-    def start(self):
-        pass
-
-    def update(self):
-        return self.robot.x, self.robot.y
-
 
 class Goalkeeper(Strategy):
     def __init__(self, match):
@@ -313,107 +124,29 @@ class Goalkeeper(Strategy):
 
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
-        aligning_angle = Aligning_angle(self.match, self.robot)  # 1
-        aligning_angle.start()
-
-        returning_to_goal = Returning_to_Goal(self.match, self.robot)  # 2
-        returning_to_goal.start()
-
         follow_ball = FollowBallPlay(self.match, self.robot)  # 3
         follow_ball.start()
 
-        defend_corner = BallInCorner(self.match, self.robot)  # 4
-        defend_corner.start()
+        inside_area = InsideArea(self.match, self.robot)
+        inside_area.start()
 
-        forward_corner = ForwardCornerPlay(self.match, self.robot)  # 5
-        forward_corner.start()
+        spin = Spin(self.match, self.robot)
+        spin.start()
 
-        pushing_ball = PushBall(self.match, self.robot)  # 6
-        pushing_ball.start()
-
-        attacker_area = AttackerAreaPlay(self.match, self.robot)  # ?
-        attacker_area.start()
-
-        stationary = StationaryPlay(self.match, self.robot)  # 7
-        stationary.start()
-
-        self.playerbook.add_play(returning_to_goal)
-        self.playerbook.add_play(aligning_angle)
-        self.playerbook.add_play(pushing_ball)
-        self.playerbook.add_play(defend_corner)
         self.playerbook.add_play(follow_ball)
-        self.playerbook.add_play(forward_corner)
-        self.playerbook.add_play(attacker_area)
-        self.playerbook.add_play(stationary)
+        self.playerbook.add_play(inside_area)
+        self.playerbook.add_play(spin)
 
-        not_aligned = OnAlignment(self.robot, .4 * math.pi / 2, True)  # 1
-        aligned = OnAlignment(self.robot, .1 * math.pi / 2)  # !1
-        outside_goal_area = OnReposition(self.robot)  # 2
-        on_follow_ball = OnInsideBox(self.match, [.15, .4, .6, .7])  # 3
-        on_corner = OrTransition([  # 4
-            OnInsideBox(self.match, [0, 1, .15, .3]),
-            OnInsideBox(self.match, [0, 0, .15, .3])
-        ])
-        on_forward_corner = OrTransition([  # 5
-            OnInsideBox(self.match, [.15, 1, .6, .3]),
-            OnInsideBox(self.match, [.15, 0, .6, .3])
-        ])
-        on_goal_area = OnInsideBox(self.match, [0, .3, .15, .7])  # 6
+        on_near_ball = OnNextTo(self.match.ball, self.robot, 0.09)
+        off_near_ball = OnNextTo(self.match.ball, self.robot, 0.12, True)
 
-        on_attack_area = OnInsideBox(self.match, [.75, 0, .75, 1.3])  # 7
+        follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)
+        follow_ball.add_transition(on_near_ball, spin)
 
-        on_spot = OnNextTo(self.robot, [.075, .65], 0.1)  # ?
+        inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)
+        inside_area.add_transition(on_near_ball, spin)
 
-        aligning_angle.add_transition(outside_goal_area, returning_to_goal)  # 1 -> 2
-        aligning_angle.add_transition(AndTransition(  # 1 -> 3
-            [aligned, on_follow_ball]
-        ), follow_ball)
-        aligning_angle.add_transition(AndTransition(  # 1 -> 4
-            [aligned, on_corner]
-        ), defend_corner)
-        aligning_angle.add_transition(AndTransition(  # 1 -> 5
-            [aligned, on_forward_corner]
-        ), forward_corner)
-        aligning_angle.add_transition(on_goal_area, pushing_ball)  # 1 -> 6
-        aligning_angle.add_transition(on_attack_area, attacker_area)  # 1 -> 6
-
-        returning_to_goal.add_transition(AndTransition(  # 2 -> 1
-            [NotTransition(outside_goal_area), not_aligned]
-        ), aligning_angle)
-        returning_to_goal.add_transition(NotTransition(outside_goal_area), aligning_angle)
-
-        follow_ball.add_transition(not_aligned, aligning_angle)  # 3 -> 1
-        follow_ball.add_transition(AndTransition([on_attack_area, on_spot]), aligning_angle)
-        follow_ball.add_transition(outside_goal_area, attacker_area)  # 3 -> 2
-        follow_ball.add_transition(on_corner, defend_corner)  # 3 -> 4
-        follow_ball.add_transition(on_forward_corner, forward_corner)  # 3 -> 5
-        follow_ball.add_transition(on_goal_area, pushing_ball)  # 3 -> 6
-        follow_ball.add_transition(AndTransition([NotTransition(on_spot), on_attack_area]), attacker_area)  # 3 -> ?
-
-        defend_corner.add_transition(not_aligned, aligning_angle)  # 4 -> 1
-        defend_corner.add_transition(outside_goal_area, returning_to_goal)  # 4 -> 2
-        defend_corner.add_transition(on_follow_ball, follow_ball)  # 4 -> 3
-        defend_corner.add_transition(on_forward_corner, forward_corner)  # 4 -> 5
-        defend_corner.add_transition(on_goal_area, pushing_ball)  # 4 -> 6
-
-        forward_corner.add_transition(not_aligned, aligning_angle)  # 5 -> 1
-        forward_corner.add_transition(outside_goal_area, returning_to_goal)  # 5 -> 2
-        forward_corner.add_transition(on_follow_ball, follow_ball)  # 5 -> 3
-        forward_corner.add_transition(on_corner, defend_corner)  # 5 -> 4
-        forward_corner.add_transition(on_goal_area, pushing_ball)  # 5 -> 6
-        forward_corner.add_transition(on_attack_area, attacker_area)  # 5 -> ?
-
-        pushing_ball.add_transition(AndTransition(  # 6 -> 2
-            [NotTransition(on_goal_area), outside_goal_area]
-        ), returning_to_goal)
-
-        attacker_area.add_transition(on_spot, aligning_angle)  # ? -> 7
-
-        stationary.add_transition(not_aligned, aligning_angle)  # 7 -> 1
-        stationary.add_transition(outside_goal_area, returning_to_goal)  # 7 -> 2
-        stationary.add_transition(on_follow_ball, follow_ball)  # 7 -> 3
-        stationary.add_transition(on_forward_corner, forward_corner)  # 7 -> 5
-        stationary.add_transition(NotTransition(on_spot), attacker_area)  # 7 -> ?
+        spin.add_transition(off_near_ball, follow_ball)
 
         if self.playerbook.actual_play == None:
             self.playerbook.set_play(follow_ball)
@@ -425,47 +158,5 @@ class Goalkeeper(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
-        # print(self.playerbook.actual_play)
+        print(self.playerbook.actual_play)
         return res
-
-
-class OnAlignment(Trigger):
-    def __init__(self, robot, tolerance, outside=False):
-        super().__init__()
-        self.robot = robot
-        self.outside = outside
-        self.tolerance = tolerance
-
-    def evaluate(self, *args, **kwargs):
-        robot_theta = self.robot.theta
-        robot_v_theta = self.robot.vtheta
-
-        if self.outside:
-            in_between = (math.pi + self.tolerance < robot_theta < -math.pi + self.tolerance or
-                          -self.tolerance < robot_theta < self.tolerance)
-
-        else:
-            in_between = (math.pi / 2 - self.tolerance < robot_theta < math.pi / 2 + self.tolerance or
-                          -math.pi / 2 - self.tolerance < robot_theta < -math.pi / 2 + self.tolerance)
-
-        return in_between and robot_v_theta < .1
-
-
-class OnReposition(Trigger):
-    def __init__(self, robot):
-        super().__init__()
-        self.robot = robot
-        self.box = [0, .3, .15, .7]  # x1, y1, w, h
-
-    def evaluate(self, *args, **kwargs):
-        return not point_in_rect([self.robot.x, self.robot.y], self.box)
-
-
-class RobotOnSpot(Trigger):
-    def __init__(self, robot):
-        super().__init__()
-        self.robot = robot
-        self.box = [0, .6, .15, .1]  # x1, y1, w, h
-
-    def evaluate(self, *args, **kwargs):
-        return point_in_rect([self.robot.x, self.robot.y], self.box)
