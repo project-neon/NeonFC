@@ -1,6 +1,6 @@
 import numpy as np
 from algorithms.limit_cycle import LimitCycle
-from algorithms.univector_field import UnivectorField
+from algorithms import UnivectorField
 import math
 from controller.PID_control import PID_W_control, PID_control
 from controller.uni_controller import UniController
@@ -283,5 +283,4 @@ class MainStriker(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
-        print(self.playerbook.actual_play)
         return res

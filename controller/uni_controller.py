@@ -136,5 +136,4 @@ class UniController(object):
 
 
         # w = w if abs(w) < 4 else 4 * w / abs(w)
-        print(w)
         return -v, -w

@@ -1,4 +1,4 @@
-from algorithms.univector_field import UnivectorField
+from algorithms import UnivectorField
 import math
 from controller.uni_controller import UniController
 from strategy.BaseStrategy import Strategy

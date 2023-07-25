@@ -12,4 +12,6 @@ from algorithms.limit_cycle import LimitCycle
 
 from algorithms import univector_field
 
+from algorithms.univector_field import UnivectorField
+
 from algorithms.RRT import rrt
