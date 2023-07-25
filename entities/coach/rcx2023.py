@@ -12,9 +12,9 @@ class Coach(BaseCoach):
         self.SS_strategy = strategy.rcx2023.ShadowAttacker(self.match)
         self.ST_strategy = strategy.rcx2023.MainStriker(self.match)
         self.GK_strategy = strategy.rcx2023.Goalkeeper(self.match)
-        self.GK_id = 3  # Goalkeeper fixed ID
+        self.GK_id = 1  # Goalkeeper fixed ID
 
-        self.unstucks = {r.robot_id: strategy.rsm2023.Unstuck(self.match) for r in self.match.robots if r.robot_id != self.GK_id}
+        # self.unstucks = {r.robot_id: strategy.rsm2023.Unstuck(self.match) for r in self.match.robots if r.robot_id != self.GK_id}
 
     def decide(self):
         GK = [i for i, r in enumerate(self.match.robots) if r.robot_id is self.GK_id][0]
@@ -58,13 +58,13 @@ class Coach(BaseCoach):
         stuck_st = ST.is_stuck() and game_runing
         stuck_ss = SS.is_stuck() and game_runing
 
-        if stuck_st and stuck_ss:
-            return self.unstucks[ST.robot_id], self.unstucks[SS.robot_id]
-
-        if stuck_st and not stuck_ss:
-            return self.unstucks[ST.robot_id], self.ST_strategy
-
-        if not stuck_st and stuck_ss:
-            return self.ST_strategy, self.unstucks[SS.robot_id]
+        # if stuck_st and stuck_ss:
+        #     return self.unstucks[ST.robot_id], self.unstucks[SS.robot_id]
+        #
+        # if stuck_st and not stuck_ss:
+        #     return self.unstucks[ST.robot_id], self.ST_strategy
+        #
+        # if not stuck_st and stuck_ss:
+        #     return self.ST_strategy, self.unstucks[SS.robot_id]
 
         return self.ST_strategy, self.SS_strategy
