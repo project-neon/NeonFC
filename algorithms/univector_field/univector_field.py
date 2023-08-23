@@ -2,7 +2,6 @@ import math
 from collections import namedtuple
 import numpy as np
 import json
-from commons.math import distance_between_points as distance
 
 Obstacle = namedtuple("obstacle", "center radius margin eradius")
 
@@ -21,6 +20,20 @@ def reduce_angle(ang):
     return ang
 
 np_reduce_angle = np.vectorize(reduce_angle)
+
+def distance(p1, p2):
+    '''
+    Calculates the distance between 2 points, p1 and p2.
+    Arguments:
+        p1: an array([x, y])
+        p2: an array([x, y])
+    Returns:
+        Distance between p1 and p2
+    '''
+    dx = p1[0] - p2[0]
+    dy = p1[1] - p2[1]
+    
+    return np.sqrt(dx**2 + dy**2)
 
 class UnivectorField:
     """
@@ -41,6 +54,8 @@ class UnivectorField:
                            angle of the target-guide line
         """
         self.obstacles = []
+        self.border = []
+        self.goal = []
         self.N = n
         self.delta_g = rect_size
 
@@ -57,8 +72,8 @@ class UnivectorField:
                 r (tuple[float, float]): guide point x and y coordinates
         """
 
-        self.g = g
-        self.r = r
+        self.g = g 
+        self.r = r 
 
     def add_obstacle(self, p, r0, m):
         """
@@ -115,6 +130,33 @@ class UnivectorField:
     def __call__(self, p):
         return self.compute(p)
 
+    def define_borders(self, margin, consider_goal=True, side=1.5, top=1.3, goal_start = 0.5, goal_end = 0.8):
+
+        self.border = [(side,top), margin]
+        self.goal = [(goal_start,goal_end), consider_goal]
+
+        return self.border, self.goal
+    
+    def vector_border(self, p):
+        
+        if (p[0] <= self.border[1]):
+            if self.goal[1] == False and (self.goal[0][0] <= p[1] <= self.goal[0][1]):
+                return None            
+            return 0
+        if (p[0] >= self.border[0][0]-self.border[1]):
+            if self.goal[1] == False and (self.goal[0][0] <= p[1] <= self.goal[0][1]):
+                return None
+            return math.pi
+        if (p[1] <= self.border[1]):
+            return math.pi/2
+        if (p[1] >= self.border[0][1] - self.border[1]):
+                return -math.pi/2
+
+        return None
+
+
+
+
     def compute(self, p):
         """
         Calculate the angle for the given position
@@ -155,17 +197,30 @@ class UnivectorField:
         if d_pg1 < self.delta_g and d_pg2 < self.delta_g:
             if distance(self.r, p) >= distance(p, self.g):
                 angle_f_p = ang_rg
+        
+        ang_b = self.vector_border(p)
+        if ang_b is not None:
+            new_angle = np.arctan2(((np.sin(angle_f_p)+np.sin(ang_b))),(np.cos(angle_f_p)+np.cos(ang_b)))
+            return reduce_angle(new_angle)
+        
 
         for obstacle in self.obstacles:
-
+        
+            ang_bo1 = self.vector_border((obstacle.center[0]+obstacle.eradius,obstacle.center[1]+obstacle.eradius))
+            ang_bo2 = self.vector_border((obstacle.center[0]-obstacle.eradius,obstacle.center[1]-obstacle.eradius))                           
+            
             # check if the position is inside the margin of the obstacle
             if obstacle.margin + obstacle.radius >= distance(obstacle.center, p):
-                margin_ang = (2 * angle_between(obstacle.center, p) + angle_f_p) / 3
+                margin_ang = (2 * angle_between(obstacle.center, p) + angle_f_p)/3
                 margin_ang = reduce_angle(margin_ang)
                 if abs(angle_between(obstacle.center, p) - angle_f_p) > math.pi:
-                    margin_ang = reduce_angle(margin_ang + math.pi)
+                    margin_ang = reduce_angle(margin_ang + math.pi)    
+                if ang_bo1 is not None:
+                    return reduce_angle(np.arctan2((np.sin(margin_ang)+np.sin(ang_bo1)),(np.cos(margin_ang)+np.cos(ang_bo1))))
+                if ang_bo2 is not None:
+                    return reduce_angle(np.arctan2((np.sin(margin_ang)+np.sin(ang_bo2)),(np.cos(margin_ang)+np.cos(ang_bo2))))   
                 return margin_ang
-
+            
             # check if the line pg is secant to the obstacle
             a = p[1] - self.g[1]
             b = self.g[0] - p[0]
@@ -188,7 +243,7 @@ class UnivectorField:
                             pass
                         else:
                             behind_angle = ang_t2
-
+        
         if behind_angle is not None:
             return behind_angle
             pass
@@ -215,18 +270,19 @@ class UnivectorField:
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    uvf = UnivectorField(n=4, rect_size=(delta:=2), plot=True, path='../../uvf_plot.json')
+    uvf = UnivectorField(n=4, rect_size=(delta:=0.3), plot=True, path='../../uvf_plot.json')
 
-    uvf.add_obstacle((1, 1), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
-    uvf.add_obstacle((.7, .65), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
-    uvf.add_obstacle((.4, .8), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
-    uvf.add_obstacle((1, 1.2), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.add_obstacle((1.45, 1), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.add_obstacle((.03, .65), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.add_obstacle((.4, .02), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.add_obstacle((1, 1.28), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.define_borders((0.075 * 1.4 * 0.5)) #5 cm de margin
 
-    g = np.array([.8, 0.65])
-    r = np.array((1.5, 1.3))
+    g = np.array([.7, .45])
+    r = np.array((1.1, .6))
     uvf.set_target(g, r)
 
-    xs, ys = np.meshgrid(np.linspace(-5, 5, 53), np.linspace(-5, 5, 53))
+    xs, ys = np.meshgrid(np.linspace(0, 1.5, 53), np.linspace(0, 1.3, 53))
     us, vs = [], []
 
     for x, y in zip(np.nditer(xs), np.nditer(ys)):
@@ -263,7 +319,7 @@ if __name__ == "__main__":
 
     print(r_g1)
 
-    x = np.linspace(-5, 5, 2)
+    x = np.linspace(0.3, 1.2, 2)
     print(x)
     y_g1 = -(r_g1['a']*x+r_g1['c'])/r_g1['b']
     y_g2 = -(r_g2['a']*x+r_g2['c'])/r_g2['b']
