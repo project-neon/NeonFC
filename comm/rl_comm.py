@@ -40,7 +40,7 @@ class RLComm(object):
         message = "<"
         robot_commands = sorted(robot_commands, key = lambda i: i['robot_id'])
         for rb in robot_commands:
-            message += f"{rb['robot_id']},{round(rb['wheel_left'], 2)},{round(rb['wheel_right'], 2)},"
+            message += f"{rb['robot_id']},{round(rb['wheel_left'], 4)},{round(rb['wheel_right'], 4)},"
 
         message = message[:-1] + '>'
 

@@ -1,4 +1,4 @@
-from algorithms.univector_field import UnivectorField
+from algorithms import UnivectorField
 import math
 from controller.uni_controller import UniController
 from strategy.BaseStrategy import Strategy
@@ -46,7 +46,7 @@ class MainPlay(PlayerPlay):
         return theta_d, theta_f
 
     def start(self):
-        self.univector_field = UnivectorField(n=2, rect_size=0)
+        self.univector_field = UnivectorField(n=.3, rect_size=.1)
         self.dl = 0.000001
 
 
@@ -60,7 +60,7 @@ class Wait(PlayerPlay):
     def start_up(self):
         super().start_up()
         controller = PID_control
-        controller_kwargs={'V_MIN': 0, 'K_RHO': 75}
+        controller_kwargs={'V_MIN': 0, 'K_RHO': 1.5}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
