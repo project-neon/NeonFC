@@ -2,6 +2,7 @@ import math
 from collections import namedtuple
 import numpy as np
 import json
+from commons.math import distance_between_points as distance
 
 Obstacle = namedtuple("obstacle", "center radius margin eradius")
 
@@ -21,19 +22,6 @@ def reduce_angle(ang):
 
 np_reduce_angle = np.vectorize(reduce_angle)
 
-def distance(p1, p2):
-    '''
-    Calculates the distance between 2 points, p1 and p2.
-    Arguments:
-        p1: an array([x, y])
-        p2: an array([x, y])
-    Returns:
-        Distance between p1 and p2
-    '''
-    dx = p1[0] - p2[0]
-    dy = p1[1] - p2[1]
-    
-    return np.sqrt(dx**2 + dy**2)
 
 class UnivectorField:
     """
@@ -131,14 +119,41 @@ class UnivectorField:
         return self.compute(p)
 
     def define_borders(self, margin, consider_goal=True, side=1.5, top=1.3, goal_start = 0.5, goal_end = 0.8):
+        """
+        Define borders and theirs sizes
 
+            Parameters
+            ----------
+                margin (float): borders margins (distance the path will avoid)
+                consider_goal (bool): if the goal should be considered as border or not
+                side (float): horizontal size of the field
+                top (float): vertical size of the field
+                goal_start (float): y coordinate for the lower vertice of the goal
+                goal_end (float): y coordinate for the upper vertice of the goal 
+
+            Return
+            ----------
+                border (list): list of border informations
+                goal (list): list of goals informations
+        """
         self.border = [(side,top), margin]
         self.goal = [(goal_start,goal_end), consider_goal]
 
         return self.border, self.goal
     
     def vector_border(self, p):
-        
+        """
+        Gives the angle of the vector for each border
+
+            Parameters
+            ----------
+                p (tuple[float, float]): position x and y coordinates
+
+            Return
+            ----------
+                angle (float): the angle of the vector for the border p is close
+                None (Nonetype): if p is not close to any border, returns None
+        """        
         if (p[0] <= self.border[1]):
             if self.goal[1] == False and (self.goal[0][0] <= p[1] <= self.goal[0][1]):
                 return None            
@@ -198,6 +213,7 @@ class UnivectorField:
             if distance(self.r, p) >= distance(p, self.g):
                 angle_f_p = ang_rg
         
+        # check if the position is close to one of the borders
         ang_b = self.vector_border(p)
         if ang_b is not None:
             new_angle = np.arctan2(((np.sin(angle_f_p)+np.sin(ang_b))),(np.cos(angle_f_p)+np.cos(ang_b)))
@@ -205,7 +221,8 @@ class UnivectorField:
         
 
         for obstacle in self.obstacles:
-        
+            
+            # check if the obstacle is close to one of the borders
             ang_bo1 = self.vector_border((obstacle.center[0]+obstacle.eradius,obstacle.center[1]+obstacle.eradius))
             ang_bo2 = self.vector_border((obstacle.center[0]-obstacle.eradius,obstacle.center[1]-obstacle.eradius))                           
             
