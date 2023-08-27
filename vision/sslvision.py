@@ -17,8 +17,8 @@ class SSLVision(threading.Thread):
         self.frame = {}
         self.last_frame = {}
         
-        self.vision_port = 10015
-        self.host = '224.5.23.2'
+        self.vision_port = int(os.environ.get('VISION_PORT', self.config['network']['vision_port']))
+        self.host = os.environ.get('MULTICAST_IP', self.config['network']['multicast_ip'])
 
         self._fps = 0
         self._frame_times = deque(maxlen=60)
