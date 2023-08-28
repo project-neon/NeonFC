@@ -169,16 +169,15 @@ class UnivectorField:
 
         return False
 
-    def weighted_sum(self, ang_vector1, ang_vector2, ang_guide, wmax=2, wmin=1):
+    def weighted_sum(self, ang_guide, *args, wmax=2, wmin=1):
         """
-        Calculate the weighted mean between the angle of two vectors
+        Calculate the weighted mean between the angle of any number of vectors
         The weight of each vector is calculated based on the angle of a guide vector
 
             Parameters
             ----------
-                ang_vector1 (float): the angle of the first vector
-                ang_vector2 (float): the angle of the second vector
                 ang_guide (float): the angle of the guide vector
+                *args (list[angles]): one or more angles used for the calculation
                 pmax (float): the maximum weight for the sum
                 pmin (float): the minimun weight for the sum
 
@@ -186,13 +185,20 @@ class UnivectorField:
             ----------
                 new_angle (float): the angle resulted by the weighted mean
         """
-        dif_ang1 = abs(ang_guide - ang_vector1)
-        dif_ang2 = abs(ang_guide - ang_vector2)
+        sum_sin = 0
+        sum_cos = 0
 
-        weight1 = ((wmax-wmin)*abs(math.cos(dif_ang1/2))+wmin)
-        weight2 = ((wmax-wmin)*abs(math.cos(dif_ang2/2))+wmin)
+        for angle in args:
 
-        new_angle = np.arctan2(((weight1*np.sin(ang_vector1)+weight2*np.sin(ang_vector2))),(weight1*np.cos(ang_vector1)+weight2*np.cos(ang_vector2)))
+            dif_ang = abs(ang_guide - angle)
+
+            weight = ((wmax-wmin)*abs(math.cos(dif_ang/2))+wmin)
+
+            sum_sin += weight*np.sin(angle)
+            sum_cos += weight*np.cos(angle)
+            
+        new_angle = np.arctan2(sum_sin,sum_cos)
+
         return new_angle
 
 
@@ -240,7 +246,7 @@ class UnivectorField:
         # check if the position is close to one of the borders
         on_border = self.check_border(p)
         if on_border:
-            new_angle = self.weighted_sum(angle_f_p,ang_pg,ang_pg)
+            new_angle = self.weighted_sum(ang_pg,ang_pg,angle_f_p)
             return reduce_angle(new_angle)
         
 
@@ -319,7 +325,7 @@ if __name__ == "__main__":
     uvf.add_obstacle((1, 1.28), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
     uvf.define_borders((0.075 * 1.4 * 0.5)) 
 
-    g = np.array([.4, .9])
+    g = np.array([.4, 1.26])
     r = np.array((.9, .5))
     uvf.set_target(g, r)
 
