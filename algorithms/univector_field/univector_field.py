@@ -20,6 +20,7 @@ def reduce_angle(ang):
         ang += 2 * math.pi
     return ang
 
+
 np_reduce_angle = np.vectorize(reduce_angle)
 
 
@@ -263,9 +264,9 @@ class UnivectorField:
                 if abs(angle_between(obstacle.center, p) - angle_f_p) > math.pi:
                     margin_ang = reduce_angle(margin_ang + math.pi)    
                 if ang_bo1:
-                    return reduce_angle(self.weighted_sum(margin_ang, ang_pg, margin_ang, 3))
+                    return reduce_angle(self.weighted_sum(margin_ang, margin_ang, ang_pg, wmax = 3))
                 if ang_bo2:
-                    return reduce_angle(self.weighted_sum(margin_ang, ang_pg, margin_ang, 3))   
+                    return reduce_angle(self.weighted_sum(margin_ang, ang_pg, margin_ang, wmax = 3))   
                 return margin_ang
             
             # check if the line pg is secant to the obstacle
