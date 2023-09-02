@@ -19,9 +19,9 @@
         "coach_name": "RCX_2023",
         "category": "3v3",
         "robot_ids": [
-            1,
-            2,
-            3
+            5,
+            7,
+            8
         ]
     },
     "comm": {
