@@ -1,31 +1,33 @@
 import math
-import numpy as np
-from strategy.BaseStrategy import Strategy
-from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, AndTransition, OrTransition, \
-    NotTransition, OnNextTo
-from entities.plays.playbook import Trigger
-from controller import PID_control, PID_W_control, UniController
-from commons.math import point_in_rect
-from algorithms import UnivectorField
 
-def genCircunferenceVector(vCoord,radius,middleDistance):
-    field_w = 1 # <-- FIXME
-    vCoord = max(-math.pi,min(vCoord/field_w*math.pi,math.pi))
-    #vCoord /= radius
-    cirCoords = {math.sin(vCoord),math.cos(vCoord)} * radius
-    cirCoords[1] -= middleDistance
-    return cirCoords
+from controller import PID_control
+from strategy.BaseStrategy import Strategy
+from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook
+
+
+# Returns a vector present in a pseudo circle centered around origin with a radius of... radius
+# The vector will always be the one with the shortest range between itself and the ballPos
+def get_equivalent_circle_pos(ballPos, origin, radius):
+    # ratio = inner_center / outer_center
+    vec = {
+        'x': ballPos['x'] - origin['x'],
+        'y': ballPos['y'] - origin['y']
+    }
+    ang = math.atan2(vec['x'], vec['y'])
+    vec = {
+        'x': origin['x'] + math.sin(ang) * radius,
+        'y': origin['y'] + math.cos(ang) * radius
+    }
+    return vec
+
 
 class StayInArea(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
-    
-    def start_up(self):
-        super().start_up()
-    
+
     def get_name(self):
         return f"<{self.robot.get_name()} Stay in area>"
-    
+
     def start_up(self):
         super().start_up()
         controller = PID_control
@@ -38,10 +40,8 @@ class StayInArea(PlayerPlay):
     def update(self):
         ball = self.match.ball
 
-    
 
-
-class Goalkeeper (Strategy):
+class Goalkeeper(Strategy):
     def __init__(self, match):
         super().__init__(match, "Goalkeeper_RSM2023", controller=PID_control)
 
