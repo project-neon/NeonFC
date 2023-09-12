@@ -49,14 +49,14 @@ class FollowBallPlay(PlayerPlay):
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
         #Follow ball in a more agressive way
-        #Considerations: X changes while ball more far away, not going from 0.04 to 0.4 suddenly; make changes more expressive in x as from each border of the goal goes to x_max-0.5
-        if ball.x >= .75:
-            x_max = 0.4
-            x_min = 0.25
+        #Considerations: make changes more expressive in x as from each border of the goal goes to x_max-0.5
 
-            x = math.sqrt((x_max**2)*(1- (((y-0.65)/0.65)**2)*(1-(x_min/x_max)**2)))
-        else:
-            x = .04
+        y_def = 0.45
+        y_attack = 0.75
+        x_max = 0.4
+
+
+        x = max(0.04, 0.4 - max(0,(ball.y - y_attack)*(x_max - 0.04)/(y_def - y_attack)))
 
         return x, y
 
@@ -150,7 +150,7 @@ class Rest(PlayerPlay):
         return self.target
 
 
-class Goalkeeper_Prepare(Strategy):   #Goalkeeper that prepares ball for counter attack and stays as GK for the whole game
+class Goalkeeper_Spin(Strategy):#Goalkeeper that prepares ball for counter attack and stays as GK for the whole game
     def __init__(self, match):
         super().__init__(match, "Goalkeeper_RSM2023", controller=PID_control)
 
@@ -181,9 +181,9 @@ class Goalkeeper_Prepare(Strategy):   #Goalkeeper that prepares ball for counter
 
         follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)  
         follow_ball.add_transition(on_near_ball, spin)
-        follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
+        #follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
 
-        inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)
+        inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)  
         inside_area.add_transition(on_near_ball, spin)
 
         spin.add_transition(off_near_ball, follow_ball)
