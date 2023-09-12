@@ -20,7 +20,9 @@ def reduce_angle(ang):
         ang += 2 * math.pi
     return ang
 
+
 np_reduce_angle = np.vectorize(reduce_angle)
+
 
 class UnivectorField:
     """
@@ -41,6 +43,8 @@ class UnivectorField:
                            angle of the target-guide line
         """
         self.obstacles = []
+        self.border = []
+        self.goal = []
         self.N = n
         self.delta_g = rect_size
 
@@ -57,8 +61,8 @@ class UnivectorField:
                 r (tuple[float, float]): guide point x and y coordinates
         """
 
-        self.g = g
-        self.r = r
+        self.g = g 
+        self.r = r 
 
     def add_obstacle(self, p, r0, m):
         """
@@ -115,6 +119,90 @@ class UnivectorField:
     def __call__(self, p):
         return self.compute(p)
 
+    def define_borders(self, margin, consider_goal=True, side=1.5, top=1.3, goal_start=0.5, goal_end=0.8):
+        """
+        Define borders and theirs sizes
+
+            Parameters
+            ----------
+                margin (float): borders margins (distance the path will avoid)
+                consider_goal (bool): if the goal should be considered as border or not
+                side (float): horizontal size of the field
+                top (float): vertical size of the field
+                goal_start (float): y coordinate for the lower vertice of the goal
+                goal_end (float): y coordinate for the upper vertice of the goal 
+
+            Return
+            ----------
+                border (list): list of border informations
+                goal (list): list of goals informations
+        """
+        self.border = [(side,top), margin]
+        self.goal = [(goal_start,goal_end), consider_goal]
+
+        return self.border, self.goal
+    
+    def check_border(self, p):
+        """
+        Gives the angle of the vector for each border
+
+            Parameters
+            ----------
+                p (tuple[float, float]): position x and y coordinates
+
+            Return
+            ----------
+               on_border (boolean): if point is on the margin of the border
+            
+        """        
+        if (p[0] <= self.border[1]):
+            if self.goal[1] == False and (self.goal[0][0] <= p[1] <= self.goal[0][1]):
+                return False            
+            return True
+        if (p[0] >= self.border[0][0]-self.border[1]):
+            if self.goal[1] == False and (self.goal[0][0] <= p[1] <= self.goal[0][1]):
+                return False
+            return True
+        if (p[1] <= self.border[1]):
+            return True
+        if (p[1] >= self.border[0][1] - self.border[1]):
+            return True
+
+        return False
+
+    def weighted_sum(self, ang_guide, *args, wmax=2, wmin=1):
+        """
+        Calculate the weighted mean between the angle of any number of vectors
+        The weight of each vector is calculated based on the angle of a guide vector
+
+            Parameters
+            ----------
+                ang_guide (float): the angle of the guide vector
+                *args (list[angles]): one or more angles used for the calculation
+                pmax (float): the maximum weight for the sum
+                pmin (float): the minimun weight for the sum
+
+            Return
+            ----------
+                new_angle (float): the angle resulted by the weighted mean
+        """
+        sum_sin = 0
+        sum_cos = 0
+
+        for angle in args:
+
+            dif_ang = abs(ang_guide - angle)
+
+            weight = ((wmax-wmin)*abs(math.cos(dif_ang/2))+wmin)
+
+            sum_sin += weight*np.sin(angle)
+            sum_cos += weight*np.cos(angle)
+            
+        new_angle = np.arctan2(sum_sin,sum_cos)
+
+        return new_angle
+
+
     def compute(self, p):
         """
         Calculate the angle for the given position
@@ -155,17 +243,32 @@ class UnivectorField:
         if d_pg1 < self.delta_g and d_pg2 < self.delta_g:
             if distance(self.r, p) >= distance(p, self.g):
                 angle_f_p = ang_rg
+        
+        # check if the position is close to one of the borders
+        on_border = self.check_border(p)
+        if on_border:
+            new_angle = self.weighted_sum(ang_pg,ang_pg,angle_f_p)
+            return reduce_angle(new_angle)
+        
 
         for obstacle in self.obstacles:
-
+            
+            # check if the obstacle is close to one of the borders
+            ang_bo1 = self.check_border((obstacle.center[0]+obstacle.eradius,obstacle.center[1]+obstacle.eradius))
+            ang_bo2 = self.check_border((obstacle.center[0]-obstacle.eradius,obstacle.center[1]-obstacle.eradius))                           
+            
             # check if the position is inside the margin of the obstacle
             if obstacle.margin + obstacle.radius >= distance(obstacle.center, p):
-                margin_ang = (2 * angle_between(obstacle.center, p) + angle_f_p) / 3
+                margin_ang = (2 * angle_between(obstacle.center, p) + angle_f_p)/3
                 margin_ang = reduce_angle(margin_ang)
                 if abs(angle_between(obstacle.center, p) - angle_f_p) > math.pi:
-                    margin_ang = reduce_angle(margin_ang + math.pi)
+                    margin_ang = reduce_angle(margin_ang + math.pi)    
+                if ang_bo1:
+                    return reduce_angle(self.weighted_sum(margin_ang, margin_ang, ang_pg, wmax = 3))
+                if ang_bo2:
+                    return reduce_angle(self.weighted_sum(margin_ang, ang_pg, margin_ang, wmax = 3))   
                 return margin_ang
-
+            
             # check if the line pg is secant to the obstacle
             a = p[1] - self.g[1]
             b = self.g[0] - p[0]
@@ -188,7 +291,7 @@ class UnivectorField:
                             pass
                         else:
                             behind_angle = ang_t2
-
+        
         if behind_angle is not None:
             return behind_angle
             pass
@@ -215,18 +318,19 @@ class UnivectorField:
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    uvf = UnivectorField(n=4, rect_size=(delta:=2), plot=True, path='../../uvf_plot.json')
+    uvf = UnivectorField(n=4, rect_size=(delta:=0.3), plot=True, path='../../uvf_plot.json')
 
-    uvf.add_obstacle((1, 1), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
-    uvf.add_obstacle((.7, .65), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
-    uvf.add_obstacle((.4, .8), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
-    uvf.add_obstacle((1, 1.2), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.add_obstacle((1.45, 1), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.add_obstacle((.03, .65), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.add_obstacle((.4, .02), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.add_obstacle((1, 1.28), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
+    uvf.define_borders((0.075 * 1.4 * 0.5)) 
 
-    g = np.array([.8, 0.65])
-    r = np.array((1.5, 1.3))
+    g = np.array([.4, 1.26])
+    r = np.array((.9, .5))
     uvf.set_target(g, r)
 
-    xs, ys = np.meshgrid(np.linspace(-5, 5, 53), np.linspace(-5, 5, 53))
+    xs, ys = np.meshgrid(np.linspace(0, 1.5, 53), np.linspace(0, 1.3, 53))
     us, vs = [], []
 
     for x, y in zip(np.nditer(xs), np.nditer(ys)):
@@ -263,7 +367,7 @@ if __name__ == "__main__":
 
     print(r_g1)
 
-    x = np.linspace(-5, 5, 2)
+    x = np.linspace(0.3, 1.2, 2)
     print(x)
     y_g1 = -(r_g1['a']*x+r_g1['c'])/r_g1['b']
     y_g2 = -(r_g2['a']*x+r_g2['c'])/r_g2['b']
