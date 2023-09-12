@@ -8,6 +8,14 @@ from controller import PID_control, PID_W_control, UniController
 from commons.math import point_in_rect
 from algorithms import UnivectorField
 
+def genCircunferenceVector(vCoord,radius,middleDistance):
+    field_w = 1 # <-- FIXME
+    vCoord = max(-math.pi,min(vCoord/field_w*math.pi,math.pi))
+    #vCoord /= radius
+    cirCoords = {math.sin(vCoord),math.cos(vCoord)} * radius
+    cirCoords[1] -= middleDistance
+    return cirCoords
+
 class StayInArea(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
