@@ -170,8 +170,8 @@ class Goalkeeper(Strategy):
         off_near_ball = OnNextTo(self.match.ball, self.robot, 0.12, True)
 
         follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)
-        follow_ball.add_transition(on_near_ball, spin)
-        follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
+        #follow_ball.add_transition(on_near_ball, spin)
+        #follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
 
         inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)
         inside_area.add_transition(on_near_ball, spin)
@@ -191,3 +191,4 @@ class Goalkeeper(Strategy):
         res = self.playerbook.update()
         print(self.playerbook.actual_play)
         return res
+
