@@ -7,18 +7,21 @@ from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook
 
 # Returns a vector present in a pseudo circle centered around origin with a radius of... radius
 # The vector will always be the one with the shortest range between itself and the ballPos
-def get_equivalent_circle_pos(ballPos, origin, radius):
-    # ratio = inner_center / outer_center
+def get_closest_ellipse_position(ballPos, origin, radiusX, radiusY):
+    ratio = radiusX / radiusY
     vec = {
-        'x': ballPos['x'] - origin['x'],
-        'y': ballPos['y'] - origin['y']
+        'x': (ballPos['x'] - origin['x']),
+        'y': (ballPos['y'] - origin['y']) * ratio
     }
     ang = math.atan2(vec['x'], vec['y'])
     vec = {
-        'x': origin['x'] + math.sin(ang) * radius,
-        'y': origin['y'] + math.cos(ang) * radius
+        'x': origin['x'] + math.sin(ang) * radiusX,
+        'y': origin['y'] + math.cos(ang) * radiusY,
+        'ang_clockwise': (ang + math.pi / 2) % math.pi,
+        'ang_counter_clockwise': (ang - math.pi / 2) % math.pi
     }
     return vec
+
 
 
 class StayInArea(PlayerPlay):
