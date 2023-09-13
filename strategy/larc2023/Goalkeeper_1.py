@@ -49,16 +49,22 @@ class FollowBallPlay(PlayerPlay):
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
         #Follow ball in a more agressive way
-        #Considerations: make changes more expressive in x as from each border of the goal goes to x_max-0.5
+        
+        y_def = 0.4
+        y_attack = 0.8
+        x_max = 0.5
 
-        y_def = 0.45
-        y_attack = 0.75
-        x_max = 0.4
+        radius = max(0.04, x_max - max(0,(ball.y - y_attack)*(x_max - 0.04)/(y_def - y_attack)))
 
+        ang = math.atan2(ball.x,y)
+        
+        x = max(0.04 , math.sin(ang)*radius)
 
-        x = max(0.04, 0.4 - max(0,(ball.y - y_attack)*(x_max - 0.04)/(y_def - y_attack)))
+        if ball.y > y_def:
+            y = math.cos(ang)*radius
 
         return x, y
+
 
 
 class InsideArea(PlayerPlay):
