@@ -48,7 +48,7 @@ class FollowBallPlay(PlayerPlay):
 
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
-        #Follow ball in a more agressive way
+        #Follow ball going foward while ball gets away from the goal
         
         y_def = 0.4
         y_attack = 0.8
@@ -60,8 +60,8 @@ class FollowBallPlay(PlayerPlay):
         
         x = max(0.04 , math.sin(ang)*radius)
 
-        if ball.y > y_def:
-            y = math.cos(ang)*radius
+        #if ball.y > y_def:
+        #    y = math.cos(ang)*radius
 
         return x, y
 
@@ -193,7 +193,7 @@ class Goalkeeper_Spin(Strategy):#Goalkeeper that prepares ball for counter attac
         inside_area.add_transition(on_near_ball, spin)
 
         spin.add_transition(off_near_ball, follow_ball)
-        rest.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball) #Primeiro é o trigger, segundo é a play que vai
+        #rest.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball) #Primeiro é o trigger, segundo é a play que vai
 
         if self.playerbook.actual_play == None:
             self.playerbook.set_play(follow_ball)
