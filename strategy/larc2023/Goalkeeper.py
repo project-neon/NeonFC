@@ -29,8 +29,8 @@ class Goalkeeper(Strategy):
 
     def start(self, robot=None):
         super().start(robot=robot)
-
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
+        self.playerbook.add_play(StayInArea(self.match, self.robot))
 
     def reset(self, robot=None):
         super().reset()
@@ -38,6 +38,10 @@ class Goalkeeper(Strategy):
             self.start(robot)
 
     def decide(self):
+
+        if True:
+            return 0,1
+
         res = self.playerbook.update()
         print(self.playerbook.actual_play)
         return res
