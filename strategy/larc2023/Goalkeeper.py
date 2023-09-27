@@ -1,6 +1,13 @@
+import math
+
 from controller import PID_control
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook
+from algorithms.trigonometry import trigonometry
+
+RAD_X = 1
+RAD_Y = 1
+GOAL_POS = {"x": 0, "y": 0}
 
 
 class StayInArea(PlayerPlay):
@@ -8,7 +15,7 @@ class StayInArea(PlayerPlay):
         super().__init__(match, robot)
 
     def get_name(self):
-        return f"<{self.robot.get_name()} Stay in area>"
+        return f"<{self.robot.get_name()} Patrol area>"
 
     def start_up(self):
         super().start_up()
@@ -21,6 +28,15 @@ class StayInArea(PlayerPlay):
 
     def update(self):
         ball = self.match.ball
+        sX, sY, sAp, sAn = trigonometry.get_closest_ellipse_position_pure(
+            ball.x, ball.y, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
+        cX = self.robot.x
+        cY = self.robot.y
+        desiredCurrentAngle = math.atan2(cX - sX, cY - sY)
+        print("x:{},y:{}\nbx:{},by:{}\nvecX:{},vecY:{},ang:{}\ndesired:{}".format(
+            cX, cY, GOAL_POS['x'], GOAL_POS['y'], sX, sY, sAp, desiredCurrentAngle
+        ))
+
 
 
 class Goalkeeper(Strategy):
@@ -38,10 +54,6 @@ class Goalkeeper(Strategy):
             self.start(robot)
 
     def decide(self):
-
-        if True:
-            return 0,1
-
         res = self.playerbook.update()
-        print(self.playerbook.actual_play)
+        print("Play: " + str(self.playerbook.actual_play))
         return res
