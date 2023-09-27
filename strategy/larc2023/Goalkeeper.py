@@ -46,7 +46,10 @@ class Goalkeeper(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
-        self.playerbook.add_play(StayInArea(self.match, self.robot))
+        stay_in_area = StayInArea(self.match, self.robot)
+        self.playerbook.add_play(stay_in_area)
+        self.playerbook.set_play(stay_in_area)
+
 
     def reset(self, robot=None):
         super().reset()
