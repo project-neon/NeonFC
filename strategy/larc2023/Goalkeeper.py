@@ -2,6 +2,7 @@ from controller import PID_control
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook
 
+
 class StayInArea(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)

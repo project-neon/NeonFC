@@ -1,14 +1,15 @@
 import strategy
-import strategy.larc2023_2
+
 from entities.coach.coach import BaseCoach
 
 
-class Coach(BaseCoach): # heranca da classe abstrata
+class Coach(BaseCoach):  # heranca da classe abstrata
     NAME = "TEST"
-    def __init__(self, match):
-        super().__init__(match) # chamada do metodo da classe mae
 
-        self._1 = strategy.larc2023_2.Goalkeeper(self.match)
+    def __init__(self, match):
+        super().__init__(match)  # chamada do metodo da classe mae
+
+        self._1 = strategy.larc2023.Goalkeeper(self.match)
         self._2 = strategy.tests.Idle(self.match)
         self._3 = strategy.tests.Idle(self.match)
 
@@ -23,8 +24,8 @@ class Coach(BaseCoach): # heranca da classe abstrata
 
         for robot, strategy in zip(robots, strategies):
             if self.match.robots[robot[0]].strategy is not None:
-            # vamos evitar chamar o start todo frame
-            # pode ser que essa strategia seja pesada de carregar
+                # vamos evitar chamar o start todo frame
+                # pode ser que essa strategia seja pesada de carregar
                 continue
             self.match.robots[robot[0]].strategy = strategy
             self.match.robots[robot[0]].start()
