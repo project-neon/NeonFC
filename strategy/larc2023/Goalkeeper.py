@@ -4,6 +4,7 @@ from controller import PID_control
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook
 from algorithms.trigonometry import trigonometry
+from strategy.utils.player_playbook import DefaultToTransition
 
 RAD_X = 1
 RAD_Y = 1
@@ -28,6 +29,7 @@ class StayInArea(PlayerPlay):
 
     def update(self):
         ball = self.match.ball
+        print("Initializing strategy logic.")
         sX, sY, sAp, sAn = trigonometry.get_closest_ellipse_position_pure(
             ball.x, ball.y, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
         cX = self.robot.x
@@ -36,7 +38,6 @@ class StayInArea(PlayerPlay):
         print("x:{},y:{}\nbx:{},by:{}\nvecX:{},vecY:{},ang:{}\ndesired:{}".format(
             cX, cY, GOAL_POS['x'], GOAL_POS['y'], sX, sY, sAp, desiredCurrentAngle
         ))
-
 
 
 class Goalkeeper(Strategy):
@@ -49,7 +50,7 @@ class Goalkeeper(Strategy):
         stay_in_area = StayInArea(self.match, self.robot)
         self.playerbook.add_play(stay_in_area)
         self.playerbook.set_play(stay_in_area)
-
+        stay_in_area.add_transition(DefaultToTransition(),stay_in_area)
 
     def reset(self, robot=None):
         super().reset()

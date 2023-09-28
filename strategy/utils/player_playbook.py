@@ -174,3 +174,11 @@ class OnNextTo(Trigger):
     def evaluate(self, *args, **kwargs):
         is_nexto = self.next_to(self.p1, self.p2, self.distance, self.far)
         return is_nexto
+
+class DefaultToTransition(Trigger):
+    def __init__(self):
+        super().__init__()
+
+    def evaluate(self, *args, **kwargs):
+        return True
+
