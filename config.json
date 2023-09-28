@@ -16,10 +16,10 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "RCX_2023",
+        "coach_name": "LARC_2023",
         "category": "3v3"
     },
     "referee": false,
-    "data_sender": false,
-    "api": true
+    "data_sender": true,
+    "api": false
 }

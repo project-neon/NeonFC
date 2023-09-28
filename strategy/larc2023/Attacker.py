@@ -199,7 +199,7 @@ class Wait(PlayerPlay):
 
         c = (self.robot.x, self.robot.y)
 
-        d = [(r.x, r.y) for r in self.match.robots if r.strategy.name not in ["Main_Attacker", "Goalkeeper_RSM2023"]][0]
+        d = [(r.x, r.y) for r in self.match.robots if r.strategy.name not in ["Main_Attacker", "Goalkeeper_Spin"]][0]
 
         # Calculate the distances between each robot and each fixed point
         distance_c_a = math.sqrt((c[0] - a[0]) ** 2 + (c[1] - a[1]) ** 2)

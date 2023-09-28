@@ -158,7 +158,7 @@ class Rest(PlayerPlay):
 
 class Goalkeeper_Spin(Strategy):#Goalkeeper that prepares ball for counter attack and stays as GK for the whole game
     def __init__(self, match):
-        super().__init__(match, "Goalkeeper_LARC2023", controller=PID_control)
+        super().__init__(match, "Goalkeeper_Spin", controller=PID_control)
 
     def start(self, robot=None):
         super().start(robot=robot)

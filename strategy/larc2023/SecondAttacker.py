@@ -25,7 +25,7 @@ class MainPlay(PlayerPlay):
         main_st = [[i.x, i.y] for i in self.match.robots if i.strategy.name == "Main_Attacker"][0]
         obs_radius = distance_between_points(main_st, ball)
         target = main_st[:]
-        gk = [[i.x, i.y] for i in self.match.robots if i.strategy.name == "Goalkeeper_RSM2023"][0]
+        gk = [[i.x, i.y] for i in self.match.robots if i.strategy.name == "Goalkeeper_Spin"][0]
 
         # second attacker offset on x based on the distance of the main attacker to the ball
         target[0] -= max(4*0.075, obs_radius)
