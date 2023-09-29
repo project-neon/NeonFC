@@ -19,6 +19,8 @@ class Coach(BaseCoach):
     def decide(self):
         GK = [i for i, r in enumerate(self.match.robots) if r.robot_id is self.GK_id][0]
         strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK_id]
+        print(GK)
+        print(strikers)
         ST, SS = self.choose_main_striker(*strikers)
 
         st_strat, ss_start = self.handle_stuck(ST, SS)

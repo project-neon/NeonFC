@@ -12,13 +12,14 @@ class Coach(BaseCoach):
         self.SS_strategy = strategy.larc2023.ShadowAttacker(self.match)
         self.ST_strategy = strategy.larc2023.MainStriker(self.match)
         self.GK_strategy = strategy.larc2023.Goalkeeper(self.match) #Goalkeeper_2, changes goalkeeper, doesn't spins when ball is close
-        self.GK_id = 0  # Goalkeeper fixed ID
+        self.GK  = self.distance_goal()
+        self.strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK.robot_id]
 
         # self.unstucks = {r.robot_id: strategy.rsm2023.Unstuck(self.match) for r in self.match.robots if r.robot_id != self.GK_id}
 
     def decide(self):
-        GK = [i for i, r in enumerate(self.match.robots) if r.robot_id is self.GK_id][0]
-        strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK_id]
+        GK = self.GK
+        strikers = self.strikers
         ST, SS = self.choose_main_striker(*strikers)
 
         st_strat, ss_start = self.handle_stuck(ST, SS)
@@ -26,19 +27,23 @@ class Coach(BaseCoach):
         if self.check_change_gk(GK):
             GK, strikers[0], strikers[1] = self.choose_gk(GK, *strikers)
 
-        if self.match.robots[GK].strategy is None:
-            self.match.robots[GK].strategy = self.GK_strategy
-            self.match.robots[GK].start()
+        if GK.strategy is None:
+            GK.strategy = self.GK_strategy
+            GK.start()
         else:
-            if self.match.robots[GK].strategy.name != self.GK_strategy:
-                self.match.robots[GK].strategy = self.GK_strategy
-                self.match.robots[GK].start()
+            if GK.strategy.name != self.GK_strategy:
+                GK.strategy = self.GK_strategy
+                GK.start()
 
         ST.strategy = st_strat
         ST.start()
 
         SS.strategy = ss_start
         SS.start()
+
+        self.GK = GK
+        self.strikers = strikers
+        print("GK, ST, SS:", GK.robot_id, ST.robot_id, SS.robot_id)
 
     def choose_main_striker(self, r1, r2):
         b = self.match.ball
@@ -80,6 +85,19 @@ class Coach(BaseCoach):
         if gk.x > 0.4 and dist_bgk < 0.1:
             return True
         return False
+    
+    def distance_goal(self):
+
+        closest = 0
+        dist = 2
+
+        for r in self.match.robots:
+            dist_r = r.x
+            if dist_r < dist:
+                dist = dist_r
+                closest = r
+        
+        return closest
             
     def handle_stuck(self, ST, SS):
         game_runing = not (self.match.game_status == 'STOP' or self.match.game_status == None)
