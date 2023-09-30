@@ -60,12 +60,6 @@ class Coach(BaseCoach):
         dist_r1 = distance_between_points((0, 0.65), (r1.x, r1.y))
         dist_r2 = distance_between_points((0, 0.65), (r2.x, r2.y))
 
-        gk_down, r1_down, r2_down = gk.y - 0.65, r1.y - 0.65, r2.y - 0.65,
-
-        if gk_down * r1_down < 0:
-            return r2, r1, gk
-        if gk_down * r2_down < 0:
-            return r1, gk, r2
         if dist_r1 > dist_r2:
             return r2, r1, gk
         return r1, gk, r2        
@@ -76,7 +70,7 @@ class Coach(BaseCoach):
         dist_bgk = distance_between_points((ball.x, ball.y), (gk.x, gk.y))
 
 
-        if gk.x > 0.4 and dist_bgk < 0.1:
+        if gk.x > 0.3 and dist_bgk < 0.1:
             return True
         return False
             

@@ -63,18 +63,23 @@ class Coach(BaseCoach):
 
     def choose_gk(self, gk,  r1, r2):
         
-        dist_r1 = distance_between_points((0, 0.65), (r1.x, r1.y))
-        dist_r2 = distance_between_points((0, 0.65), (r2.x, r2.y))
+        dist_r1 = distance_between_points([r1.x, r1.y], [0, 0.65])
+        dist_r2 = distance_between_points([r2.x, r2.y], [0, 0.65])
 
-        gk_down, r1_down, r2_down = gk.y - 0.65, r1.y - 0.65, r2.y - 0.65,
-
+        #gk_down, r1_down, r2_down = gk.y - 0.65, r1.y - 0.65, r2.y - 0.65,
+        '''
         if gk_down * r1_down < 0:
             return r2, r1, gk
         if gk_down * r2_down < 0:
             return r1, gk, r2
         if dist_r1 > dist_r2:
             return r2, r1, gk
-        return r1, gk, r2        
+        return r1, gk, r2    
+        '''
+
+        if dist_r1 > dist_r2:
+            return r2, r1, gk
+        return r1, gk, r2     
     
     def check_change_gk(self, gk, x_attack = 0.4):
         ball = self.match.ball
@@ -82,18 +87,20 @@ class Coach(BaseCoach):
         dist_bgk = distance_between_points((ball.x, ball.y), (gk.x, gk.y))
 
 
-        if gk.x > 0.4 and dist_bgk < 0.1:
+        if gk.x > 0.3 and dist_bgk < 0.1:
             return True
         return False
     
     def distance_goal(self):
 
         closest = 0
-        dist = 2
+        dist = 1000
 
         for r in self.match.robots:
-            dist_r = r.x
+            dist_r = distance_between_points([r.x, r.y], [0, 0.65])
+            print(dist_r)
             if dist_r < dist:
+                print("Distancia",  r.robot_id, dist_r)
                 dist = dist_r
                 closest = r
         

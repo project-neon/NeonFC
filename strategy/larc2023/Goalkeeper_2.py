@@ -53,8 +53,9 @@ class FollowBallPlay(PlayerPlay):
         x_def = 0.4
         x_attack = 0.8
         x_max = 0.5
+        x_min = 0.04
 
-        x = max(0.08, x_max - max(0,(ball.x - x_attack)*(x_max - 0.08)/(x_def - x_attack))) 
+        x = max(x_min, x_max - max(0,(ball.x - x_attack)*(x_max - x_min)/(x_def - x_attack))) 
 
         return x, y
 
