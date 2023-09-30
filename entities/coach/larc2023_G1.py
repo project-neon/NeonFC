@@ -12,7 +12,7 @@ class Coach(BaseCoach):
         self.SS_strategy = strategy.larc2023.ShadowAttacker(self.match)
         self.ST_strategy = strategy.larc2023.MainStriker(self.match)
         self.GK_strategy = strategy.larc2023.Goalkeeper_Spin(self.match) #Goalkeeper_1, doesn't change goalkeeper, spins when ball is close
-        self.GK_id = 0  # Goalkeeper fixed ID
+        self.GK_id = 8  # Goalkeeper fixed ID
 
         # self.unstucks = {r.robot_id: strategy.rsm2023.Unstuck(self.match) for r in self.match.robots if r.robot_id != self.GK_id}
 
@@ -20,7 +20,6 @@ class Coach(BaseCoach):
         GK = [i for i, r in enumerate(self.match.robots) if r.robot_id is self.GK_id][0]
         strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK_id]
         print(GK)
-        print(strikers)
         ST, SS = self.choose_main_striker(*strikers)
 
         st_strat, ss_start = self.handle_stuck(ST, SS)

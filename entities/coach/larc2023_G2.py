@@ -104,7 +104,7 @@ class Coach(BaseCoach):
                 dist = dist_r
                 closest = r
         
-        return closest
+        return r
             
     def handle_stuck(self, ST, SS):
         game_runing = not (self.match.game_status == 'STOP' or self.match.game_status == None)

@@ -5,7 +5,7 @@
         "host_ip": "localhost",
         "blue_port": 30011,
         "yellow_port": 30012,
-        "vision_port": 10005,
+        "vision_port": 10015,
         "command_port": 20011,
         "replacer_port": 10004,
         "referee_port": 10003,
@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "yellow",
-        "coach_name": "RCX_2023",
+        "coach_name": "LARC_2023_G1",
         "category": "3v3",
         "robot_ids": [
             5,
@@ -30,5 +30,5 @@
     },
     "referee": false,
     "data_sender": false,
-    "api": true
+    "api": false
 }
