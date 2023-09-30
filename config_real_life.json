@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "yellow",
-        "coach_name": "RCX_2023",
+        "coach_name": "TEST",
         "category": "3v3",
         "robot_ids": [
             5,
