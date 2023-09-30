@@ -9,9 +9,9 @@ class Coach(BaseCoach):  # heranca da classe abstrata
     def __init__(self, match):
         super().__init__(match)  # chamada do metodo da classe mae
 
-        self._1 = strategy.larc2023.Goalkeeper(self.match)
+        self._1 = strategy.tests.Idle(self.match)
         self._2 = strategy.tests.Idle(self.match)
-        self._3 = strategy.tests.Idle(self.match)
+        self._3 = strategy.larc2023.Goalkeeper(self.match)
 
     def decide(self):
         # esta lista eh ordenada em [robot_0, ..., robot_n]

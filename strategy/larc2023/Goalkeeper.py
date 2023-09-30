@@ -6,9 +6,9 @@ from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook
 from algorithms.trigonometry import trigonometry
 from strategy.utils.player_playbook import DefaultToTransition
 
-RAD_X = 1
-RAD_Y = 1
-GOAL_POS = {"x": 0, "y": 0}
+RAD_X = .25
+RAD_Y = .25
+GOAL_POS = {"x": 0, "y": 0.65}
 
 
 class StayInArea(PlayerPlay):
@@ -31,15 +31,9 @@ class StayInArea(PlayerPlay):
         ball = self.match.ball
         print("Initializing strategy logic.")
         sX, sY, sAp, sAn = trigonometry.get_closest_ellipse_position_pure(
-            ball.x, ball.y, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
-        cX = self.robot.x
-        cY = self.robot.y
-        desiredCurrentAngle = math.atan2(cX - sX, cY - sY)
-        print("x:{},y:{}\nbx:{},by:{}\nvecX:{},vecY:{},ang:{}\ndesired:{}".format(
-            cX, cY, GOAL_POS['x'], GOAL_POS['y'], sX, sY, sAp, desiredCurrentAngle
-        ))
+            ball.x+ball.vx, ball.y+ball.vy, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
 
-
+        return sX,sY
 class Goalkeeper(Strategy):
     def __init__(self, match):
         super().__init__(match, "Goalkeeper_RSM2023", controller=PID_control)
