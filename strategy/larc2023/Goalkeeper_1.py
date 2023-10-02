@@ -49,7 +49,9 @@ class FollowBallPlay(PlayerPlay):
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
         #Follow ball going forward while ball gets away from the goal
-        
+        if OnNextTo(self.robot, self.match.ball, dist = 0.08):
+            return ball.x, y
+
         x_def = 0.4
         x_attack = 0.8
         x_max = 0.5
@@ -183,16 +185,16 @@ class Goalkeeper_Spin(Strategy):#Goalkeeper that prepares ball for counter attac
         follow_ball.add_transition(on_near_ball, spin)
         #follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
 
-        rest.add_transition(on_near_ball,spin)
+        #rest.add_transition(on_near_ball,spin)
 
         inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)  
         inside_area.add_transition(on_near_ball, spin)
 
-        #spin.add_transition(off_near_ball, rest)
+        spin.add_transition(off_near_ball, follow_ball)
         #rest.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball) #Primeiro é o trigger, segundo é a play que vai
 
         if self.playerbook.actual_play == None:
-            self.playerbook.set_play(rest)
+            self.playerbook.set_play(follow_ball)
 
     def reset(self, robot=None):
         super().reset()
