@@ -54,8 +54,12 @@ class FollowBallPlay(PlayerPlay):
         x_attack = 0.8
         x_max = 0.5
         x_min = 0.04
+        go_after = 0.13
 
         x = max(x_min, x_max - max(0,(ball.x - x_attack)*(x_max - x_min)/(x_def - x_attack))) 
+        
+        if OnNextTo(self.match.ball, self.robot, go_after) and (ball.x > x_max - go_after):
+            return ball.x, y 
 
         return x, y
 

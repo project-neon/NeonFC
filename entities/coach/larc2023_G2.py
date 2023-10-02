@@ -24,7 +24,7 @@ class Coach(BaseCoach):
 
         st_strat, ss_start = self.handle_stuck(ST, SS)
 
-        if self.check_change_gk(GK):
+        if self.check_change_gk(GK, 0.22):
             GK, strikers[0], strikers[1] = self.choose_gk(GK, *strikers)
 
         if GK.strategy is None:
@@ -87,7 +87,7 @@ class Coach(BaseCoach):
         dist_bgk = distance_between_points((ball.x, ball.y), (gk.x, gk.y))
 
 
-        if gk.x > 0.3 and dist_bgk < 0.1:
+        if gk.x > x_attack and dist_bgk < 0.1:
             return True
         return False
     

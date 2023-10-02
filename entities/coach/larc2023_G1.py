@@ -19,7 +19,8 @@ class Coach(BaseCoach):
     def decide(self):
         GK = [i for i, r in enumerate(self.match.robots) if r.robot_id is self.GK_id][0]
         strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK_id]
-        print(GK)
+
+        
         ST, SS = self.choose_main_striker(*strikers)
 
         st_strat, ss_start = self.handle_stuck(ST, SS)
@@ -69,7 +70,7 @@ class Coach(BaseCoach):
         dist_bgk = distance_between_points((ball.x, ball.y), (gk.x, gk.y))
 
 
-        if gk.x > 0.3 and dist_bgk < 0.1:
+        if gk.x > x_attack and dist_bgk < 0.09:
             return True
         return False
             

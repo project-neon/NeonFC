@@ -49,16 +49,18 @@ class FollowBallPlay(PlayerPlay):
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
         #Follow ball going forward while ball gets away from the goal
-        if OnNextTo(self.robot, self.match.ball, dist = 0.08):
-            return ball.x, y
 
         x_def = 0.4
         x_attack = 0.8
         x_max = 0.5
         x_min = 0.04
+        go_after = 0.13
 
-        x = max(x_min, x_max - max(0,(ball.x - x_attack)*(x_max - x_min)/(x_def - x_attack)))         
+        x = max(x_min, x_max - max(0,(ball.x - x_attack)*(x_max - x_min)/(x_def - x_attack)))    
 
+
+        if OnNextTo(self.robot, self.match.ball, go_after) and (ball.x < x_max - go_after):
+            return ball.x, y     
         return x, y
 
 
@@ -179,19 +181,16 @@ class Goalkeeper_Spin(Strategy):#Goalkeeper that prepares ball for counter attac
         self.playerbook.add_play(rest)
 
         on_near_ball = OnNextTo(self.match.ball, self.robot, 0.09)
-        off_near_ball = OnNextTo(self.match.ball, self.robot, 0.3, True) #Fica checando se a bola ta perto ou não
+        off_near_ball = OnNextTo(self.match.ball, self.robot, 0.2, True) 
 
         follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)  
         follow_ball.add_transition(on_near_ball, spin)
-        #follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
 
-        #rest.add_transition(on_near_ball,spin)
 
         inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)  
         inside_area.add_transition(on_near_ball, spin)
 
         spin.add_transition(off_near_ball, follow_ball)
-        #rest.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball) #Primeiro é o trigger, segundo é a play que vai
 
         if self.playerbook.actual_play == None:
             self.playerbook.set_play(follow_ball)
