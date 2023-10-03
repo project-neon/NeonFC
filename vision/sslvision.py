@@ -8,6 +8,7 @@ from collections import deque
 from commons.utils import get_config
 from google.protobuf.json_format import MessageToJson
 from protocols.ssl_vision import messages_robocup_ssl_wrapper_pb2
+import os
 
 class SSLVision(threading.Thread):
     def __init__(self):
