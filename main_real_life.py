@@ -66,6 +66,8 @@ class Game():
         self.vision.last_frame = frame
         
         self.match.update(frame)
+        if self.use_referee:
+            self.match.check_foul(self.referee)
         commands = self.match.decide()
 
         if (self.use_api or self.use_referee) and (self.match.game_status == 'STOP' or self.match.game_status is None):

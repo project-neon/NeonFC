@@ -21,6 +21,7 @@ class MatchRealLife(object):
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.game_status = 'STOP'
+        self.match_event = {'event': None, 'quadrant': 1, 'mine': True}
 
     
     def start(self):
@@ -68,6 +69,20 @@ class MatchRealLife(object):
         
         for entity in self.robots:
             entity.update(frame)
+
+
+    def check_foul(self, ref):
+        if ref.can_play():
+            self.match_event['event'] = 'PLAYING'
+            self.game_status = 'GAME_ON'
+        else:
+            if ref.get_foul() == 'STOP':
+                self.game_status = 'STOP'
+                return
+
+            self.match_event['event'] = ref.get_foul()
+            self.match_event['quadrant'] = ref.get_quadrant()
+            self.match_event['mine'] = ref.get_color() == self.team_color
 
 
     def decide(self):
