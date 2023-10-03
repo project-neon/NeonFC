@@ -7,6 +7,7 @@ import fields as pitch
 from commons.utils import get_config
 from pyVSSSReferee.RefereeComm import RefereeComm
 from vision.sslvision import assign_empty_values
+import os
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config_real_life.json')
@@ -35,14 +36,19 @@ class Game():
         self.api = Api(self.api_address, self.api_port)
         self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
 
-        self.use_referee = False
+        if os.environ.get('USE_REFEREE'):
+            self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
+        else:
+            self.use_referee = self.config.get('referee')
         
         self.start()
 
     def start(self):
         self.vision.assign_vision(self)
+        if self.use_referee:
+            self.referee.start()
         self.match.start()
-        
+
         self.vision.start()
         self.comm.start()
 
@@ -62,7 +68,7 @@ class Game():
         self.match.update(frame)
         commands = self.match.decide()
 
-        if self.use_api and (self.match.game_status == 'STOP' or self.match.game_status == None):
+        if (self.use_api or self.use_referee) and (self.match.game_status == 'STOP' or self.match.game_status is None):
             commands = [
                 {
                     'robot_id': r['robot_id'],
