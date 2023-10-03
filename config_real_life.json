@@ -1,7 +1,7 @@
 {
     "network" : {
         "multicast_ip": "224.5.23.2",
-        "referee_ip": "224.5.23.3",
+        "referee_ip": "224.5.23.2",
         "host_ip": "localhost",
         "blue_port": 30011,
         "yellow_port": 30012,
@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "yellow",
-        "coach_name": "RCX_2023",
+        "coach_name": "TEST",
         "category": "3v3",
         "robot_ids": [
             5,
@@ -28,7 +28,7 @@
         "comm_port": "/dev/ttyUSB0",
         "baud_rate": 115200
     },
-    "referee": false,
+    "referee": true,
     "data_sender": false,
-    "api": true
+    "api": false
 }
