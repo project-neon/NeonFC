@@ -55,24 +55,6 @@ class Coach(BaseCoach):
             return r1, r2
         return r2, r1
 
-    def choose_gk(self, gk,  r1, r2):
-        
-        dist_r1 = distance_between_points((0, 0.65), (r1.x, r1.y))
-        dist_r2 = distance_between_points((0, 0.65), (r2.x, r2.y))
-
-        if dist_r1 > dist_r2:
-            return r2, r1, gk
-        return r1, gk, r2        
-    
-    def check_change_gk(self, gk, x_attack = 0.4):
-        ball = self.match.ball
-
-        dist_bgk = distance_between_points((ball.x, ball.y), (gk.x, gk.y))
-
-
-        if gk.x > x_attack and dist_bgk < 0.09:
-            return True
-        return False
             
     def handle_stuck(self, ST, SS):
         game_runing = not (self.match.game_status == 'STOP' or self.match.game_status == None)

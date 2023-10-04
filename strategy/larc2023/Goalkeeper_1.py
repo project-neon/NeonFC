@@ -50,16 +50,19 @@ class FollowBallPlay(PlayerPlay):
 
         #Follow ball going forward while ball gets away from the goal
 
-        x_def = 0.4
+        x_def = 0.2
         x_attack = 0.8
-        x_max = 0.5
+        x_max = 0.55
         x_min = 0.04
-        go_after = 0.13
+        go_after = 0.11
 
-        x = max(x_min, x_max - max(0,(ball.x - x_attack)*(x_max - x_min)/(x_def - x_attack)))    
+        if ball.x > x_def:
+            x = min(0, ((x_max - x_min)/(x_attack - x_def)^(1/3))*(ball.x - x_def)^(1/3)) + x_min
+        else:
+            x = x_min   
 
 
-        if OnNextTo(self.robot, self.match.ball, go_after) and (ball.x < x_max - go_after):
+        if OnNextTo(self.robot, self.match.ball, go_after) and (ball.x <= x_max):                                                                     
             return ball.x, y     
         return x, y
 
@@ -154,7 +157,7 @@ class Rest(PlayerPlay):
         return self.target
 
 
-class Goalkeeper_Spin(Strategy):#Goalkeeper that prepares ball for counter attack and stays as GK for the whole game
+class Goalkeeper_Spin(Strategy): 
     def __init__(self, match):
         super().__init__(match, "Goalkeeper_Spin", controller=PID_control)
 
