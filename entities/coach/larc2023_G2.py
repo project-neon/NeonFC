@@ -26,7 +26,7 @@ class Coach(BaseCoach):
         st_strat, ss_start = self.handle_stuck(ST, SS)
 
         if self.check_change_gk(GK, 0.22):
-            GK, strikers[0], strikers[1] = self.choose_gk(GK, strikers)
+            GK, strikers[0], strikers[1] = self.choose_gk(GK, *strikers)
 
         if GK.strategy is None:
             GK.strategy = self.GK_strategy
@@ -91,10 +91,10 @@ class Coach(BaseCoach):
         
         if cont_r1 == cont_r2:
             if r1_way > r2_way:
-                return r2, r1, gk
+                return r2, gk, r1
             return r1, gk, r2
         
-        return r2, r1, gk
+        return r2, gk, r1
     
     def check_change_gk(self, gk, x_attack = 0.4):
         ball = self.match.ball
@@ -119,7 +119,9 @@ class Coach(BaseCoach):
                 print("Distancia",  r.robot_id, dist_r)
                 dist = dist_r
                 closest = r
-        
+        #for i in self.match.robots:
+        #    if i.robot_id == 5:
+        #        return i
         return r
     
     def robots_on_way(self, r1, check_gk = True):
