@@ -6,8 +6,8 @@ from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook
 from algorithms.trigonometry import trigonometry
 from strategy.utils.player_playbook import DefaultToTransition
 
-RAD_X = .25
-RAD_Y = .25
+RAD_X = .5
+RAD_Y = .5
 GOAL_POS = {"x": 0, "y": 0.65}
 
 
@@ -31,9 +31,10 @@ class StayInArea(PlayerPlay):
         ball = self.match.ball
         sX, sY, sAp, sAn = trigonometry.get_closest_ellipse_position_pure(
             ball.x, ball.y + ball.vy, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
-        print("Ball at {:.2f},{:.2f}, prediction vector located at {:.2f},{:.2f}".
+        print("Ball at {:.4f},{:.4f}, prediction vector located at {:.2f},{:.2f}".
               format(ball.x, ball.y, sX, sY))
         return sX, sY
+
 
 class Goalkeeper(Strategy):
     def __init__(self, match):
