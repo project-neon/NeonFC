@@ -29,11 +29,11 @@ class StayInArea(PlayerPlay):
 
     def update(self):
         ball = self.match.ball
-        print("Initializing strategy logic.")
         sX, sY, sAp, sAn = trigonometry.get_closest_ellipse_position_pure(
-            ball.x+ball.vx, ball.y+ball.vy, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
+            ball.x, ball.y + ball.vy, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
+        return sX, sY
 
-        return sX,sY
+
 class Goalkeeper(Strategy):
     def __init__(self, match):
         super().__init__(match, "Goalkeeper_RSM2023", controller=PID_control)
@@ -44,7 +44,7 @@ class Goalkeeper(Strategy):
         stay_in_area = StayInArea(self.match, self.robot)
         self.playerbook.add_play(stay_in_area)
         self.playerbook.set_play(stay_in_area)
-        stay_in_area.add_transition(DefaultToTransition(),stay_in_area)
+        stay_in_area.add_transition(DefaultToTransition(), stay_in_area)
 
     def reset(self, robot=None):
         super().reset()
