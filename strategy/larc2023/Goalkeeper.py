@@ -31,8 +31,9 @@ class StayInArea(PlayerPlay):
         ball = self.match.ball
         sX, sY, sAp, sAn = trigonometry.get_closest_ellipse_position_pure(
             ball.x, ball.y + ball.vy, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
+        print("Ball at {:.2f},{:.2f}, prediction vector located at {:.2f},{:.2f}".
+              format(ball.x, ball.y, sX, sY))
         return sX, sY
-
 
 class Goalkeeper(Strategy):
     def __init__(self, match):
@@ -53,5 +54,4 @@ class Goalkeeper(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
-        print("Play: " + str(self.playerbook.actual_play))
         return res
