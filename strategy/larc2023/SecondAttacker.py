@@ -132,14 +132,20 @@ class ShadowAttacker(Strategy):
         self.playerbook.add_play(defensive)
         self.playerbook.add_play(angle)
 
-        on_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7])
-        on_positon_1 = OnNextTo([.35, 1.1], self.robot, 0.1)
-        on_positon_2 = OnNextTo([.35, .2], self.robot, 0.1)
+        on_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7], False)
+        off_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7], True)
+        on_positon_1 = OnNextTo([.35, 1.1], self.robot, 0.1, False)
+        off_positon_1 = OnNextTo([.35, 1.1], self.robot, 0.1, True)
+        on_positon_2 = OnNextTo([.35, .2], self.robot, 0.1, False)
+        off_positon_2 = OnNextTo([.35, .2], self.robot, 0.1, True)
 
         main.add_transition(on_defensive_box, defensive)
+        defensive.add_transition(off_defensive_box, main)
 
-        main.add_transition(AndTransition([on_positon_1, on_defensive_box]), angle)
-        main.add_transition(AndTransition([on_positon_2, on_defensive_box]), angle)
+        defensive.add_transition(on_positon_1, angle)
+        defensive.add_transition(on_positon_2, angle)
+        angle.add_transition(AndTransition([off_positon_1, off_positon_2]), defensive)
+        angle.add_transition(off_defensive_box, main)
 
         # Estado inicial
         self.playerbook.set_play(main)
