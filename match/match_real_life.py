@@ -21,7 +21,7 @@ class MatchRealLife(object):
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.game_status = 'STOP'
-        self.match_event = {'event': None, 'quadrant': 1, 'mine': True}
+        self.match_event = {'event': 'KICKOFF', 'quadrant': 1, 'mine': True}
 
     
     def start(self):
@@ -79,10 +79,11 @@ class MatchRealLife(object):
             if ref.get_foul() == 'STOP':
                 self.game_status = 'STOP'
                 return
+            self.game_status = 'GAME_ON'
 
-            self.match_event['event'] = ref.get_foul()
+            self.match_event['event'] = 'KICKOFF' if ref.get_foul() == None else ref.get_foul()
             self.match_event['quadrant'] = ref.get_quadrant()
-            self.match_event['mine'] = ref.get_color() == self.team_color
+            self.match_event['mine'] = ref.get_color() == self.team_color.upper()
 
 
     def decide(self):
