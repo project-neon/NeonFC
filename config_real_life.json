@@ -14,9 +14,9 @@
         "api_recv_port": 43221
     },
     "match" : {
-        "team_side": "left",
+        "team_side": "right",
         "team_color": "yellow",
-        "coach_name": "TEST",
+        "coach_name": "LARC_2023_E",
         "category": "3v3",
         "robot_ids": [
             5,

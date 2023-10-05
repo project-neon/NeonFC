@@ -8,11 +8,14 @@ from entities.coach.rsm2023 import Coach as RSM_2023
 
 from entities.coach.rcx2023 import Coach as RCX_2023
 
+from entities.coach.larc2023_E import Coach as LARC_2023_E
+
 _coach_list = [
     # Tournament coaches
     GuideCoach,
     RSM_2023,
     RCX_2023,
+    LARC_2023_E,
     TestCoach
 ]
 
