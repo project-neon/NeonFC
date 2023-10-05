@@ -27,19 +27,17 @@ class Coach(BaseCoach):
         st_strat, ss_start = self.handle_stuck(ST, SS)
         if self.match.match_event['event'] == 'PLAYING':
 
-            if self.match.robots[GK].strategy is None:
+            if self.match.robots[GK].strategy != self.GK_strategy:
                 self.match.robots[GK].strategy = self.GK_strategy
                 self.match.robots[GK].start()
-            else:
-                if self.match.robots[GK].strategy.name != self.GK_strategy:
-                    self.match.robots[GK].strategy = self.GK_strategy
-                    self.match.robots[GK].start()
 
-            ST.strategy = st_strat
-            ST.start()
+            if ST.strategy != st_strat:
+                ST.strategy = st_strat
+                ST.start()
 
-            SS.strategy = ss_start
-            SS.start()
+            if SS.strategy != ss_start:
+                SS.strategy = ss_start
+                SS.start()
 
         else:
             robots = [(i, r.robot_id) for i, r in enumerate(self.match.robots)]
