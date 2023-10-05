@@ -1,6 +1,6 @@
 from commons.math import distance_between_points
 from entities.coach.coach import BaseCoach
-import strategy.larc2023
+import strategy.larc2023_G2
 
 
 class Coach(BaseCoach):
@@ -9,42 +9,36 @@ class Coach(BaseCoach):
     def __init__(self, match):
         super().__init__(match)
 
-        self.SS_strategy = strategy.larc2023.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.larc2023.MainStriker(self.match)
-        self.GK_strategy = strategy.larc2023.Goalkeeper(self.match) #Goalkeeper_2, changes goalkeeper, doesn't spins when ball is close
-        self.GK  = self.distance_goal()
-        self.strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK.robot_id]
+        self.SS_strategy = strategy.larc2023_G2.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.larc2023_G2.MainStriker(self.match)
+        self.GK_strategy = strategy.larc2023_G2.Goalkeeper(self.match) #Goalkeeper_2, changes goalkeeper, doesn't spins when ball is close
+        self.GK_id  = 7
+        self.strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK_id]
         self.opposites = self.match.opposites
 
         # self.unstucks = {r.robot_id: strategy.rsm2023.Unstuck(self.match) for r in self.match.robots if r.robot_id != self.GK_id}
 
     def decide(self):
-        GK = self.GK
-        strikers = self.strikers
-        ST, SS = self.choose_main_striker(*strikers)
+        GK, strikers = self.GK, self.strikers
+        GK, ST, SS = self.make_choices(GK, *strikers) 
+
+        st_strat, ss_start = self.handle_stuck(ST, SS)
+        print('GK, ST, SS:', GK.robot_id, ST.robot_id, SS.robot_id)
+        print('self GK ST SS:', self.GK.robot_id, self.ST.robot_id, self.SS.robot_id)
+        self.GK, self.strikers = GK, strikers
 
         st_strat, ss_start = self.handle_stuck(ST, SS)
 
-        if self.check_change_gk(GK, 0.22):
-            GK, strikers[0], strikers[1] = self.choose_gk(GK, *strikers)
-
-        if GK.strategy is None:
+        if GK.strategy != self.GK_strategy:
             GK.strategy = self.GK_strategy
             GK.start()
-        else:
-            if GK.strategy.name != self.GK_strategy:
-                GK.strategy = self.GK_strategy
-                GK.start()
+        GK.start()
 
         ST.strategy = st_strat
         ST.start()
 
         SS.strategy = ss_start
         SS.start()
-
-        self.GK = GK
-        self.strikers = strikers
-        print("GK, ST, SS:", GK.robot_id, ST.robot_id, SS.robot_id)
 
     def choose_main_striker(self, r1, r2):
         b = self.match.ball
@@ -62,51 +56,45 @@ class Coach(BaseCoach):
             return r1, r2
         return r2, r1
 
-    def choose_gk(self, gk, r1, r2):
+    def choose_gk(self, r1, r2):
 
-        cont_r1 = 0
-        cont_r2 = 0
-    
-        if distance_between_points((r1.x, r1.y), (0, 0.65)) > distance_between_points((r2.x, r2.y), (0, 0.65)):
-            cont_r2 += 1
-        cont_r1 += 1
+        dist_br1 = distance_between_points((0, 0.65), (r1.x, r1.y))
+        dist_br2 = distance_between_points((0, 0.65), (r2.x, r2.y))
 
-        if r1.x > 0.75:
-            cont_r2 += 1
-        if r2.x > 0.75:
-            cont_r1 += 1
+        #gk_r1, gk_r2 = ((gk.x - 0.65)*(r1.x - 0.65)), ((gk.x - 0.65)*(r2.x - 0.65))
 
-        r1_way, r1_gk = self.robots_on_way(r1)
-        r2_way, r2_gk = self.robots_on_way(r2)
-
-        if r1_way >= r2_way:
-            if not r2_gk:
-                cont_r2 += 1
-        if r1_way <= r2_way:
-            if not r1_gk:
-                cont_r1 += 1
-
-        if cont_r1 > cont_r2:
-            return r1, gk, r2
+        if dist_br1 < dist_br2:
+            return r1
+        return r2 
         
-        if cont_r1 == cont_r2:
-            if r1_way > r2_way:
-                return r2, gk, r1
-            return r1, gk, r2
-        
-        return r2, gk, r1
-    
     def check_change_gk(self, gk, x_attack = 0.4):
         ball = self.match.ball
 
         dist_bgk = distance_between_points((ball.x, ball.y), (gk.x, gk.y))
 
         for r in self.opposites:
-            dist_bop = distance_between_points((ball.x, ball.y), (r.x, r.y))
-            if gk.x > x_attack and dist_bgk < 0.1 and dist_bop > dist_bgk:
+            if ball.vx < 0 and ball.x < 0.75:
                 return True
         return False
-    
+
+
+
+    def make_choices(self, gk, r1, r2):
+        ball = self.match.ball
+        GK, ST, SS = 0, 0, 0
+
+
+        if self.check_change_gk(gk):
+            GK = self.choose_gk(r1, r2) 
+        else:
+            GK = gk
+
+        not_gk = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK.robot_id]
+        
+        ST, SS = self.choose_main_striker(*not_gk)
+
+        return GK, ST, SS 
+
     def distance_goal(self):
 
         closest = 0
@@ -119,9 +107,9 @@ class Coach(BaseCoach):
                 print("Distancia",  r.robot_id, dist_r)
                 dist = dist_r
                 closest = r
-        #for i in self.match.robots:
-        #    if i.robot_id == 5:
-        #        return i
+        for i in self.match.robots:
+            if i.robot_id == 7:
+                return i
         return r
     
     def robots_on_way(self, r1, check_gk = True):
@@ -140,7 +128,7 @@ class Coach(BaseCoach):
                 cont += 1
 
 
-        return [(cont-1), gk_way]
+        return (cont-1), gk_way
 
     
             
@@ -159,3 +147,8 @@ class Coach(BaseCoach):
         #     return self.ST_strategy, self.unstucks[SS.robot_id]
 
         return self.ST_strategy, self.SS_strategy
+
+    #def same_strat(self, r1, r2, gk):
+    #    if
+
+
