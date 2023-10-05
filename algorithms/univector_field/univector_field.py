@@ -50,6 +50,7 @@ class UnivectorField:
 
         self.plot = plot
         self.path = path
+        self.define_borders((0.075 * 1.4 * 0.5))
 
     def set_target(self, g, r):
         """
@@ -324,7 +325,7 @@ if __name__ == "__main__":
     uvf.add_obstacle((.03, .65), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
     uvf.add_obstacle((.4, .02), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
     uvf.add_obstacle((1, 1.28), 0.075 * 1.4 * 0.5, 0.075 * 1.4 * 0.25)
-    uvf.define_borders((0.075 * 1.4 * 0.5)) 
+    uvf.define_borders((0.075 * 1.4 * 0.5))
 
     g = np.array([.4, 1.26])
     r = np.array((.9, .5))
