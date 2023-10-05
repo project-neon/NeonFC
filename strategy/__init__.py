@@ -1,5 +1,6 @@
 from strategy import tests
 from strategy import rcx2023
+from strategy import larc2023
 from strategy.BaseStrategy import Strategy
 from strategy import commons
 
