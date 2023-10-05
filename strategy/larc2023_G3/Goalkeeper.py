@@ -29,8 +29,11 @@ class StayInArea(PlayerPlay):
 
     def update(self):
         ball = self.match.ball
+        y_predict = ball.y + ball.vy
+        # TODO ADD FIELD DELIMITERS
+        x_predict = min(0,ball.x + ball.xv*.5)
         sX, sY, sAp, sAn = trigonometry.get_closest_ellipse_position_pure(
-            ball.x, ball.y + ball.vy, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
+            x_predict, y_predict, GOAL_POS['x'], GOAL_POS['y'], RAD_X, RAD_Y)
         print("Ball at {:.4f},{:.4f}, prediction vector located at {:.2f},{:.2f}".
               format(ball.x, ball.y, sX, sY))
         return sX, sY

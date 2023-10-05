@@ -6,7 +6,7 @@ from strategy import tests
 # from strategy import iron2023
 from strategy import rsm2023
 from strategy import rcx2023
-from strategy import larc2023
+from strategy import larc2023_G3
 from strategy.BaseStrategy import Strategy
 
 # debug tools
