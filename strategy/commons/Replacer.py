@@ -84,7 +84,7 @@ class Angle(PlayerPlay):
     def start_up(self):
         super().start_up()
         controller = PID_control
-        controller_kwargs = {'V_MIN': 0, 'V_MAX': 0}
+        controller_kwargs = {'V_MIN': 0, 'V_MAX': 0, 'TWO_SIDES': False, 'K_P': -5}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
