@@ -21,7 +21,7 @@ class MatchRealLife(object):
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.game_status = 'STOP'
-        self.match_event = {'event': 'KICKOFF', 'quadrant': 1, 'mine': True}
+        self.match_event = {'event': 'PLAYING', 'quadrant': 1, 'mine': True}
 
     
     def start(self):
