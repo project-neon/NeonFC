@@ -50,19 +50,15 @@ class FollowBallPlay(PlayerPlay):
 
         #Follow ball going foward while ball gets away from the goal
         
-        x_def = 0.2
         x_attack = 0.75
         x_max = 0.4
         x_min = 0.04
-        go_after = 0.13
         dist_bg = math.sqrt((ball.x)**2 + (ball.y - 0.65)**2)
 
         
-        if ball.x > x_attack and ball.vx:
-            x = min(x_max, ((x_max - x_min)/(x_attack - x_def)**(1/3))*(ball.x - x_def)**(1/3) + x_min)
-        elif ball.x > x_def and ball.x < x_attack: 
+        if ball.x > x_attack:
             ball_ang  = math.atan2(ball.y - 0.65 , max(ball.x, 0.001))
-            x = ((dist_bg/2)*math.cos(ball_ang - 0.65)) +0.2*ball.vx
+            x = ((x_max)*math.cos(ball_ang - 0.65)) +0.2*ball.vx
         else:
             x = x_min   
         return x, y
