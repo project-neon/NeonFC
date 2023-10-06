@@ -12,33 +12,34 @@ class Coach(BaseCoach):
         self.SS_strategy = strategy.larc2023_G2.ShadowAttacker(self.match)
         self.ST_strategy = strategy.larc2023_G2.MainStriker(self.match)
         self.GK_strategy = strategy.larc2023_G2.Goalkeeper(self.match) #Goalkeeper_2, changes goalkeeper, doesn't spins when ball is close
-        self.GK_id  = 7
-        self.strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK_id]
+        self.GK = self.distance_goal()
+        self.strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK.robot_id]
         self.opposites = self.match.opposites
 
         # self.unstucks = {r.robot_id: strategy.rsm2023.Unstuck(self.match) for r in self.match.robots if r.robot_id != self.GK_id}
 
     def decide(self):
-        GK, strikers = self.GK, self.strikers
-        GK, ST, SS = self.make_choices(GK, *strikers) 
+        self.GK, self.strikers = self.GK, self.strikers
+        self.GK, self.ST, self.SS = self.make_choices(self.GK, *self.strikers) 
 
-        st_strat, ss_start = self.handle_stuck(ST, SS)
-        print('GK, ST, SS:', GK.robot_id, ST.robot_id, SS.robot_id)
-        print('self GK ST SS:', self.GK.robot_id, self.ST.robot_id, self.SS.robot_id)
-        self.GK, self.strikers = GK, strikers
+        self.strikers[0], self.strikers[1] = self.ST, self.SS
+ 
+        st_strat, ss_start = self.handle_stuck(self.ST, self.SS)
+        print('GK, ST, SS:', self.GK.robot_id, self.ST.robot_id, self.SS.robot_id)
+        print('self GK id1 id2:', self.GK.robot_id, self.strikers[0].robot_id, self.strikers[1].robot_id)
 
-        st_strat, ss_start = self.handle_stuck(ST, SS)
+        st_strat, ss_start = self.handle_stuck(self.ST, self.SS)
 
-        if GK.strategy != self.GK_strategy:
-            GK.strategy = self.GK_strategy
-            GK.start()
-        GK.start()
+        if self.GK.strategy != self.GK_strategy:
+            self.GK.strategy = self.GK_strategy
+            self.GK.start()
+        self.GK.start()
 
-        ST.strategy = st_strat
-        ST.start()
+        self.ST.strategy = st_strat
+        self.ST.start()
 
-        SS.strategy = ss_start
-        SS.start()
+        self.SS.strategy = ss_start
+        self.SS.start()
 
     def choose_main_striker(self, r1, r2):
         b = self.match.ball
@@ -108,7 +109,7 @@ class Coach(BaseCoach):
                 dist = dist_r
                 closest = r
         for i in self.match.robots:
-            if i.robot_id == 7:
+            if i.robot_id == 0:
                 return i
         return r
     
