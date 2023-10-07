@@ -183,9 +183,9 @@ class Rest(PlayerPlay):
         return self.target
 
 
-class Goalkeeper(Strategy):
+class Goalkeeper_Change(Strategy):
     def __init__(self, match):
-        super().__init__(match, "Goalkeeper", controller=PID_control)
+        super().__init__(match, "Goalkeeper_Change", controller=PID_control)
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -217,7 +217,6 @@ class Goalkeeper(Strategy):
         off_near_ball = OnNextTo(self.match.ball, self.robot, 0.15, True)
 
         follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)
-        #follow_ball.add_transition(on_near_ball, spin)
         follow_ball.add_transition(RobotOnInsideBox(self.match, [.75, -.3, 7, 1.9], self.robot), backoff)
 
         inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)
