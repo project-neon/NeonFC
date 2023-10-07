@@ -174,3 +174,16 @@ class OnNextTo(Trigger):
     def evaluate(self, *args, **kwargs):
         is_nexto = self.next_to(self.p1, self.p2, self.distance, self.far)
         return is_nexto
+
+class RobotOnInsideBox(Trigger):
+    def __init__(self, match, box, robot, outside=False):
+        super().__init__()
+        self.ball = match.ball
+        self.box = box
+        self.robot = robot
+        self.outside = outside
+
+    def evaluate(self, *args, **kwargs):
+        if self.outside:
+            return not point_in_rect([self.robot.x, self.robot.y], self.box)
+        return point_in_rect([self.robot.x, self.robot.y], self.box)

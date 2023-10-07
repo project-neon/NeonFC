@@ -98,20 +98,19 @@ class Coach(BaseCoach):
             return r1, gk, r2
         return r2, r1, gk
        
-    def check_change_gk(self, gk, x_attack = 0.4):
+    def check_change_gk(self, gk, r1, r2):
         ball = self.match.ball
 
-        dist_bgk = distance_between_points((ball.x, ball.y), (gk.x, gk.y))
-
-        if ball.vx < 0 and ball.x < 0.75 and ball.x <= gk.x + 0.05:
-            return True
+        if r1.x >= ball.x and r2.x >= ball.x:
+            if ball.x < 1.25 and ball.vx < 0:
+                return True
         return False
 
     def make_choices(self, gk, r1, r2):
         GK, ST, SS = 0, 0, 0
         not_gk = [0,1]
 
-        if self.check_change_gk(gk):
+        if self.check_change_gk(gk, r1, r2):
             GK, not_gk[0], not_gk[1] = self.choose_gk(gk, r1, r2) 
 
         else:

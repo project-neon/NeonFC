@@ -2,11 +2,12 @@ import math
 import numpy as np
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, AndTransition, OrTransition, \
-    NotTransition, OnNextTo
+    NotTransition, OnNextTo, RobotOnInsideBox
 from entities.plays.playbook import Trigger
 from controller import PID_control, PID_W_control, UniController
 from commons.math import point_in_rect
 from algorithms import UnivectorField
+from algorithms.limit_cycle.limit_cycle import LimitCycle
 
 
 class FollowBallPlay(PlayerPlay):
@@ -48,20 +49,49 @@ class FollowBallPlay(PlayerPlay):
 
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
-        #Follow ball going foward while ball gets away from the goal
-        
-        x_attack = 0.75
-        x_max = 0.4
-        x_min = 0.04
-        dist_bg = math.sqrt((ball.x)**2 + (ball.y - 0.65)**2)
+        x_attack = 0.4
 
+        if ball.x >  1:
+            return x_attack, y
         
-        if ball.x > x_attack:
-            ball_ang  = math.atan2(ball.y - 0.65 , max(ball.x, 0.001))
-            x = ((x_max)*math.cos(ball_ang - 0.65)) +0.2*ball.vx
-        else:
-            x = x_min   
-        return x, y
+        return 0.04, y
+
+
+class BackOff(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+        self.opposites = self.match.opposites
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} BackOff>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs = {
+            'K_RHO': 1,
+            'V_MIN': 0,
+        }
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def start(self):
+        self.limit_cycle = LimitCycle(self.match)
+        self.field_w, self.field_h = self.match.game.field.get_dimensions()
+
+    def update(self):
+
+        self.limit_cycle.set_target((0.04, 0.65))
+
+        for r in self.opposites:
+            self.limit_cycle.add_obstacle((r.x, r.y, 0.04, False))
+        
+        try:
+            desired = self.limit_cycle.compute(self.robot)
+        except ZeroDivisionError:
+            desired = list((self.robot.x, self.robot.y))
+
+        return desired
 
 
 class InsideArea(PlayerPlay):
@@ -174,20 +204,26 @@ class Goalkeeper(Strategy):
         rest = Rest(self.match, self.robot)
         rest.start()
 
+        backoff = BackOff(self.match, self.robot)
+        backoff.start() 
+
         self.playerbook.add_play(follow_ball)
         self.playerbook.add_play(inside_area)
         self.playerbook.add_play(spin)
         self.playerbook.add_play(rest)
+        self.playerbook.add_play(backoff)
 
         on_near_ball = OnNextTo(self.match.ball, self.robot, 0.11)
         off_near_ball = OnNextTo(self.match.ball, self.robot, 0.15, True)
 
         follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)
         #follow_ball.add_transition(on_near_ball, spin)
-        #follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
+        follow_ball.add_transition(RobotOnInsideBox(self.match, [.75, -.3, 7, 1.9], self.robot), backoff)
 
         inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)
         inside_area.add_transition(on_near_ball, spin)
+
+        backoff.add_transition(RobotOnInsideBox(self.match, [-.3, -.2, .6, 1.9], self.robot), follow_ball)
 
         spin.add_transition(off_near_ball, follow_ball)
         rest.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball)

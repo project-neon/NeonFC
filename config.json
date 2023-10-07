@@ -20,6 +20,6 @@
         "category": "3v3"
     },
     "referee": false,
-    "data_sender": true,
+    "data_sender": true ,
     "api": false
 }
