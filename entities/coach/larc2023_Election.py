@@ -1,6 +1,6 @@
 from commons.math import distance_between_points
 from entities.coach.coach import BaseCoach
-import strategy.larc2023_G2
+import strategy.larc2023
 
 
 class Coach(BaseCoach):
@@ -9,9 +9,9 @@ class Coach(BaseCoach):
     def __init__(self, match):
         super().__init__(match)
 
-        self.SS_strategy = strategy.larc2023_G2.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.larc2023_G2.MainStriker(self.match)
-        self.GK_strategy = strategy.larc2023_G2.Goalkeeper(self.match) #Goalkeeper_2, changes goalkeeper, doesn't spins when ball is close
+        self.SS_strategy = strategy.larc2023.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.larc2023.MainStriker(self.match)
+        self.GK_strategy = strategy.larc2023.Goalkeeper_Change(self.match) 
         self.GK = self.set_gk()
         self.strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK.robot_id]
         self.opposites = self.match.opposites
