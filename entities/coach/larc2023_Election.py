@@ -1,17 +1,17 @@
 from commons.math import distance_between_points
 from entities.coach.coach import BaseCoach
-import strategy.larc2023_G2
+import strategy.rcx2023
 
 
 class Coach(BaseCoach):
-    NAME = "LARC_2023_G2"
+    NAME = "LARC_2023Election"
 
     def __init__(self, match):
         super().__init__(match)
 
-        self.SS_strategy = strategy.larc2023_G2.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.larc2023_G2.MainStriker(self.match)
-        self.GK_strategy = strategy.larc2023_G2.Goalkeeper(self.match) #Goalkeeper_2, changes goalkeeper, doesn't spins when ball is close
+        self.SS_strategy = strategy.rcx2023.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.rcx2023.MainStriker(self.match)
+        self.GK_strategy = strategy.rcx2023.GoalkeeperChange(self.match)
         self.GK = self.set_gk()
         self.strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id is not self.GK.robot_id]
         self.opposites = self.match.opposites
@@ -65,7 +65,7 @@ class Coach(BaseCoach):
             closest = r1
         closest = r2
 
-
+        '''
         r1_way, r1_gk = self.robots_on_way(r1)
         r2_way, r2_gk = self.robots_on_way(r2)
 
@@ -93,7 +93,7 @@ class Coach(BaseCoach):
             return r2, r1, gk
         if r1_gk != r2_gk and r2_gk == True:
             return r1, gk, r2     
-
+        '''
         if closest == r1:
             return r1, gk, r2
         return r2, r1, gk
@@ -102,8 +102,8 @@ class Coach(BaseCoach):
         ball = self.match.ball
 
         if r1.x >= ball.x and r2.x >= ball.x:
-            if ball.x < 1.25 and ball.vx < 0:
-                return True
+            #if ball.x < 1.25 and ball.vx < 0:
+            return True
         return False
 
     def make_choices(self, gk, r1, r2):
@@ -123,7 +123,7 @@ class Coach(BaseCoach):
 
     def set_gk(self):
         for r in self.match.robots:
-            if r.robot_id == 0:
+            if r.robot_id == 5:
                 return r
         return r
     

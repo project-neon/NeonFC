@@ -8,8 +8,8 @@ from entities.coach.rsm2023 import Coach as RSM_2023
 
 from entities.coach.rcx2023 import Coach as RCX_2023
 
-from entities.coach.larc2023_G1 import Coach as LARC_2023_G1
-from entities.coach.larc2023_G2 import Coach as LARC_2023_G2
+from entities.coach.larc2023_Election import Coach as LARC_2023Election
+
 
 _coach_list = [
     # Tournament coaches
@@ -17,8 +17,7 @@ _coach_list = [
     RSM_2023,
     RCX_2023,
     TestCoach,
-    LARC_2023_G1,
-    LARC_2023_G2
+    LARC_2023Election
 ]
 
 COACHES = {c.NAME: c for c in _coach_list}

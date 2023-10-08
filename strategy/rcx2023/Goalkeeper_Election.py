@@ -62,6 +62,12 @@ class BackOff(PlayerPlay):
         super().__init__(match, robot)
 
         self.opposites = self.match.opposites
+        self.our_robots = []
+        self.ball = self.match.ball
+
+        for r in self.match.robots:
+            if r.robot_id != self.robot.robot_id:
+                self.our_robots.append(r)
 
     def get_name(self):
         return f"<{self.robot.get_name()} BackOff>"
@@ -84,7 +90,12 @@ class BackOff(PlayerPlay):
         self.limit_cycle.set_target((0.04, 0.65))
 
         for r in self.opposites:
-            self.limit_cycle.add_obstacle((r.x, r.y, 0.04, False))
+            self.limit_cycle.add_obstacle((r.x, r.y, 0.06, False))
+
+        for r in self.our_robots:
+            self.limit_cycle.add_obstacle((r.x, r.y), 0.06, False)
+
+        self.limit_cycle.add_obstacle((self.ball.x, self.ball.y), 0.1, False)                
         
         try:
             desired = self.limit_cycle.compute(self.robot)
@@ -183,9 +194,9 @@ class Rest(PlayerPlay):
         return self.target
 
 
-class Goalkeeper(Strategy):
+class GoalkeeperChange(Strategy):
     def __init__(self, match):
-        super().__init__(match, "Goalkeeper", controller=PID_control)
+        super().__init__(match, "GoalkeeperChange", controller=PID_control)
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -223,7 +234,7 @@ class Goalkeeper(Strategy):
         inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)
         inside_area.add_transition(on_near_ball, spin)
 
-        backoff.add_transition(RobotOnInsideBox(self.match, [-.3, -.2, .6, 1.9], self.robot), follow_ball)
+        backoff.add_transition(RobotOnInsideBox(self.match, [.75, -.3, 7, 1.9], self.robot, True), follow_ball)
 
         spin.add_transition(off_near_ball, follow_ball)
         rest.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball)

@@ -142,7 +142,7 @@ class Rest(PlayerPlay):
 
 class Goalkeeper(Strategy):
     def __init__(self, match):
-        super().__init__(match, "Goalkeeper_RSM2023", controller=PID_control)
+        super().__init__(match, "GoalkeeperChange", controller=PID_control)
 
     def start(self, robot=None):
         super().start(robot=robot)
