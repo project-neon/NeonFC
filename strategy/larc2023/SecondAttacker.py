@@ -28,7 +28,8 @@ class MainPlay(PlayerPlay):
         gk = [[i.x, i.y] for i in self.match.robots if i.strategy.name == "Goalkeeper_LARC2023"][0]
 
         # second attacker offset on x based on the distance of the main attacker to the ball
-        target[0] -= max(4*0.075, obs_radius)
+        target[0] *= 0.7 # max(4*0.075, obs_radius)
+        target[0] = max(target[0], 0.2)
         # second attacker offset on y based on the distance of the ball to the center
         target[1] += .5*(.65-ball[1])
 

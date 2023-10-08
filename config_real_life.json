@@ -5,10 +5,10 @@
         "host_ip": "localhost",
         "blue_port": 30011,
         "yellow_port": 30012,
-        "vision_port": 10015,
+        "vision_port": 10321,
         "command_port": 20011,
         "replacer_port": 10004,
-        "referee_port": 10003,
+        "referee_port": 10311,
         "api_address": "127.0.0.1",
         "api_port" : 43220,
         "api_recv_port": 43221
@@ -28,7 +28,7 @@
         "comm_port": "/dev/ttyUSB0",
         "baud_rate": 115200
     },
-    "referee": true,
+    "referee": false,
     "data_sender": false,
-    "api": false
+    "api": true
 }

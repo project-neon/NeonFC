@@ -56,7 +56,7 @@ class Coach(BaseCoach):
         a1 = distance_between_points((b.x, b.y), (r1.x, r1.y))
         a2 = distance_between_points((b.x, b.y), (r2.x, r2.y))
 
-        b1, b2 = b.x - r1.x, b.x - r2.x
+        b1, b2 = b.x - r1.x - 0.05, b.x - r2.x - 0.05
 
         if b1 * b2 > 0:
             if a1 < a2:
