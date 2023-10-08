@@ -39,9 +39,9 @@ class UniController(object):
             'K_P': 10
         },
         'real_life': {
-            'V_M': 0.5,
-            'R_M': 0.44, # 20 * V_M
-            'K_W': 3.5, # 313,
+            'V_M': 0.6,
+            'R_M': 0.4, # 20 * V_M
+            'K_W': 4, # 313,
             'K_P': 1
         }
     }

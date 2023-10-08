@@ -13,7 +13,7 @@ import os
 class SSLVision(threading.Thread):
     def __init__(self):
         super(SSLVision, self).__init__()
-        self.config = get_config()
+        self.config = get_config('config_real_life.json')
 
         self.frame = {}
         self.last_frame = {}
