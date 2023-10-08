@@ -7,6 +7,7 @@ Angle based controller
 reffering to soccer robotics
 """
 
+
 class UniController(object):
     """
     An implementation of the Uni controller specified on the soccer robotics article
@@ -30,18 +31,18 @@ class UniController(object):
     target: tuple[float, float]
         the target position used for calculating the linear speed P
     """
-    
+
     CONSTANTS = {
         'simulation': {
             'V_M': 100,
-            'R_M': 3 * 100, # 3 * V_M
+            'R_M': 3 * 100,  # 3 * V_M
             'K_W': 90,
             'K_P': 10
         },
         'real_life': {
-            'V_M': 0.6,
-            'R_M': 0.4, # 20 * V_M
-            'K_W': 4.5, # 313,
+            'V_M': 0.5,
+            'R_M': 0.44,  # 20 * V_M
+            'K_W': 3.5,  # 313,
             'K_P': 1
         }
     }
@@ -53,7 +54,7 @@ class UniController(object):
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m
 
-        self.__dict__.update( self.CONSTANTS.get(self.environment) )
+        self.__dict__.update(self.CONSTANTS.get(self.environment))
 
         self.control_speed = control_speed
         self.v1 = 0  # speed limit 1
@@ -133,7 +134,6 @@ class UniController(object):
 
         if self.environment == 'simulation':
             return tuple(np.dot(250, speed_to_power(v, w, self.L, self.R)))
-
 
         # w = w if abs(w) < 4 else 4 * w / abs(w)
         return -v, -w
