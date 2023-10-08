@@ -41,7 +41,7 @@ class UniController(object):
         'real_life': {
             'V_M': 0.6,
             'R_M': 0.4, # 20 * V_M
-            'K_W': 4, # 313,
+            'K_W': 4.5, # 313,
             'K_P': 1
         }
     }
