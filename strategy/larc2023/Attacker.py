@@ -1,17 +1,13 @@
 import numpy as np
-from algorithms.limit_cycle import LimitCycle
 from algorithms import UnivectorField
 import math
-from controller.PID_control import PID_W_control, PID_control
-from controller.uni_controller import UniController
+from controller import PID_W_control, PID_control, UniController, NoController
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition
-from commons.math import distance_between_points
 
 
 class MainPlay(PlayerPlay):
     def __init__(self, match, robot):
-        # super().__init__(match, "Main_Attacker", controller=PID_W_control)
         super().__init__(match, robot)
         self.dl = 0.000001
 
@@ -154,20 +150,16 @@ class CrossPlay(PlayerPlay):
 
     def start_up(self):
         super().start_up()
-        controller = PID_W_control
-        controller_kwargs = {'V_MAX': 0, 'V_MIN': 0, 'W_MAX': 100000000000}
-        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+        controller = NoController
+        self.robot.strategy.controller = controller(self.robot)
 
     def update(self):
         if self.robot.y > .65:
-            ang_diff = self.robot.theta - math.pi/2.1
+            w = 1_000
         else:
-            ang_diff = self.robot.theta + math.pi/2.1
+            w = -1_000
 
-        x = self.robot.x + 0.5*math.cos(ang_diff)
-        y = self.robot.y + 0.5*math.sin(ang_diff)
-
-        return x, y
+        return 0, w
 
     def start(self):
         pass
@@ -266,8 +258,8 @@ class MainStriker(Strategy):
 
         on_wing = OnInsideBox(self.match, [0, 0.2, 1.5, 0.9], True)
         off_wing = OnInsideBox(self.match, [0, 0.25, 1.5, 0.8], False)
-        on_cross_region = OnInsideBox(self.match, [1.43, -0.5, .15, 1.4], False)
-        off_cross_region = OnInsideBox(self.match, [1.43, -0.5, .15, 1.4], True)
+        on_cross_region = OnInsideBox(self.match, [1.35, -0.5, .2, 1.4], False)
+        off_cross_region = OnInsideBox(self.match, [1.35, -0.5, .2, 1.4], True)
         on_near_ball = OnNextTo(self.match.ball, self.robot, 0.1, False)
         off_near_ball = OnNextTo(self.match.ball, self.robot, 0.1, True)
         on_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7], False)
