@@ -7,7 +7,7 @@ CATEGORIES = {
 }
 
 class MatchRealLife(object):
-    def __init__(self, game, team_side, team_color, coach_name=None, category="3v3", robot_ids=[0,1,2]):
+    def __init__(self, game, team_side, team_color, coach_name=None, category="3v3", robot_ids=[0,1,2], opposite_ids=[0,1,2]):
         super().__init__()
         self.game = game
         
@@ -17,8 +17,10 @@ class MatchRealLife(object):
         self.category = os.environ.get('CATEGORY', category)
         self.n_robots = CATEGORIES.get(self.category)
         self.robot_ids = os.environ.get('robot_ids', robot_ids)
+        self.opposite_ids = os.environ.get('opposite_ids', opposite_ids)
 
-        self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+        self.\
+            opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.game_status = 'STOP'
         self.match_event = {'event': 'PLAYING', 'quadrant': 1, 'mine': True}
@@ -29,7 +31,7 @@ class MatchRealLife(object):
         self.ball = entities.Ball(self.game)
 
         self.opposites = [
-            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
+            entities.Robot(self.game, i, self.opposite_team_color) for i in self.opposite_ids
         ]
 
         self.robots = [
@@ -48,7 +50,7 @@ class MatchRealLife(object):
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.opposites = [
-            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
+            entities.Robot(self.game, i, self.opposite_team_color) for i in [] # range(self.n_robots)
         ]
 
         self.robots = [
