@@ -9,5 +9,4 @@ class NoController(object):
         self.w = desired[1]
 
     def update(self):
-        print(self.v)
         return self.v, self.w
