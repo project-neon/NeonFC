@@ -28,20 +28,44 @@ class Api_recv(threading.Thread):
             # Feedback commands from socket (e.g. an interface)
             #print(decoded_data)
 
-            team_color = decoded_data.get('TEAM_COLOR', None)
-            team_side = decoded_data.get('TEAM_SIDE', None)
-            game_status = decoded_data.get('GAME_STATUS', None)
 
-            # Change team color - Doesnt need to return color because it already changes on match team color inside the function
-            if team_color and team_color != self.match.team_color:
-                self.match.restart(team_color)
+            #List with informations that are needed to be recieved and changed with there are any modifications.
+            needs = [['TEAM_COLOR',self.match.team_color], ['TEAM_SIDE', self.match.team_side], ['GAME_STATUS',self.match.game_status], 
+                     ['COACH_NAME', self.match.coach_names]] 
+
+
+            for i in needs:
+                info = decoded_data.get(i[0], None)
+
+                if info and info != i[1]:
+                    i[1] = info #Changing informations on other files if any are needed
+
+                
+
+            # team_color = decoded_data.get('TEAM_COLOR', None)
+            # team_side = decoded_data.get('TEAM_SIDE', None)
+            # game_status = decoded_data.get('GAME_STATUS', None)
+
+            # # Change team color - Doesnt need to return color because it already changes on match team color inside the function
+            # if team_color and team_color != self.match.team_color:
+            #     self.match.restart(team_color)  
             
-            # Stop game and game on
-            if game_status and game_status != self.match.game_status:
-                self.match.game_status = game_status
+            # # Stop game and game on
+            # if game_status and game_status != self.match.game_status:
+            #     self.match.game_status = game_status
 
-            # Change team side - returns team side
-            if team_side and team_side != self.match.team_side:
-                self.match.team_side = team_side
+            # # Change team side - returns team side
+            # if team_side and team_side != self.match.team_side:
+            #     self.match.team_side = team_side
+
+
 
             self.decod_data = decoded_data
+
+#Oq o NeonFC vai receber: 
+# 
+# match: cor do time, status do jogo, lado do time, coach
+# 
+# referee
+# 
+# robots: parametros
