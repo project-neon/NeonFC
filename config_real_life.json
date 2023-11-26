@@ -5,7 +5,7 @@
         "host_ip": "localhost",
         "blue_port": 30011,
         "yellow_port": 30012,
-        "vision_port": 10005,
+        "vision_port": 10015,
         "command_port": 20011,
         "replacer_port": 10004,
         "referee_port": 10003,

@@ -30,15 +30,23 @@ class Api_recv(threading.Thread):
 
 
             #List with informations that are needed to be recieved and changed with there are any modifications.
+
             needs = [['TEAM_COLOR',self.match.team_color], ['TEAM_SIDE', self.match.team_side], ['GAME_STATUS',self.match.game_status], 
                      ['COACH_NAME', self.match.coach_names]] 
+            
+            needs_dict ={}
 
+            for i in needs: 
+                needs_dict.update({i[1]: i[1]}) #Creates dictionary to change information in variable, not list
 
             for i in needs:
                 info = decoded_data.get(i[0], None)
 
                 if info and info != i[1]:
-                    i[1] = info #Changing informations on other files if any are needed
+                    if i[0] != 'TEAM_COLOR':
+                        needs_dict[i[1]] = info #Changing informations on other files if any are needed
+                    else:
+                        self.match.restart(info) #Function for team color change
 
                 
 
@@ -68,4 +76,4 @@ class Api_recv(threading.Thread):
 # 
 # referee
 # 
-# robots: parametros
+# robots (lista no match, ver como chamar cada parametro): parametros
