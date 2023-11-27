@@ -1,7 +1,11 @@
 import math
+import numpy as np
 from strategy.BaseStrategy import Strategy
-from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition
-from controller import PID_control, PID_W_control, NoController
+from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, AndTransition, OrTransition, \
+    NotTransition, OnNextTo
+from entities.plays.playbook import Trigger
+from controller import PID_control, PID_W_control, UniController
+from commons.math import point_in_rect
 from algorithms import UnivectorField
 
 
@@ -44,7 +48,7 @@ class FollowBallPlay(PlayerPlay):
 
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
-        return 0.06, y
+        return 0.04, y
 
 
 class InsideArea(PlayerPlay):
@@ -62,10 +66,23 @@ class InsideArea(PlayerPlay):
         self.robot.strategy.controller = controller(self.robot, W_MAX=10)
 
     def start(self):
-        pass
+        self.univector = UnivectorField(n=6, rect_size=.1)
+        self.field_w, self.field_h = self.match.game.field.get_dimensions()
 
     def update(self):
         ball = self.match.ball
+        theta_ball = math.atan2(0.3 - ball.y, 0.15 - ball.x) if ball.y < self.robot.y else math.atan2(1 - ball.y, 0.15 - ball.x)
+        ball_rx, ball_ry = ball.x + .05 * math.cos(theta_ball), ball.y + .05 * math.sin(theta_ball)
+
+        self.univector.set_target(g=(ball.x, ball.y), r=(ball_rx, ball_ry))
+
+        x, y = self.robot.x, self.robot.y
+
+        theta_d = self.univector.compute((x, y))
+        theta_f = self.univector.compute(
+            (x + self.dl * math.cos(self.robot.theta),
+             y + self.dl * math.sin(self.robot.theta))
+        )
 
         return ball.x, ball.y
 
@@ -79,16 +96,20 @@ class Spin(PlayerPlay):
 
     def start_up(self):
         super().start_up()
-        controller = NoController
-        self.robot.strategy.controller = controller(self.robot)
+        controller = PID_W_control
+        controller_kwargs = {'V_MAX': 0, 'V_MIN': 0, 'W_MAX': 100000000000, 'KP':-10000000}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
     def update(self):
-        if self.robot.y > self.match.ball.y:
-            w = 1_000
+        if self.robot.y > .65:
+            ang_diff = self.robot.theta - math.pi/2.1
         else:
-            w = -1_000
+            ang_diff = self.robot.theta + math.pi/2.1
 
-        return 0, w
+        x = self.robot.x + 0.5*math.cos(ang_diff)
+        y = self.robot.y + 0.5*math.sin(ang_diff)
+
+        return x, y
 
     def start(self):
         pass
@@ -121,7 +142,7 @@ class Rest(PlayerPlay):
 
 class Goalkeeper(Strategy):
     def __init__(self, match):
-        super().__init__(match, "Goalkeeper_RSM2023", controller=PID_control)
+        super().__init__(match, "Goalkeeper_LARC2023", controller=PID_control)
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -153,11 +174,6 @@ class Goalkeeper(Strategy):
         follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
 
         inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)
-        inside_area.add_transition(
-            AndTransition([
-                OnInsideBox(self.match, [-.5, .3, .65, .7], True),
-                off_near_ball])
-            , follow_ball)
         inside_area.add_transition(on_near_ball, spin)
 
         spin.add_transition(off_near_ball, follow_ball)
@@ -173,5 +189,4 @@ class Goalkeeper(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
-        print(self.playerbook.actual_play)
         return res

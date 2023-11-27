@@ -58,6 +58,9 @@ class LimitCycle(object):
 
         self.target = Target(*target)
 
+    def del_all_obstacles(self):
+        self.obstacles = []
+
     def add_obstacle(self, obstacle: Obstacle):
         '''
         Add an obstacle to the 'obstacles' list

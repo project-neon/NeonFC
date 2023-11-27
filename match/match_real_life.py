@@ -7,7 +7,7 @@ CATEGORIES = {
 }
 
 class MatchRealLife(object):
-    def __init__(self, game, team_side, team_color, coach_name=None, category="3v3", robot_ids=[0,1,2]):
+    def __init__(self, game, team_side, team_color, coach_name=None, category="3v3", robot_ids=[0,1,2], opposite_ids=[0,1,2]):
         super().__init__()
         self.game = game
         
@@ -17,10 +17,13 @@ class MatchRealLife(object):
         self.category = os.environ.get('CATEGORY', category)
         self.n_robots = CATEGORIES.get(self.category)
         self.robot_ids = os.environ.get('robot_ids', robot_ids)
+        self.opposite_ids = os.environ.get('opposite_ids', opposite_ids)
 
-        self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+        self.\
+            opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.game_status = 'STOP'
+        self.match_event = {'event': 'PLAYING', 'quadrant': 1, 'mine': True}
 
     
     def start(self):
@@ -28,7 +31,7 @@ class MatchRealLife(object):
         self.ball = entities.Ball(self.game)
 
         self.opposites = [
-            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
+            entities.Robot(self.game, i, self.opposite_team_color) for i in self.opposite_ids
         ]
 
         self.robots = [
@@ -47,7 +50,7 @@ class MatchRealLife(object):
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.opposites = [
-            entities.Robot(self.game, i, self.opposite_team_color) for i in range(self.n_robots)
+            entities.Robot(self.game, i, self.opposite_team_color) for i in [] # range(self.n_robots)
         ]
 
         self.robots = [
@@ -68,6 +71,21 @@ class MatchRealLife(object):
         
         for entity in self.robots:
             entity.update(frame)
+
+
+    def check_foul(self, ref):
+        if ref.can_play():
+            self.match_event['event'] = 'PLAYING'
+            self.game_status = 'GAME_ON'
+        else:
+            if ref.get_foul() == 'STOP':
+                self.game_status = 'STOP'
+                return
+            self.game_status = 'GAME_ON'
+
+            self.match_event['event'] = 'KICKOFF' if ref.get_foul() == None else ref.get_foul()
+            self.match_event['quadrant'] = ref.get_quadrant()
+            self.match_event['mine'] = ref.get_color() == self.team_color.upper()
 
 
     def decide(self):
