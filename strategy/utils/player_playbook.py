@@ -175,6 +175,13 @@ class OnNextTo(Trigger):
         is_nexto = self.next_to(self.p1, self.p2, self.distance, self.far)
         return is_nexto
 
+class DefaultToTransition(Trigger):
+    def __init__(self):
+        super().__init__()
+
+    def evaluate(self, *args, **kwargs):
+        return True
+
 class RobotOnInsideBox(Trigger):
     def __init__(self, match, box, robot, outside=False):
         super().__init__()

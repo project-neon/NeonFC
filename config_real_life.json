@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "yellow",
-        "coach_name": "LARC_2023Election",
+        "coach_name": "TEST",
         "category": "3v3",
         "robot_ids": [
             5,
@@ -25,7 +25,7 @@
         ]
     },
     "comm": {
-        "comm_port": "/dev/ttyUSB0",
+        "comm_port": "/dev/ttyUSB2",
         "baud_rate": 115200
     },
     "referee": false,
