@@ -2,11 +2,12 @@ import math
 import numpy as np
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, AndTransition, OrTransition, \
-    NotTransition, OnNextTo
+    NotTransition, OnNextTo, RobotOnInsideBox
 from entities.plays.playbook import Trigger
 from controller import PID_control, PID_W_control, UniController
 from commons.math import point_in_rect
 from algorithms import UnivectorField
+from algorithms.limit_cycle.limit_cycle import LimitCycle
 
 
 class FollowBallPlay(PlayerPlay):
@@ -48,7 +49,60 @@ class FollowBallPlay(PlayerPlay):
 
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
+        x_attack = 0.4
+
+        if ball.x >  1:
+            return x_attack, y
+        
         return 0.04, y
+
+
+class BackOff(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+        self.opposites = self.match.opposites
+        self.our_robots = []
+        self.ball = self.match.ball
+
+        for r in self.match.robots:
+            if r.robot_id != self.robot.robot_id:
+                self.our_robots.append(r)
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} BackOff>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs = {
+            'K_RHO': 1,
+            'V_MIN': 0,
+        }
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def start(self):
+        self.limit_cycle = LimitCycle(self.match)
+        self.field_w, self.field_h = self.match.game.field.get_dimensions()
+
+    def update(self):
+
+        self.limit_cycle.set_target((0.04, 0.65))
+
+        for r in self.opposites:
+            self.limit_cycle.add_obstacle((r.x, r.y, 0.06, False))
+
+        for r in self.our_robots:
+            self.limit_cycle.add_obstacle((r.x, r.y), 0.06, False)
+
+        self.limit_cycle.add_obstacle((self.ball.x, self.ball.y), 0.1, False)                
+        
+        try:
+            desired = self.limit_cycle.compute(self.robot)
+        except ZeroDivisionError:
+            desired = list((self.robot.x, self.robot.y))
+
+        return desired
 
 
 class InsideArea(PlayerPlay):
@@ -140,7 +194,7 @@ class Rest(PlayerPlay):
         return self.target
 
 
-class Goalkeeper(Strategy):
+class GoalkeeperChange(Strategy):
     def __init__(self, match):
         super().__init__(match, "GoalkeeperChange", controller=PID_control)
 
@@ -161,20 +215,26 @@ class Goalkeeper(Strategy):
         rest = Rest(self.match, self.robot)
         rest.start()
 
+        backoff = BackOff(self.match, self.robot)
+        backoff.start() 
+
         self.playerbook.add_play(follow_ball)
         self.playerbook.add_play(inside_area)
         self.playerbook.add_play(spin)
         self.playerbook.add_play(rest)
+        self.playerbook.add_play(backoff)
 
-        on_near_ball = OnNextTo(self.match.ball, self.robot, 0.09)
-        off_near_ball = OnNextTo(self.match.ball, self.robot, 0.12, True)
+        on_near_ball = OnNextTo(self.match.ball, self.robot, 0.11)
+        off_near_ball = OnNextTo(self.match.ball, self.robot, 0.15, True)
 
         follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)
-        follow_ball.add_transition(on_near_ball, spin)
-        follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
+        #follow_ball.add_transition(on_near_ball, spin)
+        follow_ball.add_transition(RobotOnInsideBox(self.match, [.75, -.3, 7, 1.9], self.robot), backoff)
 
         inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)
         inside_area.add_transition(on_near_ball, spin)
+
+        backoff.add_transition(RobotOnInsideBox(self.match, [.75, -.3, 7, 1.9], self.robot, True), follow_ball)
 
         spin.add_transition(off_near_ball, follow_ball)
         rest.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball)
@@ -191,3 +251,4 @@ class Goalkeeper(Strategy):
         res = self.playerbook.update()
         print(self.playerbook.actual_play)
         return res
+

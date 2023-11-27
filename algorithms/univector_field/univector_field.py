@@ -51,6 +51,8 @@ class UnivectorField:
         self.plot = plot
         self.path = path
 
+        self.define_borders((0.075 * 1.4 * 0.5))
+
     def set_target(self, g, r):
         """
         Defines the target position and a guiding point
