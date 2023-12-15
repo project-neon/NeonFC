@@ -29,44 +29,30 @@ class Api_recv(threading.Thread):
             #print(decoded_data)
 
 
-            #List with informations that are needed to be recieved and changed with there are any modifications.
+            #List with informations that are needed to be recieved and changed when there are any modifications.
 
-            needs = [['TEAM_COLOR',self.match.team_color], ['TEAM_SIDE', self.match.team_side], ['GAME_STATUS',self.match.game_status], 
-                     ['COACH_NAME', self.match.coach_names]] 
+            needs = [['TEAM_COLOR',self.match.team_color], ['TEAM_SIDE', self.match.team_side], ['GAME_STATUS',self.match.game_status]]
+                     #['COACH_NAME', self.match.coach_names]] 
             
             needs_dict ={}
-
-            for i in needs: 
-                needs_dict.update({i[1]: i[1]}) #Creates dictionary to change information in variable, not list
 
             for i in needs:
                 info = decoded_data.get(i[0], None)
 
-                if info and info != i[1]:
-                    if i[0] != 'TEAM_COLOR':
-                        needs_dict[i[1]] = info #Changing informations on other files if any are needed
-                    else:
-                        self.match.restart(info) #Function for team color change
+                if i[0] == 'TEAM_COLOR' and info != self.match.team_color:
+                        self.match.restart(info) #This function already changes the color of our team, and accordingly, changes the color of the other team.
+                elif i[0] != 'TEAM_COLOR':
+                    needs_dict.update({i[0]: info})
 
-                
-
-            # team_color = decoded_data.get('TEAM_COLOR', None)
-            # team_side = decoded_data.get('TEAM_SIDE', None)
-            # game_status = decoded_data.get('GAME_STATUS', None)
-
-            # # Change team color - Doesnt need to return color because it already changes on match team color inside the function
-            # if team_color and team_color != self.match.team_color:
-            #     self.match.restart(team_color)  
-            
-            # # Stop game and game on
-            # if game_status and game_status != self.match.game_status:
-            #     self.match.game_status = game_status
-
-            # # Change team side - returns team side
-            # if team_side and team_side != self.match.team_side:
-            #     self.match.team_side = team_side
+            self.match.update_information(**needs_dict) #calls function in match.py to update values.
 
 
+            #print('lista:', self.match.team_color, self.match.team_side, self.match.game_status)
+            #print('variaveis:', self.match.team_color, self.match.team_side, self.match.game_status)
+
+
+
+            self.match.update_information
 
             self.decod_data = decoded_data
 
