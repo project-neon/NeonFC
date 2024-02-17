@@ -1,5 +1,7 @@
 from socket import *
 import json
+import api.Info_api as Info_api
+
 
 class SingletonMeta(type):
     """
@@ -32,17 +34,8 @@ class Api(metaclass=SingletonMeta):
         self.obj_socket = socket(AF_INET, SOCK_DGRAM)
 
     # Sends dict game data to socket listener
-    def send_data(self, obj):
-        data_dict = dict({
-            'COACH_NAME' :  obj.coach_name,
-            'TEAM_COLOR' :  obj.team_color,
-            'CATEGORY' :    obj.category,
-            'TEAM_ROBOTS_POS' : [{f"{robot.robot_id}": (robot.x, robot.y, robot.theta)} for robot in obj.robots],
-            'OPPOSITE_ROBOTS_POS' : [{f"{robot.robot_id}": (robot.x, robot.y, robot.theta)} for robot in obj.opposites],
-            'BALL_POS' : (obj.ball.x, obj.ball.y),
-            'GAME_STATUS' : obj.game_status,
-            'TEAM_SIDE' : obj.team_side
-        })
+    def send_data(self):
+        data_dict = Info_api.organize_send()
         msg = json.dumps(data_dict)
         self.obj_socket.sendto(msg.encode(), (self.address, self.port))
     

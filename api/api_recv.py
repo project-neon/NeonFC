@@ -2,6 +2,7 @@ from socket import *
 import json
 import threading
 import struct
+import api.Info_api as Info_api
 
 class Api_recv(threading.Thread):
     def __init__(self, match, address, port):
@@ -28,38 +29,6 @@ class Api_recv(threading.Thread):
             # Feedback commands from socket (e.g. an interface)
             #print(decoded_data)
 
-
-            #List with informations that are needed to be recieved and changed when there are any modifications.
-
-            needs = [['TEAM_COLOR',self.match.team_color], ['TEAM_SIDE', self.match.team_side], ['GAME_STATUS',self.match.game_status]]
-                     #['COACH_NAME', self.match.coach_names]] 
-            
-            needs_dict ={}
-
-            for i in needs:
-                info = decoded_data.get(i[0], None)
-
-                if i[0] == 'TEAM_COLOR' and info != self.match.team_color:
-                        self.match.restart(info) #This function already changes the color of our team, and accordingly, changes the color of the other team.
-                elif i[0] != 'TEAM_COLOR':
-                    needs_dict.update({i[0]: info})
-
-            self.match.update_information(**needs_dict) #calls function in match.py to update values.
-
-
-            #print('lista:', self.match.team_color, self.match.team_side, self.match.game_status)
-            #print('variaveis:', self.match.team_color, self.match.team_side, self.match.game_status)
-
-
-
-            self.match.update_information
+            Info_api.update_recv(decoded_data)
 
             self.decod_data = decoded_data
-
-#Oq o NeonFC vai receber: 
-# 
-# match: cor do time, status do jogo, lado do time, coach
-# 
-# referee
-# 
-# robots (lista no match, ver como chamar cada parametro): parametros

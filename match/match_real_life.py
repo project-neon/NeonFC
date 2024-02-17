@@ -73,6 +73,7 @@ class MatchRealLife(object):
             entity.update(frame)
 
 
+
     def check_foul(self, ref):
         if ref.can_play():
             self.match_event['event'] = 'PLAYING'
@@ -87,6 +88,12 @@ class MatchRealLife(object):
             self.match_event['quadrant'] = ref.get_quadrant()
             self.match_event['mine'] = ref.get_color() == self.team_color.upper()
 
+
+    def update_information(self, **kwargs): #Function to update values recieved in api
+        for key, value in kwargs.items():
+            if hasattr(self, key.lower()):
+                setattr(self, key.lower(), value)
+                
 
     def decide(self):
         commands = []

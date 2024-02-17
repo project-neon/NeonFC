@@ -1,4 +1,4 @@
-from api import Api, Api_recv
+from api import Api, Api_recv, Info_api
 import comm
 import vision
 import match
@@ -30,11 +30,12 @@ class Game():
         self.api_address = self.config.get("network").get("api_address")
         self.api_port = self.config.get("network").get("api_port")
         self.api_recv_port = self.config.get("network").get("api_recv_port")
-
+ 
         self.referee = RefereeComm(config_file)
 
         self.api = Api(self.api_address, self.api_port)
         self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
+        self.Info_api = Info_api(self.match, self.match.robots, self.match.coach, self.match.ball)
 
         if os.environ.get('USE_REFEREE'):
             self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
