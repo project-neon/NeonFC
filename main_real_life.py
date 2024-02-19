@@ -1,12 +1,11 @@
 from api import Api, Api_recv
 import comm
-import vision
 import match
 import argparse
 import fields as pitch
 from commons.utils import get_config
 from pyVSSSReferee.RefereeComm import RefereeComm
-from vision.sslvision import assign_empty_values
+from pySSLVision.VisionComm import SSLVision, assign_empty_values
 import os
 
 parser = argparse.ArgumentParser(description='NeonFC')
@@ -21,7 +20,7 @@ class Game():
         self.match = match.MatchRealLife(self,
             **self.config.get('match')
         )
-        self.vision = vision.SSLVision()
+        self.vision = SSLVision()
         self.comm = comm.RLComm()
         self.field = pitch.Field(self.match.category)
         self.environment = env
@@ -44,7 +43,7 @@ class Game():
         self.start()
 
     def start(self):
-        self.vision.assign_vision(self)
+        self.vision.assign_vision(self.update)
         if self.use_referee:
             self.referee.start()
         self.match.start()
