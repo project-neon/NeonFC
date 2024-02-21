@@ -1,16 +1,16 @@
 from controller.PID_control import PID_control, PID_W_control
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlaybook, PlayerPlay, OnNextTo
-from algorithms.limit_cycle import LimitCycle
+from NeonPathPlanning import LimitCycle
+from itertools import chain
 
 
 class Target:
     def __init__(self, target_dict):
-        self.x = 0
-        self.y = 0
         self.target_dict = target_dict
         self.guide_x = 0
         self.guide_y = 0
+        self.target = []
 
     def update(self, foul, quadrant, mine):
         if foul == 'KICKOFF':
@@ -29,11 +29,21 @@ class Target:
             target = [0, 0]
             guide = [0, 0]
 
-        self.x = target[0]
-        self.y = target[1]
+        self.target = target
 
         self.guide_x = guide[0]
         self.guide_y = guide[1]
+
+    @property
+    def x(self):
+        return self.target[0]
+
+    @property
+    def y(self):
+        return self.target[1]
+
+    def __getitem__(self, item):
+        return self.target[item]
 
 
 class Position(PlayerPlay):
@@ -70,19 +80,22 @@ class Far(PlayerPlay):
         controller = PID_W_control
         controller_kwargs={'V_MIN': 0, 'V_MAX':0.1}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
-        self.limit_cycle = LimitCycle(self.match)
+        self.limit_cycle = LimitCycle()
+        self.limit_cycle.add_obstacle(self.match.ball, 0.13)
 
     def update(self):
-        self.limit_cycle.set_target((self.target.x, self.target.y))
-        self.limit_cycle.del_all_obstacles()
+        self.limit_cycle.set_target(self.target)
 
-        for robot in self.match.robots:
-            self.limit_cycle.add_obstacle((robot.x, robot.y, 0.11, 0))
-
-        for robot in self.match.opposites:
-            self.limit_cycle.add_obstacle((robot.x, robot.y, 0.13, 0))
-
-        self.limit_cycle.add_obstacle((self.match.ball.x, self.match.ball.y, 0.13, 0))
+        for robot in chain(self.match.robots, self.match.opposites):
+            if robot == self.robot:
+                continue
+            if robot.is_visible():
+                self.limit_cycle.add_obstacle(robot, 0.11)
+            else:
+                try:
+                    self.limit_cycle.del_obstacle(robot)
+                except KeyError:
+                    pass
 
         return self.limit_cycle.compute(self.robot)
 

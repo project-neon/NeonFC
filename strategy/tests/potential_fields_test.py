@@ -2,7 +2,7 @@ import math
 from collections import deque
 from strategy.BaseStrategy import Strategy
 from controller import PID_control, SimpleLQR, TwoSidesLQR, UniController
-from algorithms.potential_fields.fields import PotentialField, PointField, LineField, TangentialField
+from NeonPathPlanning.potential_fields import PotentialField, PointField, LineField, TangentialField
 
 class Fields_Test(Strategy):
     def __init__(self, match, plot_field=False):
