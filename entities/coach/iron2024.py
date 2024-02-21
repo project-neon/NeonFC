@@ -5,15 +5,15 @@ import json
 
 
 class Coach(BaseCoach):
-    NAME = "LARC_2023_E"
+    NAME = "IRON_2024"
 
     def __init__(self, match):
         super().__init__(match)
 
-        self.SS_strategy = strategy.larc2023.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.larc2023.MainStriker(self.match)
-        self.GK_strategy = strategy.larc2023.Goalkeeper(self.match)
-        self.GK_id = 5  # Goalkeeper fixed ID
+        self.SS_strategy = strategy.iron2024.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.iron2024.MainStriker(self.match)
+        self.GK_strategy = strategy.iron2024.Goalkeeper(self.match)
+        self.GK_id = 8  # Goalkeeper fixed ID
         positions = json.loads(open('foul_placements3v3.json', 'r').read())
         self._position = [strategy.commons.Replacer(self.match, positions[str(r.robot_id)]) for r in self.match.robots]
 

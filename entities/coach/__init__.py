@@ -4,19 +4,13 @@ from entities.coach.guideCoach import Coach as GuideCoach
 
 from entities.coach.test_coach import Coach as TestCoach
 
-from entities.coach.rcx2023 import Coach as RCX_2023
-
-from entities.coach.larc2023_E import Coach as LARC_2023_E
-
-from entities.coach.larc2023_Election import Coach as LARC_2023_CHANGE
+from entities.coach.iron2024 import Coach as IRON_2024
 
 _coach_list = [
     # Tournament coaches
     GuideCoach,
-    RCX_2023,
-    LARC_2023_E,
     TestCoach,
-    LARC_2023_CHANGE
+    IRON_2024
 ]
 
 COACHES = {c.NAME: c for c in _coach_list}
