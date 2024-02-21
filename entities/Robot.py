@@ -46,8 +46,8 @@ class Robot(object):
         self.vx, self.vy, self.vtheta = 0, 0, 0
         self.x, self.y, self.theta = 0, 0, 0
         self.speed = 0
-        self.last_frame = 0
-        self.actual_frame = 0
+        self.lost_frames = 0
+        self.visible = False
 
     def start(self):
         self.strategy.start(self)
@@ -56,11 +56,7 @@ class Robot(object):
         return 'ROBOT_{}_{}'.format(self.robot_id, self.team_color)
 
     def is_visible(self):
-        actual_frame = self.actual_frame
-        robot_frame = self.last_frame
-        if abs(actual_frame - robot_frame) > 45:
-            return False
-        return True
+        return self.visible
 
     def update(self, frame):
         team_color_key = 'robotsBlue' if self.team_color == 'blue' else 'robotsYellow'
@@ -69,7 +65,12 @@ class Robot(object):
 
         if len(robot_data) >= 1:
             self.current_data = robot_data[0]
+            self.lost_frames = 0
+            self.visible = True
         else:
+            self.lost_frames += 1
+            if self.lost_frames > 45:
+                self.visible = False
             return
 
         self._update_speeds()
