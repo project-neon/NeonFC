@@ -34,7 +34,7 @@ class Game():
 
         self.api = Api(self.api_address, self.api_port)
         self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
-        self.Info_api = Info_api(self.match, self.match.robots, self.match.coach, self.match.ball)
+        self.Info_api = Info_api(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
 
         self.use_referee = False
         

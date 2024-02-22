@@ -75,6 +75,7 @@ class PID_control(object):
         self.vision = robot.game.vision
         self.field_w, self.field_h = robot.game.field.get_dimensions()
         self.robot = robot
+        self.match = robot.game.match
         self.desired = [0, 0]
         self.environment = robot.game.environment
 
@@ -94,6 +95,12 @@ class PID_control(object):
         self.error = 0
 
         self.last_ki = self.KI
+
+        self.parameters = self.match.parameters
+        self.KP = self.parameters.kp
+        self.KD = self.parameters.kd
+        self.KI = self.parameters.ki
+
 
     def set_desired(self, vector):
         """
@@ -156,6 +163,14 @@ class PID_control(object):
             return tuple(np.dot(1000, powers))
 
         return v, w
+    
+    def update_parameters(self):
+        if self.KP != self.parameters.kp:
+            self.KP == self.parameters.kp
+        if self.KD != self.parameters.kd:
+            self.KD == self.parameters.kd
+        if self.KI != self.parameters.ki:
+            self.KI == self.parameters.ki
 
 
 class PID_W_control(PID_control):
