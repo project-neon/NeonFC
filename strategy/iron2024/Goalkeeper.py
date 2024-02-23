@@ -28,9 +28,6 @@ class FollowBallPlay(PlayerPlay):
         }
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
-    def start(self):
-        pass
-
     def update(self):
         ball = self.match.ball
 
@@ -60,8 +57,6 @@ class InsideArea(PlayerPlay):
         super().start_up()
         controller = PID_W_control
         self.robot.strategy.controller = controller(self.robot, W_MAX=10)
-
-    def start(self):
         self.univector = UnivectorField(n=6, rect_size=.1)
 
     def update(self):
@@ -97,9 +92,6 @@ class Spin(PlayerPlay):
 
         return x, y
 
-    def start(self):
-        pass
-
 
 class Rest(PlayerPlay):
     def __init__(self, match, robot):
@@ -118,9 +110,6 @@ class Rest(PlayerPlay):
         }
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
 
-    def start(self):
-        pass
-
     def update(self):
 
         return self.target
@@ -128,7 +117,7 @@ class Rest(PlayerPlay):
 
 class Goalkeeper(Strategy):
     def __init__(self, match):
-        super().__init__(match, "Goalkeeper_IRON2023", controller=PID_control)
+        super().__init__(match, "Goalkeeper", controller=PID_control)
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -136,16 +125,9 @@ class Goalkeeper(Strategy):
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
         follow_ball = FollowBallPlay(self.match, self.robot)  # 3
-        follow_ball.start()
-
         inside_area = InsideArea(self.match, self.robot)
-        inside_area.start()
-
         spin = Spin(self.match, self.robot)
-        spin.start()
-
         rest = Rest(self.match, self.robot)
-        rest.start()
 
         self.playerbook.add_play(follow_ball)
         self.playerbook.add_play(inside_area)
@@ -165,7 +147,7 @@ class Goalkeeper(Strategy):
         spin.add_transition(off_near_ball, follow_ball)
         rest.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball)
 
-        if self.playerbook.actual_play == None:
+        if self.playerbook.actual_play is None:
             self.playerbook.set_play(follow_ball)
 
     def reset(self, robot=None):

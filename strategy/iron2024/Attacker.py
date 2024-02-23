@@ -18,8 +18,6 @@ class MainPlay(PlayerPlay):
         super().start_up()
         controller = UniController
         self.robot.strategy.controller = controller(self.robot)
-
-    def start(self):
         self.univector = UnivectorField(n=6, rect_size=.1, field=VSSS)
 
     def update(self):
@@ -54,8 +52,6 @@ class WingPlay(PlayerPlay):
         super().start_up()
         controller = UniController
         self.robot.strategy.controller = controller(self.robot)
-
-    def start(self):
         self.univector = UnivectorField(n=6, rect_size=.1, field=VSSS)
 
     def update(self):
@@ -96,9 +92,6 @@ class CrossPlay(PlayerPlay):
 
         return 0, w
 
-    def start(self):
-        pass
-
 
 class Wait(PlayerPlay):
     def __init__(self, match, robot):
@@ -116,9 +109,6 @@ class Wait(PlayerPlay):
     def update(self):
         # print(self.position())
         return self.position()
-
-    def start(self):
-        pass
 
     def position(self):
         a = (.35, 1.1)
@@ -174,13 +164,9 @@ class MainStriker(Strategy):
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
         main = MainPlay(self.match, self.robot)
-        main.start()
         wing = WingPlay(self.match, self.robot)
-        wing.start()
         cross = CrossPlay(self.match, self.robot)
-        cross.start()
         defensive = Wait(self.match, self.robot)
-        defensive.start()
         angle = LookAtBall(self.match, self.robot)
 
         self.playerbook.add_play(main)

@@ -10,6 +10,7 @@ from controller.PID_control import PID_control, PID_W_control
 class MainPlay(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
+        self.dl = 0.000001
 
     def get_name(self):
         return f"<{self.robot.get_name()} Shadow Position Planning>"
@@ -19,12 +20,13 @@ class MainPlay(PlayerPlay):
         controller = UniController
         controller_kwargs = {'control_speed': True}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+        self.univector = UnivectorField(n=.3, rect_size=.1)
 
     def update(self):
         ball = self.match.ball
         main_st = next(filter(lambda r:r.strategy.name == "Main_Attacker", self.match.robots))
         obs_radius = distance_between_points(main_st, ball)
-        gk = next(filter(lambda r:r.strategy.name == "Goalkeeper_IRON2023", self.match.robots))
+        gk = next(filter(lambda r:r.strategy.name == "Goalkeeper", self.match.robots))
 
         # second attacker offset on x based on the distance of the main attacker to the ball
         # second attacker offset on y based on the distance of the ball to the center
@@ -46,10 +48,6 @@ class MainPlay(PlayerPlay):
 
         return theta_d, theta_f
 
-    def start(self):
-        self.univector = UnivectorField(n=.3, rect_size=.1)
-        self.dl = 0.000001
-
 
 class Wait(PlayerPlay):
     def __init__(self, match, robot):
@@ -66,9 +64,6 @@ class Wait(PlayerPlay):
 
     def update(self):
         return self.position()
-
-    def start(self):
-        pass
 
     def position(self):
         a = (.35, 1.1)
@@ -89,9 +84,6 @@ class Wait(PlayerPlay):
         else:
             return b
 
-    def start(self):
-        pass
-
 
 class LookAtBall(PlayerPlay):
     def __init__(self, match, robot):
@@ -109,9 +101,6 @@ class LookAtBall(PlayerPlay):
     def update(self):
         return self.match.ball.x, self.match.ball.y
 
-    def start(self):
-        pass
-
 class ShadowAttacker(Strategy):
     def __init__(self, match, name="Shadow_Attacker"):
         super().__init__(match, name, controller=UniController, controller_kwargs={'control_speed': True})
@@ -123,11 +112,8 @@ class ShadowAttacker(Strategy):
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
         main = MainPlay(self.match, self.robot)
-        main.start()
         defensive = Wait(self.match, self.robot)
-        defensive.start()
         angle = LookAtBall(self.match, self.robot)
-        angle.start()
 
         self.playerbook.add_play(main)
         self.playerbook.add_play(defensive)
