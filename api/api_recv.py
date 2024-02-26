@@ -2,7 +2,6 @@ from socket import *
 import json
 import threading
 import struct
-import api.Info_api as Info_api
 
 class Api_recv(threading.Thread):
     def __init__(self, match, address, port):
@@ -15,6 +14,10 @@ class Api_recv(threading.Thread):
         self.port = port
         self.buffer_size = BUFFER_SIZE
         self.decod_data = None   
+
+
+    def connect_info(self,Info_api):
+        self.Info_api = Info_api
 
     # Receives data
     def run(self):
@@ -29,6 +32,6 @@ class Api_recv(threading.Thread):
             # Feedback commands from socket (e.g. an interface)
             #print(decoded_data)
 
-            Info_api.update_recv(decoded_data)
+            self.Info_api.update_recv(decoded_data)
 
             self.decod_data = decoded_data
