@@ -11,7 +11,6 @@ class Info_Api():
 
         self.data = {}
 
-
     def organize_send(self):
 
         data_send = dict({
@@ -28,13 +27,12 @@ class Info_Api():
 
 
     def update_recv(self,info_recv):
-
+        print('a')
         self.match.update_information(**info_recv)
-
-        for robot in self.robots:
-            self.robot.update_information(**info_recv)
         
         self.parameters.update_information(**info_recv)
+
+        print(self.parameters)
 
         self.save_data(info_recv)
         

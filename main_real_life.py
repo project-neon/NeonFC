@@ -1,4 +1,4 @@
-from api import Api, Api_recv, Info_api
+from api import Api, Api_recv, Info_Api
 import comm
 import vision
 import match
@@ -34,7 +34,6 @@ class Game():
 
         self.api = Api(self.api_address, self.api_port)
         self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
-        self.Info_api = Info_api(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
 
         self.use_referee = False
         
@@ -48,8 +47,12 @@ class Game():
         self.comm.start()
 
         if self.use_api:
+            self.Info_api = Info_Api(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
             self.api.start()
+            self.api_recv.connect_info(self.Info_api)
             self.api_recv.start()
+
+
 
     def update(self):
         frame = assign_empty_values(
@@ -76,6 +79,6 @@ class Game():
         self.comm.send(commands)
 
         if self.use_api:
-            self.api.send_data(self.match)
+            self.api.send_data(self.Info_api)
             
 g = Game(config_file=args.config_file, env=args.env)
