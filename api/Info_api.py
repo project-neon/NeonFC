@@ -27,12 +27,9 @@ class Info_Api():
 
 
     def update_recv(self,info_recv):
-        print('a')
         self.match.update_information(**info_recv)
         
         self.parameters.update_information(**info_recv)
-
-        print(self.parameters)
 
         self.save_data(info_recv)
         
