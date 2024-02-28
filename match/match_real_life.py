@@ -19,7 +19,7 @@ class MatchRealLife(object):
         self.n_robots = CATEGORIES.get(self.category)
         self.robot_ids = os.environ.get('robot_ids', robot_ids)
         self.opposite_ids = os.environ.get('opposite_ids', opposite_ids)
-        self.parameters = Parameter()
+        self.parameter = Parameter()
 
         self.\
             opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'

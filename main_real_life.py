@@ -53,7 +53,7 @@ class Game():
         self.comm.start()
 
         if self.use_api:
-            self.Info_api = Info_Api(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
+            self.Info_api = Info_Api(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameter)
             self.api.start()
             self.api_recv.connect_info(self.Info_api)
             self.api_recv.start()

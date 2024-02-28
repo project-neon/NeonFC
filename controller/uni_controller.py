@@ -68,11 +68,11 @@ class UniController(object):
         self.theta_e = 0
         self.a_theta_e = 0  # absolute value of theta_e
 
-        self.parameters = self.match.parameters
-        self.K_P = self.parameters.kp
-        self.K_W = self.parameters.kw
-        self.R_M = self.parameters.rm
-        self.V_M = self.parameters.vm
+        self.parameter = self.match.parameter
+        self.K_P = self.parameter.kp
+        self.K_W = self.parameter.kw
+        self.R_M = self.parameter.rm
+        self.V_M = self.parameter.vm
         
         self.target = [1.5, 0.65]
 
@@ -148,11 +148,11 @@ class UniController(object):
         return -v, -w
 
     def update_parameters(self):
-        if self.K_P != self.parameters.kp:
-            self.K_P == self.parameters.kp
-        if self.K_W != self.parameters.kw:
-            self.K_W == self.parameters.kw
-        if self.R_M != self.parameters.rm:
-            self.R_M == self.parameters.rm
-        if self.V_M != self.parameters.vm:
-            self.V_M == self.parameters.vm
+        if self.K_P != self.parameter.kp:
+            self.K_P == self.parameter.kp
+        if self.K_W != self.parameter.kw:
+            self.K_W == self.parameter.kw
+        if self.R_M != self.parameter.rm:
+            self.R_M == self.parameter.rm
+        if self.V_M != self.parameter.vm:
+            self.V_M == self.parameter.vm
