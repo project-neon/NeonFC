@@ -1,4 +1,4 @@
-from api import Api, Api_recv, Info_Api
+from api import Api, Api_recv, InfoApi
 import comm
 import vision
 import match
@@ -47,9 +47,9 @@ class Game():
         self.comm.start()
 
         if self.use_api:
-            self.Info_api = Info_Api(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
+            self.info_api = InfoApi(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
             self.api.start()
-            self.api_recv.connect_info(self.Info_api)
+            self.api_recv.connect_info(self.info_api)
             self.api_recv.start()
 
 
@@ -79,6 +79,6 @@ class Game():
         self.comm.send(commands)
 
         if self.use_api:
-            self.api.send_data(self.Info_api)
+            self.api.send_data(self.info_api)
             
 g = Game(config_file=args.config_file, env=args.env)

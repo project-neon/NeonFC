@@ -16,8 +16,8 @@ class Api_recv(threading.Thread):
         self.decod_data = None   
 
 
-    def connect_info(self,Info_api):
-        self.Info_api = Info_api
+    def connect_info(self,info_api):
+        self.info_api = info_api
 
     # Receives data
     def run(self):
@@ -32,6 +32,6 @@ class Api_recv(threading.Thread):
             # Feedback commands from socket (e.g. an interface)
             #print(decoded_data)
 
-            self.Info_api.update_recv(decoded_data)
+            self.info_api.update_recv(decoded_data)
 
             self.decod_data = decoded_data

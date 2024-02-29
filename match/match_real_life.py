@@ -19,10 +19,14 @@ class MatchRealLife(object):
         self.n_robots = CATEGORIES.get(self.category)
         self.robot_ids = os.environ.get('robot_ids', robot_ids)
         self.opposite_ids = os.environ.get('opposite_ids', opposite_ids)
-        self.parameters = Parameter()
+        
 
-        self.\
-            opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+        pid_kp, ki, kd = Parameter(0.1, ('pid_kp')), Parameter(0, ('ki')), Parameter(0, ('kd'))
+        kw, rm, vm, uni_kp = Parameter(3.5, ('pid_kp')), Parameter(0.44, ('ki')), Parameter(0.5, ('kd')), Parameter(1, 'uni_kp')
+
+        self.parameters = [pid_kp, ki, kd, kw, rm, vm, uni_kp]
+
+        self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.game_status = 'STOP'
         self.match_event = {'event': 'PLAYING', 'quadrant': 1, 'mine': True}

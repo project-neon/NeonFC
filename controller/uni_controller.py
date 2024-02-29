@@ -68,10 +68,10 @@ class UniController(object):
         self.a_theta_e = 0  # absolute value of theta_e
 
         self.parameters = self.match.parameters
-        self.K_P = self.parameters.kp
-        self.K_W = self.parameters.kw
-        self.R_M = self.parameters.rm
-        self.V_M = self.parameters.vm
+        self.K_P = self.parameters[3]
+        self.K_W = self.parameters[4]
+        self.R_M = self.parameters[5]
+        self.V_M = self.parameters[6]
         
         self.target = [1.5, 0.65]
 

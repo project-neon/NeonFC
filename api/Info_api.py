@@ -1,5 +1,4 @@
-
-class Info_Api():
+class InfoApi():
     def __init__(self, match, robots, opposites, coach, ball, parameters)  :
         
         self.match = match
@@ -12,7 +11,6 @@ class Info_Api():
         self.data = {}
 
     def organize_send(self):
-
         data_send = dict({
             'COACH_NAME' :  self.match.coach_name,
             'TEAM_ROBOTS_POS' : [{f"{robot.robot_id}": (robot.x, robot.y, robot.theta)} for robot in self.robots],
@@ -29,7 +27,8 @@ class Info_Api():
     def update_recv(self,info_recv):
         self.match.update_information(**info_recv)
         
-        self.parameters.update_information(**info_recv)
+        for parameter in self.parameters:
+            parameter.update(**info_recv)
 
         self.save_data(info_recv)
         

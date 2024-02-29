@@ -97,9 +97,9 @@ class PID_control(object):
         self.last_ki = self.KI
 
         self.parameters = self.match.parameters
-        self.KP = self.parameters.kp
-        self.KD = self.parameters.kd
-        self.KI = self.parameters.ki
+        self.KP = self.parameters[0]
+        self.KD = self.parameters[1]
+        self.KI = self.parameters[2]
 
 
     def set_desired(self, vector):
@@ -163,14 +163,6 @@ class PID_control(object):
             return tuple(np.dot(1000, powers))
 
         return v, w
-    
-    def update_parameters(self):
-        if self.KP != self.parameters.kp:
-            self.KP == self.parameters.kp
-        if self.KD != self.parameters.kd:
-            self.KD == self.parameters.kd
-        if self.KI != self.parameters.ki:
-            self.KI == self.parameters.ki
 
 
 class PID_W_control(PID_control):
