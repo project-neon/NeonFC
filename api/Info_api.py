@@ -30,7 +30,7 @@ class Info_Api():
         self.match.update_information(**info_recv)
         
         for parameter in self.parameters:
-            parameter.update(**info_recv)
+            self.parameters[parameter].update(**info_recv)
 
         self.save_data(info_recv)
         

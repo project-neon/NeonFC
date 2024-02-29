@@ -22,3 +22,15 @@ class Parameter:
 
     def __pow__(self, power):
         return self.value ** power
+    
+    def __lt__(self, value): 
+        return self.value < value
+    
+    def __gt__(self, value): 
+        return self.value > value
+    
+    def __le__(self, value): 
+        return self.value <= value
+
+    def __ge__(self, value): 
+          return self.value >= value
