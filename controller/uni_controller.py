@@ -68,10 +68,12 @@ class UniController(object):
         self.a_theta_e = 0  # absolute value of theta_e
 
         self.parameters = self.match.parameters
-        self.K_P = self.parameters[3]
-        self.K_W = self.parameters[4]
-        self.R_M = self.parameters[5]
-        self.V_M = self.parameters[6]
+        self.K_W = self.parameters['kw']
+        self.R_M = self.parameters['rm']
+        self.V_M = self.parameters['vm']
+        self.K_P = self.parameters['uni_kp']
+
+
         
         self.target = [1.5, 0.65]
 
@@ -80,8 +82,6 @@ class UniController(object):
         x, y, q: robot's posture (x position, t position, robot's angle)
         returns: v and w, linear and angular speed, respectively
         """
-
-        self.update_parameters()
 
         self.phi_v = self.theta_f - self.theta_d
 
@@ -146,13 +146,3 @@ class UniController(object):
 
         # w = w if abs(w) < 4 else 4 * w / abs(w)
         return -v, -w
-
-    def update_parameters(self):
-        if self.K_P != self.parameters.kp:
-            self.K_P == self.parameters.kp
-        if self.K_W != self.parameters.kw:
-            self.K_W == self.parameters.kw
-        if self.R_M != self.parameters.rm:
-            self.R_M == self.parameters.rm
-        if self.V_M != self.parameters.vm:
-            self.V_M == self.parameters.vm

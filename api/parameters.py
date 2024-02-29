@@ -8,12 +8,15 @@ class Parameter:
     def update(self, **kwargs):
         for key, value in kwargs.items():
             if key == 'PARAMETERS':
-                self.value = value[self.addr[0]][self.addr[1]]
+                self.value = value[self.addr]
         
     def __add__(self, value):
         return self.value + value
         
     def __mul__(self, value):
+        return self.value * value
+    
+    def __rmul__(self, value):
         return self.value * value
        
     def __pow__(self, power):

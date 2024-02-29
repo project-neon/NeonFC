@@ -97,9 +97,9 @@ class PID_control(object):
         self.last_ki = self.KI
 
         self.parameters = self.match.parameters
-        self.KP = self.parameters[0]
-        self.KD = self.parameters[1]
-        self.KI = self.parameters[2]
+        self.KP = self.parameters['pid_kp']
+        self.KD = self.parameters['kd']
+        self.KI = self.parameters['ki']
 
 
     def set_desired(self, vector):
