@@ -166,6 +166,12 @@ class Robot(object):
             'wheel_right': power_right,
             'color': self.team_color
         }
+    
+
+    def update_information(self, **kwargs): #Function to update values recieved in api
+        for key, value in kwargs.items():
+            if hasattr(self, key.lower()):
+                setattr(self, key.lower(), value)
 
     def __getitem__(self, item):
         if item == 0:

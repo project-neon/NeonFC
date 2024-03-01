@@ -5,18 +5,18 @@
         "host_ip": "localhost",
         "blue_port": 30011,
         "yellow_port": 30012,
-        "vision_port": 10322,
+        "vision_port": 10015,
         "command_port": 20011,
         "replacer_port": 10004,
         "referee_port": 10312,
         "api_address": "127.0.0.1",
-        "api_port" : 43220,
-        "api_recv_port": 43221
+        "api_port" : 43210,
+        "api_recv_port": 43211
     },
     "match" : {
         "team_side": "left",
-        "team_color": "blue",
-        "coach_name": "LARC_2023_E",
+        "team_color": "yellow",
+        "coach_name": "TEST",
         "category": "3v3",
         "robot_ids": [
             5,
@@ -34,6 +34,6 @@
         "baud_rate": 115200
     },
     "referee": false,
-    "data_sender": false,
+    "data_sender": true,
     "api": true
 }
