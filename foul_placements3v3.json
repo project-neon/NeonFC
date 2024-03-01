@@ -1,0 +1,148 @@
+{
+    "5": {
+        "KICKOFF": {
+            "True": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            },
+            "False": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            }
+        },
+        "FREE_BALL": {
+            "QUADRANT_3": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            },
+            "QUADRANT_4": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            },
+            "QUADRANT_1": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            },
+            "QUADRANT_2": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            }
+        },
+        "GOAL_KICK": {
+            "False": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            },
+            "True": {
+                "robot" : [0.2, 0.34], "guide": [0, 0.65]
+            }
+        },
+        "PENALTY_KICK": {
+            "True": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            },
+            "False": {
+                "robot" : [0.8625, 0.35], "guide": [0.9125, 0.35]
+            }
+        },
+        "FREE_KICK": {
+            "True": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            },
+            "False": {
+                "robot" : [0.05, 0.65], "guide": [0.05, 0]
+            }
+        }
+
+    },
+
+    "7": {
+        "KICKOFF": {
+            "True": {
+                "robot" : [0.69, 0.65], "guide": [0.85, 0.65]
+            },
+            "False": {
+                "robot" : [0.45, 0.65], "guide": [0.6, 0.65]
+            }
+        },
+        "FREE_BALL": {
+            "QUADRANT_3": {
+                "robot" : [0.135, 0.25], "guide": [0.375, 0.25]
+            },
+            "QUADRANT_4": {
+                "robot" : [0.885, 0.25], "guide": [1.125, 0.25]
+            },
+            "QUADRANT_1": {
+                "robot" : [0.885, 1.05], "guide": [1.125, 1.05]
+            },
+            "QUADRANT_2": {
+                "robot" : [0.135, 1.05], "guide": [0.375, 1.05]
+            }
+        },
+        "GOAL_KICK": {
+            "False":{
+                "robot" : [0.35, 1.075], "guide": [0.40, 1.075]
+            },
+            "True": {
+                "robot" : [0.25, 1], "guide": [1.5, 0.65]
+            }
+        },
+        "PENALTY_KICK": {
+            "True": {
+                "robot" : [1.07, 0.65], "guide": [1.5, 0.65]
+            },
+            "False": {
+                "robot" : [0.03, 0.65], "guide": [0.5, 0.65]
+            }
+        },
+        "FREE_KICK": {
+            "True": {
+                "robot" : [0.975, 0.75], "guide": [1.025, 0.75]
+            },
+            "False": {
+                "robot" : [0.05, 0.65], "guide": [1, 0.65]
+            }
+        }
+    },
+    "8": {
+        "KICKOFF": {
+            "True": {
+                "robot" : [0.45, 0.65], "guide": [0.85, 0.65]
+                 },
+            "False": {
+                "robot" : [0.35, 0.65], "guide": [0.6, 0.65]
+                }
+        },
+        "FREE_BALL": {
+            "QUADRANT_3": {
+                "robot" : [0.3, 0.8], "guide": [0.375, 0.25]
+            },
+            "QUADRANT_4": {
+                "robot" : [0.68, 0.65], "guide": [1.125, 0.25]
+            },
+            "QUADRANT_1": {
+                "robot" : [0.68, 0.65], "guide": [1.125, 1.05]
+            },
+            "QUADRANT_2": {
+                "robot" : [0.3, 0.5], "guide": [0.375, 1.05]
+            }
+        },
+        "GOAL_KICK": {
+            "False":{
+                "robot" : [0.50, 0.65], "guide": [0.55, 0.275]
+            },
+            "True": {
+                "robot" : [0.07, 0.65], "guide": [1.5, 0.65]
+            }
+        },
+        "PENALTY_KICK": {
+            "True": {
+                "robot" : [0.5, 0.9], "guide": [1.5, 0.65]
+            },
+            "False": {
+                "robot" : [0.8, 1], "guide": [0.9, 1]
+            }
+        },
+        "FREE_KICK": {
+            "True": {
+                "robot" : [0.637, 1.15], "guide": [0.6837, 1.15]
+            },
+            "False": {
+                "robot" : [0.9125, 1.10], "guide": [0.8625, 1.10]
+            }
+        }
+    }
+}

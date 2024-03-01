@@ -25,7 +25,8 @@ class MatchRealLife(object):
 
         self.parameters = {"pid_kp":pid_kp, "ki":ki, "kd":kd, "kw":kw, "rm":rm, "vm":vm, "uni_kp":uni_kp}
 
-        self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+        self.\
+            opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.game_status = 'STOP'
         self.match_event = {'event': 'PLAYING', 'quadrant': 1, 'mine': True}
@@ -76,9 +77,7 @@ class MatchRealLife(object):
         
         for entity in self.robots:
             entity.update(frame)
-
-
-
+            
     def check_foul(self, ref):
         if ref.can_play():
             self.match_event['event'] = 'PLAYING'
@@ -99,7 +98,6 @@ class MatchRealLife(object):
             if hasattr(self, key.lower()):
                 setattr(self, key.lower(), value)
                 
-
     def decide(self):
         commands = []
         commands_futures = []

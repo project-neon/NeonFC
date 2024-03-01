@@ -2,7 +2,7 @@ import math
 from collections import deque
 from strategy.BaseStrategy import Strategy
 from controller import PID_control, PID_W_control, SimpleLQR, TwoSidesLQR, UniController
-from algorithms.limit_cycle import LimitCycle
+from NeonPathPlanning import LimitCycle
 
 class LimitCycle_Test(Strategy):
     def __init__(self, match, plot_field=False):
