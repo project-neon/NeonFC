@@ -1,6 +1,5 @@
 from strategy import tests
-from strategy import rcx2023
-from strategy import larc2023
+from strategy import iron2024
 from strategy.BaseStrategy import Strategy
 from strategy import commons
 

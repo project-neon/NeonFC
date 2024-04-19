@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from commons.math import speed_to_power
+from api import Parameter
 
 """
 Angle based controller
@@ -67,6 +68,14 @@ class UniController(object):
         self.theta_e = 0
         self.a_theta_e = 0  # absolute value of theta_e
 
+        self.parameters = self.match.parameters
+        self.K_W = self.parameters['kw']
+        self.R_M = self.parameters['rm']
+        self.V_M = self.parameters['vm']
+        self.K_P = self.parameters['uni_kp']
+
+
+        
         self.target = [1.5, 0.65]
 
     def control(self):

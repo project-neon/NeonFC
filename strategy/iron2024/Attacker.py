@@ -1,5 +1,5 @@
 import numpy as np
-from algorithms import UnivectorField
+from NeonPathPlanning import UnivectorField, VSSS, Point
 import math
 from controller import PID_W_control, PID_control, UniController, NoController
 from strategy.BaseStrategy import Strategy
@@ -18,25 +18,21 @@ class MainPlay(PlayerPlay):
         super().start_up()
         controller = UniController
         self.robot.strategy.controller = controller(self.robot)
-
-    def start(self):
-        self.univector = UnivectorField(n=6, rect_size=.1)
-        self.field_w, self.field_h = self.match.game.field.get_dimensions()
+        self.univector = UnivectorField(n=6, rect_size=.1, field=VSSS)
 
     def update(self):
-        ball_x, ball_y = self.match.ball.x, self.match.ball.y
-        theta_ball = math.atan2(0.65 - ball_y, 1.6 - ball_x)
-        ball_rx, ball_ry = ball_x + .05 * math.cos(theta_ball), ball_y + .05 * math.sin(theta_ball)
+        ball = self.match.ball
+        guide = math.atan2(0.65 - ball.y, 1.6 - ball.x)
 
-        self.univector.set_target(g=(ball_x, ball_y), r=(ball_rx, ball_ry))
+        self.univector.set_target(target=ball, guide=guide, guide_type='a')
 
-        x, y = self.robot.x, self.robot.y
+        robot =  self.robot
 
-        theta_d = self.univector.compute((x, y))
-        theta_f = self.univector.compute(
-            (x + self.dl * math.cos(self.robot.theta),
-             y + self.dl * math.sin(self.robot.theta))
-        )
+        theta_d = self.univector.compute(robot)
+        theta_f = self.univector.compute(Point(
+            robot.x + self.dl * math.cos(robot.theta),
+            robot.y + self.dl * math.sin(robot.theta)
+        ))
 
         return theta_d, theta_f
 
@@ -56,89 +52,24 @@ class WingPlay(PlayerPlay):
         super().start_up()
         controller = UniController
         self.robot.strategy.controller = controller(self.robot)
-
-    def start(self):
-        self.univector = UnivectorField(n=6, rect_size=.1)
-        self.field_w, self.field_h = self.match.game.field.get_dimensions()
+        self.univector = UnivectorField(n=6, rect_size=.1, field=VSSS)
 
     def update(self):
-        target = [self.match.ball.x, self.match.ball.y]
+        ball = self.match.ball
 
-        target[1] = min(self.BALL_Y_MAX, target[1])
-        target[1] = max(self.BALL_Y_MIN, target[1])
+        target = Point(ball.x, max(self.BALL_Y_MIN, min(self.BALL_Y_MAX, ball.y)))
 
-        ball_x, ball_y = target[0], target[1]
-        theta_ball = math.atan2(target[1] - ball_y, 1.6 - ball_x)
-        ball_rx, ball_ry = ball_x + .05 * math.cos(theta_ball), ball_y + .05 * math.sin(theta_ball)
+        self.univector.set_target(target=target, guide=math.pi/2, guide_type='a')
 
-        self.univector.set_target(g=(ball_x, ball_y), r=(ball_rx, ball_ry))
+        robot =  self.robot
 
-        x, y = self.robot.x, self.robot.y
-
-        theta_d = self.univector.compute((x, y))
-        theta_f = self.univector.compute(
-            (x + self.dl * math.cos(self.robot.theta),
-             y + self.dl * math.sin(self.robot.theta))
-        )
+        theta_d = self.univector.compute(robot)
+        theta_f = self.univector.compute(Point(
+            robot.x + self.dl * math.cos(robot.theta),
+            robot.y + self.dl * math.sin(robot.theta)
+        ))
 
         return theta_d, theta_f
-
-    def get_virtual_obstacle(self, target):
-        """
-        - m:    angle of the line perpendicular to the line between the ball and
-                the center of the goal
-        - p:    distance of the virtual obstacles to the ball / radius of the virtual obstacle
-        - vo:   virtual obstacle
-        - j:    this is the angle between the ball and the center of the goal
-        - m:    the normal angle perpendicular to j
-        - r:    radius of the ball
-        """
-        aim_point = [self.field_w, self.BALL_Y_MAX] if target[1] > .65 else [self.field_w, self.BALL_Y_MIN]
-
-        j = math.atan2(aim_point[1] - target[1], aim_point[0] - target[0])
-        m = j + math.pi / 2
-        p = 0.1
-
-        r = .0427 / 2
-
-        '''
-        the terms r*cos(j) and r*sin(j) are subtracted to move
-        the center of the obstacles behind the ball instead of its center
-        '''
-        if self.robot.y < math.tan(j) * (self.robot.x - target[0]) + target[1]:
-            virtual_obstacle = (
-                target[0] - p * math.cos(m) - r * math.cos(j),
-                target[1] - p * math.sin(m) - r * math.sin(j),
-                p,
-                1
-            )
-        else:
-            virtual_obstacle = (
-                target[0] + p * math.cos(m) - r * math.cos(j),
-                target[1] + p * math.sin(m) - r * math.sin(j),
-                p,
-                -1
-            )
-
-        return virtual_obstacle
-
-    def behind_ball(self, aim_point):
-        # Convert input to numpy arrays for easy calculation
-        point_on_line = np.array((self.match.ball.x, self.match.ball.y))
-        point_on_normal = np.array(aim_point)
-        point_to_check = np.array((self.robot.x, self.robot.y))
-
-        # Calculate the normal vector of the line
-        normal = point_on_normal - point_on_line
-
-        # Calculate the vector from the point on the line to the point to check
-        vector_to_check = point_to_check - point_on_line
-
-        # Calculate the dot product of the normal vector and the vector to check
-        dot_product = np.dot(normal, vector_to_check)
-
-        # Check the sign of the dot product to determine if the point is to the right or left of the line
-        return dot_product > 0
 
 
 class CrossPlay(PlayerPlay):
@@ -161,9 +92,6 @@ class CrossPlay(PlayerPlay):
 
         return 0, w
 
-    def start(self):
-        pass
-
 
 class Wait(PlayerPlay):
     def __init__(self, match, robot):
@@ -181,9 +109,6 @@ class Wait(PlayerPlay):
     def update(self):
         # print(self.position())
         return self.position()
-
-    def start(self):
-        pass
 
     def position(self):
         a = (.35, 1.1)
@@ -235,19 +160,13 @@ class MainStriker(Strategy):
     def start(self, robot=None):
         super().start(robot=robot)
 
-        field_dim = self.match.game.field.get_dimensions()
-
         # Criando Player Playbook: A maquina de estados do jogador
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
         main = MainPlay(self.match, self.robot)
-        main.start()
         wing = WingPlay(self.match, self.robot)
-        wing.start()
         cross = CrossPlay(self.match, self.robot)
-        cross.start()
         defensive = Wait(self.match, self.robot)
-        defensive.start()
         angle = LookAtBall(self.match, self.robot)
 
         self.playerbook.add_play(main)
@@ -264,10 +183,10 @@ class MainStriker(Strategy):
         off_near_ball = OnNextTo(self.match.ball, self.robot, 0.1, True)
         on_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7], False)
         off_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7], True)
-        on_positon_1 = OnNextTo([.35, 1.1], self.robot, 0.1, False)
-        off_positon_1 = OnNextTo([.35, 1.1], self.robot, 0.1, True)
-        on_positon_2 = OnNextTo([.35, .2], self.robot, 0.1, False)
-        off_positon_2 = OnNextTo([.35, .2], self.robot, 0.1, True)
+        on_position_1 = OnNextTo([.35, 1.1], self.robot, 0.1, False)
+        off_position_1 = OnNextTo([.35, 1.1], self.robot, 0.1, True)
+        on_position_2 = OnNextTo([.35, .2], self.robot, 0.1, False)
+        off_position_2 = OnNextTo([.35, .2], self.robot, 0.1, True)
 
         main.add_transition(on_wing, wing)
         wing.add_transition(off_wing, main)
@@ -280,9 +199,9 @@ class MainStriker(Strategy):
         main.add_transition(on_defensive_box, defensive)
         defensive.add_transition(off_defensive_box, main)
 
-        defensive.add_transition(on_positon_1, angle)
-        defensive.add_transition(on_positon_2, angle)
-        angle.add_transition(AndTransition([off_positon_1, off_positon_2]), defensive)
+        defensive.add_transition(on_position_1, angle)
+        defensive.add_transition(on_position_2, angle)
+        angle.add_transition(AndTransition([off_position_1, off_position_2]), defensive)
         angle.add_transition(off_defensive_box, main)
 
         # Estado inicial

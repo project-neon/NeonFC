@@ -1,4 +1,4 @@
-from algorithms import UnivectorField
+from NeonPathPlanning import UnivectorField, Point
 import math
 from controller.uni_controller import UniController
 from strategy.BaseStrategy import Strategy
@@ -10,6 +10,7 @@ from controller.PID_control import PID_control, PID_W_control
 class MainPlay(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
+        self.dl = 0.000001
 
     def get_name(self):
         return f"<{self.robot.get_name()} Shadow Position Planning>"
@@ -19,35 +20,33 @@ class MainPlay(PlayerPlay):
         controller = UniController
         controller_kwargs = {'control_speed': True}
         self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+        self.univector = UnivectorField(n=.3, rect_size=.1)
 
     def update(self):
-        ball = (self.match.ball.x, self.match.ball.y)
-        main_st = [[i.x, i.y] for i in self.match.robots if i.strategy.name == "Main_Attacker"][0]
+        ball = self.match.ball
+        main_st = next(filter(lambda r:r.strategy.name == "Main_Attacker", self.match.robots))
         obs_radius = distance_between_points(main_st, ball)
-        target = main_st[:]
-        gk = [[i.x, i.y] for i in self.match.robots if i.strategy.name == "Goalkeeper_RSM2023"][0]
+        gk = next(filter(lambda r:r.strategy.name == "Goalkeeper", self.match.robots))
 
         # second attacker offset on x based on the distance of the main attacker to the ball
-        target[0] -= max(4*0.075, obs_radius)
         # second attacker offset on y based on the distance of the ball to the center
-        target[1] += .5*(.65-ball[1])
+        target = Point(max(main_st.x*.7, 0.2), main_st.y + .5*(.65-ball.y))
 
-        self.univector_field.set_target(target, ball)
-        self.univector_field.del_obstacle(all=True)
-        self.univector_field.add_obstacle(main_st, 0.075*1.4, obs_radius-0.075*1.4)
-        self.univector_field.add_obstacle(gk, 0.075*1.4, 0.1)
+        self.univector.set_target(target, ball)
+        self.univector.add_obstacle(main_st, obs_radius)
+        self.univector.add_obstacle(gk, 0.075*1.4 + 0.1)
 
-        x, y = self.robot.x, self.robot.y
-        theta_d = self.univector_field.compute((x, y))
-        theta_f = self.univector_field.compute((x + self.dl * math.cos(self.robot.theta), y + self.dl * math.sin(self.robot.theta)))
+        robot =  self.robot
+
+        theta_d = self.univector.compute(robot)
+        theta_f = self.univector.compute(Point(
+            robot.x + self.dl * math.cos(robot.theta),
+            robot.y + self.dl * math.sin(robot.theta)
+        ))
 
         self.robot.strategy.controller.target = target
 
         return theta_d, theta_f
-
-    def start(self):
-        self.univector_field = UnivectorField(n=.3, rect_size=.1)
-        self.dl = 0.000001
 
 
 class Wait(PlayerPlay):
@@ -65,9 +64,6 @@ class Wait(PlayerPlay):
 
     def update(self):
         return self.position()
-
-    def start(self):
-        pass
 
     def position(self):
         a = (.35, 1.1)
@@ -88,9 +84,6 @@ class Wait(PlayerPlay):
         else:
             return b
 
-    def start(self):
-        pass
-
 
 class LookAtBall(PlayerPlay):
     def __init__(self, match, robot):
@@ -108,9 +101,6 @@ class LookAtBall(PlayerPlay):
     def update(self):
         return self.match.ball.x, self.match.ball.y
 
-    def start(self):
-        pass
-
 class ShadowAttacker(Strategy):
     def __init__(self, match, name="Shadow_Attacker"):
         super().__init__(match, name, controller=UniController, controller_kwargs={'control_speed': True})
@@ -122,24 +112,27 @@ class ShadowAttacker(Strategy):
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
         main = MainPlay(self.match, self.robot)
-        main.start()
         defensive = Wait(self.match, self.robot)
-        defensive.start()
         angle = LookAtBall(self.match, self.robot)
-        angle.start()
 
         self.playerbook.add_play(main)
         self.playerbook.add_play(defensive)
         self.playerbook.add_play(angle)
 
-        on_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7])
-        on_positon_1 = OnNextTo([.35, 1.1], self.robot, 0.1)
-        on_positon_2 = OnNextTo([.35, .2], self.robot, 0.1)
+        on_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7], False)
+        off_defensive_box = OnInsideBox(self.match, [-.2, .3, .35, .7], True)
+        on_position_1 = OnNextTo([.35, 1.1], self.robot, 0.1, False)
+        off_position_1 = OnNextTo([.35, 1.1], self.robot, 0.1, True)
+        on_position_2 = OnNextTo([.35, .2], self.robot, 0.1, False)
+        off_position_2 = OnNextTo([.35, .2], self.robot, 0.1, True)
 
         main.add_transition(on_defensive_box, defensive)
+        defensive.add_transition(off_defensive_box, main)
 
-        main.add_transition(AndTransition([on_positon_1, on_defensive_box]), angle)
-        main.add_transition(AndTransition([on_positon_2, on_defensive_box]), angle)
+        defensive.add_transition(on_position_1, angle)
+        defensive.add_transition(on_position_2, angle)
+        angle.add_transition(AndTransition([off_position_1, off_position_2]), defensive)
+        angle.add_transition(off_defensive_box, main)
 
         # Estado inicial
         self.playerbook.set_play(main)

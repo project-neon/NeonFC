@@ -3,7 +3,7 @@ import time
 from collections import deque
 from strategy.BaseStrategy import Strategy
 from controller import PID_control, SimpleLQR, TwoSidesLQR, UniController
-from algorithms.univector_field import UnivectorField
+from NeonPathPlanning import UnivectorField
 
 class UVF_Test(Strategy):
     def __init__(self, match, plot_field=False):

@@ -69,6 +69,11 @@ class Match(object):
             entity.update(frame)
 
 
+    def update_information(self, **kwargs): #Function to update values recieved in api
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
     def decide(self):
         commands = []
         commands_futures = []
