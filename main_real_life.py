@@ -7,6 +7,7 @@ from commons.utils import get_config
 from pyVSSSReferee.RefereeComm import RefereeComm
 from pySSLVision.VisionComm import SSLVision, assign_empty_values
 import os
+import time, collections
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config_real_life.json')
@@ -24,6 +25,10 @@ class Game():
         self.comm = comm.RLComm()
         self.field = pitch.Field(self.match.category)
         self.environment = env
+
+        self.t1 = time.time()
+        self.t2 = time.time()
+        self.piro = collections.deque(maxlen=25)
 
         self.use_api = self.config.get("api")
         self.api_address = self.config.get("network").get("api_address")
@@ -84,8 +89,17 @@ class Game():
             ]
 
         self.comm.send(commands)
+        delta_t = float(time.time() - self.t1)
+        self.piro.append(delta_t)
+        self.t1 = time.time()
+
+        print(len(self.piro)/sum(self.piro), 'hz')
 
         if self.use_api:
-            self.api.send_data(self.info_api)
+            delta_t2 = float(time.time() - self.t2)
+            if delta_t2 > 10:
+                self.api.send_data(self.info_api)
+                self.t2 = time.time()
+            
             
 g = Game(config_file=args.config_file, env=args.env)

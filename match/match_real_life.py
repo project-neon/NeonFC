@@ -20,13 +20,13 @@ class MatchRealLife(object):
         self.robot_ids = os.environ.get('robot_ids', robot_ids)
         self.opposite_ids = os.environ.get('opposite_ids', opposite_ids)
         
+
         pid_kp, ki, kd = Parameter(0.1, 'pid_kp'), Parameter(0, 'ki'), Parameter(0, 'kd')
         kw, rm, vm, uni_kp = Parameter(3.5, 'kw'), Parameter(0.44, 'rm'), Parameter(0.5, 'vm'), Parameter(1, 'uni_kp')
-
+        
         self.parameters = {"pid_kp":pid_kp, "ki":ki, "kd":kd, "kw":kw, "rm":rm, "vm":vm, "uni_kp":uni_kp}
 
-        self.\
-            opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+        self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.game_status = 'STOP'
         self.match_event = {'event': 'PLAYING', 'quadrant': 1, 'mine': True}
@@ -77,7 +77,10 @@ class MatchRealLife(object):
         
         for entity in self.robots:
             entity.update(frame)
-            
+        
+
+
+
     def check_foul(self, ref):
         if ref.can_play():
             self.match_event['event'] = 'PLAYING'
@@ -93,11 +96,11 @@ class MatchRealLife(object):
             self.match_event['mine'] = ref.get_color() == self.team_color.upper()
 
 
-    def update_information(self, **kwargs): #Function to update values recieved in api
-        for key, value in kwargs.items():
-            if hasattr(self, key.lower()):
-                setattr(self, key.lower(), value)
+    def update_information(self, info): #Function to update values recieved in api
+        for key, value in info.items():
+            setattr(self, key.lower(), value)
                 
+
     def decide(self):
         commands = []
         commands_futures = []

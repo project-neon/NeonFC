@@ -15,7 +15,7 @@
     },
     "match" : {
         "team_side": "left",
-        "team_color": "yellow",
+        "team_color": "blue",
         "coach_name": "TEST",
         "category": "3v3",
         "robot_ids": [
@@ -24,9 +24,9 @@
             8
         ],
         "opposite_ids": [
-            4,
             5,
-            7
+            7,
+            8
         ]
     },
     "comm": {
