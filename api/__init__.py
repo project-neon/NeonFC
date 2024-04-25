@@ -6,5 +6,3 @@ from api.api_recv import Api_recv
 from api.info_api import InfoApi
 
 from api.parameters import Parameter
-
-from api.send_thread import SendDataThread

@@ -1,4 +1,4 @@
-from api import Api, Api_recv, InfoApi, SendDataThread
+from api import Api, Api_recv, InfoApi
 import comm
 import match
 import argparse
@@ -57,13 +57,12 @@ class Game():
         self.vision.start()
         self.comm.start()
 
-        if self.use_api:
+        if self.use_api:   
+            self.match.game_status = 'GAME_ON'     
             self.info_api = InfoApi(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
             self.api.start()
             self.api_recv.connect_info(self.info_api)
-            self.api_recv.start()
-            self.send_data_thread = SendDataThread(self.api, self.info_api)
-            self.send_data_thread.start()
+            #self.api_recv.start()  #Problema 1
 
     def update(self):
         frame = assign_empty_values(
@@ -96,6 +95,8 @@ class Game():
 
         print(len(self.list)/sum(self.list), 'hz')
 
+        if self.use_api:
+            self.api.send_data(self.info_api)
             
             
 g = Game(config_file=args.config_file, env=args.env)
