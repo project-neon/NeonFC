@@ -1,4 +1,4 @@
-from api import Api, Api_recv, InfoApi
+from api import Api, Api_recv, InfoApi, SendDataThread
 import comm
 import match
 import argparse
@@ -7,6 +7,7 @@ from commons.utils import get_config
 from pyVSSSReferee.RefereeComm import RefereeComm
 from pySSLVision.VisionComm import SSLVision, assign_empty_values
 import os
+import threading
 import time, collections
 
 parser = argparse.ArgumentParser(description='NeonFC')
@@ -27,8 +28,8 @@ class Game():
         self.environment = env
 
         self.t1 = time.time()
-        self.t2 = time.time()
-        self.piro = collections.deque(maxlen=25)
+        self.t2 = time.time() 
+        self.list = collections.deque(maxlen=25)
 
         self.use_api = self.config.get("api")
         self.api_address = self.config.get("network").get("api_address")
@@ -61,8 +62,8 @@ class Game():
             self.api.start()
             self.api_recv.connect_info(self.info_api)
             self.api_recv.start()
-
-
+            self.send_data_thread = SendDataThread(self.api, self.info_api)
+            self.send_data_thread.start()
 
     def update(self):
         frame = assign_empty_values(
@@ -90,16 +91,11 @@ class Game():
 
         self.comm.send(commands)
         delta_t = float(time.time() - self.t1)
-        self.piro.append(delta_t)
+        self.list.append(delta_t)
         self.t1 = time.time()
 
-        print(len(self.piro)/sum(self.piro), 'hz')
+        print(len(self.list)/sum(self.list), 'hz')
 
-        if self.use_api:
-            delta_t2 = float(time.time() - self.t2)
-            if delta_t2 > 10:
-                self.api.send_data(self.info_api)
-                self.t2 = time.time()
             
             
 g = Game(config_file=args.config_file, env=args.env)

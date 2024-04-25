@@ -7,7 +7,7 @@ class Api_recv(threading.Thread):
     def __init__(self, match, address, port):
         super(Api_recv, self).__init__()
 
-        BUFFER_SIZE = 2048
+        BUFFER_SIZE = 4096
 
         self.match = match
         self.address = address
