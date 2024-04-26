@@ -36,7 +36,7 @@ class Api(metaclass=SingletonMeta):
     def send_data(self, info_api):
         data_dict = info_api.organize_send()
         msg = json.dumps(data_dict)
-        self.obj_socket.sendto(msg.encode(), (self.address, self.port))
+        self.obj_socket.sendto(msg.encode(), (self.address, self.port)) #Problema 2
     
     def send_custom_data(self, data):
          msg = json.dumps(data)
