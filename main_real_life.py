@@ -57,12 +57,11 @@ class Game():
         self.vision.start()
         self.comm.start()
 
-        if self.use_api:   
-            self.match.game_status = 'GAME_ON'     
+        if self.use_api:     
             self.info_api = InfoApi(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
             self.api.start()
             self.api_recv.connect_info(self.info_api)
-            #self.api_recv.start()  #Problema 1
+            self.api_recv.start()  #Problema 1
 
     def update(self):
         frame = assign_empty_values(
