@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "IRON_2024",
+        "coach_name": "ATTACK",
         "category": "3v3",
         "robot_ids": [
             5,
@@ -35,5 +35,5 @@
     },
     "referee": false,
     "data_sender": true,
-    "api": false
+    "api": true
 }

@@ -89,9 +89,9 @@ class Game():
             ]
 
         self.comm.send(commands)
-        delta_t = float(time.time() - self.t1)
-        self.list.append(delta_t)
-        self.t1 = time.time()
+        # delta_t = float(time.time() - self.t1)
+        # self.list.append(delta_t)
+        # self.t1 = time.time()
 
         #print(len(self.list)/sum(self.list), 'hz')
 
