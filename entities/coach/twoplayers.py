@@ -3,20 +3,16 @@ from entities.coach.coach import BaseCoach
 import strategy
 import json
 
-
-class Coach(BaseCoach):
-    NAME = "IRON_2024"
-
+class Coach(BaseCoach): # heranca da classe abstrata
+    NAME = "TwoPlayers"
     def __init__(self, match):
-        super().__init__(match)
+        super().__init__(match) # chamada do metodo da classe mae
 
-        self.SS_strategy = strategy.iron2024.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.iron2024.MainStriker(self.match)
-        self.GK_strategy = strategy.iron2024.Goalkeeper(self.match)
-        self.CB_strategy = strategy.iron2024.Defender(self.match)
-        self.SD_strategy = strategy.iron2024.ShadowDefender(self.match)
+        self.SS_strategy = strategy.rsm2024.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.rsm2024.MainStriker(self.match)
+        self.GK_strategy = strategy.rsm2024.Goalkeeper(self.match)
 
-        self.GK_id = 8  # Goalkeeper fixed ID
+        self.GK_id = 5  # Goalkeeper fixed ID
 
         self.defending = False
 
@@ -29,11 +25,8 @@ class Coach(BaseCoach):
         if self.match.match_event['event'] == 'PLAYING':
             GK = next(filter(lambda r: r.robot_id == self.GK_id, self.match.robots))
             self.set_strategy(GK, self.GK_strategy)
-
-            if self.match.ball.x < .4:
-                self.defend()
-            else:
-                self.attack()
+        
+            self.attack()
 
         else:
             self.not_playing()
@@ -44,15 +37,6 @@ class Coach(BaseCoach):
 
         self.set_strategy(ST, self.ST_strategy)
         self.set_strategy(SS, self.SS_strategy)
-
-    def defend(self):
-        defenders = [r for i, r in enumerate(self.match.robots) if r.robot_id != self.GK_id]
-        CB, SD = self.choose_main_defender(*defenders)
-
-        #print(CB.robot_id)
-
-        self.set_strategy(CB, self.CB_strategy)
-        self.set_strategy(SD, self.SD_strategy)
 
     def not_playing(self):
         robots = [(i, r.robot_id) for i, r in enumerate(self.match.robots)]
@@ -80,17 +64,6 @@ class Coach(BaseCoach):
                 return r1, r2
             return r2, r1
         if b1 > 0:
-            return r1, r2
-        return r2, r1
-
-    def choose_main_defender(self, r1, r2):
-        b = self.match.ball
-
-        a1 = distance_between_points((b.x, b.y), (r1.x, r1.y))
-        a2 = distance_between_points((b.x, b.y), (r2.x, r2.y))
-
-
-        if a1 < a2:
             return r1, r2
         return r2, r1
 
