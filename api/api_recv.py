@@ -7,7 +7,7 @@ class Api_recv(threading.Thread):
     def __init__(self, match, address, port):
         super(Api_recv, self).__init__()
 
-        BUFFER_SIZE = 2048
+        BUFFER_SIZE = 4096
 
         self.match = match
         self.address = address
@@ -21,6 +21,7 @@ class Api_recv(threading.Thread):
 
     # Receives data
     def run(self):
+        self.match.game_status = 'GAME_ON'
         self.obj_socket = socket(AF_INET, SOCK_DGRAM)
         self.obj_socket.bind((self.address, self.port))
 
@@ -29,9 +30,11 @@ class Api_recv(threading.Thread):
         while True:
             data, origem = self.obj_socket.recvfrom(self.buffer_size)
             decoded_data = json.loads(data.decode())
-            # Feedback commands from socket (e.g. an interface)
+        #     # Feedback commands from socket (e.g. an interface)
+        #     #print(decoded_data)
+
             #print(decoded_data)
 
             self.info_api.update_recv(decoded_data)
 
-            self.decod_data = decoded_data
+            #self.decod_data = decoded_data

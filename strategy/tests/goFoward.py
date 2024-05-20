@@ -16,5 +16,4 @@ class Foward(Strategy):
 
 
     def decide(self):
-        print(self.robot.speed, self.robot.vtheta)
         return 30, 0
