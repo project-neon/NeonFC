@@ -27,8 +27,8 @@ class Game():
         self.field = pitch.Field(self.match.category)
         self.environment = env
 
-        self.t1 = time.time()
-        self.t2 = time.time() 
+        # self.t1 = time.time()
+        # self.t2 = time.time() 
         self.list = collections.deque(maxlen=25)
 
         self.use_api = self.config.get("api")

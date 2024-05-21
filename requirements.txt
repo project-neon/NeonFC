@@ -1,4 +1,4 @@
-protobuf
+protobuf>=3.19.3, <=3.20.1
 numpy
 scipy
 matplotlib
@@ -8,10 +8,13 @@ pyqtgraph
 PyQt5
 
 # Referee custom library
-pyVsssReferee
+#pyVsssReferee
 
 # Vision custom library
-pySSLVision
+#pySSLVision
+
+# Path Planning 
+NeonPathPlanning
 
 # For real life execution
 pyserial

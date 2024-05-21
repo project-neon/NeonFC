@@ -78,9 +78,6 @@ class MatchRealLife(object):
         for entity in self.robots:
             entity.update(frame)
         
-
-
-
     def check_foul(self, ref):
         if ref.can_play():
             self.match_event['event'] = 'PLAYING'
