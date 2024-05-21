@@ -16,7 +16,7 @@ class Coach(BaseCoach):
         self.CB_strategy = strategy.rsm2024.Defender(self.match)
         self.SD_strategy = strategy.rsm2024.ShadowDefender(self.match)
 
-        self.GK_id = 8  # Goalkeeper fixed ID
+        self.GK_id = 5  # Goalkeeper fixed ID
 
         self.defending = False
 
