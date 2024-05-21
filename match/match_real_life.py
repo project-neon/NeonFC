@@ -1,6 +1,6 @@
 import os
 import entities
-from concurrent import futures
+from concurrent.futures import ThreadPoolExecutor, as_completed, thread
 from api import Parameter
 
 CATEGORIES = {
@@ -106,12 +106,12 @@ class MatchRealLife(object):
         '''
         self.coach.decide()
 
-        with futures.ThreadPoolExecutor(max_workers=self.n_robots) as executor:
+        with ThreadPoolExecutor(max_workers=self.n_robots) as executor:
             commands_futures = [
                 executor.submit(robot.decide) for robot in self.robots
             ]
 
-        for future in futures.as_completed(commands_futures):
+        for future in as_completed(commands_futures):
             commands.append(future.result())
 
         return commands

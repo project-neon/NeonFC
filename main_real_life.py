@@ -9,6 +9,7 @@ from pySSLVision.VisionComm import SSLVision, assign_empty_values
 import os
 import threading
 import time, collections
+from concurrent.futures import thread
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config_real_life.json')
@@ -44,11 +45,10 @@ class Game():
         if os.environ.get('USE_REFEREE'):
             self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
         else:
-            self.use_referee = self.config.get('referee')
-        
+            self.use_referee = self.config.get('referee')     
         self.start()
 
-    def start(self):
+    def start(self):  
         self.vision.assign_vision(self.update)
         if self.use_referee:
             self.referee.start()
@@ -56,7 +56,7 @@ class Game():
 
         self.vision.start()
         self.comm.start()
-
+        
         if self.use_api:  
             #self.match.game_status = 'GAME_ON'   
             self.info_api = InfoApi(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
