@@ -15,6 +15,8 @@ class Api_recv(threading.Thread):
         self.buffer_size = BUFFER_SIZE
         self.decod_data = None   
 
+        self.kill_recieved = False
+
 
     def connect_info(self,info_api):
         self.info_api = info_api
@@ -27,7 +29,7 @@ class Api_recv(threading.Thread):
 
         print("Starting api_recv...")
 
-        while True:
+        while not self.kill_recieved:
             data, origem = self.obj_socket.recvfrom(self.buffer_size)
             decoded_data = json.loads(data.decode())
         #     # Feedback commands from socket (e.g. an interface)

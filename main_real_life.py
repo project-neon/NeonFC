@@ -10,6 +10,7 @@ import os
 import threading
 import time, collections
 from concurrent.futures import thread
+from signal import pthread_kill, SIGINT
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config_real_life.json')
@@ -97,6 +98,19 @@ class Game():
 
         if self.use_api:
                 self.api.send_data(self.info_api)
+
+    def stop(self):
+        for t in threading.enumerate():
+            t.kill_recieved = True
+    
             
             
 g = Game(config_file=args.config_file, env=args.env)
+
+try: 
+    while True:
+        pass
+except KeyboardInterrupt:
+    g.stop()
+
+

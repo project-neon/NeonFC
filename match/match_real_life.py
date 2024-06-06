@@ -114,4 +114,4 @@ class MatchRealLife(object):
         for future in as_completed(commands_futures):
             commands.append(future.result())
 
-        return commands
+        return commands            
