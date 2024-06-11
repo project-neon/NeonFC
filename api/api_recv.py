@@ -23,10 +23,8 @@ class Api_recv(threading.Thread):
 
     # Receives data
     def run(self):
-        self.match.game_status = 'GAME_ON'
         self.obj_socket = socket(AF_INET, SOCK_DGRAM)
         self.obj_socket.bind((self.address, self.port))
-
         print("Starting api_recv...")
 
         while not self.kill_recieved:

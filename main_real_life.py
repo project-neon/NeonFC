@@ -9,8 +9,6 @@ from pySSLVision.VisionComm import SSLVision, assign_empty_values
 import os
 import threading
 import time, collections
-from concurrent.futures import thread
-from signal import pthread_kill, SIGINT
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config_real_life.json')
@@ -29,8 +27,8 @@ class Game():
         self.field = pitch.Field(self.match.category)
         self.environment = env
 
-        # self.t1 = time.time()
-        # self.t2 = time.time() 
+        self.t1 = time.time()
+        self.t2 = time.time() 
         self.list = collections.deque(maxlen=25)
 
         self.use_api = self.config.get("api")
@@ -40,8 +38,9 @@ class Game():
  
         self.referee = RefereeComm(config_file)
 
-        self.api = Api(self.api_address, self.api_port)
-        self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
+        if self.use_api:
+            self.api = Api(self.api_address, self.api_port)
+            self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
 
         if os.environ.get('USE_REFEREE'):
             self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
@@ -90,11 +89,11 @@ class Game():
             ]
 
         self.comm.send(commands)
-        # delta_t = float(time.time() - self.t1)
-        # self.list.append(delta_t)
-        # self.t1 = time.time()
+        delta_t = float(time.time() - self.t1)
+        self.list.append(delta_t)
+        self.t1 = time.time()
 
-        #print(len(self.list)/sum(self.list), 'hz')
+        print(len(self.list)/sum(self.list), 'hz')
 
         if self.use_api:
                 self.api.send_data(self.info_api)

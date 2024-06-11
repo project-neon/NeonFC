@@ -35,5 +35,5 @@
     },
     "referee": false,
     "data_sender": true,
-    "api": true
+    "api": false
 }
