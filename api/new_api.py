@@ -1,5 +1,7 @@
 from socket import *
 import json
+import time
+import threading
 
 
 class SingletonMeta(type):
@@ -23,8 +25,10 @@ class SingletonMeta(type):
         return cls._instances[cls]
 
 class Api(metaclass=SingletonMeta):
+    
+    #sender_thread: threading.Thread
+    
     def __init__(self, address, port):
-        
         self.address = address
         self.port = port
 
@@ -34,9 +38,13 @@ class Api(metaclass=SingletonMeta):
 
     # Sends dict game data to socket listener
     def send_data(self, info_api):
-        data_dict = info_api.organize_send()
-        msg = json.dumps(data_dict)
-        self.obj_socket.sendto(msg.encode(), (self.address, self.port)) #Problema 2
+         while True:
+            i = time.time()
+            data_dict = info_api.organize_send()
+            msg = json.dumps(data_dict)
+            print("{}ms".format(time.time() - i))
+            self.obj_socket.sendto(msg.encode(), (self.address, self.port)) #Problema 2
+
     
     def send_custom_data(self, data):
          msg = json.dumps(data)
