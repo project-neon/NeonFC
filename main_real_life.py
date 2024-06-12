@@ -63,6 +63,9 @@ class Game():
             self.api.start()
             self.api_recv.connect_info(self.info_api)
             self.api_recv.start()  #Problema 1
+            self.sender_thread = threading.Thread(target = self.api.send_data(self.info_api))
+            self.sender_thread.start()
+            self.sender_thread.join()
 
     def update(self):
         frame = assign_empty_values(
@@ -89,14 +92,11 @@ class Game():
             ]
 
         self.comm.send(commands)
-        # delta_t = float(time.time() - self.t1)
-        # self.list.append(delta_t)
-        # self.t1 = time.time()
+        delta_t = float(time.time() - self.t1)
+        self.list.append(delta_t)
+        self.t1 = time.time()
 
         #print(len(self.list)/sum(self.list), 'hz')
-
-        if self.use_api:
-                self.api.send_data(self.info_api)
             
             
 g = Game(config_file=args.config_file, env=args.env)
