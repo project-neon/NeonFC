@@ -38,17 +38,17 @@ class Game():
  
         self.referee = RefereeComm(config_file)
 
-        self.api = Api(self.api_address, self.api_port)
-        self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
+        if self.use_api:
+            self.api = Api(self.api_address, self.api_port)
+            self.api_recv = Api_recv(self.match, self.api_address, self.api_recv_port)
 
         if os.environ.get('USE_REFEREE'):
             self.use_referee = bool(int(os.environ.get('USE_REFEREE')))
         else:
-            self.use_referee = self.config.get('referee')
-        
+            self.use_referee = self.config.get('referee')     
         self.start()
 
-    def start(self):
+    def start(self):  
         self.vision.assign_vision(self.update)
         if self.use_referee:
             self.referee.start()
@@ -56,7 +56,7 @@ class Game():
 
         self.vision.start()
         self.comm.start()
-
+        
         if self.use_api:  
             #self.match.game_status = 'GAME_ON'   
             self.info_api = InfoApi(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
@@ -96,7 +96,24 @@ class Game():
         self.list.append(delta_t)
         self.t1 = time.time()
 
-        #print(len(self.list)/sum(self.list), 'hz')
+        print(len(self.list)/sum(self.list), 'hz')
+
+        if self.use_api:
+                self.api.send_data(self.info_api)
+
+    def stop(self):
+        for t in threading.enumerate():
+            t.kill_recieved = True
+    
+
             
             
 g = Game(config_file=args.config_file, env=args.env)
+
+try: 
+    while True:
+        pass
+except KeyboardInterrupt:
+    g.stop()
+
+

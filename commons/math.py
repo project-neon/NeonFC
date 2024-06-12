@@ -2,7 +2,6 @@ import math
 import numpy as np
 from numpy import arccos, array, dot, pi, cross
 from numpy.linalg import det, norm
-from scipy.signal import savgol_filter
 
 def dist_point_line(x1, y1, x2, y2, x3, y3):
     """
