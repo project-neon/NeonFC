@@ -369,13 +369,13 @@ files = [
 
 [[package]]
 name = "packaging"
-version = "24.0"
+version = "24.1"
 description = "Core utilities for Python packages"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "packaging-24.0-py3-none-any.whl", hash = "sha256:2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5"},
-    {file = "packaging-24.0.tar.gz", hash = "sha256:eb82c5e3e56209074766e6885bb04b8c38a0c015d0a30036ebe7ece34c9989e9"},
+    {file = "packaging-24.1-py3-none-any.whl", hash = "sha256:5b8f2217dbdbd2f7f384c41c628544e6d52f2d0f53c6d0c3ea61aa5d1d7ff124"},
+    {file = "packaging-24.1.tar.gz", hash = "sha256:026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002"},
 ]
 
 [[package]]
@@ -466,32 +466,34 @@ xmp = ["defusedxml"]
 
 [[package]]
 name = "protobuf"
-version = "3.6.1"
+version = "3.20.3"
 description = "Protocol Buffers"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "protobuf-3.6.1-cp27-cp27m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:10394a4d03af7060fa8a6e1cbf38cea44be1467053b0aea5bbfcb4b13c4b88c4"},
-    {file = "protobuf-3.6.1-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:59cd75ded98094d3cf2d79e84cdb38a46e33e7441b2826f3838dcc7c07f82995"},
-    {file = "protobuf-3.6.1-cp34-cp34m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:1931d8efce896981fe410c802fd66df14f9f429c32a72dd9cfeeac9815ec6444"},
-    {file = "protobuf-3.6.1-cp34-cp34m-manylinux1_x86_64.whl", hash = "sha256:92e8418976e52201364a3174e40dc31f5fd8c147186d72380cbda54e0464ee19"},
-    {file = "protobuf-3.6.1-cp35-cp35m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:a7ee3bb6de78185e5411487bef8bc1c59ebd97e47713cba3c460ef44e99b3db9"},
-    {file = "protobuf-3.6.1-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:5ee0522eed6680bb5bac5b6d738f7b0923b3cafce8c4b1a039a6107f0841d7ed"},
-    {file = "protobuf-3.6.1-cp35-cp35m-win32.whl", hash = "sha256:fcfc907746ec22716f05ea96b7f41597dfe1a1c088f861efb8a0d4f4196a6f10"},
-    {file = "protobuf-3.6.1-cp35-cp35m-win_amd64.whl", hash = "sha256:ceec283da2323e2431c49de58f80e1718986b79be59c266bb0509cbf90ca5b9e"},
-    {file = "protobuf-3.6.1-cp36-cp36m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:65917cfd5da9dfc993d5684643063318a2e875f798047911a9dd71ca066641c9"},
-    {file = "protobuf-3.6.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:46e34fdcc2b1f2620172d3a4885128705a4e658b9b62355ae5e98f9ea19f42c2"},
-    {file = "protobuf-3.6.1-cp36-cp36m-win32.whl", hash = "sha256:9335f79d1940dfb9bcaf8ec881fb8ab47d7a2c721fb8b02949aab8bbf8b68625"},
-    {file = "protobuf-3.6.1-cp36-cp36m-win_amd64.whl", hash = "sha256:685bc4ec61a50f7360c9fd18e277b65db90105adbf9c79938bd315435e526b90"},
-    {file = "protobuf-3.6.1-cp37-cp37m-macosx_10_6_intel.macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:574085a33ca0d2c67433e5f3e9a0965c487410d6cb3406c83bdaf549bfc2992e"},
-    {file = "protobuf-3.6.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:4b92e235a3afd42e7493b281c8b80c0c65cbef45de30f43d571d1ee40a1f77ef"},
-    {file = "protobuf-3.6.1-py2.py3-none-any.whl", hash = "sha256:196d3a80f93c537f27d2a19a4fafb826fb4c331b0b99110f985119391d170f96"},
-    {file = "protobuf-3.6.1.tar.gz", hash = "sha256:1489b376b0f364bcc6f89519718c057eb191d7ad6f1b395ffd93d1aa45587811"},
+    {file = "protobuf-3.20.3-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:f4bd856d702e5b0d96a00ec6b307b0f51c1982c2bf9c0052cf9019e9a544ba99"},
+    {file = "protobuf-3.20.3-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:9aae4406ea63d825636cc11ffb34ad3379335803216ee3a856787bcf5ccc751e"},
+    {file = "protobuf-3.20.3-cp310-cp310-win32.whl", hash = "sha256:28545383d61f55b57cf4df63eebd9827754fd2dc25f80c5253f9184235db242c"},
+    {file = "protobuf-3.20.3-cp310-cp310-win_amd64.whl", hash = "sha256:67a3598f0a2dcbc58d02dd1928544e7d88f764b47d4a286202913f0b2801c2e7"},
+    {file = "protobuf-3.20.3-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:899dc660cd599d7352d6f10d83c95df430a38b410c1b66b407a6b29265d66469"},
+    {file = "protobuf-3.20.3-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:e64857f395505ebf3d2569935506ae0dfc4a15cb80dc25261176c784662cdcc4"},
+    {file = "protobuf-3.20.3-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:d9e4432ff660d67d775c66ac42a67cf2453c27cb4d738fc22cb53b5d84c135d4"},
+    {file = "protobuf-3.20.3-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:74480f79a023f90dc6e18febbf7b8bac7508420f2006fabd512013c0c238f454"},
+    {file = "protobuf-3.20.3-cp37-cp37m-win32.whl", hash = "sha256:b6cc7ba72a8850621bfec987cb72623e703b7fe2b9127a161ce61e61558ad905"},
+    {file = "protobuf-3.20.3-cp37-cp37m-win_amd64.whl", hash = "sha256:8c0c984a1b8fef4086329ff8dd19ac77576b384079247c770f29cc8ce3afa06c"},
+    {file = "protobuf-3.20.3-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:de78575669dddf6099a8a0f46a27e82a1783c557ccc38ee620ed8cc96d3be7d7"},
+    {file = "protobuf-3.20.3-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:f4c42102bc82a51108e449cbb32b19b180022941c727bac0cfd50170341f16ee"},
+    {file = "protobuf-3.20.3-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:44246bab5dd4b7fbd3c0c80b6f16686808fab0e4aca819ade6e8d294a29c7050"},
+    {file = "protobuf-3.20.3-cp38-cp38-win32.whl", hash = "sha256:c02ce36ec760252242a33967d51c289fd0e1c0e6e5cc9397e2279177716add86"},
+    {file = "protobuf-3.20.3-cp38-cp38-win_amd64.whl", hash = "sha256:447d43819997825d4e71bf5769d869b968ce96848b6479397e29fc24c4a5dfe9"},
+    {file = "protobuf-3.20.3-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:398a9e0c3eaceb34ec1aee71894ca3299605fa8e761544934378bbc6c97de23b"},
+    {file = "protobuf-3.20.3-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:bf01b5720be110540be4286e791db73f84a2b721072a3711efff6c324cdf074b"},
+    {file = "protobuf-3.20.3-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:daa564862dd0d39c00f8086f88700fdbe8bc717e993a21e90711acfed02f2402"},
+    {file = "protobuf-3.20.3-cp39-cp39-win32.whl", hash = "sha256:819559cafa1a373b7096a482b504ae8a857c89593cf3a25af743ac9ecbd23480"},
+    {file = "protobuf-3.20.3-cp39-cp39-win_amd64.whl", hash = "sha256:03038ac1cfbc41aa21f6afcbcd357281d7521b4157926f30ebecc8d4ea59dcb7"},
+    {file = "protobuf-3.20.3-py2.py3-none-any.whl", hash = "sha256:a7ca6d488aa8ff7f329d4c545b2dbad8ac31464f1d8b1c87ad1346717731e4db"},
+    {file = "protobuf-3.20.3.tar.gz", hash = "sha256:2e3427429c9cffebf259491be0af70189607f365c2f41c7c3764af6f337105f2"},
 ]
-
-[package.dependencies]
-setuptools = "*"
-six = ">=1.9"
 
 [[package]]
 name = "pyparsing"
@@ -537,17 +539,17 @@ cp2110 = ["hidapi"]
 
 [[package]]
 name = "pysslvision"
-version = "1.0.1"
+version = "2.0.0"
 description = "Creates a network socket to communicate with the SSL Vision"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pySSLVision-1.0.1-py3-none-any.whl", hash = "sha256:4f20d699bbd4b14191523770b986d4d1de68804628a240c0c35a4b41ce906736"},
-    {file = "pySSLVision-1.0.1.tar.gz", hash = "sha256:d1beb9bd1c8b7423de88f92e4a2144b33b3f0634d2afbb6ad9ce642b8349ec6e"},
+    {file = "pySSLVision-2.0.0-py3-none-any.whl", hash = "sha256:af619ce95c35f2540db0678d3dd840c259025596c1dfc51a09d267902527a454"},
+    {file = "pySSLVision-2.0.0.tar.gz", hash = "sha256:16709e3733f7345eeacdf2d93d5c2f8fcddf2ae1357e90986ff588b7045288ae"},
 ]
 
 [package.dependencies]
-protobuf = "3.6.1"
+protobuf = "3.20.3"
 
 [[package]]
 name = "python-dateutil"
@@ -565,17 +567,17 @@ six = ">=1.5"
 
 [[package]]
 name = "pyvsssreferee"
-version = "1.1.0"
+version = "2.0.0"
 description = "Creates a network socket to communicate with the VSSS League referee"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pyVSSSReferee-1.1.0-py3-none-any.whl", hash = "sha256:f0cd6ed4bd41f935d8135fdace57b7f06966addffce339f9cee8903adb901fba"},
-    {file = "pyVSSSReferee-1.1.0.tar.gz", hash = "sha256:d58f527ce5133043e889db7292d0f3f839ff16a17a6cfce69361b3e720eb45a9"},
+    {file = "pyVSSSReferee-2.0.0-py3-none-any.whl", hash = "sha256:02c6070a8e5209c613fc11a6460afb80e426cb7ccec54a00d2194ba72d3c3690"},
+    {file = "pyVSSSReferee-2.0.0.tar.gz", hash = "sha256:67cb41b2f6af3f69fea92f28cd286132da3f5df6c7bbbc1c1f557e414a993672"},
 ]
 
 [package.dependencies]
-protobuf = "3.6.1"
+protobuf = "3.20.3"
 
 [[package]]
 name = "scipy"
@@ -620,21 +622,6 @@ doc = ["jupyterlite-pyodide-kernel", "jupyterlite-sphinx (>=0.12.0)", "jupytext"
 test = ["array-api-strict", "asv", "gmpy2", "hypothesis (>=6.30)", "mpmath", "pooch", "pytest", "pytest-cov", "pytest-timeout", "pytest-xdist", "scikit-umfpack", "threadpoolctl"]
 
 [[package]]
-name = "setuptools"
-version = "70.0.0"
-description = "Easily download, build, install, upgrade, and uninstall Python packages"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "setuptools-70.0.0-py3-none-any.whl", hash = "sha256:54faa7f2e8d2d11bcd2c07bed282eef1046b5c080d1c32add737d7b5817b1ad4"},
-    {file = "setuptools-70.0.0.tar.gz", hash = "sha256:f211a66637b8fa059bb28183da127d4e86396c991a942b028c6650d4319c3fd0"},
-]
-
-[package.extras]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "pyproject-hooks (!=1.1)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
-testing = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "importlib-metadata", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "mypy (==1.9)", "packaging (>=23.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.1)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-home (>=0.5)", "pytest-mypy", "pytest-perf", "pytest-ruff (>=0.2.1)", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
-
-[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -648,4 +635,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "072681c4efd93d5a1b5326068b35c4ff876ee776a2941555c29688be3a24445b"
+content-hash = "c3ba5916b8c3b030080819204a1c052b4bc29ad2b51113a56b11153981ad414c"
