@@ -8,9 +8,8 @@ Software desenvolvido para LARC 2020 para o VSSS online.
 
 #### Para usar o NeonFC você irá precisar ter instalado em sua máquina:
 
-- Python >=3.7.x
-- PiPy
-- Google protobuf
+- Python == 3.12.1
+- Poetry
 
 Além de uma interface que irá enviar os dados do campo. Atualmente o [FIRASim](https://github.com/VSSSLeague/FIRASim) é suportado.
 
@@ -21,11 +20,11 @@ Além de uma interface que irá enviar os dados do campo. Atualmente o [FIRASim]
 git clone https://github.com/project-neon/NeonFC.git
 ```
 
-2. Instalar dependências usando pipy:
+2. Instalar dependências usando poetry:
 
 ```bash
 cd NeonFC
-pip3 install -r requirements.txt
+poetry install
 ```
 
 2.1. Antes de executar, é importante checar o arquivo de configuração para verificar se as portas e endereços de rede estão compativeis com o software de simulação.

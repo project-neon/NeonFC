@@ -13,8 +13,11 @@ matplotlib = "^3.9.0"
 pyqtgraph = "^0.13.7"
 pyserial = "^3.5"
 neonpathplanning = "^1.0.1"
-pysslvision = "^1.0.1"
-pyvsssreferee = "^1.1.0"
+protobuf = "3.20.3"
+pysslvision = "^2.0.0"
+pyvsssreferee = "^2.0.0"
+pyqt5-qt5 = "5.15.2"
+pyqt5 = "^5.15.10"
 
 
 [build-system]
