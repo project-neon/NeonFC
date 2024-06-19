@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "RSM_2024",
+        "coach_name": "TEST",
         "category": "3v3",
         "robot_ids": [
             5,
@@ -34,6 +34,6 @@
         "baud_rate": 115200
     },
     "referee": false,
-    "data_sender": true,
+    "data_sender": false,
     "api": false
 }

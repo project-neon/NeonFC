@@ -1,6 +1,6 @@
 import os
 import entities
-from concurrent.futures import ThreadPoolExecutor, as_completed, thread
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from api import Parameter
 
 CATEGORIES = {
