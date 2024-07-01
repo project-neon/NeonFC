@@ -109,10 +109,10 @@ class Game():
             
 g = Game(config_file=args.config_file, env=args.env)
 
-#Try: 
-while True:
-        pass
-#except KeyboardInterrupt:
-#    g.stop()
+try:
+    while True:
+        time.sleep(0.01)
+except KeyboardInterrupt:
+   g.stop()
 
 
