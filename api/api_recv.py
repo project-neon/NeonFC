@@ -2,6 +2,7 @@ from socket import *
 import json
 import threading
 import struct
+import time, collections
 
 class Api_recv(threading.Thread):
     def __init__(self, match, address, port):
@@ -16,7 +17,8 @@ class Api_recv(threading.Thread):
         self.decod_data = None   
 
         self.kill_recieved = False
-
+        self.t1 = time.time()
+        self.list = collections.deque(maxlen=25)
 
     def connect_info(self,info_api):
         self.info_api = info_api
@@ -30,11 +32,8 @@ class Api_recv(threading.Thread):
         while not self.kill_recieved:
             data, origem = self.obj_socket.recvfrom(self.buffer_size)
             decoded_data = json.loads(data.decode())
-        #     # Feedback commands from socket (e.g. an interface)
-        #     #print(decoded_data)
-
-            #print(decoded_data)
+            # Feedback commands from socket (e.g. an interface)
 
             self.info_api.update_recv(decoded_data)
 
-            #self.decod_data = decoded_data
+            self.decod_data = decoded_data
