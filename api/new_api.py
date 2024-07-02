@@ -38,12 +38,9 @@ class Api(metaclass=SingletonMeta):
 
     # Sends dict game data to socket listener
     def send_data(self, info_api):
-         while True:
-            i = time.time()
             data_dict = info_api.organize_send()
             msg = json.dumps(data_dict)
-            # print("{}ms".format(time.time() - i))
-            # self.obj_socket.sendto(msg.encode(), (self.address, self.port)) #Problema 2
+            self.obj_socket.sendto(msg.encode(), (self.address, self.port)) #Problema 2
 
     
     def send_custom_data(self, data):
