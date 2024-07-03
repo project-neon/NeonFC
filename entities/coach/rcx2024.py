@@ -5,16 +5,16 @@ import json
 
 
 class Coach(BaseCoach):
-    NAME = "RSM_2024"
+    NAME = "RCX_2024"
 
     def __init__(self, match):
         super().__init__(match)
 
-        self.SS_strategy = strategy.rsm2024.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.rsm2024.MainStriker(self.match)
-        self.GK_strategy = strategy.rsm2024.Goalkeeper(self.match)
-        self.CB_strategy = strategy.rsm2024.Defender(self.match)
-        self.SD_strategy = strategy.rsm2024.ShadowDefender(self.match)
+        self.SS_strategy = strategy.rcx2024.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.rcx2024.MainStriker(self.match)
+        self.GK_strategy = strategy.rcx2024.Goalkeeper(self.match)
+        self.CB_strategy = strategy.rcx2024.Defender(self.match)
+        self.SD_strategy = strategy.rcx2024.ShadowDefender(self.match)
 
         self.GK_id = 5  # Goalkeeper fixed ID
 
@@ -30,7 +30,7 @@ class Coach(BaseCoach):
             GK = next(filter(lambda r: r.robot_id == self.GK_id, self.match.robots))
             self.set_strategy(GK, self.GK_strategy)
 
-            if self.match.ball.x < .4:
+            if self.match.ball.x < .5:
                 self.defend()
             else:
                 self.attack()

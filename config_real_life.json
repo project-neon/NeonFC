@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "TwoPlayers",
+        "coach_name": "RCX_2024",
         "category": "3v3",
         "robot_ids": [
             5,
@@ -34,6 +34,6 @@
         "baud_rate": 115200
     },
     "referee": false,
-    "data_sender": false,
+    "data_sender": true,
     "api": false
 }

@@ -28,9 +28,9 @@ class CenterPlay(PlayerPlay):
         ball = self.match.ball
 
         if ball.y > self.robot.y:
-            guide = Point(ball.x, 1.3)
+            guide = Point(ball.x + .1, 1.3)
         else:
-            guide = Point(ball.x, 0)
+            guide = Point(ball.x + .1, 0)
 
         self.univector.set_target(target=ball, guide=guide)
 
@@ -65,8 +65,8 @@ class BlockCross(PlayerPlay):
         )
 
     def update(self):
-        left_target = Point(.09, 1.08)
-        right_target = Point(.09, .22)
+        left_target = Point(.2, 1.08)
+        right_target = Point(.2, .22)
 
         if self.match.ball.y > .65:
             self.limit_cycle.set_target(target=left_target)
