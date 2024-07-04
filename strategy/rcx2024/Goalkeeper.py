@@ -1,7 +1,7 @@
 import math
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo
-from controller import PID_control, PID_W_control
+from controller import PID_control, PID_W_control, UniController
 from NeonPathPlanning import UnivectorField, Point
 
 
@@ -113,6 +113,30 @@ class Rest(PlayerPlay):
     def update(self):
 
         return self.target
+    
+class PushPlay(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Push Play>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs = {
+            'K_RHO': 1,
+            'V_MIN': 0,
+        }
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def update(self):
+        ball = self.match.ball
+
+        if ball.y > self.robot.y:
+            return ball.x, 1.3
+        else:
+            return ball.x, 0
 
 
 class Goalkeeper(Strategy):
@@ -128,11 +152,13 @@ class Goalkeeper(Strategy):
         inside_area = InsideArea(self.match, self.robot)
         spin = Spin(self.match, self.robot)
         rest = Rest(self.match, self.robot)
+        push = PushPlay(self.match, self.robot)
 
         self.playerbook.add_play(follow_ball)
         self.playerbook.add_play(inside_area)
         self.playerbook.add_play(spin)
         self.playerbook.add_play(rest)
+        self.playerbook.add_play(push)
 
         on_near_ball = OnNextTo(self.match.ball, self.robot, 0.09)
         off_near_ball = OnNextTo(self.match.ball, self.robot, 0.12, True)
@@ -140,9 +166,14 @@ class Goalkeeper(Strategy):
         follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)
         follow_ball.add_transition(on_near_ball, spin)
         follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
+        follow_ball.add_transition(OnInsideBox(self.match, [-.5, -.1, .75, .3]), push)
+        follow_ball.add_transition(OnInsideBox(self.match, [-.5, 1.05, .75, .4]), push)
 
-        inside_area.add_transition(OnInsideBox(self.match, [-.5, .3, .75, .8], True), follow_ball)
+        inside_area.add_transition(OnInsideBox(self.match, [-.5, -.1, .75, .3]), push)
+        inside_area.add_transition(OnInsideBox(self.match, [-.5, 1.05, .75, .4]), push)
         inside_area.add_transition(on_near_ball, spin)
+
+        push.add_transition(OnInsideBox(self.match, [-.5, -.1, .75, 1.7], True), follow_ball)
 
         spin.add_transition(off_near_ball, follow_ball)
         rest.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball)
@@ -157,4 +188,7 @@ class Goalkeeper(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
+        print(res)
+        # print(OnInsideBox(self.match, [-.5, -.2, .75, 1.7], True).evaluate())
+        # print(self.match.ball.x, self.match.ball.y)
         return res

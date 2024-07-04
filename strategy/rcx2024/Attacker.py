@@ -150,40 +150,6 @@ class LookAtBall(PlayerPlay):
     def start(self):
         pass
 
-class RSM(PlayerPlay):
-    def __init__(self, match, robot):
-        super().__init__(match, robot)
-        self.dl = 0.000001
-
-    def get_name(self):
-        return f"<{self.robot.get_name()} RSM Planning>"
-
-    def start_up(self):
-        super().start_up()
-        controller = UniController
-        self.robot.strategy.controller = controller(self.robot)
-        self.univector = UnivectorField(n=6, rect_size=.1, field=VSSS)
-
-    def update(self):
-        ball = self.match.ball
-        if ball.y < .65:
-            guide = math.atan2( .1 - ball.y, .1 - ball.x)
-        else:
-            guide = math.atan2( 1.2 - ball.y, .1 - ball.x)
-
-        self.univector.set_target(target=ball, guide=guide, guide_type='a')
-
-        robot =  self.robot
-
-        theta_d = self.univector.compute(robot)
-        theta_f = self.univector.compute(Point(
-            robot.x + self.dl * math.cos(robot.theta),
-            robot.y + self.dl * math.sin(robot.theta)
-        ))
-
-        return theta_d, theta_f
-
-
 class MainStriker(Strategy):
     def __init__(self, match, name="Main_Attacker"):
         super().__init__(match, name, controller=PID_W_control)
@@ -199,13 +165,11 @@ class MainStriker(Strategy):
         main = MainPlay(self.match, self.robot)
         wing = WingPlay(self.match, self.robot)
         cross = CrossPlay(self.match, self.robot)
-        defensive = RSM(self.match, self.robot)
         angle = LookAtBall(self.match, self.robot)
 
         self.playerbook.add_play(main)
         self.playerbook.add_play(wing)
         self.playerbook.add_play(cross)
-        self.playerbook.add_play(defensive)
         self.playerbook.add_play(angle)
 
         on_wing = OnInsideBox(self.match, [0, 0.2, 1.5, 0.9], True)
@@ -228,14 +192,6 @@ class MainStriker(Strategy):
         cross.add_transition(off_cross_region, wing)
         cross.add_transition(off_near_ball, main)
         cross.add_transition(off_wing, main)
-
-        main.add_transition(on_defensive_box, defensive)
-        defensive.add_transition(off_defensive_box, main)
-
-        # defensive.add_transition(on_position_1, angle)
-        # defensive.add_transition(on_position_2, angle)
-        # angle.add_transition(AndTransition([off_position_1, off_position_2]), defensive)
-        # angle.add_transition(off_defensive_box, main)
 
         # Estado inicial
         self.playerbook.set_play(main)

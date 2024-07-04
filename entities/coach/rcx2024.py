@@ -16,7 +16,7 @@ class Coach(BaseCoach):
         self.CB_strategy = strategy.rcx2024.Defender(self.match)
         self.SD_strategy = strategy.rcx2024.ShadowDefender(self.match)
 
-        self.GK_id = 5  # Goalkeeper fixed ID
+        self.GK_id = 8  # Goalkeeper fixed ID
 
         self.defending = False
 
@@ -32,8 +32,10 @@ class Coach(BaseCoach):
 
             if self.match.ball.x < .5:
                 self.defend()
+                # print("Defend")
             else:
                 self.attack()
+                # print("Attack")
 
         else:
             self.not_playing()

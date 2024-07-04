@@ -67,7 +67,7 @@ class Wait(PlayerPlay):
         super().__init__(match, robot)
 
     def get_name(self):
-        return f"<{self.robot.get_name()} Position Planning>"
+        return f"<{self.robot.get_name()} Wait in area>"
 
     def start_up(self):
         super().start_up()
@@ -103,7 +103,7 @@ class LookAtBall(PlayerPlay):
         super().__init__(match, robot)
 
     def get_name(self):
-        return f"<{self.robot.get_name()} Looking at the ball>"
+        return f"<{self.robot.get_name()} Go to angle>"
 
     def start_up(self):
         super().start_up()

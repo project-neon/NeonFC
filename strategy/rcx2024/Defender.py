@@ -28,9 +28,9 @@ class CenterPlay(PlayerPlay):
         ball = self.match.ball
 
         if ball.y > self.robot.y:
-            guide = Point(ball.x + .1, 1.3)
+            guide = Point(ball.x , 1.3)
         else:
-            guide = Point(ball.x + .1, 0)
+            guide = Point(ball.x, 0)
 
         self.univector.set_target(target=ball, guide=guide)
 
@@ -101,7 +101,7 @@ class Wait(PlayerPlay):
         super().__init__(match, robot)
 
     def get_name(self):
-        return f"<{self.robot.get_name()} Position Planning>"
+        return f"<{self.robot.get_name()} Wait in area>"
 
     def start_up(self):
         super().start_up()
@@ -137,7 +137,7 @@ class LookAtBall(PlayerPlay):
         super().__init__(match, robot)
 
     def get_name(self):
-        return f"<{self.robot.get_name()} Looking at the ball>"
+        return f"<{self.robot.get_name()} Go to angle>"
 
     def start_up(self):
         super().start_up()
@@ -179,8 +179,8 @@ class Defender(Strategy):
         on_cross_2 = OnInsideBox(self.match, [0, 1, .15, .25], False)
         off_cross_1 = OnInsideBox(self.match, [0, 0, .15, .3], True)
         off_cross_2 = OnInsideBox(self.match, [0, 1, .15, .3], True)
-        on_area = OnInsideBox(self.match, [0, .25, .2, .8], False)
-        off_area = OnInsideBox(self.match, [0, .25, .2, .8], True)
+        on_area = OnInsideBox(self.match, [0, .25, .18, .8], False)
+        off_area = OnInsideBox(self.match, [0, .25, .18, .8], True)
         on_near_ball = OnNextTo(self.match.ball, self.robot, 0.1, False)
         off_near_ball = OnNextTo(self.match.ball, self.robot, 0.13, True)
         on_position_1 = OnNextTo([.35, 1.1], self.robot, 0.1, False)
@@ -216,4 +216,5 @@ class Defender(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
+        # print(self.match.ball.x, self.match.ball.y)
         return res

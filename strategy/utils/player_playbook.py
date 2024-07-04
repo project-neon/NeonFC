@@ -10,6 +10,8 @@ class PlayerPlaybook(Playbook):
 
     def update(self):
         self._transition_if_have()
+        if self.robot.robot_id == 8:
+            print(self.robot.robot_id, self.robot.strategy ,self.actual_play)
         return self.plays[self.actual_play].update()
 
 
