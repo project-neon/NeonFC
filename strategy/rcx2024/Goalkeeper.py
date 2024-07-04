@@ -188,7 +188,7 @@ class Goalkeeper(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
-        print(res)
+        # print(res)
         # print(OnInsideBox(self.match, [-.5, -.2, .75, 1.7], True).evaluate())
         # print(self.match.ball.x, self.match.ball.y)
         return res
