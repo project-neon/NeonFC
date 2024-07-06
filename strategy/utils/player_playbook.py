@@ -2,6 +2,7 @@
 import math
 from commons.math import point_in_rect
 from entities.plays.playbook import Play, Playbook, Trigger
+from strategy.rcx2024.Goalkeeper import PushPlay, Goalkeeper
 
 class PlayerPlaybook(Playbook):
     def __init__(self, coach, robot):
@@ -188,3 +189,15 @@ class RobotOnInsideBox(Trigger):
         if self.outside:
             return not point_in_rect([self.robot.x, self.robot.y], self.box)
         return point_in_rect([self.robot.x, self.robot.y], self.box)
+
+class GoalkeeperPush(Trigger):
+    def __init__(self, match):
+        super.__init__()
+        self.match = match
+        self.goalkeeper = None
+        for r in self.match.robots:
+            if isinstance(r.strategy, Goalkeeper):
+                self.goalkeeper = r
+    
+    def evaluate(self):
+        return isinstance(self.goalkeeper.strategy.get_play(),PushPlay)

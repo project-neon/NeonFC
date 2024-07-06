@@ -5,3 +5,4 @@ from strategy.rcx2024.SecondAttacker import ShadowAttacker
 from strategy.rcx2024.Defender import Defender
 from strategy.rcx2024.SecondDefender import ShadowDefender
 # from strategy.rcx2023.Unstuck import Unstuck
+from strategy.rcx2024.Goalkeeper import PushPlay

@@ -1,6 +1,6 @@
 import math
 from strategy.BaseStrategy import Strategy
-from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition
+from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition, GoalkeeperPush
 from controller import PID_control, PID_W_control
 from NeonPathPlanning import Point, LimitCycle
 
@@ -114,7 +114,31 @@ class LookAtBall(PlayerPlay):
     def update(self):
         return self.match.ball.x, self.match.ball.y
 
+class GoalPlay(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
 
+    def get_name(self):
+        return f"<{self.robot.get_name()} Goal play>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs={'V_MIN': 0, 'K_RHO': 1.5}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def update(self):
+        return self.position()
+
+    def position(self):
+        x = 0.3
+
+        if self.match.ball.y >= 0.65:
+            y = self.match.ball.y - 0.5
+        else:
+            y = self.match.ball.y + 0.5
+        
+        return (x, y)
 
 class ShadowDefender(Strategy):
     def __init__(self, match):
@@ -129,11 +153,13 @@ class ShadowDefender(Strategy):
         block_play = BlockCross(self.match, self.robot)
         wait_play = Wait(self.match, self.robot)
         angle_play = LookAtBall(self.match, self.robot)
+        goal_play = GoalPlay(self.match, self.robot)
 
         self.playerbook.add_play(main_play)
         self.playerbook.add_play(wait_play)
         self.playerbook.add_play(angle_play)
         self.playerbook.add_play(block_play)
+        self.playerbook.add_play(goal_play)
 
         on_cross_1 = OnInsideBox(self.match, [0, 0, .15, .25], False)
         on_cross_2 = OnInsideBox(self.match, [0, 1, .15, .25], False)
@@ -145,6 +171,7 @@ class ShadowDefender(Strategy):
         off_position_1 = OnNextTo([.35, 1.1], self.robot, 0.1, True)
         on_position_2 = OnNextTo([.35, .2], self.robot, 0.1, False)
         off_position_2 = OnNextTo([.35, .2], self.robot, 0.1, True)
+        on_gk_push = GoalkeeperPush(self.match)
 
         main_play.add_transition(on_cross_1, block_play)
         main_play.add_transition(on_cross_2, block_play)
@@ -156,6 +183,13 @@ class ShadowDefender(Strategy):
         wait_play.add_transition(on_position_2, angle_play)
         angle_play.add_transition(AndTransition([off_position_1, off_position_2]), wait_play)
         angle_play.add_transition(off_area, main_play)
+
+        main_play.add_transition(on_gk_push, goal_play)
+        block_play.add_transition(on_gk_push, goal_play)
+        wait_play.add_transition(on_gk_push, goal_play)
+        angle_play.add_transition(on_gk_push, goal_play)
+
+        goal_play.add_transition((not on_gk_push), angle_play)
 
         if self.playerbook.actual_play is None:
             self.playerbook.set_play(main_play)

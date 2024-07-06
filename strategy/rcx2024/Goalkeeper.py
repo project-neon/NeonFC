@@ -186,8 +186,12 @@ class Goalkeeper(Strategy):
         if robot:
             self.start(robot)
 
+    def get_play(self):
+        return self.playerbook.actual_play
+
     def decide(self):
         res = self.playerbook.update()
+        # print(self.playerbook.actual_play)
         # print(res)
         # print(OnInsideBox(self.match, [-.5, -.2, .75, 1.7], True).evaluate())
         # print(self.match.ball.x, self.match.ball.y)

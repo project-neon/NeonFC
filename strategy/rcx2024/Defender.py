@@ -1,6 +1,6 @@
 import math
 from strategy.BaseStrategy import Strategy
-from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition
+from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition, GoalkeeperPush
 from controller import PID_control, PID_W_control, UniController, NoController
 from NeonPathPlanning import UnivectorField, Point, LimitCycle
 
@@ -132,6 +132,33 @@ class Wait(PlayerPlay):
             return b
 
 
+class GoalPlay(PlayerPlay):
+    def __init__(self, match, robot):
+        super().__init__(match, robot)
+
+    def get_name(self):
+        return f"<{self.robot.get_name()} Goal play>"
+
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs={'V_MIN': 0, 'K_RHO': 1.5}
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+
+    def update(self):
+        return self.position()
+
+    def position(self):
+        x = 0.2
+        
+        if self.match.ball.y >= 0.65:
+            y = self.match.ball.y - 0.3
+        else:
+            y = self.match.ball.y + 0.3
+        
+        return (x, y)
+
+
 class LookAtBall(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
@@ -165,6 +192,7 @@ class Defender(Strategy):
         block_spin_play = Spin(self.match, self.robot)
         wait_play = Wait(self.match, self.robot)
         angle_play = LookAtBall(self.match, self.robot)
+        goal_play = GoalPlay(self.match, self.robot)
 
         self.playerbook.add_play(center_play)
         self.playerbook.add_play(block_play)
@@ -172,6 +200,7 @@ class Defender(Strategy):
         self.playerbook.add_play(block_spin_play)
         self.playerbook.add_play(wait_play)
         self.playerbook.add_play(angle_play)
+        self.playerbook.add_play(goal_play)
 
         on_wing = OnInsideBox(self.match, [0, 0.2, 1.5, 0.9], True)
         off_wing = OnInsideBox(self.match, [0, 0.25, 1.5, 0.8], False)
@@ -187,6 +216,10 @@ class Defender(Strategy):
         off_position_1 = OnNextTo([.35, 1.1], self.robot, 0.1, True)
         on_position_2 = OnNextTo([.35, .2], self.robot, 0.1, False)
         off_position_2 = OnNextTo([.35, .2], self.robot, 0.1, True)
+        # ball_on_goal = OnInsideBox(self.match, [1.0, 0, 0.2, 0.3], False) or OnInsideBox(self.match, [0, 0, 0.2, 0.3], False)
+        on_gk_push = GoalkeeperPush(self.match)
+
+        # condição que pega nome da play do goleiro
 
 
         center_play.add_transition(AndTransition([on_wing, on_near_ball]), wing_spin_play)
@@ -205,6 +238,22 @@ class Defender(Strategy):
         wait_play.add_transition(on_position_2, angle_play)
         angle_play.add_transition(AndTransition([off_position_1, off_position_2]), wait_play)
         angle_play.add_transition(off_area, center_play)
+
+        # center_play.add_transition(ball_on_goal, goal_play)
+        # block_play.add_transition(ball_on_goal, goal_play)
+        # wing_spin_play.add_transition(ball_on_goal, goal_play)
+        # block_spin_play.add_transition(ball_on_goal, goal_play)
+        # wait_play.add_transition(ball_on_goal, goal_play)
+        # angle_play.add_transition(ball_on_goal, goal_play)
+
+        center_play.add_transition(on_gk_push, goal_play)
+        block_play.add_transition(on_gk_push, goal_play)
+        wing_spin_play.add_transition(on_gk_push, goal_play)
+        block_spin_play.add_transition(on_gk_push, goal_play)
+        wait_play.add_transition(on_gk_push, goal_play)
+        angle_play.add_transition(on_gk_push, goal_play)
+
+        goal_play.add_transition((not on_gk_push), angle_play)
 
         if self.playerbook.actual_play is None:
             self.playerbook.set_play(center_play)
