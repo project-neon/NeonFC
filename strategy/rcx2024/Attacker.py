@@ -198,4 +198,6 @@ class MainStriker(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
+        # print(res)
+        # print(self.match.ball.x, self.match.ball.y)
         return res

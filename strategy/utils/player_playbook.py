@@ -2,7 +2,6 @@
 import math
 from commons.math import point_in_rect
 from entities.plays.playbook import Play, Playbook, Trigger
-from strategy.rcx2024.Goalkeeper import PushPlay, Goalkeeper
 
 class PlayerPlaybook(Playbook):
     def __init__(self, coach, robot):
@@ -12,7 +11,7 @@ class PlayerPlaybook(Playbook):
     def update(self):
         self._transition_if_have()
         # if self.robot.robot_id == 8:
-        #     print(self.robot.robot_id, self.robot.strategy ,self.actual_play)
+        #      print(self.robot.robot_id, self.robot.strategy ,self.actual_play)
         return self.plays[self.actual_play].update()
 
 
@@ -82,7 +81,8 @@ class OnStuckTrigger(Trigger):
         self.seconds_stuck = seconds_stuck
 
     def evaluate(self, *args, **kwargs):
-        return self.robot.is_stuck(self.seconds_stuck)
+        print('aaaaaa')
+        return self.robot.is_stuck()
 
 class OnAttackerPushTrigger(Trigger):
     def __init__(self, robot, match, min_angle=0.60):
@@ -137,6 +137,18 @@ class NotTransition(Trigger):
 
     def evaluate(self, *args, **kwargs):
         return not self.transition.evaluate()
+    
+class CheckAngle(Trigger):
+    def __init__(self, robot, ball):
+        super().__init__()
+        self.robot = robot
+        self.ball = ball
+
+    def evaluate(self, *args, **kwargs):
+        if not ((self.robot.theta < 5 and self.robot.theta > 4.6) or (self.robot.theta < 1.7 and self.robot.theta > 1.35)):
+            if self.ball.x > .6:
+                return True
+        return False
 
 class OnNextTo(Trigger):
     def next_to(self, p1, p2, err=0.05, far=False):
@@ -190,14 +202,14 @@ class RobotOnInsideBox(Trigger):
             return not point_in_rect([self.robot.x, self.robot.y], self.box)
         return point_in_rect([self.robot.x, self.robot.y], self.box)
 
-class GoalkeeperPush(Trigger):
-    def __init__(self, match):
-        super.__init__()
-        self.match = match
-        self.goalkeeper = None
-        for r in self.match.robots:
-            if isinstance(r.strategy, Goalkeeper):
-                self.goalkeeper = r
+# class GoalkeeperPush(Trigger):
+#     def __init__(self, match):
+#         super.__init__()
+#         self.match = match
+#         self.goalkeeper = None
+#         for r in self.match.robots:
+#             if r.strategy.name == "Goalkeeper":
+#                 self.goalkeeper = r
     
-    def evaluate(self):
-        return isinstance(self.goalkeeper.strategy.get_play(),PushPlay)
+#     def evaluate(self):
+#         return isinstance(self.goalkeeper.strategy.get_play(),PushPlay)

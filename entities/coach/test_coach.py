@@ -3,6 +3,7 @@ from entities.coach.coach import BaseCoach
 import strategy
 import strategy.rcx2024
 import strategy.rcx2024.Attacker
+import strategy.tests.goFoward
 
 class Coach(BaseCoach): # heranca da classe abstrata
     NAME = "TEST"
@@ -10,9 +11,9 @@ class Coach(BaseCoach): # heranca da classe abstrata
         super().__init__(match) # chamada do metodo da classe mae
 
         # vamos usar strategies de teste por enquanto, essa deixa o robo parado
-        self._1 = strategy.rcx2024.Goalkeeper(self.match)
-        self._2 = strategy.rcx2024.ShadowAttacker(self.match)
-        self._3 = strategy.rcx2024.MainStriker(self.match)
+        self._1 = strategy.tests.Foward(self.match)
+        self._2 = strategy.tests.Foward(self.match)
+        self._3 = strategy.tests.Foward(self.match)
 
     def decide(self):
         # esta lista eh ordenada em [robot_0, ..., robot_n]

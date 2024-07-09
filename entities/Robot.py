@@ -109,6 +109,7 @@ class Robot(object):
             self.stuck_time += 1
         else:
             self.stuck_time = 0
+        print(self.stuck_time)
 
     def is_stuck(self):
         MIN_STUCK_TIME = 1  # in seconds

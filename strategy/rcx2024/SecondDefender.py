@@ -1,6 +1,6 @@
 import math
 from strategy.BaseStrategy import Strategy
-from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition, GoalkeeperPush
+from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition
 from controller import PID_control, PID_W_control
 from NeonPathPlanning import Point, LimitCycle
 
@@ -171,7 +171,11 @@ class ShadowDefender(Strategy):
         off_position_1 = OnNextTo([.35, 1.1], self.robot, 0.1, True)
         on_position_2 = OnNextTo([.35, .2], self.robot, 0.1, False)
         off_position_2 = OnNextTo([.35, .2], self.robot, 0.1, True)
-        on_gk_push = GoalkeeperPush(self.match)
+        # on_gk_push = GoalkeeperPush(self.match)
+        on_angle_goal_1 = OnInsideBox(self.match, [-.5, -.1, .75, .3])
+        off_angle_goal_1 = OnInsideBox(self.match, [-.5, -.1, .75, .3], False)
+        on_angle_goal_2 = OnInsideBox(self.match, [-.5, 1.05, .75, .4])
+        off_angle_goal_2 = OnInsideBox(self.match, [-.5, 1.05, .75, .4], False)
 
         main_play.add_transition(on_cross_1, block_play)
         main_play.add_transition(on_cross_2, block_play)
@@ -179,17 +183,17 @@ class ShadowDefender(Strategy):
 
         main_play.add_transition(on_area, wait_play)
         wait_play.add_transition(off_area, main_play)
-        wait_play.add_transition(on_position_1, angle_play)
-        wait_play.add_transition(on_position_2, angle_play)
+        wait_play.add_transition(on_position_1, goal_play)
+        wait_play.add_transition(on_position_2, goal_play)
         angle_play.add_transition(AndTransition([off_position_1, off_position_2]), wait_play)
         angle_play.add_transition(off_area, main_play)
 
-        main_play.add_transition(on_gk_push, goal_play)
-        block_play.add_transition(on_gk_push, goal_play)
-        wait_play.add_transition(on_gk_push, goal_play)
-        angle_play.add_transition(on_gk_push, goal_play)
+        main_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
+        block_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
+        wait_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
+        angle_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
 
-        goal_play.add_transition((not on_gk_push), angle_play)
+        goal_play.add_transition(AndTransition([off_angle_goal_1, off_angle_goal_2]), main_play)
 
         if self.playerbook.actual_play is None:
             self.playerbook.set_play(main_play)

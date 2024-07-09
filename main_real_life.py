@@ -27,8 +27,8 @@ class Game():
         self.field = pitch.Field(self.match.category)
         self.environment = env
 
-        self.t1 = time.time()
-        self.list = collections.deque(maxlen=25)
+        # self.t1 = time.time()
+        # self.list = collections.deque(maxlen=25)
 
         self.use_api = self.config.get("api")
         self.api_address = self.config.get("network").get("api_address")
@@ -90,11 +90,11 @@ class Game():
             ]
 
         self.comm.send(commands)
-        delta_t = float(time.time() - self.t1)
-        self.list.append(delta_t)
-        self.t1 = time.time()
+        # delta_t = float(time.time() - self.t1)
+        # self.list.append(delta_t)
+        # self.t1 = time.time()
 
-        print(len(self.list)/sum(self.list), 'hz')
+        # print(len(self.list)/sum(self.list), 'hz')
         # print('a')
 
     def stop(self):

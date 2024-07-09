@@ -1,6 +1,6 @@
 import math
 from strategy.BaseStrategy import Strategy
-from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition, GoalkeeperPush
+from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, AndTransition
 from controller import PID_control, PID_W_control, UniController, NoController
 from NeonPathPlanning import UnivectorField, Point, LimitCycle
 
@@ -149,7 +149,7 @@ class GoalPlay(PlayerPlay):
         return self.position()
 
     def position(self):
-        x = 0.2
+        x = 0.3
         
         if self.match.ball.y >= 0.65:
             y = self.match.ball.y - 0.3
@@ -217,7 +217,11 @@ class Defender(Strategy):
         on_position_2 = OnNextTo([.35, .2], self.robot, 0.1, False)
         off_position_2 = OnNextTo([.35, .2], self.robot, 0.1, True)
         # ball_on_goal = OnInsideBox(self.match, [1.0, 0, 0.2, 0.3], False) or OnInsideBox(self.match, [0, 0, 0.2, 0.3], False)
-        on_gk_push = GoalkeeperPush(self.match)
+        # on_gk_push = GoalkeeperPush(self.match)
+        on_angle_goal_1 = OnInsideBox(self.match, [-.5, -.1, .75, .3])
+        off_angle_goal_1 = OnInsideBox(self.match, [-.5, -.1, .75, .3], False)
+        on_angle_goal_2 = OnInsideBox(self.match, [-.5, 1.05, .75, .4])
+        off_angle_goal_2 = OnInsideBox(self.match, [-.5, 1.05, .75, .4], False)
 
         # condição que pega nome da play do goleiro
 
@@ -234,8 +238,8 @@ class Defender(Strategy):
 
         center_play.add_transition(on_area, wait_play)
         wait_play.add_transition(off_area, center_play)
-        wait_play.add_transition(on_position_1, angle_play)
-        wait_play.add_transition(on_position_2, angle_play)
+        # wait_play.add_transition(on_position_1, angle_play)
+        # wait_play.add_transition(on_position_2, angle_play)
         angle_play.add_transition(AndTransition([off_position_1, off_position_2]), wait_play)
         angle_play.add_transition(off_area, center_play)
 
@@ -246,14 +250,14 @@ class Defender(Strategy):
         # wait_play.add_transition(ball_on_goal, goal_play)
         # angle_play.add_transition(ball_on_goal, goal_play)
 
-        center_play.add_transition(on_gk_push, goal_play)
-        block_play.add_transition(on_gk_push, goal_play)
-        wing_spin_play.add_transition(on_gk_push, goal_play)
-        block_spin_play.add_transition(on_gk_push, goal_play)
-        wait_play.add_transition(on_gk_push, goal_play)
-        angle_play.add_transition(on_gk_push, goal_play)
+        center_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
+        block_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
+        wing_spin_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
+        block_spin_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
+        wait_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
+        angle_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
 
-        goal_play.add_transition((not on_gk_push), angle_play)
+        goal_play.add_transition((AndTransition([off_angle_goal_1, off_angle_goal_2])), center_play)
 
         if self.playerbook.actual_play is None:
             self.playerbook.set_play(center_play)
