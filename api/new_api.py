@@ -31,6 +31,7 @@ class Api(metaclass=SingletonMeta):
     def __init__(self, address, port):
         self.address = address
         self.port = port
+        self.kill_recieved = False
 
     # Initiate socket connection
     def start(self):
@@ -38,10 +39,10 @@ class Api(metaclass=SingletonMeta):
 
     # Sends dict game data to socket listener
     def send_data(self, info_api):
-         while True:
-            data_dict = info_api.organize_send()
-            msg = json.dumps(data_dict)
-            self.obj_socket.sendto(msg.encode(), (self.address, self.port)) #Problema 2
+            while not self.kill_recieved:
+                data_dict = info_api.organize_send()
+                msg = json.dumps(data_dict)
+                self.obj_socket.sendto(msg.encode(), (self.address, self.port)) 
 
     
     def send_custom_data(self, data):

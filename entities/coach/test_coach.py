@@ -1,6 +1,9 @@
 from entities.coach.coach import BaseCoach
 
 import strategy
+import strategy.rcx2024
+import strategy.rcx2024.Attacker
+import strategy.tests.goFoward
 
 class Coach(BaseCoach): # heranca da classe abstrata
     NAME = "TEST"

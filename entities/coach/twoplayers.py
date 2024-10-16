@@ -8,9 +8,9 @@ class Coach(BaseCoach): # heranca da classe abstrata
     def __init__(self, match):
         super().__init__(match) # chamada do metodo da classe mae
 
-        self.SS_strategy = strategy.rsm2024.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.rsm2024.MainStriker(self.match)
-        self.GK_strategy = strategy.rsm2024.Goalkeeper(self.match)
+        self.SS_strategy = strategy.rcx2024.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.rcx2024.MainStriker(self.match)
+        self.GK_strategy = strategy.rcx2024.Goalkeeper(self.match)
 
         self.GK_id = 5  # Goalkeeper fixed ID
 

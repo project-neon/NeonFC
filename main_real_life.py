@@ -27,9 +27,8 @@ class Game():
         self.field = pitch.Field(self.match.category)
         self.environment = env
 
-        self.t1 = time.time()
-        self.t2 = time.time() 
-        self.list = collections.deque(maxlen=25)
+        # self.t1 = time.time()
+        # self.list = collections.deque(maxlen=25)
 
         self.use_api = self.config.get("api")
         self.api_address = self.config.get("network").get("api_address")
@@ -58,13 +57,13 @@ class Game():
         self.comm.start()
         
         if self.use_api:  
+            #self.match.game_status = 'GAME_ON'   
             self.info_api = InfoApi(self.match, self.match.robots, self.match.opposites, self.match.coach, self.match.ball, self.match.parameters)
             self.api.start()
             self.api_recv.connect_info(self.info_api)
             self.api_recv.start()  #Problema 1
-            # self.sender_thread = threading.Thread(target = self.api.send_data(self.info_api))
-            # self.sender_thread.start()
-            # self.sender_thread.join()
+            self.sender_thread = threading.Thread(target = self.api.send_data, args=[self.info_api])
+            self.sender_thread.start()
 
     def update(self):
         frame = assign_empty_values(
@@ -91,28 +90,25 @@ class Game():
             ]
 
         self.comm.send(commands)
-        delta_t = float(time.time() - self.t1)
-        self.list.append(delta_t)
-        self.t1 = time.time()
+        # delta_t = float(time.time() - self.t1)
+        # self.list.append(delta_t)
+        # self.t1 = time.time()
 
-        print('Game:',len(self.list)/sum(self.list), 'hz')
-
-        if self.use_api:
-                self.api.send_data(self.info_api)
+        # print(len(self.list)/sum(self.list), 'hz')
+        # print('a')
 
     def stop(self):
         for t in threading.enumerate():
             t.kill_recieved = True
-    
 
             
             
 g = Game(config_file=args.config_file, env=args.env)
 
-try:
+try: 
     while True:
         time.sleep(0.01)
 except KeyboardInterrupt:
-   g.stop()
+    g.stop()
 
 
