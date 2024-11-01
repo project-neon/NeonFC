@@ -35,16 +35,23 @@ class Api(metaclass=SingletonMeta):
 
     # Initiate socket connection
     def start(self):
-        self.obj_socket = socket(AF_INET, SOCK_DGRAM)
+        # self.obj_socket = socket(AF_INET, SOCK_DGRAM)
+        # Creating TCP socket
+        self.obj_socket = socket(AF_INET, SOCK_STREAM)
+        self.obj_socket.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1)
+        # Connects to TCP server
+        self.obj_socket.connect((self.address, self.port))
 
     # Sends dict game data to socket listener
     def send_data(self, info_api):
             while not self.kill_recieved:
                 data_dict = info_api.organize_send()
                 msg = json.dumps(data_dict)
-                self.obj_socket.sendto(msg.encode(), (self.address, self.port)) 
+                # self.obj_socket.sendto(msg.encode(), (self.address, self.port))
+                self.obj_socket.sendall(msg.encode())
 
     
     def send_custom_data(self, data):
-         msg = json.dumps(data)
-         self.obj_socket.sendto(msg.encode(), (self.address, self.port))
+        msg = json.dumps(data)
+        # self.obj_socket.sendto(msg.encode(), (self.address, self.port))
+        self.obj_socket.sendall(msg.encode())
