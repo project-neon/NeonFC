@@ -75,6 +75,7 @@ class Game():
         self.vision.last_frame = frame
         
         self.match.update(frame)
+        print(self.match.game_status)
         if self.use_referee:
             self.match.check_foul(self.referee)
         commands = self.match.decide()

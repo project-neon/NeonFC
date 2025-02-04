@@ -28,7 +28,7 @@ class MatchRealLife(object):
 
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
-        self.game_status = 'STOP'
+        self.game_status = 'GAME_ON'
         self.match_event = {'event': 'PLAYING', 'quadrant': 1, 'mine': True}
 
     
@@ -56,7 +56,7 @@ class MatchRealLife(object):
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
         self.opposites = [
-            entities.Robot(self.game, i, self.opposite_team_color) for i in [] # range(self.n_robots)
+            entities.Robot(self.game, i, self.opposite_team_color) for i in self.opposite_ids
         ]
 
         self.robots = [
