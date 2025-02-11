@@ -44,8 +44,6 @@ class RLComm(object):
 
         message = message[:-1] + '>'
 
-        print(message)
-
         self.comm.write(message.encode())
 
     def _get_robot_color(self, robot):

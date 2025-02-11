@@ -185,8 +185,7 @@ class Stuck(PlayerPlay):
 
     def update(self):
 
-        while self.t1 < 1:
-            return self.robot.x + 2., self.robot.y
+        return self.robot.x + 0.2, self.robot.y
     
 
 class Goalkeeper(Strategy):
@@ -264,5 +263,4 @@ class Goalkeeper(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
-        # print(res)
         return res

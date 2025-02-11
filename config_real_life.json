@@ -30,7 +30,7 @@
         ]
     },
     "comm": {
-        "comm_port": "/dev/ttyACM0",
+        "comm_port": "/dev/ttyACM1",
         "baud_rate": 115200
     },
     "referee": false,

@@ -5,18 +5,18 @@ import json
 
 
 class Coach(BaseCoach):
-    NAME = "RCX_2024"
+    NAME = "IRON_2025"
 
     def __init__(self, match):
         super().__init__(match)
 
-        self.SS_strategy = strategy.rcx2024.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.rcx2024.MainStriker(self.match)
-        self.GK_strategy = strategy.rcx2024.Goalkeeper(self.match)
-        self.CB_strategy = strategy.rcx2024.Defender(self.match)
-        self.SD_strategy = strategy.rcx2024.ShadowDefender(self.match)
+        self.SS_strategy = strategy.iron2025.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.iron2025.MainStriker(self.match)
+        self.GK_strategy = strategy.iron2025.Goalkeeper(self.match)
+        self.CB_strategy = strategy.iron2025.Defender(self.match)
+        self.SD_strategy = strategy.iron2025.ShadowDefender(self.match)
 
-        self.GK_id = 8  # Goalkeeper fixed ID
+        self.GK_id = 5  # Goalkeeper fixed ID
 
         self.defending = False
 

@@ -27,8 +27,8 @@ class Game():
         self.field = pitch.Field(self.match.category)
         self.environment = env
 
-        # self.t1 = time.time()
-        # self.list = collections.deque(maxlen=25)
+        self.t1 = time.time()
+        self.list = collections.deque(maxlen=25)
 
         self.use_api = self.config.get("api")
         self.api_address = self.config.get("network").get("api_address")
@@ -75,7 +75,6 @@ class Game():
         self.vision.last_frame = frame
         
         self.match.update(frame)
-        print(self.match.game_status)
         if self.use_referee:
             self.match.check_foul(self.referee)
         commands = self.match.decide()
@@ -91,12 +90,11 @@ class Game():
             ]
 
         self.comm.send(commands)
-        # delta_t = float(time.time() - self.t1)
-        # self.list.append(delta_t)
-        # self.t1 = time.time()
+        delta_t = float(time.time() - self.t1)
+        self.list.append(delta_t)
+        self.t1 = time.time()
 
-        # print(len(self.list)/sum(self.list), 'hz')
-        # print('a')
+        print(len(self.list)/sum(self.list), 'hz')
 
     def stop(self):
         for t in threading.enumerate():
