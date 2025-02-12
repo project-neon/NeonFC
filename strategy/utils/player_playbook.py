@@ -143,9 +143,23 @@ class CheckAngle(Trigger):
 
     def evaluate(self, *args, **kwargs):
         if not ((self.robot.theta < 5 and self.robot.theta > 4.6) or (self.robot.theta < 1.7 and self.robot.theta > 1.35)):
-            if self.ball.x > .6:
+            if self.ball.x > .45:
                 return True
         return False
+    
+class RobotLookBall(Trigger):
+    def __init__(self, robot, ball):
+        super().__init__()
+        self.robot = robot
+        self.ball = ball
+
+    def evaluate(self, *args, **kwargs):
+        if (self.robot.theta > 4.2 and self.robot.theta < 5.5) and self.ball.y < self.robot.y:
+            return True
+        if (self.robot.theta > 0.9 and self.robot.theta < 2.1) and self.ball.y > self.robot.y:
+            return True
+        return False
+
 
 class OnNextTo(Trigger):
     def next_to(self, p1, p2, err=0.05, far=False):

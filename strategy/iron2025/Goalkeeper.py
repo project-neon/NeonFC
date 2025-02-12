@@ -1,6 +1,6 @@
 import math
 from strategy.BaseStrategy import Strategy
-from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, CheckAngle, AndTransition, RobotOnInsideBox, NotTransition, OnStuckTrigger
+from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, CheckAngle, AndTransition, RobotOnInsideBox, NotTransition, OnStuckTrigger, RobotLookBall
 from controller import PID_control, PID_W_control, UniController, NoController
 from NeonPathPlanning import UnivectorField, Point
 
@@ -44,11 +44,11 @@ class FollowBallPlay(PlayerPlay):
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
         if self.robot.y < .25: 
-            return 0.04, .3
+            return 0.1, .3
         if self.robot.y > 1.1:
-            return 0.04, 1.0
+            return 0.1, 1.0
 
-        return 0.04, y
+        return 0.1, y
 
 
 class InsideArea(PlayerPlay):
@@ -137,9 +137,9 @@ class PushPlay(PlayerPlay):
         ball = self.match.ball
 
         if ball.y > self.robot.y:
-            return ball.x  , 1.3
+            return ball.x + ball.x*0.1 , 1.3
         else:
-            return ball.x , 0
+            return ball.x + ball.x*0.1 , 0.1
         
 class CorrectAngle(PlayerPlay):
     def __init__(self, match, robot):
@@ -184,13 +184,17 @@ class Stuck(PlayerPlay):
         self.t1 = time.time()
 
     def update(self):
+        
+        if self.robot.y >= .65:
+            return self.robot.x + .2, self.robot.y - .1
+        return self.robot.x + .2, self.robot.y + .1
 
-        return self.robot.x + 0.2, self.robot.y
     
 
 class Goalkeeper(Strategy):
     def __init__(self, match):
         super().__init__(match, "Goalkeeper", controller=PID_control)
+        self.old_play = None
 
     def start(self, robot=None):
         super().start(robot=robot)
@@ -208,7 +212,7 @@ class Goalkeeper(Strategy):
         self.playerbook.add_play(follow_ball)
         self.playerbook.add_play(inside_area)
         self.playerbook.add_play(spin)
-        self.playerbook.add_play(rest)
+        #self.playerbook.add_play(rest)
         self.playerbook.add_play(push)
         self.playerbook.add_play(correct_angle)
         self.playerbook.add_play(stuck)
@@ -219,32 +223,34 @@ class Goalkeeper(Strategy):
         not_need_reposition = NotTransition(need_reposition)
         on_stuck = OnStuckTrigger(self.robot)
         not_stuck = NotTransition(stuck)
+        robot_look_ball = RobotLookBall(self.robot, self.match.ball)
 
 
         follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)
         follow_ball.add_transition(on_near_ball, spin)
-        follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
-        follow_ball.add_transition(OnInsideBox(self.match, [-.5, -.1, .75, .3]), push)
-        follow_ball.add_transition(OnInsideBox(self.match, [-.5, 1.05, .75, .4]), push)
-        follow_ball.add_transition(AndTransition([RobotOnInsideBox(self.match, [-.5, .3, .65, .7], self.robot), need_reposition]), correct_angle)
+        # follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
+        follow_ball.add_transition(AndTransition([OnInsideBox(self.match, [.0, 0.25, .3, .8]), robot_look_ball]), push) 
+        follow_ball.add_transition(AndTransition([RobotOnInsideBox(self.match, [-.5, -.1, .65, 1.6], self.robot), need_reposition]), correct_angle)
         follow_ball.add_transition(on_stuck, stuck)
 
-        push.add_transition(AndTransition([RobotOnInsideBox(self.match, [-.5, .3, .65, .7], self.robot), need_reposition]), correct_angle)
-        spin.add_transition(AndTransition([RobotOnInsideBox(self.match, [-.5, .3, .65, .7], self.robot), need_reposition]), correct_angle)
+        push.add_transition(AndTransition([RobotOnInsideBox(self.match, [-.5, -.1, .65, 1.6], self.robot), need_reposition]), correct_angle)
+        spin.add_transition(AndTransition([RobotOnInsideBox(self.match, [-.5, -.1, .65, 1.6], self.robot), need_reposition]), correct_angle)
         rest.add_transition(need_reposition, correct_angle)
-        rest.add_transition(on_stuck, stuck)
+        # rest.add_transition(on_stuck, stuck)
 
-        inside_area.add_transition(OnInsideBox(self.match, [-.5, -.1, .75, .3]), push)
-        inside_area.add_transition(OnInsideBox(self.match, [-.5, 1.05, .75, .4]), push)
+        
         inside_area.add_transition(on_near_ball, spin)
         inside_area.add_transition(need_reposition, correct_angle)
         inside_area.add_transition(on_stuck, stuck)
+        inside_area.add_transition(OnInsideBox(self.match,[-.3, -.1, .5, 1.5], True), follow_ball)
 
 
-        push.add_transition(OnInsideBox(self.match, [-.5, -.1, .75, 1.7], True), follow_ball)
+        push.add_transition(OnInsideBox(self.match, [-.1, 0.2, .3, .9], True),follow_ball)
         push.add_transition(on_stuck, stuck)
+        push.add_transition(on_near_ball, spin)
         correct_angle.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9], True), follow_ball)
         correct_angle.add_transition(not_need_reposition, follow_ball)
+        correct_angle.add_transition(AndTransition([OnInsideBox(self.match, [.0, 0.25, .3, .8]), robot_look_ball]), push)
         stuck.add_transition(not_stuck, follow_ball)
 
         spin.add_transition(off_near_ball, follow_ball)
@@ -263,4 +269,7 @@ class Goalkeeper(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
+        if self.old_play != self.playerbook.actual_play:
+            print(self.playerbook.actual_play,self.old_play)
+            self.old_play = self.playerbook.actual_play
         return res

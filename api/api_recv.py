@@ -17,8 +17,6 @@ class Api_recv(threading.Thread):
         self.decod_data = None   
 
         self.kill_recieved = False
-        self.t1 = time.time()
-        self.list = collections.deque(maxlen=25)
 
     def connect_info(self,info_api):
         self.info_api = info_api

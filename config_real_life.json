@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "right",
         "team_color": "blue",
-        "coach_name": "RCX_2024",
+        "coach_name": "IRON_2025",
         "category": "3v3",
         "robot_ids": [
             5,
@@ -30,7 +30,7 @@
         ]
     },
     "comm": {
-        "comm_port": "/dev/ttyACM1",
+        "comm_port": "/dev/ttyACM0",
         "baud_rate": 115200
     },
     "referee": false,
