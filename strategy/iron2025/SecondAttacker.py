@@ -30,7 +30,7 @@ class MainPlay(PlayerPlay):
 
         # second attacker offset on x based on the distance of the main attacker to the ball
         # second attacker offset on y based on the distance of the ball to the center
-        target = Point(max(main_st.x*.7, 0.2), main_st.y + .5*(.65-ball.y))
+        target = Point(max(main_st.x*.8, 0.2), main_st.y + .7*(.65-ball.y))
 
         self.univector.set_target(target, ball)
         self.univector.add_obstacle(main_st, obs_radius)

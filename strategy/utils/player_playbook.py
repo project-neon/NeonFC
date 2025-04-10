@@ -142,8 +142,7 @@ class CheckAngle(Trigger):
         self.ball = ball
 
     def evaluate(self, *args, **kwargs):
-        if not ((self.robot.theta < 5 and self.robot.theta > 4.6) or (self.robot.theta < 1.7 and self.robot.theta > 1.35)):
-            if self.ball.x > .45:
+        if ((self.robot.theta > 2.3 and self.robot.theta < 0.9) or (self.robot.theta > -0.9 and self.robot.theta < -2.3)):
                 return True
         return False
     
@@ -154,9 +153,9 @@ class RobotLookBall(Trigger):
         self.ball = ball
 
     def evaluate(self, *args, **kwargs):
-        if (self.robot.theta > 4.2 and self.robot.theta < 5.5) and self.ball.y < self.robot.y:
+        if (self.robot.theta > 0.9 and self.robot.theta < 2.3 ) and self.ball.y > .65:
             return True
-        if (self.robot.theta > 0.9 and self.robot.theta < 2.1) and self.ball.y > self.robot.y:
+        if (self.robot.theta > -2.3 and self.robot.theta < -0.9) and self.ball.y <= .65:
             return True
         return False
 
