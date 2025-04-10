@@ -10,8 +10,6 @@ class PlayerPlaybook(Playbook):
 
     def update(self):
         self._transition_if_have()
-        # if self.robot.robot_id == 8:
-        #      print(self.robot.robot_id, self.robot.strategy ,self.actual_play)
         return self.plays[self.actual_play].update()
 
 
@@ -81,7 +79,6 @@ class OnStuckTrigger(Trigger):
         self.seconds_stuck = seconds_stuck
 
     def evaluate(self, *args, **kwargs):
-        print('aaaaaa')
         return self.robot.is_stuck()
 
 class OnAttackerPushTrigger(Trigger):
@@ -145,10 +142,23 @@ class CheckAngle(Trigger):
         self.ball = ball
 
     def evaluate(self, *args, **kwargs):
-        if not ((self.robot.theta < 5 and self.robot.theta > 4.6) or (self.robot.theta < 1.7 and self.robot.theta > 1.35)):
-            if self.ball.x > .6:
+        if ((self.robot.theta > 2.3 and self.robot.theta < 0.9) or (self.robot.theta > -0.9 and self.robot.theta < -2.3)):
                 return True
         return False
+    
+class RobotLookBall(Trigger):
+    def __init__(self, robot, ball):
+        super().__init__()
+        self.robot = robot
+        self.ball = ball
+
+    def evaluate(self, *args, **kwargs):
+        if (self.robot.theta > 0.9 and self.robot.theta < 2.3 ) and self.ball.y > .65:
+            return True
+        if (self.robot.theta > -2.3 and self.robot.theta < -0.9) and self.ball.y <= .65:
+            return True
+        return False
+
 
 class OnNextTo(Trigger):
     def next_to(self, p1, p2, err=0.05, far=False):

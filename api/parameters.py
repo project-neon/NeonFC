@@ -7,7 +7,7 @@ class Parameter:
         self.addr = address
         
     def update(self, info):
-        self.value = info[self.addr.upper()]
+        self.value = info.get(self.addr.upper(), self.value)
         
     def __add__(self, value):
         return self.value + value

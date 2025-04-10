@@ -120,7 +120,7 @@ class PID_control(object):
 
     def _update(self):
         # Params calculation
-        # Feedback errors
+        # Feedback errors]
         D_x = self.desired[0] - self.robot.x
         D_y = self.desired[1] - self.robot.y
 

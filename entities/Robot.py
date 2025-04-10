@@ -62,6 +62,8 @@ class Robot(object):
         team_color_key = 'robotsBlue' if self.team_color == 'blue' else 'robotsYellow'
 
         robot_data = [i for i in frame.get(team_color_key, []) if i.get('robotId') == self.robot_id]
+        # if self.robot_id == 5 and self.team_color == 'blue':
+        #     print(self.theta)
 
         if len(robot_data) >= 1:
             self.current_data = robot_data[0]
@@ -72,9 +74,6 @@ class Robot(object):
             if self.lost_frames > 45:
                 self.visible = False
             return
-        
-        # if self.robot_id == 5:
-        #     print(self.x, self.y)
 
         self._update_speeds()
         self.update_stuckness()
@@ -109,7 +108,7 @@ class Robot(object):
             self.stuck_time += 1
         else:
             self.stuck_time = 0
-        print(self.stuck_time)
+        #print(self.stuck_time)
 
     def is_stuck(self):
         MIN_STUCK_TIME = 1  # in seconds

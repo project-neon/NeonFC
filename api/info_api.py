@@ -46,7 +46,7 @@ class InfoApi():
 
 
         for parameter in self.parameter_list:
-            parameter.update(info_recv['PARAMETERS'])
+            parameter.update(info_recv.get('PARAMETERS', {}))
 
         self.save_data(info_recv)
         
