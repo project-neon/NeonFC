@@ -6,7 +6,35 @@ from NeonPathPlanning import UnivectorField, Point
 
 import time
 
+class DefendPlay(PlayerPlay):
+    radius = None
+    dist = None
+    def __init__(self,match,robot,dist,radius):
+        super().__init__(match,robot)
+        #dist é a distancia do ponto em relação a origem
+        #radius é o raio de distancia ao ponto
+        self.dist = dist
+        self.radius = radius
 
+    def update(self):
+        x = self.robot.x; y = self.robot.y
+        ball = self.match.ball;
+        
+        cx = ball.x - dist; cy = ball.y; #centro
+        mag = (cx**2 + cy **2) ** .5
+        cx /= mag; cy /= mag
+        return cx * dist, cy * dist
+        
+    # olha se isso é o controller certo     
+    def start_up(self):
+        super().start_up()
+        controller = PID_control
+        controller_kwargs = {
+            'K_RHO': 1,
+            'V_MIN': 0,
+        }
+        self.robot.strategy.controller = controller(self.robot, **controller_kwargs)
+    
 class FollowBallPlay(PlayerPlay):
     def __init__(self, match, robot):
         super().__init__(match, robot)
