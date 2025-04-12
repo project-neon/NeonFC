@@ -11,19 +11,36 @@ class DefendPlay(PlayerPlay):
     dist = None
     def __init__(self,match,robot,dist,radius):
         super().__init__(match,robot)
+
         #dist é a distancia do ponto em relação a origem
         #radius é o raio de distancia ao ponto
+
         self.dist = dist
         self.radius = radius
+        self.ball = self.match.ball
+        self.goal_left = .3
+        self.goal_right = 1.1
 
     def update(self):
-        x = self.robot.x; y = self.robot.y
-        ball = self.match.ball;
+        ball = self.ball
+
+        if ball.y > 1.1:
+            return .1, 1.1
         
-        cx = ball.x - dist; cy = ball.y; #centro
-        mag = (cx**2 + cy **2) ** .5
-        cx /= mag; cy /= mag
-        return cx * dist, cy * dist
+        if ball.y < .3:
+            return .1, .3
+        
+
+        projection_rate = 0.3 #(ball.x - .15) / (1 - .15)
+        projection_point = ball.y + projection_rate * ball.vy
+
+        y = min(max(projection_point, self.goal_right), self.goal_left)
+
+        x = (0.0256 - y**2) **.2
+
+        self.x = x, self.y = y
+
+        return x, y 
         
     # olha se isso é o controller certo     
     def start_up(self):
@@ -63,6 +80,6 @@ class Goalkeeper(Strategy):
     def decide(self):
         res = self.playerbook.update()
         # if self.old_play != self.playerbook.actual_play:
-        print(self.playerbook.actual_play,self.old_play)
+        print(self.playerbook.actual_play)
             # self.old_play = self.playerbook.actual_play
         return res

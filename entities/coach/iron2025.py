@@ -3,6 +3,8 @@ from entities.coach.coach import BaseCoach
 import strategy
 import json
 
+import strategy.rsm2025
+
 
 class Coach(BaseCoach):
     NAME = "IRON_2025"
@@ -12,7 +14,7 @@ class Coach(BaseCoach):
 
         self.SS_strategy = strategy.iron2025.ShadowAttacker(self.match)
         self.ST_strategy = strategy.iron2025.MainStriker(self.match)
-        self.GK_strategy = strategy.iron2025.Goalkeeper(self.match)
+        self.GK_strategy = strategy.rsm2025.Goalkeeper(self.match)
         self.CB_strategy = strategy.iron2025.Defender(self.match)
         self.SD_strategy = strategy.iron2025.ShadowDefender(self.match)
 

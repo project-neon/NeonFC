@@ -15,7 +15,7 @@
     },
     "match" : {
         "team_side": "right",
-        "team_color": "yellow",
+        "team_color": "blue",
         "coach_name": "IRON_2025",
         "category": "3v3",
         "robot_ids": [
