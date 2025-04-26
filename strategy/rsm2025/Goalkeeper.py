@@ -1,10 +1,41 @@
 import math
+
+from entities.plays.playbook import Trigger
 from strategy.BaseStrategy import Strategy
 from strategy.utils.player_playbook import PlayerPlay, PlayerPlaybook, OnInsideBox, OnNextTo, CheckAngle, AndTransition, RobotOnInsideBox, NotTransition, OnStuckTrigger, RobotLookBall
 from controller import PID_control, PID_W_control, UniController, NoController
 from NeonPathPlanning import UnivectorField, Point
 
 import time
+
+class IsInLine(Trigger):
+    """
+    Verifica se o robô está arbitrariamente perto de uma linha
+    reta entre a bola e alguma determinada coordenada (que em tese é pra ser o centro do gol)
+    A ideia é que caso o robô consiga se inserir entre o gol (nosso) e a bola, ele vai atacar
+    pra cima da bola.
+    """
+
+    def calc_dist(self):
+        # equação distância ponto-hiperplano
+        # d=|w.p + b| / ||w||
+        b = self.point
+        #TODO
+        pass
+
+    def __init__(self, robot, ball, point, dist):
+        super().__init__()
+        self.robot = robot
+        self.ball = ball
+        self.point = point
+        self.dist = dist
+
+    def evaluate(self, *args, **kwargs):
+        if (self.robot.theta > 0.9 and self.robot.theta < 2.3 ) and self.ball.y > .65:
+            return True
+        if (self.robot.theta > -2.3 and self.robot.theta < -0.9) and self.ball.y <= .65:
+            return True
+        return False
 
 class DefendPlay(PlayerPlay):
     radius = None
@@ -33,7 +64,8 @@ class DefendPlay(PlayerPlay):
 
         cx /= mag; cy /= mag # normaliza o vetor c
 
-        return cx * dist, cy * dist
+        return cx * dist, cy * dist # TODO minimiza o raio caso a bola esteja dentro da área
+
         # eu quero testar se isso ^^^ dá certo, senão só descomenta tudo isso aqui embaixo
 
         # ball = self.ball
@@ -110,7 +142,6 @@ class InterceptPlay(PlayerPlay):
         # v[0]/= mag; v[1]/= mag
         v /= 2
         return v[0], v[1]
-
 
 class Goalkeeper(Strategy):
     def __init__(self, match):
