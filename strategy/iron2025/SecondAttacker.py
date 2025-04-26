@@ -28,6 +28,7 @@ class MainPlay(PlayerPlay):
         obs_radius = distance_between_points(main_st, ball)
         gk = next(filter(lambda r:r.strategy.name == "Goalkeeper", self.match.robots))
 
+
         # second attacker offset on x based on the distance of the main attacker to the ball
         # second attacker offset on y based on the distance of the ball to the center
         target = Point(max(main_st.x*.8, 0.2), main_st.y + .7*(.65-ball.y))

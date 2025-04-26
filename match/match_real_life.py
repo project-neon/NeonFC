@@ -2,6 +2,7 @@ import os
 import entities
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from api import Parameter
+import entities.coach.coach
 
 CATEGORIES = {
     '3v3': 3, '5v5': 5

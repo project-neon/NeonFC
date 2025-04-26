@@ -58,7 +58,7 @@ class DefendPlay(PlayerPlay):
         ball = self.ball
         dist = self.dist
 
-        cx = ball.x - dist; cy = ball.y  # vetor que aponta do centro até a bola
+        cx = ball.x - dist; cy = ball.y - .75 # vetor que aponta do centro até a bola
 
         mag = (cx ** 2 + cy ** 2) ** .5
 
@@ -115,9 +115,9 @@ class FollowBallPlay(PlayerPlay):
         ball = self.match.ball
 
         if ball.y > self.robot.y:
-            return ball.x, ball.y
+            return .05, ball.y
         else:
-            return ball.x, ball.y
+            return .05, ball.y
 
 class InterceptPlay(PlayerPlay):
     """Tenta colocar o robô entre a bola e o centro do gol"""
@@ -135,8 +135,8 @@ class InterceptPlay(PlayerPlay):
 
     def update(self):
         ball = self.match.ball
-        goal = [0,0] #presumo que isso seja a coordenada do gol,
-        # não sou muito versado no sistema de coordenadas do NeonFC
+        goal = [0,0.65]
+
         v = [goal[0] - ball.x, goal[1] - ball.y]
         # mag = (v[0]**2+v[1]**2)**.5
         # v[0]/= mag; v[1]/= mag
@@ -153,12 +153,13 @@ class Goalkeeper(Strategy):
 
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
-        defend_play = DefendPlay(self.match, self.robot,6,4) #  TODO muda os parametros aqui
+        defend_play = DefendPlay(self.match, self.robot,1,1) #  TODO muda os parametros aqui
+        follow_ball = FollowBallPlay(self.match, self.robot)
         
-        self.playerbook.add_play(defend_play)
+        self.playerbook.add_play(follow_ball)
         
         if self.playerbook.actual_play is None:
-            self.playerbook.set_play(defend_play)
+            self.playerbook.set_play(follow_ball)
 
     def reset(self, robot=None):
         super().reset()
@@ -171,6 +172,7 @@ class Goalkeeper(Strategy):
     def decide(self):
         res = self.playerbook.update()
         # if self.old_play != self.playerbook.actual_play:
-        print(self.playerbook.actual_play)
+        # print(self.playerbook.actual_play)
+        print('GK_id:', self.robot.robot_id)
             # self.old_play = self.playerbook.actual_play
         return res
