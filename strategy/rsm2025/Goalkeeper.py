@@ -88,6 +88,7 @@ class FollowBallPlay(PlayerPlay):
             return ball.x, ball.y
 
 class InterceptPlay(PlayerPlay):
+    """Tenta colocar o robô entre a bola e o centro do gol"""
     def __init__(self, match, robot):
         super().__init__(match, robot)
 
@@ -102,11 +103,14 @@ class InterceptPlay(PlayerPlay):
 
     def update(self):
         ball = self.match.ball
+        goal = [0,0] #presumo que isso seja a coordenada do gol,
+        # não sou muito versado no sistema de coordenadas do NeonFC
+        v = [goal[0] - ball.x, goal[1] - ball.y]
+        # mag = (v[0]**2+v[1]**2)**.5
+        # v[0]/= mag; v[1]/= mag
+        v /= 2
+        return v[0], v[1]
 
-        if ball.y > self.robot.y:
-            return ball.x, ball.y
-        else:
-            return ball.x, ball.y
 
 class Goalkeeper(Strategy):
     def __init__(self, match):
