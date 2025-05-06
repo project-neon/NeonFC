@@ -14,9 +14,9 @@
         "api_recv_port": 43211
     },
     "match" : {
-        "team_side": "right",
+        "team_side": "left",
         "team_color": "blue",
-        "coach_name": "IRON_2025",
+        "coach_name": "RSM_2025_Attack",
         "category": "3v3",
         "robot_ids": [
             5,

@@ -43,13 +43,13 @@ class FollowBallPlay(PlayerPlay):
 
         y = min(max(projection_point, self.goal_right), self.goal_left)
 
-        if (self.robot.y < .4 and self.robot.y > 1.2) and (self.robot.x > .3):
-            return 0.1, .65
+        # if (self.robot.y < .4 and self.robot.y > 1.2) and (self.robot.x > .3):
+        #     return 0.1, .65
 
-        if ball.y < .25 and ball.x < .2: 
-            return 0.1, .3
-        if ball.y > 1.1 and ball.x <.2:
-            return 0.1, 1.0
+        # if ball.y < .25 and ball.x < .2: 
+        #     return 0.1, .3
+        # if ball.y > 1.1 and ball.x <.2:
+        #     return 0.1, 1.0
 
         return 0.1, y
 
@@ -234,31 +234,13 @@ class Goalkeeper(Strategy):
 
         follow_ball.add_transition(OnInsideBox(self.match, [-.5, .3, .65, .7]), inside_area)
         follow_ball.add_transition(on_near_ball, spin)
-        #follow_ball.add_transition(OnInsideBox(self.match, [.75, -.3, 7, 1.9]), rest)
-        #follow_ball.add_transition(AndTransition([OnInsideBox(self.match, [.0, 0.25, .3, .8]), robot_look_ball]), push) 
-        # correct_angle.add_transition(OnInsideBox(self.match, [-.45, -.3, 7, 1.9], True), follow_ball)
-
-        #BOLA BOLA BOLA BOLA
-        # follow_ball.add_transition(AndTransition([OnInsideBox(self.match, [-.1, -.2, .3, 1.7], True), need_reposition]),correct_angle)
-        # spin.add_transition(AndTransition([RobotOnInsideBox(self.match, [-.5, -.1, .65, 1.6], self.robot), need_reposition]), correct_angle)
-        # inside_area.add_transition(need_reposition, correct_angle)
-        # inside_area.add_transition(OnInsideBox(self.match,[-.3, -.1, .5, 1.5], True), follow_ball)
-        
-        
-        #Corrige sempre
-        # follow_ball.add_transition(need_reposition,correct_angle)
-        # spin.add_transition(need_reposition, correct_angle)
-
-
-        # follow_ball.add_transition(on_stuck, stuck)
-        # correct_angle.add_transition(not_need_reposition, follow_ball)
-
-        # push.add_transition(AndTransition([RobotOnInsideBox(self.match, [-.5, -.1, .65, 1.6], self.robot), need_reposition]), correct_angle)
         
         inside_area.add_transition(on_near_ball, spin)
         inside_area.add_transition(off_near_ball, follow_ball)
-        # inside_area.add_transition(on_stuck, stuck)
+        inside_area.add_transition(on_stuck, stuck)
         stuck.add_transition(not_stuck, follow_ball)
+        spin.add_transition(off_near_ball, follow_ball)
+
 
         # push.add_transition(OnInsideBox(self.match, [-.1, 0.2, .3, .9], True),follow_ball)
         # push.add_transition(on_stuck, stuck)

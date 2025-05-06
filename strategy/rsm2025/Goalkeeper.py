@@ -153,7 +153,7 @@ class Goalkeeper(Strategy):
 
         self.playerbook = PlayerPlaybook(self.match.coach, self.robot)
 
-        defend_play = DefendPlay(self.match, self.robot,1,1) #  TODO muda os parametros aqui
+        defend_play = DefendPlay(self.match, self.robot,.2,.1) #  TODO muda os parametros aqui
         follow_ball = FollowBallPlay(self.match, self.robot)
         
         self.playerbook.add_play(follow_ball)
