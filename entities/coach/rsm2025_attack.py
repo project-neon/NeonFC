@@ -4,7 +4,7 @@ import strategy
 import json
 
 import strategy.rsm2025
-import strategy.iron2025
+import strategy.rsm2025
 
 
 class Coach(BaseCoach):
@@ -12,9 +12,9 @@ class Coach(BaseCoach):
 
     def __init__(self, match):
         super().__init__(match)
-        self.SS_strategy = strategy.iron2025.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.iron2025.MainStriker(self.match)
-        self.GK_strategy = strategy.iron2025.Goalkeeper(self.match)
+        self.SS_strategy = strategy.rsm2025.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.rsm2025.MainStriker(self.match)
+        self.GK_strategy = strategy.rsm2025.Goalkeeper(self.match)
 
         self.GK_id = 5  # Goalkeeper fixed ID
         self.defending = False
@@ -60,16 +60,12 @@ class Coach(BaseCoach):
                 self.set_strategy(self.GK, self.GK_strategy)
                 self.set_strategy(self.SS, self.SS_strategy)
 
-            # self.attack()
-            # print('a')
         else:
             self.not_playing()
 
     def attack(self):
         strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id != self.GK_id]
         self.ST, self.SS = self.choose_main_striker(*strikers)
-
-        # print("Attack", ST.robot_id, SS.robot_id)
 
         self.set_strategy(self.ST, self.ST_strategy)
         self.set_strategy(self.SS, self.SS_strategy)

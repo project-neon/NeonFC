@@ -13,14 +13,13 @@ class Coach(BaseCoach):
         super().__init__(match)
         #print("AAAAAA");print(match); print(match.coach)
 
-        self.SS_strategy = strategy.iron2025.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.iron2025.MainStriker(self.match)
+        self.SS_strategy = strategy.rsm2025.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.rsm2025.MainStriker(self.match)
         self.GK_strategy = strategy.rsm2025.Goalkeeper(self.match)
-        self.CB_strategy = strategy.iron2025.Defender(self.match)
-        self.SD_strategy = strategy.iron2025.ShadowDefender(self.match)
+        self.CB_strategy = strategy.rsm2025.Defender(self.match)
+        self.SD_strategy = strategy.rsm2025.ShadowDefender(self.match)
 
         self.GK_id = 5  # Goalkeeper fixed ID
-        # todo volta isso pra 5
         self.defending = False
 
         positions = json.loads(open('foul_placements3v3.json', 'r').read())
@@ -47,7 +46,6 @@ class Coach(BaseCoach):
         strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id != self.GK_id]
         ST, SS = self.choose_main_striker(*strikers)
 
-        # print("Attack", ST.robot_id, SS.robot_id)
 
         self.set_strategy(ST, self.ST_strategy)
         self.set_strategy(SS, self.SS_strategy)
@@ -56,7 +54,6 @@ class Coach(BaseCoach):
         defenders = [r for i, r in enumerate(self.match.robots) if r.robot_id != self.GK_id]
         CB, SD = self.choose_main_defender(*defenders)
 
-        # print("Defend:", CB.robot_id, SD.robot_id)
 
         self.set_strategy(CB, self.CB_strategy)
         self.set_strategy(SD, self.SD_strategy)

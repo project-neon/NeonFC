@@ -216,8 +216,6 @@ class Defender(Strategy):
         off_position_1 = OnNextTo([.35, 1.1], self.robot, 0.1, True)
         on_position_2 = OnNextTo([.35, .2], self.robot, 0.1, False)
         off_position_2 = OnNextTo([.35, .2], self.robot, 0.1, True)
-        # ball_on_goal = OnInsideBox(self.match, [1.0, 0, 0.2, 0.3], False) or OnInsideBox(self.match, [0, 0, 0.2, 0.3], False)
-        # on_gk_push = GoalkeeperPush(self.match)
         on_angle_goal_1 = OnInsideBox(self.match, [-.5, -.1, .75, .3])
         off_angle_goal_1 = OnInsideBox(self.match, [-.5, -.1, .75, .3], False)
         on_angle_goal_2 = OnInsideBox(self.match, [-.5, 1.05, .75, .4])
@@ -238,17 +236,9 @@ class Defender(Strategy):
 
         center_play.add_transition(on_area, wait_play)
         wait_play.add_transition(off_area, center_play)
-        # wait_play.add_transition(on_position_1, angle_play)
-        # wait_play.add_transition(on_position_2, angle_play)
         angle_play.add_transition(AndTransition([off_position_1, off_position_2]), wait_play)
         angle_play.add_transition(off_area, center_play)
 
-        # center_play.add_transition(ball_on_goal, goal_play)
-        # block_play.add_transition(ball_on_goal, goal_play)
-        # wing_spin_play.add_transition(ball_on_goal, goal_play)
-        # block_spin_play.add_transition(ball_on_goal, goal_play)
-        # wait_play.add_transition(ball_on_goal, goal_play)
-        # angle_play.add_transition(ball_on_goal, goal_play)
 
         center_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
         block_play.add_transition(AndTransition([on_angle_goal_1, on_angle_goal_2]), goal_play)
@@ -269,5 +259,4 @@ class Defender(Strategy):
 
     def decide(self):
         res = self.playerbook.update()
-        # print(self.match.ball.x, self.match.ball.y)
         return res

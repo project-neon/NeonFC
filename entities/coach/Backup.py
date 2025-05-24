@@ -13,11 +13,11 @@ class Coach(BaseCoach):
         super().__init__(match)
         #print("AAAAAA");print(match); print(match.coach)
 
-        self.SS_strategy = strategy.iron2025.ShadowAttacker(self.match)
-        self.ST_strategy = strategy.iron2025.MainStriker(self.match)
-        self.GK_strategy = strategy.iron2025.Goalkeeper(self.match)
-        self.CB_strategy = strategy.iron2025.Defender(self.match)
-        self.SD_strategy = strategy.iron2025.ShadowDefender(self.match)
+        self.SS_strategy = strategy.rsm2025.ShadowAttacker(self.match)
+        self.ST_strategy = strategy.rsm2025.MainStriker(self.match)
+        self.GK_strategy = strategy.rsm2025.Goalkeeper(self.match)
+        self.CB_strategy = strategy.rsm2025.Defender(self.match)
+        self.SD_strategy = strategy.rsm2025.ShadowDefender(self.match)
 
         self.GK_id = 5  # Goalkeeper fixed ID
         # todo volta isso pra 5
