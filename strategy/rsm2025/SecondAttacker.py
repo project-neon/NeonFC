@@ -24,9 +24,15 @@ class MainPlay(PlayerPlay):
 
     def update(self):
         ball = self.match.ball
+        robot =  self.robot
         main_st = next(filter(lambda r:r.strategy.name == "Main_Attacker", self.match.robots))
         obs_radius = distance_between_points(main_st, ball)
         gk = next(filter(lambda r:r.strategy.name == "Goalkeeper", self.match.robots))
+
+        # for r in self.match.robots:
+        #     if r != robot:
+        #         self.univector.add_obstacle(r, obs_radius)
+
 
         # second attacker offset on x based on the distance of the main attacker to the ball
         # second attacker offset on y based on the distance of the ball to the center
@@ -36,7 +42,6 @@ class MainPlay(PlayerPlay):
         self.univector.add_obstacle(main_st, obs_radius)
         self.univector.add_obstacle(gk, 0.075*1.4 + 0.1)
 
-        robot =  self.robot
 
         theta_d = self.univector.compute(robot)
         theta_f = self.univector.compute(Point(

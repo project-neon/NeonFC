@@ -93,7 +93,7 @@ class Game():
         self.list.append(delta_t)
         self.t1 = time.time()
 
-        # print(len(self.list)/sum(self.list), 'hz')
+        print(len(self.list)/sum(self.list), 'hz')
 
     def stop(self):
         for t in threading.enumerate():

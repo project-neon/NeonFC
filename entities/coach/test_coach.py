@@ -1,8 +1,8 @@
 from entities.coach.coach import BaseCoach
 
 import strategy
-import strategy.iron2025
-import strategy.iron2025.Attacker
+import strategy.rsm2025
+import strategy.rsm2025.Attacker
 import strategy.tests.goFoward
 
 class Coach(BaseCoach): # heranca da classe abstrata
