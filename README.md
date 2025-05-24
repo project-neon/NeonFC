@@ -2,7 +2,7 @@
 
 ### Software de estratégia
 
-Software desenvolvido para LARC 2020 para o VSSS online.
+Software desenvolvido para RSM 2025 para o Futebol Mini.
 
 ### Instalação
 
