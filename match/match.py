@@ -1,5 +1,6 @@
 import os
 import entities
+from api import Parameter
 from concurrent import futures
 
 CATEGORIES = {
@@ -19,7 +20,13 @@ class Match(object):
 
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
-        self.game_status = 'stop'
+        pid_kp, ki, kd = Parameter(0.1, 'pid_kp'), Parameter(0, 'ki'), Parameter(0, 'kd')
+        kw, rm, vm, uni_kp = Parameter(3.5, 'kw'), Parameter(0.44, 'rm'), Parameter(0.5, 'vm'), Parameter(1, 'uni_kp')
+        
+        self.parameters = {"pid_kp":pid_kp, "ki":ki, "kd":kd, "kw":kw, "rm":rm, "vm":vm, "uni_kp":uni_kp}
+
+        self.game_status = 'GAME_ON'
+        self.match_event = {'event': 'PLAYING', 'quadrant': 1, 'mine': True}
 
     
     def start(self):

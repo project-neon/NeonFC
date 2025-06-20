@@ -11,7 +11,6 @@ class Coach(BaseCoach):
 
     def __init__(self, match):
         super().__init__(match)
-        #print("AAAAAA");print(match); print(match.coach)
 
         self.SS_strategy = strategy.rsm2025.ShadowAttacker(self.match)
         self.ST_strategy = strategy.rsm2025.MainStriker(self.match)
@@ -19,12 +18,9 @@ class Coach(BaseCoach):
         self.CB_strategy = strategy.rsm2025.Defender(self.match)
         self.SD_strategy = strategy.rsm2025.ShadowDefender(self.match)
 
-        self.GK_id = 5  # Goalkeeper fixed ID
+        self.GK_id = 0  # Goalkeeper fixed ID
         # todo volta isso pra 5
         self.defending = False
-
-        positions = json.loads(open('foul_placements3v3.json', 'r').read())
-        self._position = {r.robot_id: strategy.commons.Replacer(self.match, positions[str(r.robot_id)]) for r in self.match.robots}
 
         # self.unstucks = {r.robot_id: strategy.rsm2023.Unstuck(self.match) for r in self.match.robots if r.robot_id != self.GK_id}
 

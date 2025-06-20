@@ -8,6 +8,7 @@ import argparse
 import fields as pitch
 from pyVSSSReferee.RefereeComm import RefereeComm
 from commons.utils import get_config
+import time
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config.json')
@@ -100,3 +101,10 @@ class Game():
             self.api.send_data(self.match)
 
 g = Game(config_file=args.config_file, env=args.env)
+
+
+try: 
+    while True:
+        time.sleep(0.01)
+except KeyboardInterrupt:
+    g.stop()
