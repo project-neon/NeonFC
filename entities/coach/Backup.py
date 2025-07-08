@@ -28,13 +28,14 @@ class Coach(BaseCoach):
         if self.match.match_event['event'] == 'PLAYING':
             GK = next(filter(lambda r: r.robot_id == self.GK_id, self.match.robots))
             self.set_strategy(GK, self.GK_strategy)
-            
+
+
             if self.match.ball.x < .6:
                 self.defend()
                 # print("Defend")
             else:
                 self.attack()
-                # print("Attack")
+                # print("Attadck")
 
         else:
             self.not_playing()
@@ -43,16 +44,12 @@ class Coach(BaseCoach):
         strikers = [r for i, r in enumerate(self.match.robots) if r.robot_id != self.GK_id]
         ST, SS = self.choose_main_striker(*strikers)
 
-        # print("Attack", ST.robot_id, SS.robot_id)
-
         self.set_strategy(ST, self.ST_strategy)
         self.set_strategy(SS, self.SS_strategy)
 
     def defend(self):
         defenders = [r for i, r in enumerate(self.match.robots) if r.robot_id != self.GK_id]
         CB, SD = self.choose_main_defender(*defenders)
-
-        # print("Defend:", CB.robot_id, SD.robot_id)
 
         self.set_strategy(CB, self.CB_strategy)
         self.set_strategy(SD, self.SD_strategy)

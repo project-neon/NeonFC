@@ -20,8 +20,8 @@ class Match(object):
 
         self.opposite_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
-        pid_kp, ki, kd = Parameter(0.1, 'pid_kp'), Parameter(0, 'ki'), Parameter(0, 'kd')
-        kw, rm, vm, uni_kp = Parameter(3.5, 'kw'), Parameter(0.44, 'rm'), Parameter(0.5, 'vm'), Parameter(1, 'uni_kp')
+        pid_kp, ki, kd = Parameter(0, 'pid_kp'), Parameter(0, 'ki'), Parameter(0, 'kd')
+        kw, rm, vm, uni_kp = Parameter(0, 'kw'), Parameter(0, 'rm'), Parameter(0, 'vm'), Parameter(0, 'uni_kp')
         
         self.parameters = {"pid_kp":pid_kp, "ki":ki, "kd":kd, "kw":kw, "rm":rm, "vm":vm, "uni_kp":uni_kp}
 

@@ -16,7 +16,7 @@
     "match" : {
         "team_side": "left",
         "team_color": "blue",
-        "coach_name": "IRON_2025",
+        "coach_name": "TEST",
         "category": "3v3"
     },
     "referee": false,
