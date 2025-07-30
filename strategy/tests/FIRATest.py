@@ -1,14 +1,11 @@
-from NeonPathPlanning import LimitCycle
-import math
-from controller.noController import NoController
-from strategy.BaseStrategy import Strategy
-from collections import deque
-from controller.uni_controller import UniController
-import algorithms
 import time
 
+from controller.noController import NoController
+from strategy.BaseStrategy import Strategy
+
+
 class FiraTest(Strategy):
-    def __init__(self, match, plot_field=False):
+    def __init__(self, match):
         self.lt = time.time()
         super().__init__(match, "FiraTest", controller=NoController)
 
@@ -21,4 +18,4 @@ class FiraTest(Strategy):
             self.start(robot)
 
     def decide(self):
-        return 20, 20 # 0, 10
+        return 20, 20  # 0, 10
