@@ -3,7 +3,7 @@ from controller import NoController
 
 class Foward(Strategy):
     def __init__(self, match):
-        super().__init__(match, 'Idle', controller=NoController)
+        super().__init__(match, 'Foward', controller=NoController)
 
 
     def start(self, robot=None):
@@ -16,4 +16,4 @@ class Foward(Strategy):
 
 
     def decide(self):
-        return 30, 0
+        return 30, 30
