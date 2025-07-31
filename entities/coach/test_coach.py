@@ -13,7 +13,7 @@ class Coach(BaseCoach): # heranca da classe abstrata
         # vamos usar strategies de teste por enquanto, essa deixa o robo parado
         self._1 = strategy.rsm2025.Goalkeeper(self.match)
         self._2 = strategy.tests.Foward(self.match)
-        self._3 = strategy.tests.Foward(self.match)
+        self._3 = strategy.tests.Foward(self.match) #
 
     def decide(self):
         # esta lista eh ordenada em [robot_0, ..., robot_n]
