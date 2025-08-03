@@ -1,19 +1,22 @@
 from entities.coach.coach import BaseCoach
 
+# from strategy.tests.FIRATest import FiraTest
+# from strategy.tests.goFoward import Foward
+
 import strategy
-import strategy.rsm2025
-import strategy.rsm2025.Attacker
+import strategy.tests.FIRATest
 import strategy.tests.goFoward
 
 class Coach(BaseCoach): # heranca da classe abstrata
     NAME = "TEST"
+
     def __init__(self, match):
         super().__init__(match) # chamada do metodo da classe mae
 
         # vamos usar strategies de teste por enquanto, essa deixa o robo parado
-        self._1 = strategy.tests.Foward(self.match)
-        self._2 = strategy.tests.Foward(self.match)
-        self._3 = strategy.tests.Foward(self.match)
+        self._1 = strategy.tests.FIRATest.FiraTest(self.match)
+        self._2 = strategy.tests.goFoward.Foward(self.match)
+        self._3 = strategy.tests.goFoward.Foward(self.match) #
 
     def decide(self):
         # esta lista eh ordenada em [robot_0, ..., robot_n]

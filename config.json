@@ -1,11 +1,11 @@
 {
     "network" : {
-        "multicast_ip": "224.5.23.2",
+        "multicast_ip": "224.0.0.1",
         "referee_ip": "224.5.23.2",
         "host_ip": "localhost",
         "blue_port": 30011,
         "yellow_port": 30012,
-        "vision_port": 10015,
+        "vision_port": 10002,
         "command_port": 20011,
         "replacer_port": 10004,
         "referee_port": 10003,
@@ -20,6 +20,6 @@
         "category": "3v3"
     },
     "referee": false,
-    "data_sender": false,
+    "data_sender": true,
     "api": false
 }
