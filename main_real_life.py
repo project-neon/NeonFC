@@ -97,7 +97,7 @@ class Game():
 
     def stop(self):
         for t in threading.enumerate():
-            t.kill_recieved = True
+            t.kill_received = True
 
             
             

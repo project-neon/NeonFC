@@ -95,7 +95,7 @@ class MatchRealLife(object):
             self.match_event['mine'] = ref.get_color() == self.team_color.upper()
 
 
-    def update_information(self, info): #Function to update values recieved in api
+    def update_information(self, info): #Function to update values received in api
         for key, value in info.items():
             setattr(self, key.lower(), value)
                 
