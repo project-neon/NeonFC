@@ -5,7 +5,7 @@ import comm
 import vision
 import match
 import argparse
-import fields as pitch
+from entities import fields as pitch
 from pyVSSSReferee.RefereeComm import RefereeComm
 from commons.utils import get_config
 import time
