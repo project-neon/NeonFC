@@ -1,8 +1,9 @@
-class NoController(object):
+from controller.Controller import Controller
+
+
+class NoController(Controller):
     def __init__(self, robot):
-        self.robot = robot
-        self.environment = robot.game.environment
-        self.match = robot.game.match
+        super().__init__(robot)
 
     def set_desired(self, desired):
         self.v = desired[0]
