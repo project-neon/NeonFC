@@ -9,7 +9,7 @@ Software desenvolvido para RSM 2025 para o Futebol Mini.
 #### Para usar o NeonFC você irá precisar ter instalado em sua máquina:
 
 - Python == 3.12.1
-- Poetry
+- [Poetry](https://python-poetry.org/)
 
 Além de uma interface que irá enviar os dados do campo. Atualmente o [FIRASim](https://github.com/VSSSLeague/FIRASim) é suportado.
 
