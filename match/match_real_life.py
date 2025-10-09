@@ -9,6 +9,7 @@ CATEGORIES = {
 }
 
 class MatchRealLife(object):
+    # TODO possivelmente remover o Match e simplesmente usar o RealLife como Match?
     def __init__(self, game, team_side, team_color, coach_name=None, category="3v3", robot_ids=[0,1,2], opposite_ids=[0,1,2]):
         super().__init__()
         self.game = game
