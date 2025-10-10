@@ -106,3 +106,6 @@ cython_debug/
 *.db
 
 .idea/
+
+# Poetry cache
+poetry.lock
