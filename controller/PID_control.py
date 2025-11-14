@@ -158,9 +158,9 @@ class PID_control(object):
     def update(self):
         v, w = self._update()
 
-        if self.environment == 'simulation':
-            powers = speed_to_power(v, w, self.l, self.R)
-            return tuple(np.dot(1000, powers))
+        #if self.environment == 'simulation':
+            #powers = speed_to_power(v, w, self.l, self.R)
+            #return tuple(np.dot(1000, powers))
 
         return v, w
 

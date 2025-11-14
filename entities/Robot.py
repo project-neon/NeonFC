@@ -1,11 +1,62 @@
 import math
 import logging
 import numpy as np
+import time
 from collections import deque
-from commons.math import angular_speed, rotate_via_numpy
+from commons.math import angular_speed, rotate_via_numpy, speed_to_power
 from commons.math import speed as avg_speed
 
-
+class SimplePI(object):
+    
+    """Um controlador PI simples para corrigir o drift angular."""
+    
+    def __init__(self, kp, ki, ilimit):
+        
+        """
+        Kp: Ganho proporcional
+        Ki: Ganho integral
+        Ilimit: limite do termo integral (anti-windup)
+        """
+        self.kp = kp
+        self.ki = ki
+        self.ilimit = abs(ilimit)
+        self.integral = 0.0
+        self.last_time = time.time()
+        self.last_erro = 0.0
+        
+    def update(self, erro):
+        """Calcula a saída da correção com base no erro."""
+        current_time = time.time()
+        dt = current_time - self.last_time
+        
+        if dt < 0.001:
+            #SE DT FOR MUITO PEQUENO, UTILIZA O P E I, MAS SEM ACUMULAR A INTEGRAL
+            p_term = self.kp*erro
+            i_term = self.ki*self.integral
+            return p_term + i_term
+            
+        #TERMO PROPOCIONAL
+        p_term = self.kp*erro
+        
+        #TERMO INTEGRAL
+        self.integral += erro*dt
+        self.integral = max(-self.ilimit, min(self.ilimit, self.integral))
+        i_term = self.ki*self.integral
+        
+        #ATUALIZA
+        self.last_time = current_time
+        self.last_erro = erro
+        
+        #SAÍDA(CORREÇÃO)
+        
+        return p_term + i_term
+        
+    def reset(self):
+        """Reseta o estado PID"""
+        self.integral = 0.0
+        self.last_time = time.time()
+            
+        
 class Robot(object):
 
     def __init__(self, game, robot_id, team_color):
@@ -34,7 +85,17 @@ class Robot(object):
             'L': 0.075,
             'R': 0.035
         }
-
+        
+        
+        #------------------------------------------------------PI-ESCRAVO-----------------------------------------------------#
+        #NECESSÁRIO SINTONIZAR, VALORES DE KP E KI SÃO CHUTES
+        #ILIMIT SIGNIFICA QUE O INTEGRAL PODE COMANDAR NO MÁXIMO 1 RAD/S DE CORREÇÃO, PODE MODIFICAR, MAS NÃO É O IDEAL
+        #
+        self.pid_drift = SimplePI(kp=0.1, ki=0.05, ilimit = 1.0)
+        #
+        #------------------------------------------------------PI-ESCRAVO-----------------------------------------------------#
+        
+        
         self.power_left, self.power_right = 0, 0
 
         self._frames = {
@@ -154,10 +215,49 @@ class Robot(object):
         return vl, va
 
     def decide(self):
+    
+        """Ciclo do controle com giroscópio"""
+    
+        #------------------------------------------------MESTRE-----------------------------------------------#
+        #-----Obtém o alvo da estratégia
         desired = self.strategy.decide()
         self.strategy.set_desired(desired)
-        self.power_left, self.power_right = self.strategy.update()
+        
+        #------MESTRE (PID_control) calcula v e w desejadas graças a mudança em controller/PID_control.py
+        v_desejada, w_desejada = self.strategy.update()
 
+        #------------------------------------------------ESCRAVO----------------------------------------------#
+        #CORREÇÃO GIROSCÓPIO
+        #
+        #OBTER A MEDIÇÃO ATUAL DO GIROSCÓPIO(OBS: EU NÃO ENCONTREI O COMANDO CORRETO, VOU USAR ESSE BASEADO NA VISÃO PORÉM ELE TEM LATÊNCIA MUITO ALTA, POR ISSO PODE PIORAR O CONTROLE, CASO ACHE O COMANDO CORRETO É SÓ MUDAR
+        #
+        w_atual = self.vtheta
+        
+        #Calcular erro de deriva
+        
+        erro_de_deriva = w_desejada - w_atual
+        
+        w_correcao = self.pid_drift.update(erro_de_deriva)
+        
+        #COMANDO FINAL
+        
+        w_final = w_desejada + w_correcao
+        v_final = v_desejada
+        
+        power_left, power_right = speed_to_power(
+            v_final
+            w_final
+            self.dimensions['L']
+            self.dimensions['R']
+        )
+        
+        #CLAMP (LIMITE) 
+        
+        self.power_left = max(-100, min(100, power_left))
+        self.power_right = max(-100, min(100, power_right))
+        
+        #ENVIANDO O COMANDO FINAL E CORRIGIDOS
+        
         return self._get_command(self.power_left, self.power_right)
 
     def _get_command(self, power_left, power_right):
