@@ -1,8 +1,9 @@
 import math
 import logging
 import numpy as np
+import time
 from collections import deque
-from commons.math import angular_speed, rotate_via_numpy
+from commons.math import angular_speed, rotate_via_numpy, speed_to_power
 from commons.math import speed as avg_speed
 
 
@@ -154,10 +155,47 @@ class Robot(object):
         return vl, va
 
     def decide(self):
-        desired = self.strategy.decide()
-        self.strategy.set_desired(desired)
-        self.power_left, self.power_right = self.strategy.update()
-
+        
+        #---------------------------MODO DE TESTE------------------------------#
+        #---------------------------INÍCIO-BLOCO-A-----------------------------#
+        #----------------PARA USAR ESSE CÓDIGO COMENTE O BLOCO B---------------#
+        #
+        #print("MODO DE TESTE DE MOTORES ATIVO")
+        #self.power_left = 50.0 #PERMANECE FIXO
+        #self.power_right = 50.0 #ALTERAR AOS POUCOS
+        #
+        #Limite de segurança
+        #self.power_left = max(-100, min(100, self.power_left))
+        #self.power_right = max(-100, min(100, self.power_right))
+        #print(f"Potência enviada: L={self.power_left}, R={self.power_right}")
+        #------------------------------FIM-MODO-TESTE---------------------------#
+        #-------------------------------FIM-BLOCO-A-----------------------------#
+        
+        
+        
+        #---------------------------MODO DE CORREÇÃO----------------------------#
+        #---------------------------INÍCIO-BLOCO-B------------------------------#
+        #----------------PARA USAR ESSE CÓDIGO COMENTE O BLOCO A----------------#
+        #
+        #desired = self.strategy.decide()
+        #self.strategy.set_desired(desired)
+        #self.power_left, self.power_right = self.strategy.update()
+        #
+        #APLICA A COMPENSAÇÃO self.power_left/self.power_right CALCULAR ANTES
+        #
+        #COMPENSACAO_ESQ = 1.0
+        #COMPENSACAO_DIR = 1.0
+        #
+        #self.power_left = self.power_left*COMPENSACAO_ESQ 
+        #self.power_right = self.power_right*COMPENSACAO_DIR
+        #
+        #-------------------------------FIM-BLOCO-B-----------------------------#
+        
+        #LIMITE DE SEGURANÇA
+        self.power_left = max(-100, min(100, self.power_left))
+        self.power_right = max(-100, min(100, self.power_right))
+        
+        #NÃO MEXER NESSA LINHA
         return self._get_command(self.power_left, self.power_right)
 
     def _get_command(self, power_left, power_right):
