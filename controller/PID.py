@@ -2,6 +2,9 @@ import api
 import math
 import numpy as np
 
+from controller.Controller import Controller
+
+
 class PID(object):
     def __init__(self, kp, kd ,ki, _ilimit=1000):
         self.desired_PID = 0.0
@@ -35,10 +38,9 @@ class PID(object):
 
         return output
 
-class Robot_PID(object):
+class Robot_PID(Controller):
     def __init__(self, robot, send_data=False):
-        self.robot = robot
-        self.game = self.robot.game
+        super().__init__(robot)
 
         self.desired = np.array([0, 0])
         self.linear_pid = PID(2, 1.2, 0)
@@ -75,6 +77,7 @@ class Robot_PID(object):
     def set_desired(self, vector):
         self.desired = vector
 
+    linear_desired = 0.0; angular_desired = 0
 
     def update_Speed(self, linear_desired, angular_desired, now_linear, now_angular):
         self.linear_desired = linear_desired

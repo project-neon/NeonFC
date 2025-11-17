@@ -2,12 +2,8 @@ import math
 #from random import betavariate
 #from scipy.spatial.qhull import Voronoi
 import algorithms
-import numpy as np
-import controller
-from fields.field import Field as fd
 from strategy.BaseStrategy import Strategy
-from commons.math import unit_vector, distance
-from strategy import DebugTools
+from commons.math import distance
 from algorithms.astar import AStar, Node
 from algorithms.astar.fieldGraph import FieldGraph
 from scipy.spatial import Voronoi

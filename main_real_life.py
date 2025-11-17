@@ -2,7 +2,7 @@ from api import Api, Api_recv, InfoApi
 import comm
 import match
 import argparse
-import fields as pitch
+from entities import fields as pitch
 from commons.utils import get_config
 from pyVSSSReferee.RefereeComm import RefereeComm
 from pySSLVision.VisionComm import SSLVision, assign_empty_values
@@ -97,7 +97,7 @@ class Game():
 
     def stop(self):
         for t in threading.enumerate():
-            t.kill_recieved = True
+            t.kill_received = True
 
             
             

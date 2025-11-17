@@ -2,7 +2,9 @@ import math
 import numpy as np
 import numpy.linalg as la
 from commons.math import speed_to_power
- 
+from controller.Controller import Controller
+
+
 def py_ang(v1, v2):
     """ Returns the angle in radians between vectors 'v1' and 'v2'    """
     cosang = np.dot(v1, v2)
@@ -15,11 +17,10 @@ para um valor coerente a velocidade desejada em m/s
 """
 EXPERIMENTAL_SPEED_CONSTANT = 7000
 
-class SimpleLQR(object):
+class SimpleLQR(Controller):
     def __init__(self, robot, l=0.185):
+        super().__init__(robot)
         self.desired = np.array([0, 0])
-        self.robot = robot
-        self.environment = robot.game.environment
 
         self.l = l
         self.L = self.robot.dimensions.get('L')
