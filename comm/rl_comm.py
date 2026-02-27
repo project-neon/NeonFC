@@ -18,7 +18,7 @@ def find_esp():
     for file in os.listdir("/dev/"):
         if file.startswith("ttyACM") or file.startswith("ttyUSB"):
             print("found potential file: %s",file)
-            options.append(file)
+            options.append("/dev/"+file)
         pass
 
     if len(options) == 0:
