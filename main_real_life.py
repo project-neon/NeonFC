@@ -110,5 +110,5 @@ try:
         time.sleep(0.01)
 except KeyboardInterrupt:
     g.stop()
-
+    # TODO Precisa parar todas as threads aqui tb
 

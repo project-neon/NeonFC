@@ -18,3 +18,5 @@ NeonPathPlanning
 
 # For real life execution
 pyserial
+
+# TODO isso ainda é importante com o poetry???
