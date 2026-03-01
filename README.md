@@ -51,7 +51,10 @@ No ```config.json```:
 }
 ```
 
-3. Agora é só rodar ```Python main.py```
+3. Agora é só rodar
+```bash
+poetry run python3 main.py
+```
 
 ### Desenvolvimento
 
