@@ -2,7 +2,7 @@
 
 ### Software de estratégia
 
-Software desenvolvido para RSM 2025 para o Futebol Mini.
+Software da estratégia do VSSS da Project Neon.
 
 ### Instalação
 
@@ -46,7 +46,7 @@ No ```config.json```:
         "command_port": 20011
     },
     "match" : {
-        "robots": 5
+        "robots": 3
     }
 }
 ```
