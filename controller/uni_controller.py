@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from commons.math import speed_to_power
+from controller.Controller import Controller
 
 """
 Angle based controller
@@ -8,7 +9,7 @@ reffering to soccer robotics
 """
 
 
-class UniController(object):
+class UniController(Controller):
     """
     An implementation of the Uni controller specified on the soccer robotics article
 
@@ -32,7 +33,7 @@ class UniController(object):
         the target position used for calculating the linear speed P
     """
 
-    CONSTANTS = {
+    CONSTANTS = { # TODO huh dá uma olhada nisso
         'simulation': {
             'V_M': 100,
             'R_M': 3 * 100,  # 3 * V_M
@@ -48,9 +49,7 @@ class UniController(object):
     }
 
     def __init__(self, robot, control_speed=False):
-        self.robot = robot
-        self.environment = robot.game.environment
-        self.match = robot.game.match
+        super().__init__(robot)
         self.L = self.robot.dimensions.get("L")  # m
         self.R = self.robot.dimensions.get("R")  # m
 

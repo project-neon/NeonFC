@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from commons.math import speed_to_power, angle_between
+from controller.Controller import Controller
 
 
 def angle_adjustment(angle):
@@ -12,7 +13,7 @@ def angle_adjustment(angle):
     return phi
 
 
-class PID_control(object):
+class PID_control(Controller):
     """
     An implementation of the PID controller on linear and angular speed
 
@@ -72,12 +73,10 @@ class PID_control(object):
     }
 
     def __init__(self, robot, default_fps=60, **kwargs):
+        super().__init__(robot)
         self.vision = robot.game.vision
         self.field_w, self.field_h = robot.game.field.get_dimensions()
-        self.robot = robot
-        self.match = robot.game.match
         self.desired = [0, 0]
-        self.environment = robot.game.environment
 
         self.l = self.robot.dimensions.get('L')/2 # half_distance_between_robot_wheels
         self.R = self.robot.dimensions.get('R')   # radius of the wheel

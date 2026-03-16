@@ -29,9 +29,10 @@ class Api(metaclass=SingletonMeta):
     #sender_thread: threading.Thread
     
     def __init__(self, address, port):
+        self.obj_socket: socket | None = None
         self.address = address
         self.port = port
-        self.kill_recieved = False
+        self.kill_received = False
 
     # Initiate socket connection
     def start(self):
@@ -39,7 +40,7 @@ class Api(metaclass=SingletonMeta):
 
     # Sends dict game data to socket listener
     def send_data(self, info_api):
-            while not self.kill_recieved:
+            while not self.kill_received:
                 data_dict = info_api.organize_send()
                 msg = json.dumps(data_dict)
                 self.obj_socket.sendto(msg.encode(), (self.address, self.port)) 
