@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-numpy = "^1.26.4"
+numpy = "^2.4.6"
 scipy = "^1.13.1"
 matplotlib = "^3.9.0"
 pyqtgraph = "^0.13.7"

@@ -9,12 +9,14 @@ from pySSLVision.VisionComm import SSLVision, assign_empty_values
 import os
 import threading
 import time, collections
+import scripts.test_esp
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config_real_life.json')
 parser.add_argument('--env', default='real_life')
 
 args = parser.parse_args()
+print(f'args = {args}')
 
 class Game():
     def __init__(self, config_file=None, env='real_life'):
