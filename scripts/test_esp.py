@@ -14,13 +14,13 @@ def begin_test():
 	while True:
 		left, right = 0,0
 		
-		key = stdscr.getch()
+		key = stdscr.getkey()
 
-		if key == curses.KEY_LEFT:
+		if key == 'A':
 			stdscr.addch('LEFT')
 			left += 5
 		if key == curses.KEY_RIGHT:
-			stdscr.addch('RIGHT')
+			'D'
 			right += 5
 		
 		stdscr.addch(key)
