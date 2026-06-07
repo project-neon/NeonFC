@@ -17,10 +17,10 @@ def begin_test():
 		key = stdscr.getkey()
 
 		if key == 'A':
-			stdscr.addch('LEFT')
+			stdscr.addstr('LEFT')
 			left += 5
 		if key == curses.KEY_RIGHT:
-			'D'
+			stdscr.addstr('RIGHT')
 			right += 5
 		
 		stdscr.addstr(f'ch = {key}\n')
