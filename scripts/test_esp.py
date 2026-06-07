@@ -23,7 +23,7 @@ def begin_test():
 			'D'
 			right += 5
 		
-		stdscr.addch(key)
+		stdscr.addstr(f'ch = {key}\n')
 		stdscr.refresh()
 
 		c.send([{
