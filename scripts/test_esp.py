@@ -29,4 +29,3 @@ def begin_test():
 			'wheel_left': left,
 			'wheel_right': right
 		}])
-		print(inp)
