@@ -21,11 +21,11 @@ def begin_test():
 		if key == 'A':
 			stdscr.addstr('LEFT')
 			left += .3
-			right -= .3
+			right += 3.42
 		if key == 'D':
 			stdscr.addstr('RIGHT')
 			right += .3
-			left -= .3
+			left += - 3.42
 		if key == 'W':
 			stdscr.addstr('FRONT')
 			left += .3
