@@ -6,7 +6,7 @@ c.start()
 
 id = int(input("Qual o ID?\n"))
 
-ratio = 2
+ratio = 0
 
 stdscr = curses.initscr()
 curses.noecho()
@@ -35,9 +35,15 @@ def begin_test():
 			stdscr.addstr('BACK')
 			left -= .3
 			right -= .3
+		if key == 'F':
+			stdscr.addstr('RAT')
+			ratio -= .2
+		if key == 'G':
+			stdscr.addstr('RAT')
+			ratio += .2
 		
 		stdscr.clear()
-		stdscr.addstr(f'ch = {key}, [{left:.2f}, {right:.2f}]\n')
+		stdscr.addstr(f'ch = {key}, [{left:.2f}, {right:.2f}] ratio={ratio:.3f}\n')
 		stdscr.refresh()
 
 		right *= ratio
