@@ -42,11 +42,9 @@ def begin_test():
 			ratio += .2
 		
 		stdscr.clear()
+		right *= ratio
 		stdscr.addstr(f'ch = {key}, [{left:.2f}, {right:.2f}] ratio={ratio:.3f}\n')
 		stdscr.refresh()
-
-		right *= ratio
-
 		c.send([{
 			'robot_id': id,
 			'color': 'yellow',
