@@ -17,14 +17,14 @@ def begin_test():
 		key = stdscr.getkey()
 
 		if key == curses.KEY_LEFT:
+			stdscr.addch('LEFT')
 			left += 5
 		if key == curses.KEY_RIGHT:
+			stdscr.addch('RIGHT')
 			right += 5
 		
 		stdscr.addch(key)
 		stdscr.refresh()
-		
-
 
 		c.send([{
 			'robot_id': id,
