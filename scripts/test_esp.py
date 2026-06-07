@@ -16,9 +16,9 @@ def begin_test():
 		
 		key = stdscr.getkey()
 
-		if key == 'KEY_LEFT':
+		if key == curses.KEY_LEFT:
 			left += 5
-		if key == 'KEY_RIGHT':
+		if key == curses.KEY_RIGHT:
 			right += 5
 		
 		stdscr.addch(key)
