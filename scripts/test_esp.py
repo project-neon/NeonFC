@@ -5,6 +5,9 @@ c = rl_comm.RLComm()
 c.start()
 
 id = int(input("Qual o ID?\n"))
+
+ratio = 2
+
 stdscr = curses.initscr()
 curses.noecho()
 curses.cbreak()
@@ -36,6 +39,8 @@ def begin_test():
 		stdscr.clear()
 		stdscr.addstr(f'ch = {key}, [{left:.2f}, {right:.2f}]\n')
 		stdscr.refresh()
+
+		right *= ratio
 
 		c.send([{
 			'robot_id': id,
