@@ -18,18 +18,20 @@ def begin_test():
 
 		if key == 'A':
 			stdscr.addstr('LEFT')
-			left += .1
+			left += .3
+			right -= .3
 		if key == 'D':
 			stdscr.addstr('RIGHT')
-			right += .1
+			right += .3
+			left -= .3
 		if key == 'W':
 			stdscr.addstr('FRONT')
-			left += .1
-			right += .1
+			left += .3
+			right += .3
 		if key == 'S':
 			stdscr.addstr('BACK')
-			left -= .1
-			right -= .1
+			left -= .3
+			right -= .3
 		
 		stdscr.addstr(f'ch = {key}\n')
 		stdscr.refresh()
