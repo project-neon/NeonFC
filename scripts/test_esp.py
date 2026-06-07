@@ -12,7 +12,7 @@ curses.noecho()
 curses.cbreak()
 
 def begin_test():
-	ratio = 0
+	ratio = 1
 	while True:
 		left, right = 0,0
 		
@@ -49,5 +49,5 @@ def begin_test():
 			'robot_id': id,
 			'color': 'yellow',
 			'wheel_left': left,
-			'wheel_right': right
+			'wheel_right': -right
 		}])
