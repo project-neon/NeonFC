@@ -3,6 +3,8 @@ from comm import rl_comm
 c = rl_comm.RLComm()
 c.start()
 
+id = int(input("Qual o ID"))
+
 def begin_test():
 	while True:
 		inp = input()
@@ -11,8 +13,8 @@ def begin_test():
 			c.send([{
 				'robot_id': 7,
 				'color': 'yellow',
-				'wheel_left': 5.0,
-				'wheel_right': 0.0
+				'wheel_left': 20,
+				'wheel_right': -20
 			}])
 		if inp == 'R':
 			print('rgh')
