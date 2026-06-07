@@ -14,7 +14,7 @@ def begin_test():
 	while True:
 		left, right = 0,0
 		
-		key = stdscr.getkey()
+		key = stdscr.getch()
 
 		if key == curses.KEY_LEFT:
 			stdscr.addch('LEFT')
