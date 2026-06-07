@@ -6,14 +6,13 @@ c.start()
 
 id = int(input("Qual o ID?\n"))
 
-ratio = 0
 
 stdscr = curses.initscr()
 curses.noecho()
 curses.cbreak()
 
 def begin_test():
-
+	ratio = 0
 	while True:
 		left, right = 0,0
 		
