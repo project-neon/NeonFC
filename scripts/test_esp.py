@@ -11,7 +11,7 @@ def begin_test():
 		if inp == 'L':
 			print('lft')
 			c.send([{
-				'robot_id': 7,
+				'robot_id': id,
 				'color': 'yellow',
 				'wheel_left': 20,
 				'wheel_right': -20
