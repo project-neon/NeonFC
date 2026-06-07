@@ -33,7 +33,8 @@ def begin_test():
 			left -= .3
 			right -= .3
 		
-		stdscr.addstr(f'ch = {key}\n')
+		stdscr.clear()
+		stdscr.addstr(f'ch = {key}, [{left:.2f}, {right:.2f}]\n')
 		stdscr.refresh()
 
 		c.send([{
