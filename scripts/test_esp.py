@@ -14,14 +14,17 @@ def begin_test():
 	while True:
 		left, right = 0,0
 		
-		stdscr.refresh()
 		key = stdscr.getkey()
 
 		if key == 'KEY_LEFT':
-			left += 1
+			left += 5
 		if key == 'KEY_RIGHT':
-			left += 1
+			right += 5
 		
+		stdscr.addch(key)
+		stdscr.refresh()
+		
+
 
 		c.send([{
 			'robot_id': id,
