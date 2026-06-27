@@ -18,9 +18,9 @@ parser.add_argument('--comm-debug', default='false')
 
 args = parser.parse_args()
 print(f'args = {args}')
-if(args.comm_debug == 'true'):
-    print('Communications Debug')
-    begin_test()
+#if(args.comm_debug == 'true'):
+#    print('Communications Debug')
+#    begin_test()
 
 class Game():
     def __init__(self, config_file=None, env='real_life'):
