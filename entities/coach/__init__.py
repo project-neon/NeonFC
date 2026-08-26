@@ -10,13 +10,17 @@ from entities.coach.rsm2025_attack import Coach as RSM_2025_Attack
 
 from entities.coach.rsm2025_defend import Coach as RSM_2025_Defend
 
+from entities.coach.dummy_coach import Coach as DummyCoach
+
+
 _coach_list = [
     # Tournament coaches
     GuideCoach,
     TestCoach,
     IRON_2025,
     RSM_2025_Attack,
-    RSM_2025_Defend
+    RSM_2025_Defend,
+    DummyCoach
 ]
 
 COACHES = {c.NAME: c for c in _coach_list}
