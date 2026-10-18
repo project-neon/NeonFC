@@ -7,12 +7,6 @@ matplotlib
 pyqtgraph
 PyQt5
 
-# Referee custom library
-#pyVsssReferee
-
-# Vision custom library
-#pySSLVision
-
 # Path Planning 
 NeonPathPlanning
 

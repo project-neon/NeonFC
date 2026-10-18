@@ -109,7 +109,6 @@ class FiraFullComm(FiraComm):
             (self.host, self.command_port)
         )
 
-
 class RefereeComm(threading.Thread):
         def __init__(self):
             super(RefereeComm, self).__init__()

@@ -4,8 +4,6 @@ import match
 import argparse
 import fields as pitch
 from commons.utils import get_config
-from pyVSSSReferee.RefereeComm import RefereeComm
-from pySSLVision.VisionComm import SSLVision, assign_empty_values
 import os
 import threading
 import time, collections
@@ -15,6 +13,7 @@ parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config_real_life.json')
 parser.add_argument('--env', default='real_life')
 parser.add_argument('--comm-debug', default='false')
+parser.add_argument('--comm-api', default='real_life')
 
 args = parser.parse_args()
 print(f'args = {args}')
@@ -104,8 +103,6 @@ class Game():
     def stop(self):
         for t in threading.enumerate():
             t.kill_recieved = True
-
-            
             
 g = Game(config_file=args.config_file, env=args.env)
 
