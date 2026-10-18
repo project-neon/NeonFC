@@ -9,7 +9,27 @@ from commons.utils import get_config
 from google.protobuf.json_format import MessageToJson
 from protocols import command_pb2, common_pb2, packet_pb2, vssref_command_pb2, replacement_pb2
 
-class FiraComm(object):
+class Communications():
+    def start(self):
+        pass
+
+    def send(self, robot_commands = []):
+        '''
+        Send commands to FIRASim
+
+        robot_commands follows:
+        [
+            {
+                robot_id: NUM,
+                color: 'yellow|blue',
+                wheel_left: float,
+                wheel_right: float,
+            }
+        ]
+        '''
+        pass
+
+class FiraComm(Communications):
     def __init__(self):
         super(FiraComm, self).__init__()
         self.config = get_config()
@@ -25,19 +45,6 @@ class FiraComm(object):
         print("Communication socket created!")
     
     def send(self, robot_commands = []):
-        '''
-        Send commands to FIRASim
-
-        robot_commands follows:
-        [
-            {
-                robot_id: NUM,
-                color: 'yellow|blue',
-                wheel_left: float,
-                wheel_right: float,
-            }
-        ]
-        '''
         commands = command_pb2.Commands()
     
         for robot in robot_commands:
@@ -161,7 +168,6 @@ class RefereeComm(threading.Thread):
             )
 
             return sock
-
 
 if __name__ == "__main__":
     import time

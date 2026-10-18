@@ -35,5 +35,6 @@
     },
     "referee": false,
     "data_sender": true,
-    "api": false
+    "api": false,
+    "comm_api": "rsim"
 }

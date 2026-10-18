@@ -7,28 +7,33 @@ from commons.utils import get_config
 import os
 import threading
 import time, collections
-from scripts.test_esp import begin_test
 
 parser = argparse.ArgumentParser(description='NeonFC')
 parser.add_argument('--config_file', default='config_real_life.json')
 parser.add_argument('--env', default='real_life')
 parser.add_argument('--comm-debug', default='false')
-parser.add_argument('--comm-api', default='real_life')
 
 args = parser.parse_args()
 print(f'args = {args}')
-#if(args.comm_debug == 'true'):
-#    print('Communications Debug')
-#    begin_test()
 
 class Game():
     def __init__(self, config_file=None, env='real_life'):
         self.config = get_config(config_file)
+    
+        print('MANO')
+        print(f"Comm API: {self.config.get('comm_api')}")
+        
         self.match = match.MatchRealLife(self,
             **self.config.get('match')
         )
+
         self.vision = SSLVision()
-        self.comm = comm.RLComm()
+
+        if self.config.get("comm_api") == 'real_life':
+            self.comm = comm.RLComm()
+        if self.config.get("comm_api") == 'rsim':
+            self.comm = comm.RSimComm()
+
         self.field = pitch.Field(self.match.category)
         self.environment = env
 

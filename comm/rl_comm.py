@@ -1,6 +1,7 @@
 import os
 import serial
 import json
+from comm.comm import Communications
 
 def get_config(config_file=None):
     if config_file:
@@ -10,7 +11,7 @@ def get_config(config_file=None):
 
     return config
 
-class RLComm(object):
+class RLComm(Communications):
     def __init__(self):
         super(RLComm, self).__init__()
         self.config = get_config()
@@ -19,24 +20,11 @@ class RLComm(object):
         self.baud_rate = int(os.environ.get('BAUD_RATE', self.config['comm']['baud_rate']))
 
     def start(self):
-        print("Starting communication...")
+        print(f"Starting Real Life Comm on port {self.command_port}")
         self.comm = serial.Serial(self.command_port, self.baud_rate)
         print(f"Communication port created on {self.command_port}!")
     
     def send(self, robot_commands = []):
-        '''
-        Send commands to ESP-32
-
-        robot_commands follows:
-        [
-            {
-                robot_id: int,
-                color: 'yellow|blue',
-                wheel_left: float,
-                wheel_right: float,
-            }
-        ]
-        '''
         message = "<"
         robot_commands = sorted(robot_commands, key = lambda i: i['robot_id'])
         for rb in robot_commands:
