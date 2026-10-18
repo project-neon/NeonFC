@@ -18,6 +18,7 @@ pysslvision = "^2.0.0"
 pyvsssreferee = "^2.0.0"
 pyqt5-qt5 = "5.15.2"
 pyqt5 = "^5.15.10"
+rc-robosim = "1.2"
 
 
 [build-system]
